@@ -1,0 +1,12 @@
+{
+  "name": "khulla-digital-library",
+  "version": "0.0.1",
+  "description": "An open-source digital library management system",
+  "private": true,
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
