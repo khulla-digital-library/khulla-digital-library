@@ -1,9 +1,7 @@
 # Khulla Digital Library — Documentation
 
-This directory contains project documentation.
-
 ## Structure
 
-- `architecture/` — System design and architecture decisions
-- `api/` — API reference and usage guides
-- `contributing/` — Contribution guidelines and development setup
+- `architecture/` — design decisions and ADRs. The living architecture guide is [CLAUDE.md](../CLAUDE.md) at the repository root; this folder records *why* decisions were made, not *what* the current shape is.
+- `contributing/` — setup, conventions, and the pull-request flow.
+- `api/` — reserved. Khulla has no server API today; if one is ever added, its reference belongs here.

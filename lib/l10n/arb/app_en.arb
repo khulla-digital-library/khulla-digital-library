@@ -1,0 +1,65 @@
+{
+    "@@locale": "en",
+
+    "appName": "Khulla",
+    "@appName": {
+        "description": "Core — application display name"
+    },
+    "appTagline": "Open digital library",
+    "@appTagline": {
+        "description": "Core — one-line product description shown under the app name"
+    },
+
+    "navCatalog": "Catalog",
+    "navCirculation": "Circulation",
+    "navMembers": "Members",
+    "navSettings": "Settings",
+    "@navSettings": {
+        "description": "Navigation — shell destination labels"
+    },
+
+    "commonRetry": "Try again",
+    "commonCancel": "Cancel",
+    "commonSave": "Save",
+    "commonDelete": "Delete",
+    "commonClose": "Close",
+    "commonSearch": "Search",
+    "@commonSearch": {
+        "description": "Common — action labels reused across every screen"
+    },
+
+    "themeToggleTooltip": "Change theme",
+    "themeModeSystem": "Match system",
+    "themeModeLight": "Light",
+    "themeModeDark": "Dark",
+    "@themeModeDark": {
+        "description": "Settings — appearance options"
+    },
+
+    "sectionComingSoonTitle": "{section} is not built yet",
+    "@sectionComingSoonTitle": {
+        "description": "Placeholder — heading for a shell destination with no feature behind it",
+        "placeholders": {
+            "section": {
+                "type": "String",
+                "example": "Catalog"
+            }
+        }
+    },
+    "sectionComingSoonBody": "This is a scaffold. Add the feature under lib/features/ and point its route here.",
+    "@sectionComingSoonBody": {
+        "description": "Placeholder — body copy for an unbuilt shell destination"
+    },
+
+    "errorUnknown": "Something went wrong. Please try again.",
+    "errorNotFound": "We could not find that record.",
+    "errorDuplicateRecord": "A record with those details already exists.",
+    "errorInvalidInput": "Some of those details are not valid.",
+    "errorConflict": "That action conflicts with the current record.",
+    "errorDatabaseUnavailable": "The library database could not be opened.",
+    "errorDatabaseFailure": "The database rejected that change.",
+    "errorStorage": "A file could not be read or written.",
+    "@errorStorage": {
+        "description": "Errors — user-facing copy for every AppException case"
+    }
+}
