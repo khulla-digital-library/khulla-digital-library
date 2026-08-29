@@ -1,0 +1,21 @@
+{
+  "editor.formatOnSave": true,
+  "editor.rulers": [80],
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.codeActionsOnSave": { "source.fixAll": "explicit" }
+  },
+  "dart.lineLength": 80,
+  "files.exclude": {
+    "**/.dart_tool": true,
+    "**/build": true
+  },
+  "search.exclude": {
+    "sizzbe-app/**": true,
+    "**/build/**": true,
+    "**/*.g.dart": true,
+    "**/*.freezed.dart": true,
+    "**/*.config.dart": true,
+    "lib/l10n/gen/**": true
+  }
+}
