@@ -1,4 +1,4 @@
-package com.khulla.khulla
+package com.khulladigitallibrary.app
 
 import io.flutter.embedding.android.FlutterActivity
 

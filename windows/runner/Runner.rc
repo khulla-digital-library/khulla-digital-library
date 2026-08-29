@@ -89,11 +89,11 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.khulla" "\0"
+            VALUE "CompanyName", "com.khulladigitallibrary.app" "\0"
             VALUE "FileDescription", "khulla" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "khulla" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.khulla. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.khulladigitallibrary.app. All rights reserved." "\0"
             VALUE "OriginalFilename", "khulla.exe" "\0"
             VALUE "ProductName", "khulla" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
