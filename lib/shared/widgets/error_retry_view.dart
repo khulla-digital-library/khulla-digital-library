@@ -3,55 +3,44 @@ import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Centered failure copy with an optional retry action.
+/// Failure copy with an optional retry action.
 ///
-/// Renders [AppException] through [AppExceptionL10n] so error strings stay in
-/// the ARB files rather than coming from the data layer.
+/// The app-side half of [AppErrorView]: it resolves an [AppException] through
+/// [AppExceptionL10n] and the retry label through the ARB files, then hands
+/// ready-made strings to the design system. Error strings stay in `l10n`
+/// rather than coming from the data layer, and the layout stays in
+/// `khulla_ui` rather than being re-implemented per screen.
 class ErrorRetryView extends StatelessWidget {
-  const ErrorRetryView({super.key, this.error, this.onRetry});
+  const ErrorRetryView({
+    super.key,
+    this.error,
+    this.onRetry,
+    this.variant = AppFeedbackVariant.centered,
+    this.padding,
+  });
 
+  /// The failure to describe. Falls back to the generic message when null.
   final AppException? error;
+
+  /// Called when the retry button is tapped. No button without it.
   final VoidCallback? onRetry;
+
+  /// Layout: centered for a whole screen or section, inline inside a card.
+  final AppFeedbackVariant variant;
+
+  /// Overrides the variant's default padding.
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
-    final retry = onRetry;
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: spacing.page,
-        vertical: spacing.xlg,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.error_outline_rounded,
-            size: spacing.xlg,
-            color: scheme.onSurfaceVariant,
-          ),
-          SizedBox(height: spacing.md),
-          Text(
-            error?.localizedMessage(l10n) ?? l10n.errorUnknown,
-            textAlign: TextAlign.center,
-            style: context.textTheme.bodySmall?.copyWith(
-              color: scheme.onSurfaceVariant,
-              height: 1.4,
-            ),
-          ),
-          if (retry != null) ...[
-            SizedBox(height: spacing.md),
-            AppButton(
-              variant: AppButtonVariant.outline,
-              onPressed: retry,
-              child: Text(l10n.commonRetry),
-            ),
-          ],
-        ],
-      ),
+    return AppErrorView(
+      message: error?.localizedMessage(l10n) ?? l10n.errorUnknown,
+      retryLabel: l10n.commonRetry,
+      onRetry: onRetry,
+      variant: variant,
+      padding: padding,
     );
   }
 }

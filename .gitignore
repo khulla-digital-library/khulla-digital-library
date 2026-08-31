@@ -117,3 +117,5 @@ Thumbs.db
 # ── IDE Configuration ─────────────────────────────────────────────────────────
 .cursor/
 .claude/
+CLAUDE.md
+DESIGN.md
