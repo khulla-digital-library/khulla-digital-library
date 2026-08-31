@@ -1,12 +1,10 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Format and auto-fix across every workspace package.
-#
-# melos exec runs these per package rather than from the repo root, which
-# keeps them out of any reference or vendored folder sitting alongside.
-dart run melos run format
-dart run melos run fix
+# Format and auto-fix implementation in /lib
+dart format .
+dart fix --apply
+
 
 git add -u
 
