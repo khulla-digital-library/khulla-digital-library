@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/app/shell/app_shell.dart';
-import 'package:khulla/app/shell/widgets/animated_branch_container.dart';
 import 'package:khulla/core/config/app_config.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/l10n/l10n.dart';
@@ -11,7 +10,10 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// Owns the single [GoRouter] instance.
 ///
 /// One [StatefulShellRoute] with one branch per shell destination, in the
-/// order `shellDestinations` declares them.
+/// order `shellDestinations` declares them. The indexed-stack form keeps
+/// every branch alive — a section holds its scroll position and navigation
+/// stack while the user is away in another — and swaps between them with no
+/// transition, which is what a desk tool wants.
 ///
 /// Every branch renders [FeaturePlaceholderView] today. Building a section
 /// means adding `features/<name>/` and swapping its placeholder for that
@@ -32,14 +34,9 @@ class AppRouter {
           path: Routes.root,
           redirect: (_, _) => Routes.catalog,
         ),
-        StatefulShellRoute(
+        StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) =>
               AppShell(navigationShell: navigationShell),
-          navigatorContainerBuilder: (context, navigationShell, children) =>
-              AnimatedBranchContainer(
-                currentIndex: navigationShell.currentIndex,
-                children: children,
-              ),
           branches: [
             StatefulShellBranch(
               routes: [

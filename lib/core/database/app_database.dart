@@ -97,8 +97,24 @@ class AppDatabase {
     // failing, and the constraint would exist only as documentation.
     await db.execute('PRAGMA foreign_keys = ON');
 
-    if (supportsWriteAheadLog) {
-      await db.execute('PRAGMA journal_mode = WAL');
+    if (!supportsWriteAheadLog) return;
+
+    // `journal_mode` reports the mode it ended up in, so this is a query, not
+    // a statement. Android routes execute() to SQLiteDatabase.execSQL(), which
+    // rejects anything that returns rows — rawQuery is the portable call.
+    //
+    // WAL is a throughput optimisation, not a correctness requirement: a
+    // backend that refuses it still reads and writes correctly under the
+    // rollback journal. Never let it stop the catalogue from opening.
+    try {
+      await db.rawQuery('PRAGMA journal_mode = WAL');
+    } on Object catch (error) {
+      AppLogger.warn(
+        'Could not enable write-ahead logging; continuing on the default '
+        'journal mode.',
+        source: _source,
+        error: error,
+      );
     }
   }
 
