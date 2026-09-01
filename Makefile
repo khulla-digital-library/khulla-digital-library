@@ -34,6 +34,10 @@ migrate:
 localize:
 	flutter gen-l10n
 
+## Regenerate launcher icons across all platforms (Android, iOS, Web, macOS, Windows, Linux).
+icons:
+	dart run icons_launcher:create
+
 ## Wipe the build_runner cache. Use when codegen fails after a dependency bump.
 clean:
 	rm -rf .dart_tool/build
