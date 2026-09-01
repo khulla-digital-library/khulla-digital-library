@@ -34,6 +34,31 @@ enum FormFactor {
 
   /// Whether a navigation rail has room to show destination labels inline.
   bool get usesExtendedRail => this == FormFactor.large;
+
+  /// Whether this class is [other] or wider.
+  ///
+  /// The enum is declared narrowest-first, so comparing ordinals is the same
+  /// question as comparing widths. Use it to gate anything that needs room —
+  /// a table column, a second pane — without naming a pixel value:
+  /// `context.formFactor.isAtLeast(FormFactor.expanded)`.
+  bool isAtLeast(FormFactor other) => index >= other.index;
+
+  /// How many equal columns a grid of cards should use at this width.
+  ///
+  /// The default ladder for dashboard tiles and card grids: one on a phone,
+  /// four on a maximised desktop window. Pass overrides where a particular
+  /// grid wants a different ladder.
+  int columns({
+    int compact = 1,
+    int medium = 2,
+    int expanded = 3,
+    int large = 4,
+  }) => switch (this) {
+    FormFactor.compact => compact,
+    FormFactor.medium => medium,
+    FormFactor.expanded => expanded,
+    FormFactor.large => large,
+  };
 }
 
 /// {@template app_breakpoints}

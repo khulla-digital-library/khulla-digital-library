@@ -10,6 +10,7 @@
         "description": "Core — one-line product description shown under the app name"
     },
 
+    "navDashboard": "Dashboard",
     "navCatalog": "Catalog",
     "navCirculation": "Circulation",
     "navMembers": "Members",
@@ -24,7 +25,11 @@
     "commonDelete": "Delete",
     "commonClose": "Close",
     "commonSearch": "Search",
-    "@commonSearch": {
+    "commonClearSearch": "Clear search",
+    "commonMoreActions": "More actions",
+    "commonPreviousPage": "Previous page",
+    "commonNextPage": "Next page",
+    "@commonNextPage": {
         "description": "Common — action labels reused across every screen"
     },
 
@@ -49,6 +54,58 @@
     "sectionComingSoonBody": "This is a scaffold. Add the feature under lib/features/ and point its route here.",
     "@sectionComingSoonBody": {
         "description": "Placeholder — body copy for an unbuilt shell destination"
+    },
+
+    "dashboardTitle": "Today at a glance",
+    "@dashboardTitle": {
+        "description": "Dashboard — page heading"
+    },
+    "dashboardSubtitle": "A snapshot of the library: what is out, what is due back, and what needs a librarian.",
+    "@dashboardSubtitle": {
+        "description": "Dashboard — supporting line under the page heading"
+    },
+    "dashboardCheckOut": "Check out a copy",
+    "dashboardReturnCopy": "Return a copy",
+    "dashboardAddTitle": "Add a title",
+    "dashboardAddMember": "Add a member",
+    "@dashboardAddMember": {
+        "description": "Dashboard — quick action labels, also used as the page's primary action"
+    },
+
+    "dashboardStatTitles": "Titles catalogued",
+    "dashboardStatOnLoan": "Copies on loan",
+    "dashboardStatDueToday": "Due back today",
+    "dashboardStatOverdue": "Overdue",
+    "dashboardStatMembers": "Active members",
+    "dashboardStatFines": "Fines outstanding",
+    "@dashboardStatFines": {
+        "description": "Dashboard — stat tile labels"
+    },
+    "dashboardStatPlaceholder": "Placeholder until the catalogue exists",
+    "@dashboardStatPlaceholder": {
+        "description": "Dashboard — caption marking a stat tile as mock data"
+    },
+
+    "dashboardActivityTitle": "Recent activity",
+    "dashboardActivitySubtitle": "Checkouts and returns from the last seven days",
+    "dashboardActivityEmptyTitle": "Nothing has moved yet",
+    "dashboardActivityEmptyBody": "Checkouts and returns appear here as staff record them at the desk.",
+    "@dashboardActivityEmptyBody": {
+        "description": "Dashboard — empty state for the activity section"
+    },
+
+    "dashboardAttentionTitle": "Needs attention",
+    "dashboardAttentionSubtitle": "Overdue loans, holds waiting to be filled, copies reported lost",
+    "dashboardAttentionEmptyTitle": "Nothing needs attention",
+    "dashboardAttentionEmptyBody": "Overdue loans and unfilled holds are listed here so the desk can work through them.",
+    "@dashboardAttentionEmptyBody": {
+        "description": "Dashboard — empty state for the attention section"
+    },
+
+    "dashboardQuickActionsTitle": "Quick actions",
+    "dashboardQuickActionsSubtitle": "The four things a desk shift starts with",
+    "@dashboardQuickActionsSubtitle": {
+        "description": "Dashboard — quick actions section heading"
     },
 
     "errorUnknown": "Something went wrong. Please try again.",

@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:khulla/app/shell/app_shell.dart';
 import 'package:khulla/core/config/app_config.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/dashboard/presentation/dashboard_page.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/widgets/feature_placeholder_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -15,7 +16,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// stack while the user is away in another — and swaps between them with no
 /// transition, which is what a desk tool wants.
 ///
-/// Every branch renders [FeaturePlaceholderView] today. Building a section
+/// The dashboard is the app's landing branch; every other branch renders
+/// [FeaturePlaceholderView] today. Building a section
 /// means adding `features/<name>/` and swapping its placeholder for that
 /// feature's page here — nothing else in the shell changes.
 ///
@@ -27,17 +29,25 @@ class AppRouter {
   AppRouter(this._config) {
     router = GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: Routes.catalog,
+      initialLocation: Routes.dashboard,
       debugLogDiagnostics: !_config.isProduction,
       routes: [
         GoRoute(
           path: Routes.root,
-          redirect: (_, _) => Routes.catalog,
+          redirect: (_, _) => Routes.dashboard,
         ),
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) =>
               AppShell(navigationShell: navigationShell),
           branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.dashboard,
+                  builder: (context, _) => const DashboardPage(),
+                ),
+              ],
+            ),
             StatefulShellBranch(
               routes: [
                 GoRoute(

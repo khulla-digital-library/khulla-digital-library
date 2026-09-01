@@ -5,6 +5,9 @@
 abstract final class Routes {
   static const String root = '/';
 
+  /// Dashboard: the shift's starting point — counts, activity, quick actions.
+  static const String dashboard = '/dashboard';
+
   /// Catalogue: titles, copies, authors, subjects.
   static const String catalog = '/catalog';
 

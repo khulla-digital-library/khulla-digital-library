@@ -9,6 +9,11 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// section means adding an entry here and a branch there, in the same place.
 List<AppNavDestination> shellDestinations(AppLocalizations l10n) => [
   AppNavDestination(
+    icon: const Icon(Icons.space_dashboard_outlined),
+    selectedIcon: const Icon(Icons.space_dashboard_rounded),
+    label: l10n.navDashboard,
+  ),
+  AppNavDestination(
     icon: const Icon(Icons.menu_book_outlined),
     selectedIcon: const Icon(Icons.menu_book_rounded),
     label: l10n.navCatalog,
