@@ -1,18 +1,20 @@
-/// Platform-specific SQLite wiring.
+/// The one place a platform difference is allowed in the data layer.
 ///
-/// One SQLite API — `package:sqflite_common` — over three backends:
+/// `drift_flutter` already reconciles the three SQLite backends — a background
+/// isolate over `dart:ffi` on desktop and mobile, sqlite3 compiled to
+/// WebAssembly in a worker on web — so this pair only carries what drift
+/// cannot decide for us:
 ///
-/// | Platform | Backend | Package |
-/// | --- | --- | --- |
-/// | Android, iOS | system SQLite via the platform channel | `sqflite` |
-/// | Windows, Linux, macOS | SQLite over `dart:ffi` | `sqflite_common_ffi` |
-/// | Web | SQLite compiled to WebAssembly, stored in IndexedDB | `sqflite_common_ffi_web` |
+/// - **where the file lives.** Native needs a path; the web build has no file
+///   system, only an OPFS or IndexedDB store keyed by name.
+/// - **write-ahead logging.** Native only. WAL keeps a long read (a catalogue
+///   export) from blocking a concurrent write (a checkout); the WebAssembly
+///   virtual file system does not support it.
 ///
-/// The web implementation is the fallback branch so that any target without
+/// The web implementation is the fallback branch so any target without
 /// `dart:io` still resolves, and `dart.library.io` selects the native one.
-///
-/// The web backend needs `sqlite3.wasm` and `sqflite_sw.js` present in `web/`.
-/// They are checked in, and `make db-web` refreshes them after an upgrade.
+/// Nothing else in the app may branch on the platform — no `if (kIsWeb)` in a
+/// data source.
 library;
 
 export 'database_platform_web.dart'

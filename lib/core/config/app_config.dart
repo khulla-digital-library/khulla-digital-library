@@ -11,28 +11,32 @@ import 'package:khulla/core/config/flavor.dart';
 class AppConfig {
   const AppConfig({
     required this.flavor,
-    required this.databaseFileName,
+    required this.databaseName,
     required this.windowTitle,
   });
 
   factory AppConfig.dev() => const AppConfig(
     flavor: Flavor.dev,
-    databaseFileName: 'khulla_dev.db',
+    databaseName: 'khulla_dev',
     windowTitle: 'Khulla (dev)',
   );
 
   factory AppConfig.prod() => const AppConfig(
     flavor: Flavor.prod,
-    databaseFileName: 'khulla.db',
+    databaseName: 'khulla',
     windowTitle: 'Khulla',
   );
 
   /// Which build this is.
   final Flavor flavor;
 
-  /// SQLite file name, resolved against the platform's application support
-  /// directory on native and used as the IndexedDB store name on web.
-  final String databaseFileName;
+  /// Name of this flavor's catalogue, without an extension.
+  ///
+  /// On native it becomes `<name>.sqlite` in the application support
+  /// directory; on web it is the key of the browser storage drift opens.
+  /// Running the dev build must never touch a real library's catalogue, so
+  /// this is the one field that keeps the flavors apart on every platform.
+  final String databaseName;
 
   /// Native window title on desktop. Ignored on mobile and web.
   final String windowTitle;

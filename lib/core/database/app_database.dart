@@ -1,162 +1,108 @@
+import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/config/app_config.dart';
-import 'package:khulla/core/database/database_platform.dart';
-import 'package:khulla/core/database/migrations/migrations.dart';
+import 'package:khulla/core/database/connection.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/logging/app_logger.dart';
-import 'package:sqflite_common/sqlite_api.dart';
+
+part 'app_database.g.dart';
 
 /// Owns the single SQLite connection for the app's lifetime.
 ///
 /// Khulla keeps the whole catalogue on the device, so this is the equivalent
-/// of the network client in a server-backed app: opened once during
+/// of the network client in a server-backed app: constructed once during
 /// `bootstrap`, injected into data sources, and never reached for from a
 /// widget.
 ///
-/// Data sources take this class, not a raw [Database], so the connection can
-/// be reopened (after a restore, or an import that swaps the file) without
-/// every collaborator holding a stale handle.
+/// Data sources take this class rather than a raw executor, so the connection
+/// can be swapped (after a restore, or an import that replaces the file)
+/// without every collaborator holding a stale handle.
 @lazySingleton
-class AppDatabase {
-  AppDatabase(this._config);
+// Tables are added here as each catalog sub-feature lands; `make migrate`
+// records the resulting schema.
+@DriftDatabase()
+class AppDatabase extends _$AppDatabase {
+  AppDatabase(AppConfig config) : super(openDatabaseConnection(config));
+
+  /// Opens an arbitrary executor — an in-memory database in tests, a second
+  /// file during an import.
+  @visibleForTesting
+  AppDatabase.connect(super.e);
 
   static const String _source = 'AppDatabase';
 
-  final AppConfig _config;
+  /// Bumped by exactly one per shipped schema change, alongside a step in
+  /// `app_database.steps.dart` recorded by `make migrate`.
+  @override
+  int get schemaVersion => 1;
 
-  Database? _connection;
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: _createSchema,
+    onUpgrade: _upgradeSchema,
+    beforeOpen: (_) async {
+      // SQLite defaults foreign keys to OFF, per connection. Without this a
+      // delete would orphan every loan pointing at the record instead of
+      // failing, and the constraint would exist only as documentation.
+      //
+      // It cannot be set inside a transaction, which is why it lives here
+      // rather than in a migration.
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
 
-  /// The open connection.
+  /// Forces the connection open and runs migrations now, rather than on the
+  /// first query.
   ///
-  /// Throws [DatabaseUnavailableException] when called before [open]
-  /// completes, which is a wiring bug rather than a runtime condition —
-  /// `bootstrap` opens the database before the first frame.
-  Database get database {
-    final connection = _connection;
-    if (connection == null || !connection.isOpen) {
-      throw const DatabaseUnavailableException(
-        'The database was used before it was opened.',
-      );
-    }
-    return connection;
-  }
+  /// Drift connects lazily. `bootstrap` needs any failure — a locked file, a
+  /// full disk, a schema from a newer build — *before* the first frame, so it
+  /// can show `StartupFailureApp` instead of a screen that throws once the
+  /// operator taps something.
+  Future<void> warmUp() => customSelect('SELECT 1').get();
 
-  /// Whether a usable connection is currently held.
-  bool get isOpen => _connection?.isOpen ?? false;
-
-  /// Opens the database, creating or migrating the schema as needed.
-  ///
-  /// Idempotent: calling it on an already-open connection returns the same
-  /// handle rather than opening a second one.
-  Future<Database> open() async {
-    final existing = _connection;
-    if (existing != null && existing.isOpen) return existing;
-
-    assert(
-      debugMigrationsAreWellOrdered(),
-      'appMigrations must be a gapless ascending run starting at version 1. '
-      'Two branches that each appended "the next" migration will collide here.',
-    );
-
-    final factory = await resolveDatabaseFactory();
-    final path = await resolveDatabasePath(_config.databaseFileName);
-
-    AppLogger.info(
-      'Opening database at $path (schema v$appSchemaVersion)',
-      source: _source,
-    );
-
-    final connection = await factory.openDatabase(
-      path,
-      options: OpenDatabaseOptions(
-        version: appSchemaVersion,
-        onConfigure: _onConfigure,
-        onCreate: _onCreate,
-        onUpgrade: _onUpgrade,
-        onDowngrade: _onDowngrade,
-      ),
-    );
-
-    _connection = connection;
-    return connection;
-  }
-
-  /// Closes the connection. Safe to call when already closed.
   @disposeMethod
-  Future<void> close() async {
-    final connection = _connection;
-    _connection = null;
-    if (connection == null || !connection.isOpen) return;
-    await connection.close();
-  }
+  Future<void> dispose() => close();
 
-  /// Runs before any create/upgrade callback, on every open.
-  Future<void> _onConfigure(Database db) async {
-    // SQLite defaults foreign keys to OFF, per connection. Without this a
-    // delete would orphan every loan pointing at the record instead of
-    // failing, and the constraint would exist only as documentation.
-    await db.execute('PRAGMA foreign_keys = ON');
-
-    if (!supportsWriteAheadLog) return;
-
-    // `journal_mode` reports the mode it ended up in, so this is a query, not
-    // a statement. Android routes execute() to SQLiteDatabase.execSQL(), which
-    // rejects anything that returns rows — rawQuery is the portable call.
-    //
-    // WAL is a throughput optimisation, not a correctness requirement: a
-    // backend that refuses it still reads and writes correctly under the
-    // rollback journal. Never let it stop the catalogue from opening.
-    try {
-      await db.rawQuery('PRAGMA journal_mode = WAL');
-    } on Object catch (error) {
-      AppLogger.warn(
-        'Could not enable write-ahead logging; continuing on the default '
-        'journal mode.',
-        source: _source,
-        error: error,
-      );
-    }
-  }
-
-  /// Fresh install: run every migration from the beginning.
-  Future<void> _onCreate(Database db, int version) =>
-      _apply(db, from: 0, to: version);
-
-  /// Existing install on an older schema: run only what it has not seen.
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) =>
-      _apply(db, from: oldVersion, to: newVersion);
-
-  /// An older build opened a newer database.
-  ///
-  /// sqflite's stock handler for this is `onDatabaseDowngradeDelete`, which
-  /// deletes the file. For a library's only copy of its catalogue that is
-  /// unacceptable — refuse to open instead, and let the operator reinstall
-  /// the newer build or restore a backup.
-  Future<void> _onDowngrade(Database db, int oldVersion, int newVersion) {
-    AppLogger.error(
-      'Database schema v$oldVersion is newer than this build expects '
-      '(v$newVersion). Refusing to open so no data is lost.',
+  Future<void> _createSchema(Migrator m) async {
+    AppLogger.info(
+      'Creating catalogue schema v$schemaVersion',
       source: _source,
-      fatal: true,
     );
-    throw const DatabaseUnavailableException(
-      'This library file was created by a newer version of Khulla.',
-    );
+    await m.createAll();
   }
 
-  /// Applies every migration whose version falls in `(from, to]`.
-  Future<void> _apply(
-    DatabaseExecutor db, {
-    required int from,
-    required int to,
-  }) async {
-    for (final migration in appMigrations) {
-      if (migration.version <= from || migration.version > to) continue;
-      AppLogger.info(
-        'Migrating to v${migration.version}: ${migration.description}',
+  Future<void> _upgradeSchema(Migrator m, int from, int to) async {
+    // Drift routes downgrades through onUpgrade with `from > to`; unlike
+    // sqflite there is no separate hook, so the refusal is ours to write.
+    // The stock behaviour elsewhere is to delete and recreate the file, which
+    // for a library's only copy of its catalogue is unacceptable — refuse to
+    // open, and let the operator reinstall the newer build or restore a
+    // backup.
+    if (from > to) {
+      AppLogger.error(
+        'Catalogue schema v$from is newer than this build expects (v$to). '
+        'Refusing to open so no data is lost.',
         source: _source,
+        fatal: true,
       );
-      await migration.up(db);
+      throw const DatabaseUnavailableException(
+        'This library file was created by a newer version of Khulla.',
+      );
     }
+
+    AppLogger.info('Migrating catalogue from v$from to v$to', source: _source);
+
+    // Once the first schema change ships, `make migrate` writes the steps and
+    // this becomes:
+    //
+    // ```dart
+    // await stepByStep(from1To2: (m, schema) async { ... })(m, from, to);
+    // ```
+    //
+    // Steps take their own schema snapshot as an argument and must never
+    // touch `this` — referring to the live database inside a step silently
+    // uses today's schema instead of that version's, which is how a migration
+    // passes in development and corrupts a real upgrade.
   }
 }

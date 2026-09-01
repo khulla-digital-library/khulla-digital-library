@@ -57,8 +57,11 @@ Future<void> bootstrap(AppConfig config) async {
 /// screen rather than a crash when the catalogue cannot be reached.
 Future<void> _runApp() async {
   try {
+    // Drift connects lazily, so this is what actually opens the file and
+    // runs migrations. Doing it here means a broken catalogue produces a
+    // readable failure screen instead of a crash mid-gesture.
     await guardDatabase(
-      getIt<AppDatabase>().open,
+      getIt<AppDatabase>().warmUp,
       source: 'bootstrap',
     );
   } on AppException catch (error, stackTrace) {

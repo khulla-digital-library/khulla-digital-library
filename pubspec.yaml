@@ -28,12 +28,12 @@ dependencies:
   get_it: ^9.2.1
   injectable: ^3.0.0
 
-  # Local database — one API (sqflite_common) over three platform backends:
-  # sqflite (mobile), sqflite_common_ffi (desktop), sqflite_common_ffi_web (web).
-  sqflite: ^2.4.3
-  sqflite_common: ^2.5.11
-  sqflite_common_ffi: ^2.4.2+1
-  sqflite_common_ffi_web: ^1.1.2
+  # Local database — drift over sqlite3. One typed API across every target:
+  # a background isolate on native, sqlite3-in-WebAssembly on web.
+  # See docs/architecture/0002-drift-for-persistence.md.
+  drift: ^2.34.3
+  drift_flutter: ^0.3.1
+  sqlite3: ^3.5.2
 
   # Paths & key-value storage
   path: ^1.9.1
@@ -61,6 +61,7 @@ dependencies:
 dev_dependencies:
   # Code generation
   build_runner: ^2.16.0
+  drift_dev: ^2.34.3
   flutter_gen_runner: ^5.15.0
   freezed: ^4.0.0
   injectable_generator: ^3.1.3

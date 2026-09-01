@@ -18,7 +18,7 @@ That plan carries costs a small library cannot absorb:
 Build a single **local-first Flutter application**. The catalogue lives in SQLite on the user's own machine. There is no backend.
 
 - **Windows and web are the primary targets**; Linux, macOS, Android and iOS build from the same source.
-- **Persistence is `sqflite`**, over three backends behind one API: the platform channel on mobile, `dart:ffi` on desktop, and SQLite compiled to WebAssembly on web.
+- **Persistence is `sqflite`**, over three backends behind one API: the platform channel on mobile, `dart:ffi` on desktop, and SQLite compiled to WebAssembly on web. *(Superseded by [ADR 0002](0002-drift-for-persistence.md): drift over sqlite3, same three targets, before any schema had shipped. Everything else in this ADR stands, including the promise that a downgrade refuses to open.)*
 - **The repository root is the app.** With one application and no server, nesting it under `apps/` buys nothing. The `apps/api`, `apps/web`, `docker-compose.yml` and Docker scripts from the previous plan were removed.
 
 ## Consequences

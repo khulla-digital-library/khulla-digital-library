@@ -1,32 +1,40 @@
-import 'dart:io';
-
+import 'package:khulla/core/logging/app_logger.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart' as sqflite;
-import 'package:sqflite_common/sqlite_api.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart'
-    show databaseFactoryFfi, sqfliteFfiInit;
+import 'package:sqlite3/common.dart';
 
-/// Native SQLite supports write-ahead logging, which keeps a long read (a
-/// catalogue export) from blocking a concurrent write (a checkout).
-const bool supportsWriteAheadLog = true;
+const String _source = 'DatabasePlatform';
 
-/// Desktop talks to SQLite over `dart:ffi`; mobile goes through the platform
-/// channel, which is the only backend with a system SQLite to talk to.
-Future<DatabaseFactory> resolveDatabaseFactory() async {
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    sqfliteFfiInit();
-    return databaseFactoryFfi;
-  }
-  return sqflite.databaseFactory;
-}
-
+/// Absolute path of the catalogue file for a database named [name].
+///
 /// Application support, not documents: the catalogue is app-managed state, so
 /// it should not sit in a folder the user is invited to reorganise or sync.
-Future<String> resolveDatabasePath(String fileName) async {
+/// `drift_flutter` defaults to the documents directory, which is why this
+/// override is load-bearing rather than decorative.
+Future<String> resolveDatabasePath(String name) async {
   final directory = await getApplicationSupportDirectory();
   if (!directory.existsSync()) {
     await directory.create(recursive: true);
   }
-  return p.join(directory.path, fileName);
+  return p.join(directory.path, '$name.sqlite');
+}
+
+/// Runs on every raw connection, inside the background isolate drift opens it
+/// on. Must stay a top-level function: it is sent across an isolate boundary,
+/// so it may not capture anything.
+void configureNativeConnection(CommonDatabase database) {
+  // `journal_mode` reports the mode it ended up in rather than failing, so a
+  // file system that refuses WAL — a network share, some sandboxes — quietly
+  // stays on the rollback journal. That is correct, just slower, and must
+  // never stop the catalogue from opening.
+  try {
+    database.execute('PRAGMA journal_mode = WAL');
+  } on SqliteException catch (error) {
+    AppLogger.warn(
+      'Could not enable write-ahead logging; continuing on the default '
+      'journal mode.',
+      source: _source,
+      error: error,
+    );
+  }
 }

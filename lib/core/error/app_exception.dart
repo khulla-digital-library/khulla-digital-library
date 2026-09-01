@@ -1,39 +1,69 @@
 import 'package:equatable/equatable.dart';
-import 'package:sqflite_common/sqlite_api.dart' as sqlite;
+import 'package:sqlite3/common.dart';
 
 /// Typed, user-presentable failures surfaced by the data layer.
 ///
 /// The data layer catches driver-level errors and converts them with
-/// [AppException.fromDatabaseException] so presentation code only ever deals
+/// [AppException.fromSqlite] so presentation code only ever deals
 /// with this small, exhaustive set of cases. The `message` carried here is a
 /// developer-facing fallback — presentation should render
 /// `AppExceptionL10n.localizedMessage` instead.
 sealed class AppException extends Equatable implements Exception {
   const AppException(this.message);
 
-  /// Maps a SQLite driver error onto the closest domain-level failure.
+  /// Maps a SQLite error onto the closest domain-level failure.
   ///
-  /// The driver reports constraint violations as ordinary errors, but they
-  /// mean different things to a librarian: a unique violation is "that
-  /// accession number already exists", a foreign-key violation is "that
-  /// record is still referenced". Classifying here keeps that judgement out
-  /// of every repository.
-  factory AppException.fromDatabaseException(sqlite.DatabaseException error) {
-    if (error.isUniqueConstraintError()) {
-      return DuplicateRecordException(error.toString());
+  /// SQLite reports everything as a numeric result code, but they mean very
+  /// different things to a librarian: a unique violation is "that accession
+  /// number already exists", a foreign-key violation is "that record is still
+  /// referenced", a busy database is "try again in a moment". Classifying
+  /// here keeps that judgement out of every repository.
+  ///
+  /// Constraint failures are read from the *extended* code, which is the only
+  /// place SQLite says which constraint broke. Everything else is read from
+  /// the primary code, because its extended variants (`SQLITE_BUSY_SNAPSHOT`,
+  /// `SQLITE_READONLY_ROLLBACK`, …) all mean the same thing to us.
+  factory AppException.fromSqlite(SqliteException error) {
+    final detail = error.toString();
+
+    if (error.resultCode == SqlError.SQLITE_CONSTRAINT) {
+      return switch (error.extendedResultCode) {
+        SqlExtendedError.SQLITE_CONSTRAINT_UNIQUE ||
+        SqlExtendedError.SQLITE_CONSTRAINT_PRIMARYKEY =>
+          DuplicateRecordException(detail),
+        SqlExtendedError.SQLITE_CONSTRAINT_FOREIGNKEY =>
+          const ConflictException(
+            'That record is still referenced by another.',
+          ),
+        SqlExtendedError.SQLITE_CONSTRAINT_NOTNULL ||
+        SqlExtendedError.SQLITE_CONSTRAINT_CHECK =>
+          const InvalidInputException(),
+        _ => DatabaseFailureException(detail),
+      };
     }
-    if (error.isNotNullConstraintError()) {
-      return const InvalidInputException();
-    }
-    if (error.isDatabaseClosedError()) {
-      return const DatabaseUnavailableException();
-    }
-    if (error.isReadOnlyError()) {
-      return const DatabaseUnavailableException(
+
+    return switch (error.resultCode) {
+      SqlError.SQLITE_BUSY ||
+      SqlError.SQLITE_LOCKED => const DatabaseUnavailableException(
+        'The library database is in use by another process.',
+      ),
+      SqlError.SQLITE_READONLY => const DatabaseUnavailableException(
         'The library database is read-only.',
-      );
-    }
-    return DatabaseFailureException(error.toString());
+      ),
+      SqlError.SQLITE_CANTOPEN => const DatabaseUnavailableException(
+        'The library database could not be opened.',
+      ),
+      SqlError.SQLITE_FULL => const DatabaseUnavailableException(
+        'There is no room left to write to the library database.',
+      ),
+      // Nothing will work until these are resolved, and neither is something
+      // a retry can fix — the operator needs a backup.
+      SqlError.SQLITE_CORRUPT ||
+      SqlError.SQLITE_NOTADB => const DatabaseUnavailableException(
+        'The library database file is damaged.',
+      ),
+      _ => DatabaseFailureException(detail),
+    };
   }
 
   /// Developer-facing fallback copy. Not for display.

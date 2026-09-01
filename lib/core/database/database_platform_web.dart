@@ -1,13 +1,14 @@
-import 'package:sqflite_common/sqlite_api.dart';
-import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:sqlite3/common.dart';
 
-/// The IndexedDB-backed virtual file system has no WAL mode — enabling it
-/// would fail the pragma rather than fall back.
-const bool supportsWriteAheadLog = false;
+/// Unreachable on web: the browser build has no file system to resolve a path
+/// against. `drift_flutter` keys its OPFS or IndexedDB store on the database
+/// name alone and never calls this.
+Future<String> resolveDatabasePath(String name) {
+  throw UnsupportedError(
+    'The web build stores the catalogue in the browser, not at a path.',
+  );
+}
 
-/// Runs SQLite in a web worker so a long query does not freeze the tab.
-Future<DatabaseFactory> resolveDatabaseFactory() async => databaseFactoryFfiWeb;
-
-/// On web there is no filesystem: the name is the IndexedDB store key, so the
-/// flavor's file name doubles as its isolation boundary.
-Future<String> resolveDatabasePath(String fileName) async => fileName;
+/// No-op on web. The WebAssembly virtual file system does not implement
+/// write-ahead logging, and drift never invokes this hook there.
+void configureNativeConnection(CommonDatabase database) {}

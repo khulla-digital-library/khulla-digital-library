@@ -18,20 +18,21 @@ const int kMinorUnitsPerMajor = 100;
 /// gets value equality and hashing from the underlying int for free — which is
 /// also why it stores and reads back from a SQLite `INTEGER` column directly.
 ///
-/// Money crosses the boundary in exactly two places:
+/// The database edge is declared once, not remembered per call: a column
+/// written `integer().map(const MoneyConverter())` hands back a [Money], and
+/// `MoneyConverter` is the only place `minorUnits` is unwrapped for storage.
 ///
-/// - **on read** — `row.value.toMoney()` lifts a column's `num` of minor units
-///   into [Money] (see [MoneyFromNum]);
-/// - **on write** — `money.minorUnits` hands the raw integer back to the row.
+/// The two edges left are:
 ///
-/// User-typed text is a third edge, and goes through [MoneyFromText.toMoney] /
-/// [Money.parse], which multiply by [kMinorUnitsPerMajor].
+/// - **user-typed text** — [MoneyFromText.toMoney] / [Money.parse], which
+///   multiply by [kMinorUnitsPerMajor], and [editable] on the way back;
+/// - **a raw row** — `row.read<int>('amount').toMoney()` for the rare
+///   `customSelect` that bypasses the generated classes (see [MoneyFromNum]).
 ///
 /// ```dart
-/// final rate  = row[FineTable.perDay].toMoney();   // read
+/// final rate  = fine.perDay;                       // Money, via the converter
 /// final owed  = rate * loan.daysOverdue;           // exact, still minor units
 /// Text(owed.display());                            // 'Rs 45'
-/// db.insert(FineTable.name, {'amount': owed.minorUnits}); // write
 /// ```
 ///
 /// **Never interpolate a [Money] directly.** `'$owed'` prints the raw minor
