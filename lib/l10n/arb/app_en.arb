@@ -1,7 +1,7 @@
 {
     "@@locale": "en",
 
-    "appName": "Khulla",
+    "appName": "Khulla Digital Library",
     "@appName": {
         "description": "Core — application display name"
     },
@@ -593,7 +593,7 @@
     "settingsAppearanceBody": "Theme for this device. Nothing here leaves the machine.",
     "settingsBackupTitle": "Backup and data",
     "settingsBackupBody": "Export the catalogue, restore a backup, import records.",
-    "settingsAboutTitle": "About Khulla",
+    "settingsAboutTitle": "About Khulla Digital Library",
     "settingsAboutBody": "Version, licence and where the source lives.",
     "@settingsAboutBody": {
         "description": "Settings — the index of setting groups"

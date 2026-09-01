@@ -12,7 +12,7 @@ import 'package:flutter/foundation.dart';
 /// to a third party by default. If a deployment does want crash reporting,
 /// [error] is the single seam to forward from, and it should be opt-in.
 abstract final class AppLogger {
-  static const String _defaultSource = 'Khulla';
+  static const String _defaultSource = 'Khulla Digital Library';
 
   /// When true, [debug] and [info] write to the console. Set `false` in
   /// production.

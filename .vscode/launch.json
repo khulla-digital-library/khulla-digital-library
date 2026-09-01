@@ -2,13 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Khulla (dev)",
+      "name": "Khulla Digital Library (dev)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main_dev.dart"
     },
     {
-      "name": "Khulla (prod)",
+      "name": "Khulla Digital Library (prod)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main_prod.dart"

@@ -18,13 +18,13 @@ class AppConfig {
   factory AppConfig.dev() => const AppConfig(
     flavor: Flavor.dev,
     databaseName: 'khulla_dev',
-    windowTitle: 'Khulla (dev)',
+    windowTitle: 'Khulla Digital Library (dev)',
   );
 
   factory AppConfig.prod() => const AppConfig(
     flavor: Flavor.prod,
     databaseName: 'khulla',
-    windowTitle: 'Khulla',
+    windowTitle: 'Khulla Digital Library',
   );
 
   /// Which build this is.

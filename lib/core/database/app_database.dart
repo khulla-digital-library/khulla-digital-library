@@ -87,7 +87,7 @@ class AppDatabase extends _$AppDatabase {
         fatal: true,
       );
       throw const DatabaseUnavailableException(
-        'This library file was created by a newer version of Khulla.',
+        'This library file was created by a newer version of Khulla Digital Library.',
       );
     }
 
