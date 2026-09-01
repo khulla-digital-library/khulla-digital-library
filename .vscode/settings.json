@@ -11,7 +11,6 @@
     "**/build": true
   },
   "search.exclude": {
-    "sizzbe-app/**": true,
     "**/build/**": true,
     "**/*.g.dart": true,
     "**/*.freezed.dart": true,

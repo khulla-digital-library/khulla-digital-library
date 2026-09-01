@@ -5,9 +5,9 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// The four things a desk shift starts with, as pressable tiles.
 ///
-/// Each one routes to the section that owns the task rather than opening an
-/// editor: the editors do not exist yet, and a tile that lands somewhere real
-/// is more honest than one that opens an empty sheet.
+/// Each one lands on the screen that does the task — the checkout desk, the
+/// returns desk, an empty title editor, an empty member editor — rather than
+/// on the section that contains it.
 class DashboardQuickActions extends StatelessWidget {
   const DashboardQuickActions({super.key});
 
@@ -22,22 +22,22 @@ class DashboardQuickActions extends StatelessWidget {
         _QuickActionTile(
           label: l10n.dashboardCheckOut,
           icon: Icons.qr_code_scanner_rounded,
-          route: Routes.circulation,
+          route: Routes.circulationCheckOut,
         ),
         _QuickActionTile(
           label: l10n.dashboardReturnCopy,
           icon: Icons.assignment_return_outlined,
-          route: Routes.circulation,
+          route: Routes.circulationReturn,
         ),
         _QuickActionTile(
           label: l10n.dashboardAddTitle,
           icon: Icons.library_add_outlined,
-          route: Routes.catalog,
+          route: Routes.catalogTitleNew,
         ),
         _QuickActionTile(
           label: l10n.dashboardAddMember,
           icon: Icons.person_add_alt_1_outlined,
-          route: Routes.members,
+          route: Routes.memberNew,
         ),
       ],
     );

@@ -42,7 +42,7 @@ class DashboardHeader extends StatelessWidget {
 
     final action = AppButton(
       size: AppButtonSize.medium,
-      onPressed: () => context.go(Routes.circulation),
+      onPressed: () => context.go(Routes.circulationCheckOut),
       child: Text(l10n.dashboardCheckOut),
     );
 

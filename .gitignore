@@ -1,8 +1,3 @@
-# ── Reference material ──────────────────────────────────────────────────────
-# Read-only copy of another codebase this project's conventions came from.
-# It carries its own .git; delete the folder once nothing else is needed.
-sizzbe-app/
-
 # ── Dart & Flutter ──────────────────────────────────────────────────────────
 .dart_tool/
 .flutter-plugins

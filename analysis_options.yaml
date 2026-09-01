@@ -14,9 +14,6 @@ include:
 
 analyzer:
   exclude:
-    # Reference copy of another codebase, kept out of the tree's analysis.
-    # Delete the folder once its patterns have all been carried over.
-    - sizzbe-app/**
     - lib/l10n/gen/*
     - lib/gen/*
     - "**/*.g.dart"

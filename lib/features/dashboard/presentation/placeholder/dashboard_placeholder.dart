@@ -1,4 +1,5 @@
 import 'package:khulla/core/money/money.dart';
+import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_stat.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -18,12 +19,14 @@ List<DashboardStat> dashboardPlaceholderStats(AppLocalizations l10n) {
   return [
     DashboardStat(
       label: l10n.dashboardStatTitles,
+      route: Routes.catalogTitles,
       value: '1,204',
       icon: Icons.menu_book_rounded,
       caption: l10n.dashboardStatPlaceholder,
     ),
     DashboardStat(
       label: l10n.dashboardStatOnLoan,
+      route: Routes.circulation,
       value: '86',
       icon: Icons.swap_horiz_rounded,
       tone: AppStatusTone.brand,
@@ -31,6 +34,7 @@ List<DashboardStat> dashboardPlaceholderStats(AppLocalizations l10n) {
     ),
     DashboardStat(
       label: l10n.dashboardStatDueToday,
+      route: Routes.circulation,
       value: '12',
       icon: Icons.event_rounded,
       tone: AppStatusTone.warning,
@@ -38,6 +42,7 @@ List<DashboardStat> dashboardPlaceholderStats(AppLocalizations l10n) {
     ),
     DashboardStat(
       label: l10n.dashboardStatOverdue,
+      route: Routes.circulation,
       value: '5',
       icon: Icons.error_outline_rounded,
       tone: AppStatusTone.danger,
@@ -45,6 +50,7 @@ List<DashboardStat> dashboardPlaceholderStats(AppLocalizations l10n) {
     ),
     DashboardStat(
       label: l10n.dashboardStatMembers,
+      route: Routes.members,
       value: '312',
       icon: Icons.people_rounded,
       tone: AppStatusTone.success,
@@ -52,6 +58,7 @@ List<DashboardStat> dashboardPlaceholderStats(AppLocalizations l10n) {
     ),
     DashboardStat(
       label: l10n.dashboardStatFines,
+      route: Routes.circulationFines,
       value: finesOutstanding.display(),
       icon: Icons.account_balance_wallet_rounded,
       tone: AppStatusTone.info,
