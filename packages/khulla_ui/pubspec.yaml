@@ -1,0 +1,44 @@
+name: khulla_ui
+description: Khulla design system — tokens, theme, and primitives.
+publish_to: none
+
+version: 0.1.0
+
+environment:
+  sdk: ">=3.13.0 <4.0.0"
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  fonts:
+    # Lexend is designed to reduce visual stress and improve reading
+    # performance — the right default for a library that people read in.
+    - family: Lexend
+      fonts:
+        - asset: assets/fonts/lexend_thin.ttf
+          weight: 100
+        - asset: assets/fonts/lexend_extra_light.ttf
+          weight: 200
+        - asset: assets/fonts/lexend_light.ttf
+          weight: 300
+        - asset: assets/fonts/lexend_regular.ttf
+          weight: 400
+        - asset: assets/fonts/lexend_medium.ttf
+          weight: 500
+        - asset: assets/fonts/lexend_semi_bold.ttf
+          weight: 600
+        - asset: assets/fonts/lexend_bold.ttf
+          weight: 700
+        - asset: assets/fonts/lexend_extra_bold.ttf
+          weight: 800
+        - asset: assets/fonts/lexend_black.ttf
+          weight: 900

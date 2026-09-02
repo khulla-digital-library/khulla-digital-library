@@ -1,0 +1,14 @@
+/// Where one physical copy currently is.
+///
+/// This is the copy's own standing, not the title's: a title with four copies
+/// can be simultaneously available, on loan and lost, which is exactly why
+/// availability is counted from copies rather than stored on the title.
+enum CopyStatus {
+  available,
+  onLoan,
+  reserved,
+  overdue,
+  lost,
+  damaged,
+  withdrawn,
+}

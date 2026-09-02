@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Format and auto-fix implementation in /lib
+dart format .
+dart fix --apply
+
+
+git add -u
+
+if ! git diff-index --quiet HEAD --; then
+  git commit -m "chore(husky): run dart format and fix"
+fi
+
+exit 0

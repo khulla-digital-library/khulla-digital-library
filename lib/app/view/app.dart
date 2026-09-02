@@ -1,0 +1,42 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:khulla/app/app_bloc_providers.dart';
+import 'package:khulla/app/router/app_router.dart';
+import 'package:khulla/core/di/injection.dart';
+import 'package:khulla/core/feedback/app_toast_wrapper.dart';
+import 'package:khulla/core/theme/cubit/theme_cubit.dart';
+import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/widgets/dismiss_keyboard.dart';
+import 'package:khulla_ui/khulla_ui.dart';
+
+/// Root widget: providers, theming, localization, and the router.
+class App extends StatelessWidget {
+  const App({super.key});
+
+  @override
+  Widget build(BuildContext context) => AppBlocProviders(
+    child: AppToastWrapper(
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) => MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          onGenerateTitle: (context) => context.l10n.appName,
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          themeMode: themeMode,
+          // Lets a mouse drag a list, which Flutter disallows by default.
+          scrollBehavior: const AppScrollBehavior(),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: getIt<AppRouter>().router,
+          // AppResponsiveTheme re-resolves the theme for the window's size
+          // class, so a resized desktop window switches type ramp and density
+          // without a restart.
+          builder: (context, child) => DismissKeyboard(
+            child: AppResponsiveTheme(
+              child: child ?? const SizedBox.shrink(),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}

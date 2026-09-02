@@ -1,0 +1,13 @@
+# Inherits the workspace lint baseline so the design system is held to the
+# same standard as the app, minus the bloc rules it has no use for.
+include: ../../analysis_options_base.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
