@@ -12,12 +12,12 @@ import 'package:khulla_ui/khulla_ui.dart';
 class AppRadius extends ThemeExtension<AppRadius> {
   /// {@macro app_radius}
   const AppRadius({
-    this.badge = 4,
+    this.badge = 6,
     this.field = 10,
-    this.control = 10,
+    this.control = 6,
     this.tile = 12,
-    this.card = 12,
-    this.banner = 20,
+    this.card = 14,
+    this.banner = 18,
     this.bar = 28,
     this.pill = 999,
   });
@@ -28,7 +28,9 @@ class AppRadius extends ThemeExtension<AppRadius> {
   /// Text fields, search fields, small pickers.
   final double field;
 
-  /// Circular icon buttons / small control chips.
+  /// Buttons, circular icon buttons / small control chips. Deliberately
+  /// sharper than [field] and [card] — a button reads as a control, not a
+  /// surface, and a professional/dense UI keeps its actions squared-off.
   final double control;
 
   /// Small tiles, tags, icon containers, secondary surfaces.

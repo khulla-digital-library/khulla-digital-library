@@ -16,6 +16,8 @@ class AppIconButton extends StatelessWidget {
     this.tone,
     this.filled = false,
     this.selected = false,
+    this.badge = false,
+    this.badgeTone = AppStatusTone.danger,
     super.key,
   });
 
@@ -39,6 +41,13 @@ class AppIconButton extends StatelessWidget {
   /// Marks the control as the active choice — a toggled view switch.
   final bool selected;
 
+  /// Draws an unread dot over the glyph's trailing corner — notifications
+  /// waiting, a filter panel with something set.
+  final bool badge;
+
+  /// The dot's tone.
+  final AppStatusTone badgeTone;
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
@@ -48,39 +57,62 @@ class AppIconButton extends StatelessWidget {
         ? scheme.primary
         : resolvedTone?.foreground(context) ?? scheme.onSurfaceVariant;
 
-    return Tooltip(
-      message: tooltip,
-      child: IconButton(
-        onPressed: onPressed,
-        icon: Icon(icon, size: spacing.md + 4),
-        color: foreground,
-        visualDensity: VisualDensity.standard,
-        constraints: BoxConstraints.tightFor(
-          width: spacing.xlg + spacing.sm,
-          height: spacing.xlg + spacing.sm,
+    final button = IconButton(
+      onPressed: onPressed,
+      icon: Icon(icon, size: spacing.md + 4),
+      color: foreground,
+      visualDensity: VisualDensity.standard,
+      constraints: BoxConstraints.tightFor(
+        width: spacing.xlg + spacing.sm,
+        height: spacing.xlg + spacing.sm,
+      ),
+      style: ButtonStyle(
+        backgroundColor: WidgetStatePropertyAll(
+          filled || selected
+              ? (resolvedTone ?? AppStatusTone.brand).background(context)
+              : Colors.transparent,
         ),
-        style: ButtonStyle(
-          backgroundColor: WidgetStatePropertyAll(
-            filled || selected
-                ? (resolvedTone ?? AppStatusTone.brand).background(context)
-                : Colors.transparent,
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.appRadius.control),
           ),
-          shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(context.appRadius.control),
-            ),
-          ),
-          overlayColor: WidgetStatePropertyAll(
-            foreground.withValues(alpha: 0.08),
-          ),
-          mouseCursor: const WidgetStateProperty<MouseCursor?>.fromMap(
-            <WidgetStatesConstraint, MouseCursor?>{
-              WidgetState.disabled: SystemMouseCursors.basic,
-              WidgetState.any: SystemMouseCursors.click,
-            },
-          ),
+        ),
+        overlayColor: WidgetStatePropertyAll(
+          foreground.withValues(alpha: 0.08),
+        ),
+        mouseCursor: const WidgetStateProperty<MouseCursor?>.fromMap(
+          <WidgetStatesConstraint, MouseCursor?>{
+            WidgetState.disabled: SystemMouseCursors.basic,
+            WidgetState.any: SystemMouseCursors.click,
+          },
         ),
       ),
+    );
+
+    return Tooltip(
+      message: tooltip,
+      child: badge
+          ? Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                button,
+                Positioned(
+                  top: spacing.xs,
+                  right: spacing.xs,
+                  child: Container(
+                    width: spacing.xs,
+                    height: spacing.xs,
+                    decoration: BoxDecoration(
+                      color: badgeTone.foreground(context),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: scheme.surface, width: 1.5),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : button,
     );
   }
 }

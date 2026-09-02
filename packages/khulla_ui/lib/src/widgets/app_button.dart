@@ -37,6 +37,9 @@ class AppButton extends StatelessWidget {
     this.variant = AppButtonVariant.primary,
     this.size = AppButtonSize.large,
     this.isLoading = false,
+    this.icon,
+    this.trailingIcon,
+    this.expand = false,
     super.key,
   });
 
@@ -54,6 +57,17 @@ class AppButton extends StatelessWidget {
 
   /// When true, disables the button and shows a progress indicator.
   final bool isLoading;
+
+  /// Glyph before the label. A primary action that names a verb reads faster
+  /// with one — *Add title*, *Check out* — but never use it for decoration.
+  final IconData? icon;
+
+  /// Glyph after the label, for a button that opens something: a chevron on
+  /// a menu button, an arrow on "next".
+  final IconData? trailingIcon;
+
+  /// Stretches the button to its slot instead of hugging its label.
+  final bool expand;
 
   @override
   Widget build(BuildContext context) {
@@ -84,16 +98,18 @@ class AppButton extends StatelessWidget {
     final labelStyle = switch (size) {
       AppButtonSize.small => textTheme.labelMedium?.copyWith(
         fontSize: 12,
-        fontWeight: FontWeight.w500,
-        letterSpacing: 0.1,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0,
       ),
       AppButtonSize.medium ||
       AppButtonSize.large => textTheme.labelLarge?.copyWith(
-        fontSize: 13,
-        fontWeight: FontWeight.w500,
-        letterSpacing: 0.1,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0,
       ),
     };
+
+    final glyphSize = size == AppButtonSize.small ? spacing.md : spacing.md + 2;
 
     final colorScheme = context.colorScheme;
     final indicatorColor = switch (variant) {
@@ -108,12 +124,32 @@ class AppButton extends StatelessWidget {
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       textStyle: WidgetStatePropertyAll(labelStyle),
     );
+    final leading = icon;
+    final trailing = trailingIcon;
+    final label = leading == null && trailing == null
+        ? child
+        : Row(
+            mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (leading != null) ...[
+                Icon(leading, size: glyphSize),
+                SizedBox(width: spacing.xs),
+              ],
+              Flexible(child: child),
+              if (trailing != null) ...[
+                SizedBox(width: spacing.xs),
+                Icon(trailing, size: glyphSize),
+              ],
+            ],
+          );
+
     final content = isLoading
         ? AppLoadingIndicator(color: indicatorColor, size: spacing.md + 2)
-        : child;
+        : label;
     final onPressedOrNull = isLoading ? null : onPressed;
 
-    return switch (variant) {
+    final button = switch (variant) {
       AppButtonVariant.primary => AppFilledButton(
         onPressed: onPressedOrNull,
         style: AppButtonInteraction.filled(style),
@@ -133,5 +169,7 @@ class AppButton extends StatelessWidget {
         child: content,
       ),
     };
+
+    return expand ? SizedBox(width: double.infinity, child: button) : button;
   }
 }

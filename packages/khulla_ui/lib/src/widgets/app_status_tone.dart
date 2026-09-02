@@ -1,69 +1,78 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// {@template app_status_tone}
-/// The semantic colour families a badge, chip or stat tile can take.
+/// The standing of a record, as the six tones the product recognises.
 ///
-/// Named by meaning rather than by colour, so a status that changes hue in a
-/// future theme does not need every call site rewritten. Khulla's library
-/// vocabulary maps onto them like this:
-///
-/// | Tone | Reads as |
-/// | --- | --- |
-/// | [neutral] | Draft, archived, no standing |
-/// | [success] | Available, returned on time, active member |
-/// | [warning] | Due soon, last copy out, membership expiring |
-/// | [info] | Reserved, on hold, imported |
-/// | [danger] | Overdue, lost, suspended |
-/// | [brand] | On loan, in progress — the app's own accent |
-/// {@endtemplate}
+/// A tone is a *meaning*, not a color: `success` is "this is settled" whether
+/// it paints a returned loan, an available copy or an active member. Widgets
+/// take a tone and resolve the ink, the wash and the border from the theme, so
+/// a badge, a stat tile and a chart series with the same meaning match without
+/// anyone passing a color.
 enum AppStatusTone {
-  /// No standing of its own.
+  /// No standing of its own — a count, an inert tag, a disabled row.
   neutral,
 
-  /// Everything is as it should be.
+  /// Settled: returned on time, available, active.
   success,
 
-  /// Needs attention soon, but nothing has gone wrong yet.
+  /// Needs an eye soon: due today, last copy out, membership expiring.
   warning,
 
-  /// Informational: a state someone chose, not a problem.
+  /// In flight: reserved, on hold, queued, imported.
   info,
 
-  /// Something has gone wrong and is costing the library.
+  /// Wrong now: overdue, lost, suspended, destructive.
   danger,
 
-  /// The app's own accent, for an in-progress state.
+  /// The brand accent — the primary action, the selected thing.
   brand,
 }
 
-/// Resolves an [AppStatusTone] against the ambient theme.
+/// Resolves a tone into the three colors a component paints with.
 extension AppStatusToneColors on AppStatusTone {
-  /// The tone's foreground (text and glyph) colour.
+  /// The ink: label text, glyph, the chart series' fill.
   Color foreground(BuildContext context) {
-    final scheme = context.colorScheme;
     final colors = context.appColors;
     return switch (this) {
-      AppStatusTone.neutral => scheme.onSurfaceVariant,
+      AppStatusTone.neutral => colors.textMuted,
       AppStatusTone.success => colors.success,
       AppStatusTone.warning => colors.warning,
       AppStatusTone.info => colors.info,
-      AppStatusTone.danger => scheme.error,
-      AppStatusTone.brand => scheme.primary,
+      AppStatusTone.danger => colors.danger,
+      AppStatusTone.brand => context.colorScheme.primary,
     };
   }
 
-  /// The tone's fill, a low-alpha wash of [foreground] over the card surface.
+  /// The wash a badge, an avatar or an icon chip sits on.
   ///
-  /// Blended rather than translucent so a badge keeps its colour when it sits
-  /// on a tinted row or a selected card.
+  /// Hand-picked per brightness rather than blended from [foreground] — a
+  /// blend that reads as a soft tint on white turns muddy on a dark canvas.
   Color background(BuildContext context) {
-    final scheme = context.colorScheme;
-    if (this == AppStatusTone.neutral) {
-      return scheme.surfaceContainerHighest.withValues(alpha: 0.7);
-    }
-    return Color.alphaBlend(
-      foreground(context).withValues(alpha: 0.12),
-      scheme.surface,
-    );
+    final colors = context.appColors;
+    return switch (this) {
+      AppStatusTone.neutral => colors.neutralSoft,
+      AppStatusTone.success => colors.successSoft,
+      AppStatusTone.warning => colors.warningSoft,
+      AppStatusTone.info => colors.infoSoft,
+      AppStatusTone.danger => colors.dangerSoft,
+      AppStatusTone.brand => colors.brandSoft,
+    };
+  }
+
+  /// The hairline around a badge, at the strength that survives on both a
+  /// white card and a dark one.
+  Color border(BuildContext context) =>
+      foreground(context).withValues(alpha: 0.22);
+
+  /// Content that sits on a *solid* [foreground] fill.
+  Color onSolid(BuildContext context) {
+    final colors = context.appColors;
+    return switch (this) {
+      AppStatusTone.neutral => context.colorScheme.surface,
+      AppStatusTone.success => colors.onSuccess,
+      AppStatusTone.warning => colors.onWarning,
+      AppStatusTone.info => colors.onInfo,
+      AppStatusTone.danger => colors.onDanger,
+      AppStatusTone.brand => context.colorScheme.onPrimary,
+    };
   }
 }

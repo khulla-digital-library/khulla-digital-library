@@ -1,15 +1,13 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// {@template app_table_header}
-/// The heading row of an [AppTable] — column labels, and sort controls on the
-/// columns that have one.
+/// The header row of an [AppTable] or [AppSliverTable].
 ///
-/// It is a plain widget rather than part of the table so it can also be
-/// pinned inside a [CustomScrollView], which is how [AppSliverTable] keeps
-/// the headings on screen through a thousand rows.
-/// {@endtemplate}
+/// Every sortable column shows its arrows at rest, muted, and lights the
+/// active one: a header that only reveals sorting on hover is a control
+/// nobody finds, and one that reveals it on click is a control nobody trusts.
+///
+/// Sorting is *reported*, never performed — see [AppTableSort].
 class AppTableHeader<T> extends StatelessWidget {
-  /// {@macro app_table_header}
   const AppTableHeader({
     required this.columns,
     this.sort,
@@ -18,36 +16,31 @@ class AppTableHeader<T> extends StatelessWidget {
     super.key,
   });
 
-  /// The table's columns. Ones that do not fit the window are dropped here
-  /// and in every row, so the two stay aligned.
+  /// The full column set; the ones too wide for this window are dropped.
   final List<AppTableColumn<T>> columns;
 
-  /// The current ordering, or null while the table is unsorted.
+  /// Which column the rows are ordered by, if any.
   final AppTableSort? sort;
 
-  /// Called with the next sort when a sortable heading is clicked. Null makes
-  /// every heading inert, whatever the column says.
+  /// Called with the sort the user asked for. Null makes the header inert.
   final ValueChanged<AppTableSort>? onSort;
 
-  /// Row height. Match it across header and rows so the grid lines up.
+  /// The header's height.
   final double height;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
+    final colors = context.appColors;
     final visible = AppTableColumn.visible(columns, context.formFactor);
     final current = sort;
     final handler = onSort;
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        border: Border(
-          bottom: BorderSide(
-            color: scheme.outlineVariant.withValues(alpha: 0.6),
-          ),
-        ),
+        color: scheme.surfaceContainerLow,
+        border: Border(bottom: BorderSide(color: colors.hairline)),
       ),
       child: SizedBox(
         height: height,
@@ -84,38 +77,36 @@ class _HeaderCell<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final spacing = context.appSpacing;
+    final colors = context.appColors;
     final scheme = context.colorScheme;
     final current = sort;
     final isSorted = current != null && current.columnId == column.id;
     final handler = onSort;
-
-    final label = Text(
-      column.label,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: context.textTheme.labelMedium?.copyWith(
-        color: isSorted ? scheme.primary : scheme.onSurfaceVariant,
-        fontWeight: FontWeight.w500,
-      ),
-    );
 
     final content = Align(
       alignment: column.alignment,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Flexible(child: label),
-          if (isSorted) ...[
-            SizedBox(width: spacing.xxs),
-            Icon(
-              current.ascending
-                  ? Icons.arrow_upward_rounded
-                  : Icons.arrow_downward_rounded,
-              size: spacing.sm + 2,
-              color: scheme.primary,
+          Flexible(
+            child: Text(
+              column.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.labelSmall?.copyWith(
+                fontSize: 12,
+                color: isSorted ? colors.textHigh : colors.textMuted,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0,
+              ),
             ),
-          ],
+          ),
+          if (handler != null)
+            _SortGlyphs(
+              ascending: isSorted ? current.ascending : null,
+              active: scheme.primary,
+              rest: colors.hairlineStrong,
+            ),
         ],
       ),
     );
@@ -131,6 +122,47 @@ class _HeaderCell<T> extends StatelessWidget {
             : current.toggled(column.id),
       ),
       child: Padding(padding: padding, child: content),
+    );
+  }
+}
+
+/// The stacked up/down carets beside a sortable column's label.
+class _SortGlyphs extends StatelessWidget {
+  const _SortGlyphs({
+    required this.ascending,
+    required this.active,
+    required this.rest,
+  });
+
+  /// Null when this column is not the sorted one.
+  final bool? ascending;
+  final Color active;
+  final Color rest;
+
+  @override
+  Widget build(BuildContext context) {
+    final direction = ascending;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.arrow_drop_up_rounded,
+            size: 14,
+            color: direction ?? false ? active : rest,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Icon(
+              Icons.arrow_drop_down_rounded,
+              size: 14,
+              color: direction == false ? active : rest,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

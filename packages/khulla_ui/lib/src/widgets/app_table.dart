@@ -22,7 +22,7 @@ class AppTable<T> extends StatelessWidget {
     this.sort,
     this.onSort,
     this.compactBuilder,
-    this.rowHeight = 52,
+    this.rowHeight = 60,
     this.headerHeight = 44,
     this.showHeader = true,
     super.key,

@@ -1,15 +1,15 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// {@template app_search_field}
-/// The search input: a pill-shaped field with a leading glyph and a clear
-/// button that appears once there is something to clear.
+/// The search input above a collection, and the global one in the top bar.
 ///
-/// It does not debounce. Debouncing is a data-layer concern with a duration
-/// that depends on how expensive the query is, so the cubit owns it — this
-/// widget reports every keystroke and stays dumb.
-/// {@endtemplate}
+/// It does **not** debounce. The cubit owns that, because only the cubit
+/// knows whether the query costs a `LIKE` over ten thousand rows or a filter
+/// over a list already in memory.
+///
+/// The field is filled rather than outlined: on a page made of white cards, a
+/// filled control is the one that reads as "type here" without adding another
+/// hairline to a screen that already has forty.
 class AppSearchField extends StatefulWidget {
-  /// {@macro app_search_field}
   const AppSearchField({
     required this.hintText,
     required this.onChanged,
@@ -17,37 +17,43 @@ class AppSearchField extends StatefulWidget {
     this.clearTooltip,
     this.onSubmitted,
     this.focusNode,
+    this.trailing,
     this.autofocus = false,
     this.enabled = true,
+    this.dense = false,
     super.key,
   });
 
-  /// Placeholder describing what is searched — "Search titles, authors, ISBN".
+  /// Placeholder copy — say what is searched, not "Search".
   final String hintText;
 
-  /// Called on every keystroke and when the field is cleared.
+  /// Called on every keystroke.
   final ValueChanged<String> onChanged;
 
-  /// Controller for a query the caller also writes to — restoring a saved
-  /// search, or clearing from an empty state's *Clear filters* button.
+  /// Supply one to drive the field from outside; otherwise it owns its own.
   final TextEditingController? controller;
 
-  /// Tooltip on the clear button. Required by [AppIconButton] semantics, so
-  /// pass it wherever the field can be cleared.
+  /// Tooltip for the clear button. Null hides the button entirely.
   final String? clearTooltip;
 
-  /// Called when Enter is pressed.
+  /// Called when the user commits the query.
   final ValueChanged<String>? onSubmitted;
 
-  /// Focus node, for a screen that focuses search on open — the accession
-  /// desk's default landing state.
+  /// External focus, for a screen that focuses search on open.
   final FocusNode? focusNode;
 
-  /// Whether the field takes focus on first build.
+  /// A control pinned inside the trailing edge — a scope switch, a filter
+  /// glyph. Replaced by the clear button while the field has text.
+  final Widget? trailing;
+
+  /// Whether to take focus on mount.
   final bool autofocus;
 
   /// Whether the field accepts input.
   final bool enabled;
+
+  /// Tightens the field to sit inside a toolbar row.
+  final bool dense;
 
   @override
   State<AppSearchField> createState() => _AppSearchFieldState();
@@ -88,7 +94,15 @@ class _AppSearchFieldState extends State<AppSearchField> {
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
+    final colors = context.appColors;
     final clearLabel = widget.clearTooltip;
+    final radius = BorderRadius.circular(context.appRadius.field);
+
+    OutlineInputBorder border(Color color, [double width = 1]) =>
+        OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: BorderSide(color: color, width: width),
+        );
 
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: _controller,
@@ -102,32 +116,32 @@ class _AppSearchFieldState extends State<AppSearchField> {
         textInputAction: TextInputAction.search,
         style: context.textTheme.bodyMedium?.copyWith(color: scheme.onSurface),
         decoration: InputDecoration(
+          isDense: widget.dense,
           hintText: widget.hintText,
+          filled: true,
+          fillColor: scheme.surfaceContainerLow,
           prefixIcon: Icon(
             Icons.search_rounded,
-            size: spacing.md + 4,
-            color: scheme.onSurfaceVariant,
+            size: spacing.md + 2,
+            color: colors.textMuted,
           ),
-          suffixIcon: value.text.isEmpty || clearLabel == null
-              ? null
-              : AppIconButton(
+          prefixIconConstraints: BoxConstraints(
+            minWidth: spacing.xlg + spacing.xxs,
+            minHeight: spacing.xlg,
+          ),
+          suffixIcon: value.text.isNotEmpty && clearLabel != null
+              ? AppIconButton(
                   icon: Icons.close_rounded,
                   tooltip: clearLabel,
                   onPressed: _clear,
-                ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(context.appRadius.bar),
-            borderSide: BorderSide(color: scheme.outlineVariant),
+                )
+              : widget.trailing,
+          border: border(colors.hairline),
+          enabledBorder: border(colors.hairline),
+          focusedBorder: border(scheme.primary, 1.5),
+          contentPadding: EdgeInsets.symmetric(
+            vertical: widget.dense ? spacing.xs + 2 : spacing.sm,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(context.appRadius.bar),
-            borderSide: BorderSide(color: scheme.outlineVariant),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(context.appRadius.bar),
-            borderSide: BorderSide(color: scheme.primary, width: 1.5),
-          ),
-          contentPadding: EdgeInsets.symmetric(vertical: spacing.xs + 2),
         ),
       ),
     );

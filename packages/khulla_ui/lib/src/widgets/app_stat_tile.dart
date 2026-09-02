@@ -1,81 +1,79 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// {@template app_stat_tile}
-/// One number on a dashboard: a label, the figure, and an optional line of
-/// context under it.
+/// One figure on a board: what it counts, what it is, and which way it moved.
 ///
-/// [value] is a ready-made string, which is what lets the same tile show a
-/// count, a percentage and a money amount without the design system
-/// learning how any of them are formatted.
-/// {@endtemplate}
+/// The layout is fixed on purpose — glyph and label on one line, the figure
+/// beneath it, the delta and its caption last — so a row of six tiles reads
+/// as one instrument panel instead of six differently-arranged cards. The
+/// figure is the only thing allowed to be large.
 class AppStatTile extends StatelessWidget {
-  /// {@macro app_stat_tile}
   const AppStatTile({
     required this.label,
     required this.value,
     this.caption,
     this.icon,
     this.tone = AppStatusTone.neutral,
+    this.trend,
+    this.trendValue = 0,
+    this.trendInverted = false,
     this.onTap,
     this.isLoading = false,
     super.key,
   });
 
-  /// What is being counted.
+  /// What the figure counts — *Books borrowed*, *Overdue returns*.
   final String label;
 
-  /// The figure itself, already formatted.
+  /// The figure itself, already formatted and localized.
   final String value;
 
-  /// A line of context under the figure — a comparison, a due date.
+  /// The line under the figure — the period it covers, or what the delta is
+  /// measured against.
   final String? caption;
 
-  /// Glyph in the tinted badge.
+  /// The glyph in the tile's leading chip.
   final IconData? icon;
 
-  /// Which semantic family the tile draws from. An *Overdue* tile is
-  /// [AppStatusTone.danger]; a plain count is [AppStatusTone.neutral].
+  /// The tone of the glyph chip, and of the figure when it is not neutral.
   final AppStatusTone tone;
 
-  /// Opens the list behind the number. A stat nobody can drill into is a
-  /// decoration, so wire it wherever a list exists.
+  /// The delta label, if this figure has a comparison period (`+8.2%`).
+  final String? trend;
+
+  /// The delta's sign. Only the sign is read; the text comes from [trend].
+  final num trendValue;
+
+  /// Whether a fall is the improvement — overdue, fines, damaged copies.
+  final bool trendInverted;
+
+  /// Makes the tile a link to the screen that explains the figure.
   final VoidCallback? onTap;
 
-  /// Shows a skeleton in place of the figure while the count is being read.
+  /// Renders the figure as a skeleton while the query is in flight.
   final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
+    final colors = context.appColors;
     final glyph = icon;
     final captionText = caption;
+    final delta = trend;
 
     return AppCard(
       onTap: onTap,
+      padding: EdgeInsets.all(spacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              if (glyph != null)
+              if (glyph != null) ...[
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: tone.background(context),
-                    borderRadius: BorderRadius.circular(
-                      context.appRadius.tile,
-                    ),
+                    borderRadius: BorderRadius.circular(context.appRadius.tile),
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(spacing.xs),
@@ -86,33 +84,60 @@ class AppStatTile extends StatelessWidget {
                     ),
                   ),
                 ),
+                SizedBox(width: spacing.xs + 2),
+              ],
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: colors.textMuted,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
             ],
           ),
           SizedBox(height: spacing.sm),
           if (isLoading)
-            const AppSkeleton(width: 72, height: 28)
+            const AppSkeleton(width: 96, height: 30)
           else
             Text(
               value,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: context.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-                letterSpacing: -0.5,
-                color: tone == AppStatusTone.neutral
-                    ? context.appColors.textHigh
-                    : tone.foreground(context),
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.8,
+                color: colors.textHigh,
               ),
             ),
-          if (captionText != null) ...[
-            SizedBox(height: spacing.xxs),
-            Text(
-              captionText,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: scheme.onSurfaceVariant,
-              ),
+          if (delta != null || captionText != null) ...[
+            SizedBox(height: spacing.xs),
+            Row(
+              children: [
+                if (delta != null) ...[
+                  AppTrendPill(
+                    label: delta,
+                    value: trendValue,
+                    inverted: trendInverted,
+                    dense: true,
+                  ),
+                  SizedBox(width: spacing.xs),
+                ],
+                if (captionText != null)
+                  Expanded(
+                    child: Text(
+                      captionText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: colors.textMuted,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ],
         ],

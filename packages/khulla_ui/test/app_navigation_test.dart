@@ -51,7 +51,15 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
-      expect(find.text('First'), findsOneWidget);
+      // Collapsed, a destination is its glyph and a tooltip — the label is
+      // not painted, which is the whole point of the narrow rail.
+      expect(find.byIcon(Icons.circle), findsOneWidget);
+      expect(find.text('First'), findsNothing);
+      expect(
+        find.byTooltip('First'),
+        findsOneWidget,
+        reason: 'a collapsed destination must still name itself on hover',
+      );
       expect(find.byIcon(Icons.settings), findsOneWidget);
     });
 
@@ -84,7 +92,7 @@ void main() {
         ),
       );
 
-      await tester.tap(find.text('Second'));
+      await tester.tap(find.byIcon(Icons.square_outlined));
       expect(selected, 1);
     });
   });

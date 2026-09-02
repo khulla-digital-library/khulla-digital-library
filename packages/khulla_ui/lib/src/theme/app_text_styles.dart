@@ -13,7 +13,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Display Large - Desktop: 48px, Bold, lineHeight: 56, letterSpacing: -2
   static const TextStyle displayLargeDesktop = TextStyle(
     fontSize: 48,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.17,
     letterSpacing: -2,
   );
@@ -21,7 +21,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Display Medium - Desktop: 40px, Bold, lineHeight: 48, letterSpacing: -1.5
   static const TextStyle displayMediumDesktop = TextStyle(
     fontSize: 40,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.2,
     letterSpacing: -1.5,
   );
@@ -29,7 +29,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Display Small - Desktop: 36px, Bold, lineHeight: 44, letterSpacing: -1.5
   static const TextStyle displaySmallDesktop = TextStyle(
     fontSize: 36,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.22,
     letterSpacing: -1.5,
   );
@@ -37,7 +37,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Headline Large - Desktop: 32px, SemiBold, lineHeight: 40, spacing: -1.5
   static const TextStyle headlineLargeDesktop = TextStyle(
     fontSize: 32,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.25,
     letterSpacing: -1.5,
   );
@@ -45,7 +45,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Headline Medium - Desktop: 24px, SemiBold, lineHeight: 32, spacing: -1
   static const TextStyle headlineMediumDesktop = TextStyle(
     fontSize: 24,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.33,
     letterSpacing: -1,
   );
@@ -53,7 +53,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Headline Small - Desktop: 20px, SemiBold, lineHeight: 28, spacing: -0.75
   static const TextStyle headlineSmallDesktop = TextStyle(
     fontSize: 20,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.4,
 
     letterSpacing: -0.75,
@@ -62,7 +62,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Title Large - Desktop: 24px, Medium, lineHeight: 32, letterSpacing: -0.5
   static const TextStyle titleLargeDesktop = TextStyle(
     fontSize: 24,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.33,
     letterSpacing: -0.5,
   );
@@ -70,7 +70,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Title Medium - Desktop: 20px, Medium, lineHeight: 28, letterSpacing: -0.5
   static const TextStyle titleMediumDesktop = TextStyle(
     fontSize: 20,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.4,
     letterSpacing: -0.5,
   );
@@ -78,7 +78,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Title Small - Desktop: 16px, Medium, lineHeight: 24, letterSpacing: -0.25
   static const TextStyle titleSmallDesktop = TextStyle(
     fontSize: 16,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.5,
     letterSpacing: -0.25,
   );
@@ -110,25 +110,25 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Body Large - Desktop: 16px, Medium, lineHeight: 24, letterSpacing: -0.15
   static const TextStyle bodyLargeDesktop = TextStyle(
     fontSize: 16,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w400,
     height: 1.5,
-    letterSpacing: -0.15,
+    letterSpacing: 0,
   );
 
   /// Body Medium - Desktop: 14px, Medium, lineHeight: 20, letterSpacing: -0.15
   static const TextStyle bodyMediumDesktop = TextStyle(
     fontSize: 14,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w400,
     height: 1.43,
-    letterSpacing: -0.15,
+    letterSpacing: 0,
   );
 
   /// Body Small - Desktop: 12px, Medium, lineHeight: 16, letterSpacing: -0.15
   static const TextStyle bodySmallDesktop = TextStyle(
     fontSize: 12,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w400,
     height: 1.33,
-    letterSpacing: -0.15,
+    letterSpacing: 0,
   );
 
   /// ============ MOBILE TEXT STYLES ============
@@ -136,7 +136,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Display Large - Mobile: 36px, Bold, lineHeight: 44, letterSpacing: -1.5
   static const TextStyle displayLargeMobile = TextStyle(
     fontSize: 36,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.22,
     letterSpacing: -1.5,
   );
@@ -144,7 +144,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Display Medium - Mobile: 32px, Bold, lineHeight: 40, letterSpacing: -1
   static const TextStyle displayMediumMobile = TextStyle(
     fontSize: 32,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.25,
     letterSpacing: -1,
   );
@@ -152,7 +152,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Display Small - Mobile: 28px, Bold, lineHeight: 36, letterSpacing: -1
   static const TextStyle displaySmallMobile = TextStyle(
     fontSize: 28,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.29,
     letterSpacing: -1,
   );
@@ -160,7 +160,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Headline Large - Mobile: 28px, SemiBold, lineHeight: 36, spacing: -1
   static const TextStyle headlineLargeMobile = TextStyle(
     fontSize: 28,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.29,
     letterSpacing: -1,
   );
@@ -168,7 +168,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Headline Medium - Mobile: 22px, SemiBold, lineHeight: 28, spacing: -0.75
   static const TextStyle headlineMediumMobile = TextStyle(
     fontSize: 22,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.27,
     letterSpacing: -0.75,
   );
@@ -176,7 +176,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Headline Small - Mobile: 18px, SemiBold, lineHeight: 24, spacing: -0.5
   static const TextStyle headlineSmallMobile = TextStyle(
     fontSize: 18,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.33,
     letterSpacing: -0.5,
   );
@@ -184,7 +184,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Title Large - Mobile: 20px, Medium, lineHeight: 28, letterSpacing: -0.25
   static const TextStyle titleLargeMobile = TextStyle(
     fontSize: 20,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.4,
     letterSpacing: -0.25,
   );
@@ -192,7 +192,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Title Medium - Mobile: 18px, Medium, lineHeight: 24, letterSpacing: -0.25
   static const TextStyle titleMediumMobile = TextStyle(
     fontSize: 18,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.33,
     letterSpacing: -0.25,
   );
@@ -200,7 +200,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Title Small - Mobile: 14px, Medium, lineHeight: 20, letterSpacing: -0.15
   static const TextStyle titleSmallMobile = TextStyle(
     fontSize: 14,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     height: 1.43,
     letterSpacing: -0.15,
   );
@@ -232,25 +232,25 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// Body Large - Mobile: 16px, Medium, lineHeight: 20, letterSpacing: -0.15
   static const TextStyle bodyLargeMobile = TextStyle(
     fontSize: 16,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w400,
     height: 1.25,
-    letterSpacing: -0.15,
+    letterSpacing: 0,
   );
 
   /// Body Medium - Mobile: 14px, Medium, lineHeight: 20, letterSpacing: -0.15
   static const TextStyle bodyMediumMobile = TextStyle(
     fontSize: 14,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w400,
     height: 1.43,
-    letterSpacing: -0.15,
+    letterSpacing: 0,
   );
 
   /// Body Small - Mobile: 12px, Medium, lineHeight: 16, letterSpacing: -0.15
   static const TextStyle bodySmallMobile = TextStyle(
     fontSize: 12,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w400,
     height: 1.33,
-    letterSpacing: -0.15,
+    letterSpacing: 0,
   );
 
   /// ============ HELPER METHODS ============

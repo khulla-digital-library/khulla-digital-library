@@ -1,34 +1,37 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// {@template app_status_badge}
-/// A pill stating one record's standing — *Available*, *Overdue*, *Reserved*.
+/// The standing pill — *Available*, *Overdue*, *Reserved*, *Active*.
 ///
-/// It takes a ready-made [label] and an [AppStatusTone]; deciding that an
-/// overdue loan is [AppStatusTone.danger] is the feature's job, because the
-/// design system does not know what a loan is.
-/// {@endtemplate}
+/// A wash, a hairline and a leading dot, never a solid fill: a table of forty
+/// rows with forty saturated pills is unreadable, and the dot carries the
+/// state for anyone who cannot separate the hues. The tone decides all three
+/// colors, so the same standing looks identical in a table, a card and a
+/// detail header.
 class AppStatusBadge extends StatelessWidget {
-  /// {@macro app_status_badge}
   const AppStatusBadge({
     required this.label,
     this.tone = AppStatusTone.neutral,
     this.icon,
     this.dense = false,
+    this.showDot = true,
     super.key,
   });
 
   /// The standing, already localized.
   final String label;
 
-  /// Which semantic family the badge draws from.
+  /// Which meaning to paint.
   final AppStatusTone tone;
 
-  /// Optional leading glyph, for a status that repeats down a dense table
-  /// where colour alone is not enough to tell two rows apart.
+  /// Replaces the dot with a glyph, where one says more than a color does.
   final IconData? icon;
 
   /// Tightens the pill for use inside a table row.
   final bool dense;
+
+  /// Whether to draw the leading dot. Turn it off only when the label is
+  /// already unambiguous without color — a count, a plan name.
+  final bool showDot;
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +43,11 @@ class AppStatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: tone.background(context),
         borderRadius: BorderRadius.circular(context.appRadius.pill),
+        border: Border.all(color: tone.border(context)),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: dense ? spacing.xs : spacing.sm,
+          horizontal: dense ? spacing.xs : spacing.sm - 2,
           vertical: dense ? spacing.xxs / 2 : spacing.xxs,
         ),
         child: Row(
@@ -52,12 +56,25 @@ class AppStatusBadge extends StatelessWidget {
             if (glyph != null) ...[
               Icon(glyph, size: spacing.sm, color: foreground),
               SizedBox(width: spacing.xxs),
+            ] else if (showDot) ...[
+              Container(
+                width: spacing.xxs + 2,
+                height: spacing.xxs + 2,
+                decoration: BoxDecoration(
+                  color: foreground,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              SizedBox(width: spacing.xxs + 2),
             ],
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: context.textTheme.labelSmall?.copyWith(
                 color: foreground,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0,
               ),
             ),
           ],

@@ -16,6 +16,7 @@ class AppSectionHeader extends StatelessWidget {
     this.trailing,
     this.icon,
     this.dense = false,
+    this.tone = AppStatusTone.brand,
     super.key,
   });
 
@@ -36,10 +37,12 @@ class AppSectionHeader extends StatelessWidget {
   /// card, where the page-level size is too loud.
   final bool dense;
 
+  /// The tone of the leading icon chip.
+  final AppStatusTone tone;
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
     final textTheme = context.textTheme;
     final glyph = icon;
     final caption = subtitle;
@@ -49,12 +52,16 @@ class AppSectionHeader extends StatelessWidget {
         if (glyph != null) ...[
           DecoratedBox(
             decoration: BoxDecoration(
-              color: scheme.primary.withValues(alpha: 0.10),
+              color: tone.background(context),
               borderRadius: BorderRadius.circular(context.appRadius.tile),
             ),
             child: Padding(
               padding: EdgeInsets.all(spacing.xs),
-              child: Icon(glyph, size: spacing.md + 2, color: scheme.primary),
+              child: Icon(
+                glyph,
+                size: spacing.md + 2,
+                color: tone.foreground(context),
+              ),
             ),
           ),
           SizedBox(width: spacing.sm),
@@ -70,9 +77,9 @@ class AppSectionHeader extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: (dense ? textTheme.titleSmall : textTheme.titleMedium)
                     ?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: -0.2,
-                      color: scheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.3,
+                      color: context.appColors.textHigh,
                     ),
               ),
               if (caption != null) ...[
@@ -82,7 +89,7 @@ class AppSectionHeader extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: textTheme.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
+                    color: context.appColors.textMuted,
                   ),
                 ),
               ],

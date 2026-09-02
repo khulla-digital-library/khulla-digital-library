@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:khulla_ui/src/theme/app_breakpoints.dart';
 import 'package:khulla_ui/src/theme/app_colors.dart';
 import 'package:khulla_ui/src/theme/app_radius.dart';
+import 'package:khulla_ui/src/theme/app_shadows.dart';
 import 'package:khulla_ui/src/theme/app_spacing.dart';
 import 'package:khulla_ui/src/theme/app_text_styles.dart';
 
@@ -24,6 +25,9 @@ extension AppThemeBuildContext on BuildContext {
 
   /// The package's corner-radius scale.
   AppRadius get appRadius => theme.extension<AppRadius>()!;
+
+  /// The elevation tokens — `card`, `raised`, `overlay`.
+  AppShadows get appShadows => theme.extension<AppShadows>()!;
 
   /// Window size class thresholds and content caps.
   AppBreakpoints get appBreakpoints => theme.extension<AppBreakpoints>()!;
