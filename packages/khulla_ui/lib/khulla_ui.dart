@@ -1,0 +1,68 @@
+/// Khulla design system: tokens, theme, and primitives.
+///
+/// `app_palette.dart` is intentionally not exported. Colors reach widgets
+/// through `context.colorScheme` or `context.appColors`.
+library;
+
+export 'package:flutter/material.dart';
+
+export 'src/extensions/build_context_extensions.dart';
+export 'src/theme/app_breakpoints.dart';
+export 'src/theme/app_colors.dart';
+export 'src/theme/app_radius.dart';
+export 'src/theme/app_responsive_theme.dart';
+export 'src/theme/app_scroll_behavior.dart';
+export 'src/theme/app_spacing.dart';
+export 'src/theme/app_text_styles.dart';
+export 'src/theme/app_theme.dart';
+export 'src/widgets/app_avatar.dart';
+export 'src/widgets/app_back_button.dart';
+export 'src/widgets/app_bottom_bar.dart';
+export 'src/widgets/app_bottom_sheet.dart';
+export 'src/widgets/app_button.dart';
+export 'src/widgets/app_card.dart';
+export 'src/widgets/app_checkbox_field.dart';
+export 'src/widgets/app_content_constraint.dart';
+export 'src/widgets/app_detail_row.dart';
+export 'src/widgets/app_dialog.dart';
+export 'src/widgets/app_dropdown_field.dart';
+export 'src/widgets/app_empty_view.dart';
+export 'src/widgets/app_error_view.dart';
+export 'src/widgets/app_feedback_variant.dart';
+export 'src/widgets/app_field_label.dart';
+export 'src/widgets/app_filled_button.dart';
+export 'src/widgets/app_filter_chip.dart';
+export 'src/widgets/app_form_row.dart';
+export 'src/widgets/app_form_section.dart';
+export 'src/widgets/app_icon_button.dart';
+export 'src/widgets/app_loading_indicator.dart';
+export 'src/widgets/app_menu_action.dart';
+export 'src/widgets/app_menu_button.dart';
+export 'src/widgets/app_nav_bar.dart';
+export 'src/widgets/app_nav_destination.dart';
+export 'src/widgets/app_nav_rail.dart';
+export 'src/widgets/app_outlined_button.dart';
+export 'src/widgets/app_page_body.dart';
+export 'src/widgets/app_page_header.dart';
+export 'src/widgets/app_pagination.dart';
+export 'src/widgets/app_picker_field.dart';
+export 'src/widgets/app_pressable.dart';
+export 'src/widgets/app_responsive_grid.dart';
+export 'src/widgets/app_search_field.dart';
+export 'src/widgets/app_section_header.dart';
+export 'src/widgets/app_segmented_control.dart';
+export 'src/widgets/app_side_sheet.dart';
+export 'src/widgets/app_skeleton.dart';
+export 'src/widgets/app_sliver_table.dart';
+export 'src/widgets/app_stat_tile.dart';
+export 'src/widgets/app_status_badge.dart';
+export 'src/widgets/app_status_tone.dart';
+export 'src/widgets/app_switch_field.dart';
+export 'src/widgets/app_table.dart';
+export 'src/widgets/app_table_column.dart';
+export 'src/widgets/app_table_header.dart';
+export 'src/widgets/app_table_row.dart';
+export 'src/widgets/app_table_sort.dart';
+export 'src/widgets/app_text_button.dart';
+export 'src/widgets/app_text_field.dart';
+export 'src/widgets/app_toolbar.dart';

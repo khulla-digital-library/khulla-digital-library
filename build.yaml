@@ -1,0 +1,29 @@
+# build_runner configuration.
+#
+# Only drift needs options today; freezed, injectable, json_serializable and
+# flutter_gen run on their defaults. `dart run drift_dev make-migrations` reads
+# the `databases` and `schema_dir` entries here, so this file is not optional
+# once a schema exists.
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # Where make-migrations looks for the database it should snapshot.
+          databases:
+            app_database: lib/core/database/app_database.dart
+
+          # Recorded schemas and the migration tests generated from them.
+          # Both are committed — they are the evidence that every shipped
+          # upgrade path produces the same schema as a clean install.
+          schema_dir: drift_schemas/
+          test_dir: test/drift/
+
+          # ISO-8601 text, not unix seconds. A due date is a wall-clock fact
+          # about a library's day, and an integer timestamp drops the offset
+          # the librarian was standing in. Changing this after data exists is
+          # a migration over every date column, so it is decided once, here.
+          store_date_time_values_as_text: true
+
+          # Generated companions and query methods take named parameters.
+          named_parameters: true

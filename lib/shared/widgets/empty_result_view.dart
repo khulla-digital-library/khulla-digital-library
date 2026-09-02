@@ -1,0 +1,38 @@
+import 'package:khulla_ui/khulla_ui.dart';
+
+/// Empty-state copy for a search or list that came back with nothing.
+///
+/// A thin app-side default over [AppEmptyView]: it only picks the search
+/// icon, so a screen with its own icon or a first action can use
+/// [AppEmptyView] directly instead of growing parameters here.
+class EmptyResultView extends StatelessWidget {
+  const EmptyResultView({
+    required this.title,
+    required this.subtitle,
+    super.key,
+    this.icon = Icons.search_off_rounded,
+    this.variant = AppFeedbackVariant.centered,
+  });
+
+  /// Short heading, e.g. "No matches".
+  final String title;
+
+  /// Supporting copy shown below [title].
+  final String subtitle;
+
+  /// Badge icon, shown only in [AppFeedbackVariant.centered].
+  final IconData icon;
+
+  /// Layout: centered for a whole screen or section, inline inside a card.
+  final AppFeedbackVariant variant;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppEmptyView(
+      title: title,
+      message: subtitle,
+      icon: icon,
+      variant: variant,
+    );
+  }
+}
