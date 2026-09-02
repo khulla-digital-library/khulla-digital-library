@@ -4,9 +4,12 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// The row of figures at the top of the dashboard.
 ///
-/// Six tiles across a maximised window, three at 840px, two on a tablet and
-/// one on a phone — the grid decides, so nothing here compares a width
-/// against a number.
+/// Four tiles across a window, two on a tablet, one on a phone — the grid
+/// decides, so nothing here compares a width against a number.
+///
+/// Four, not six: the top of a dashboard is the one place where every figure
+/// has to be readable without a second look, and the fifth tile is always the
+/// one nobody reads.
 class DashboardStatsGrid extends StatelessWidget {
   const DashboardStatsGrid({required this.stats, super.key});
 
@@ -16,7 +19,6 @@ class DashboardStatsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppResponsiveGrid(
-      largeColumns: 3,
       children: [
         for (final stat in stats)
           AppStatTile(
@@ -25,6 +27,9 @@ class DashboardStatsGrid extends StatelessWidget {
             caption: stat.caption,
             icon: stat.icon,
             tone: stat.tone,
+            trend: stat.trend,
+            trendValue: stat.trendValue,
+            trendInverted: stat.trendInverted,
             onTap: stat.route == null ? null : () => context.go(stat.route!),
           ),
       ],

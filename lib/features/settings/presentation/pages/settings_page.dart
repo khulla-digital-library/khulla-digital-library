@@ -63,6 +63,12 @@ class SettingsPage extends StatelessWidget {
                       icon: Icons.backup_outlined,
                       route: Routes.settingsBackup,
                     ),
+                    NavigationTile(
+                      label: l10n.settingsSyncTitle,
+                      description: l10n.settingsSyncBody,
+                      icon: Icons.cloud_sync_outlined,
+                      route: Routes.settingsSync,
+                    ),
                   ],
                 ),
                 SizedBox(height: spacing.lg),

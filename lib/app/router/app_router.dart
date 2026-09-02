@@ -7,6 +7,7 @@ import 'package:khulla/features/catalog/author/presentation/author_detail_page.d
 import 'package:khulla/features/catalog/author/presentation/author_list_page.dart';
 import 'package:khulla/features/catalog/catalog/presentation/catalog_page.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_list_page.dart';
+import 'package:khulla/features/catalog/copy/presentation/label_print_page.dart';
 import 'package:khulla/features/catalog/title/presentation/title_detail_page.dart';
 import 'package:khulla/features/catalog/title/presentation/title_form_page.dart';
 import 'package:khulla/features/catalog/title/presentation/title_list_page.dart';
@@ -19,11 +20,16 @@ import 'package:khulla/features/dashboard/presentation/dashboard_page.dart';
 import 'package:khulla/features/members/presentation/pages/member_detail_page.dart';
 import 'package:khulla/features/members/presentation/pages/member_form_page.dart';
 import 'package:khulla/features/members/presentation/pages/member_list_page.dart';
+import 'package:khulla/features/opac/presentation/opac_page.dart';
+import 'package:khulla/features/reports/presentation/reports_page.dart';
 import 'package:khulla/features/settings/presentation/pages/appearance_page.dart';
 import 'package:khulla/features/settings/presentation/pages/backup_page.dart';
 import 'package:khulla/features/settings/presentation/pages/library_profile_page.dart';
 import 'package:khulla/features/settings/presentation/pages/loan_rules_page.dart';
 import 'package:khulla/features/settings/presentation/pages/settings_page.dart';
+import 'package:khulla/features/settings/presentation/pages/sync_page.dart';
+import 'package:khulla/features/users/presentation/pages/role_list_page.dart';
+import 'package:khulla/features/users/presentation/pages/user_list_page.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Owns the single [GoRouter] instance.
@@ -106,6 +112,10 @@ class AppRouter {
                       builder: (context, _) => const CopyListPage(),
                     ),
                     GoRoute(
+                      path: Routes.labelsSegment,
+                      builder: (context, _) => const LabelPrintPage(),
+                    ),
+                    GoRoute(
                       path: Routes.authorsSegment,
                       builder: (context, _) => const AuthorListPage(),
                       routes: [
@@ -178,6 +188,36 @@ class AppRouter {
             StatefulShellBranch(
               routes: [
                 GoRoute(
+                  path: Routes.opac,
+                  builder: (context, _) => const OpacPage(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.reports,
+                  builder: (context, _) => const ReportsPage(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.users,
+                  builder: (context, _) => const UserListPage(),
+                  routes: [
+                    GoRoute(
+                      path: Routes.rolesSegment,
+                      builder: (context, _) => const RoleListPage(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
                   path: Routes.settings,
                   builder: (context, _) => const SettingsPage(),
                   routes: [
@@ -196,6 +236,10 @@ class AppRouter {
                     GoRoute(
                       path: Routes.backupSegment,
                       builder: (context, _) => const BackupPage(),
+                    ),
+                    GoRoute(
+                      path: Routes.syncSegment,
+                      builder: (context, _) => const SyncPage(),
                     ),
                   ],
                 ),

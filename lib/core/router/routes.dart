@@ -30,6 +30,9 @@ abstract final class Routes {
   static const String idSegment = ':id';
 
   /// Every work the library holds.
+  /// Label and barcode printing, under the catalogue.
+  static const String labelsSegment = 'labels';
+
   static const String catalogTitles = '$catalog/$titlesSegment';
 
   /// The title editor, opened empty.
@@ -40,6 +43,9 @@ abstract final class Routes {
 
   /// The people and organisations credited on a title.
   static const String catalogAuthors = '$catalog/$authorsSegment';
+
+  /// The label and barcode desk.
+  static const String catalogLabels = '$catalog/$labelsSegment';
 
   /// One title's record.
   static String catalogTitle(String id) => '$catalogTitles/$id';
@@ -73,6 +79,21 @@ abstract final class Routes {
   static const String circulationFines = '$circulation/$finesSegment';
 
   /// Members: borrower records and their standing.
+  /// The reader-facing catalogue search.
+  static const String opac = '/opac';
+
+  /// Reports and statistics.
+  static const String reports = '/reports';
+
+  /// Staff accounts and the roles they hold.
+  static const String users = '/users';
+
+  /// The role and permission matrix, under staff.
+  static const String rolesSegment = 'roles';
+
+  /// The role list.
+  static const String usersRoles = '$users/$rolesSegment';
+
   static const String members = '/members';
 
   /// The borrower editor, opened empty.
@@ -92,6 +113,9 @@ abstract final class Routes {
   static const String appearanceSegment = 'appearance';
   static const String backupSegment = 'backup';
 
+  /// Online sync, under settings.
+  static const String syncSegment = 'sync';
+
   /// Library profile — name, branch, contact, currency.
   static const String settingsLibrary = '$settings/$librarySegment';
 
@@ -103,6 +127,9 @@ abstract final class Routes {
 
   /// Export, restore, import, and the destructive reset.
   static const String settingsBackup = '$settings/$backupSegment';
+
+  /// The online sync and remote backup screen.
+  static const String settingsSync = '$settings/$syncSegment';
 
   /// Whether [location] is [prefix] or nested under it.
   static bool isUnder(String location, String prefix) =>

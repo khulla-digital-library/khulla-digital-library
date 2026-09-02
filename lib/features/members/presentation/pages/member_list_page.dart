@@ -325,13 +325,16 @@ class _MemberListPageState extends State<MemberListPage> {
               onAction: () => context.go(Routes.memberNew),
             ),
       footer: AppPagination(
-        rangeLabel: l10n.commonRangeLabel(
+        rangeLabel: l10n.commonShowingRange(
           '${start + 1}',
           '$end',
           '${matches.length}',
         ),
         previousTooltip: l10n.commonPreviousPage,
         nextTooltip: l10n.commonNextPage,
+        pageCount: pageCount,
+        currentPage: page,
+        onPageSelected: (next) => setState(() => _page = next),
         onPrevious: page == 0 ? null : () => setState(() => _page = page - 1),
         onNext: page >= pageCount - 1
             ? null

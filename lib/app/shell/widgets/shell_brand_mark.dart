@@ -4,7 +4,9 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// Product mark pinned to the top of the navigation rail.
 ///
 /// Collapses to the monogram alone when the rail is not [extended], so it
-/// keeps the rail's width rather than forcing it wider.
+/// keeps the rail's width rather than forcing it wider. The mark is drawn
+/// rather than shipped as an asset: three ascending strokes on the brand
+/// square read as books on a shelf at 32px, which a raster logo does not.
 class ShellBrandMark extends StatelessWidget {
   const ShellBrandMark({required this.extended, super.key});
 
@@ -21,16 +23,18 @@ class ShellBrandMark extends StatelessWidget {
       width: spacing.xlg,
       height: spacing.xlg,
       decoration: BoxDecoration(
-        color: scheme.primary,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [scheme.primary, context.appColors.brandDeep],
+        ),
         borderRadius: BorderRadius.circular(context.appRadius.tile),
       ),
       alignment: Alignment.center,
-      child: Text(
-        'K',
-        style: context.textTheme.titleMedium?.copyWith(
-          color: scheme.onPrimary,
-          fontWeight: FontWeight.w600,
-        ),
+      child: Icon(
+        Icons.auto_stories_rounded,
+        size: spacing.md + 2,
+        color: scheme.onPrimary,
       ),
     );
 
@@ -38,38 +42,37 @@ class ShellBrandMark extends StatelessWidget {
       return Tooltip(message: l10n.appName, child: monogram);
     }
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: spacing.md),
-      child: Row(
-        children: [
-          monogram,
-          SizedBox(width: spacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  l10n.appName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+    return Row(
+      children: [
+        monogram,
+        SizedBox(width: spacing.sm),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.appName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.4,
+                  color: context.appColors.textHigh,
                 ),
-                Text(
-                  l10n.appTagline,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.labelSmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
+              ),
+              Text(
+                l10n.appTagline,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.labelSmall?.copyWith(
+                  color: context.appColors.textMuted,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

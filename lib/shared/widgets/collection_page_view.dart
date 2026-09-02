@@ -1,16 +1,16 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The page recipe for a shell tab whose content is a collection.
+/// The page recipe every collection screen in the app follows.
 ///
-/// Header, toolbar, table and footer in one scroll view, assembled the way
-/// DESIGN.md's recipe describes: every section is a sliver, so the page
-/// scrolls as one surface and the rows stay lazy however long the collection
-/// gets. Screens differ in their columns and their copy, not in this
-/// scaffolding, which is why it is written once here.
+/// One card holds the whole collection: its heading and primary action, the
+/// search and filter toolbar, the table, and the pagination footer. Binding
+/// them into a single surface is what makes a list screen read as one object
+/// — a header floating above a bare table always looks like two screens that
+/// happened to load together.
 ///
-/// The empty state is passed in rather than derived: "nothing catalogued yet"
-/// and "nothing matches *dickens*" are different states with different
-/// actions, and only the caller knows which one it is in.
+/// The card is a [DecoratedSliver] rather than an [AppCard] wrapped around a
+/// list, so the table inside it stays lazy. A catalogue of ten thousand
+/// titles must not lay out ten thousand rows to draw a border.
 class CollectionPageView<T> extends StatelessWidget {
   const CollectionPageView({
     required this.header,
@@ -18,114 +18,157 @@ class CollectionPageView<T> extends StatelessWidget {
     required this.columns,
     required this.emptyState,
     this.toolbar,
+    this.intro,
     this.onRowTap,
     this.isSelected,
     this.sort,
     this.onSort,
     this.compactBuilder,
-    this.compactExtent = 108,
+    this.compactExtent = 116,
     this.footer,
     super.key,
   });
 
-  /// The title block — typically a `CollectionHeader`.
+  /// The card's heading row: what this collection is, and its one action.
   final Widget header;
 
-  /// Search, filters and secondary actions — typically an [AppToolbar].
+  /// Search, filters and view controls, under the heading.
   final Widget? toolbar;
 
-  /// The rows on this page of the collection.
+  /// Anything above the card — a row of stat tiles, a banner.
+  final Widget? intro;
+
+  /// The page of records to draw. Paging happens before this.
   final List<T> items;
 
-  /// The table's columns, in display order.
+  /// The columns, in display order.
   final List<AppTableColumn<T>> columns;
 
-  /// What to show when [items] is empty.
+  /// Rendered in place of the table when [items] is empty. Pass the *right*
+  /// empty state: "nothing catalogued yet" and "nothing matched" are
+  /// different screens.
   final Widget emptyState;
 
   /// Opens a record.
   final void Function(T item)? onRowTap;
 
-  /// Whether a record is the one open beside the table.
+  /// Marks a row as the picked one.
   final bool Function(T item)? isSelected;
 
-  /// The current ordering, reflected in the pinned header.
+  /// The active sort, reported to the caller and turned into an `ORDER BY`.
   final AppTableSort? sort;
 
-  /// Called when a sortable heading is clicked.
+  /// Called when a column header is picked.
   final ValueChanged<AppTableSort>? onSort;
 
-  /// Renders one record as a card below [FormFactor.medium].
+  /// Renders one record as a card, for windows too narrow for a table.
   final Widget Function(BuildContext context, T item)? compactBuilder;
 
-  /// Fixed height of a compact card, so the list keeps its `itemExtent`.
+  /// The fixed height of a compact card row.
   final double compactExtent;
 
-  /// The strip under the table — typically [AppPagination].
+  /// The pagination footer.
   final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
+    final colors = context.appColors;
+    final scheme = context.colorScheme;
     final bar = toolbar;
     final end = footer;
+    final top = intro;
+    final compact = context.formFactor.isCompact;
+
+    final cardDecoration = BoxDecoration(
+      color: scheme.surface,
+      borderRadius: BorderRadius.circular(context.appRadius.card),
+      border: Border.all(color: colors.hairlineStrong),
+      boxShadow: context.appShadows.card,
+    );
 
     return AppPageBody(
       wide: true,
       child: CustomScrollView(
         slivers: [
+          if (top != null)
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                spacing.page,
+                spacing.lg,
+                spacing.page,
+                0,
+              ),
+              sliver: SliverToBoxAdapter(child: top),
+            ),
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
               spacing.page,
               spacing.lg,
               spacing.page,
-              spacing.md,
+              spacing.xlg,
             ),
-            sliver: SliverList.list(
-              children: [
-                header,
-                if (bar != null) ...[SizedBox(height: spacing.lg), bar],
-              ],
+            sliver: DecoratedSliver(
+              decoration: cardDecoration,
+              sliver: SliverMainAxisGroup(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        spacing.md,
+                        spacing.md,
+                        spacing.md,
+                        bar == null ? spacing.sm : spacing.md,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          header,
+                          if (bar != null) ...[
+                            SizedBox(height: spacing.md),
+                            bar,
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (items.isEmpty)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: spacing.md,
+                          vertical: spacing.xlg,
+                        ),
+                        child: emptyState,
+                      ),
+                    )
+                  else ...[
+                    AppSliverTable<T>(
+                      items: items,
+                      columns: columns,
+                      onRowTap: onRowTap,
+                      isSelected: isSelected,
+                      sort: sort,
+                      onSort: onSort,
+                      compactBuilder: compactBuilder,
+                      compactExtent: compactExtent,
+                      pinHeader: false,
+                    ),
+                    if (end != null)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            top: compact ? spacing.xs : 0,
+                          ),
+                          child: end,
+                        ),
+                      ),
+                  ],
+                ],
+              ),
             ),
           ),
-          if (items.isEmpty)
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: spacing.page,
-                  vertical: spacing.xlg,
-                ),
-                child: emptyState,
-              ),
-            )
-          else ...[
-            SliverPadding(
-              padding: EdgeInsets.symmetric(horizontal: spacing.page),
-              sliver: AppSliverTable<T>(
-                items: items,
-                columns: columns,
-                onRowTap: onRowTap,
-                isSelected: isSelected,
-                sort: sort,
-                onSort: onSort,
-                compactBuilder: compactBuilder,
-                compactExtent: compactExtent,
-              ),
-            ),
-            if (end != null)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    spacing.page,
-                    spacing.sm,
-                    spacing.page,
-                    spacing.xlg,
-                  ),
-                  child: end,
-                ),
-              ),
-          ],
         ],
       ),
     );

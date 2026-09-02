@@ -1,6 +1,5 @@
 {
     "@@locale": "en",
-
     "appName": "Khulla Digital Library",
     "@appName": {
         "description": "Core — application display name"
@@ -9,7 +8,6 @@
     "@appTagline": {
         "description": "Core — one-line product description shown under the app name"
     },
-
     "navDashboard": "Dashboard",
     "navCatalog": "Catalog",
     "navCirculation": "Circulation",
@@ -18,7 +16,6 @@
     "@navSettings": {
         "description": "Navigation — shell destination labels"
     },
-
     "commonRetry": "Try again",
     "commonCancel": "Cancel",
     "commonSave": "Save",
@@ -32,7 +29,6 @@
     "@commonNextPage": {
         "description": "Common — action labels reused across every screen"
     },
-
     "themeToggleTooltip": "Change theme",
     "themeModeSystem": "Match system",
     "themeModeLight": "Light",
@@ -40,7 +36,6 @@
     "@themeModeDark": {
         "description": "Settings — appearance options"
     },
-
     "sectionComingSoonTitle": "{section} is not built yet",
     "@sectionComingSoonTitle": {
         "description": "Placeholder — heading for a shell destination with no feature behind it",
@@ -55,7 +50,6 @@
     "@sectionComingSoonBody": {
         "description": "Placeholder — body copy for an unbuilt shell destination"
     },
-
     "dashboardTitle": "Today at a glance",
     "@dashboardTitle": {
         "description": "Dashboard — page heading"
@@ -71,7 +65,6 @@
     "@dashboardAddMember": {
         "description": "Dashboard — quick action labels, also used as the page's primary action"
     },
-
     "dashboardStatTitles": "Titles catalogued",
     "dashboardStatOnLoan": "Copies on loan",
     "dashboardStatDueToday": "Due back today",
@@ -85,7 +78,6 @@
     "@dashboardStatPlaceholder": {
         "description": "Dashboard — caption marking a stat tile as mock data"
     },
-
     "dashboardActivityTitle": "Recent activity",
     "dashboardActivitySubtitle": "Checkouts and returns from the last seven days",
     "dashboardActivityEmptyTitle": "Nothing has moved yet",
@@ -93,7 +85,6 @@
     "@dashboardActivityEmptyBody": {
         "description": "Dashboard — empty state for the activity section"
     },
-
     "dashboardAttentionTitle": "Needs attention",
     "dashboardAttentionSubtitle": "Overdue loans, holds waiting to be filled, copies reported lost",
     "dashboardAttentionEmptyTitle": "Nothing needs attention",
@@ -101,13 +92,11 @@
     "@dashboardAttentionEmptyBody": {
         "description": "Dashboard — empty state for the attention section"
     },
-
     "dashboardQuickActionsTitle": "Quick actions",
     "dashboardQuickActionsSubtitle": "The four things a desk shift starts with",
     "@dashboardQuickActionsSubtitle": {
         "description": "Dashboard — quick actions section heading"
     },
-
     "commonEdit": "Edit",
     "commonOpen": "Open",
     "commonAdd": "Add",
@@ -115,6 +104,8 @@
     "commonAll": "All",
     "commonStatus": "Status",
     "commonActions": "Actions",
+    "commonDecrease": "One fewer",
+    "commonIncrease": "One more",
     "commonClearFilters": "Clear filters",
     "commonNotSet": "Not set",
     "commonNoMatchesTitle": "No matches",
@@ -126,16 +117,24 @@
     "@commonRangeLabel": {
         "description": "Common — pagination footer range, e.g. 1-25 of 1,204",
         "placeholders": {
-            "start": { "type": "String", "example": "1" },
-            "end": { "type": "String", "example": "25" },
-            "total": { "type": "String", "example": "1,204" }
+            "start": {
+                "type": "String",
+                "example": "1"
+            },
+            "end": {
+                "type": "String",
+                "example": "25"
+            },
+            "total": {
+                "type": "String",
+                "example": "1,204"
+            }
         }
     },
     "commonNotWiredYet": "This build is the interface only — that action is not wired up yet.",
     "@commonNotWiredYet": {
         "description": "Common — toast shown by an action whose data layer does not exist"
     },
-
     "statusAvailable": "Available",
     "statusOnLoan": "On loan",
     "statusReserved": "Reserved",
@@ -148,7 +147,6 @@
     "@statusReturned": {
         "description": "Domain — standings shared by copies, loans and reservations"
     },
-
     "conditionNew": "New",
     "conditionGood": "Good",
     "conditionFair": "Fair",
@@ -156,7 +154,6 @@
     "@conditionPoor": {
         "description": "Domain — physical condition of a copy"
     },
-
     "formatBook": "Book",
     "formatJournal": "Journal",
     "formatMagazine": "Magazine",
@@ -167,7 +164,6 @@
     "@formatAllFormats": {
         "description": "Catalogue — the media a title can be held in"
     },
-
     "catalogHeading": "Catalogue",
     "catalogSubtitle": "Every work the library holds, the copies behind them, and the people who wrote them.",
     "catalogStatTitles": "Titles",
@@ -184,13 +180,15 @@
     "@catalogRecentEmptyBody": {
         "description": "Catalogue — overview page copy"
     },
-
     "titlesHeading": "Titles",
     "titlesSubtitle": "{count} works catalogued",
     "@titlesSubtitle": {
         "description": "Catalogue — count line under the titles heading",
         "placeholders": {
-            "count": { "type": "String", "example": "1,204" }
+            "count": {
+                "type": "String",
+                "example": "1,204"
+            }
         }
     },
     "titlesSearchHint": "Search titles, authors, ISBN",
@@ -210,8 +208,14 @@
     "@titlesCopiesOf": {
         "description": "Catalogue — availability summary on a title card",
         "placeholders": {
-            "available": { "type": "String", "example": "2" },
-            "total": { "type": "String", "example": "4" }
+            "available": {
+                "type": "String",
+                "example": "2"
+            },
+            "total": {
+                "type": "String",
+                "example": "4"
+            }
         }
     },
     "titlesReferenceOnly": "Reference only",
@@ -223,7 +227,6 @@
     "@titlesEmptyBody": {
         "description": "Catalogue — first-run empty state for the titles list"
     },
-
     "titleDetailOverview": "Overview",
     "titleDetailDescription": "Description",
     "titleDetailCopiesTitle": "Copies",
@@ -243,7 +246,6 @@
     "@titleDetailDeleteBody": {
         "description": "Catalogue — destructive confirmation for a title"
     },
-
     "fieldTitle": "Title",
     "fieldSubtitle": "Subtitle",
     "fieldAuthor": "Author",
@@ -266,7 +268,6 @@
     "@fieldAddedOn": {
         "description": "Forms — field labels shared by the catalogue screens"
     },
-
     "titleFormNewHeading": "New title",
     "titleFormEditHeading": "Edit title",
     "titleFormBibliographic": "Bibliographic details",
@@ -282,13 +283,15 @@
     "@titleFormSave": {
         "description": "Catalogue — the title editor"
     },
-
     "copiesHeading": "Copies",
     "copiesSubtitle": "{count} items on the shelves",
     "@copiesSubtitle": {
         "description": "Catalogue — count line under the copies heading",
         "placeholders": {
-            "count": { "type": "String", "example": "3,120" }
+            "count": {
+                "type": "String",
+                "example": "3,120"
+            }
         }
     },
     "copiesSearchHint": "Search barcode, title, shelf",
@@ -307,13 +310,15 @@
     "@copiesWithdraw": {
         "description": "Catalogue — the copies list and its row actions"
     },
-
     "authorsHeading": "Authors",
     "authorsSubtitle": "{count} people and organisations credited on the catalogue",
     "@authorsSubtitle": {
         "description": "Catalogue — count line under the authors heading",
         "placeholders": {
-            "count": { "type": "String", "example": "412" }
+            "count": {
+                "type": "String",
+                "example": "412"
+            }
         }
     },
     "authorsSearchHint": "Search authors",
@@ -331,7 +336,6 @@
     "@authorDetailEdit": {
         "description": "Catalogue — the authors list and detail pane"
     },
-
     "circulationHeading": "Circulation",
     "circulationSubtitle": "What is out, what is due back, and what is late.",
     "circulationCheckOut": "Check out",
@@ -365,7 +369,6 @@
     "@loansViewMember": {
         "description": "Circulation — the active loans table and its row menu"
     },
-
     "checkOutHeading": "Check out",
     "checkOutSubtitle": "Find the member, then add every copy going home with them.",
     "checkOutMemberSection": "Member",
@@ -387,7 +390,10 @@
     "@checkOutDays": {
         "description": "Circulation — a loan period in days",
         "placeholders": {
-            "days": { "type": "String", "example": "14" }
+            "days": {
+                "type": "String",
+                "example": "14"
+            }
         }
     },
     "checkOutConfirm": "Confirm checkout",
@@ -395,7 +401,6 @@
     "@checkOutRemoveCopy": {
         "description": "Circulation — the checkout desk"
     },
-
     "returnsHeading": "Return copies",
     "returnsSubtitle": "Scan each copy coming back. Anything late is priced as it is added.",
     "returnsScanSection": "Scan",
@@ -418,7 +423,6 @@
     "@returnsRemoveCopy": {
         "description": "Circulation — the returns desk"
     },
-
     "reservationsHeading": "Reservations",
     "reservationsSubtitle": "Members waiting for a copy, in the order they asked.",
     "reservationsSearchHint": "Search member or title",
@@ -435,7 +439,10 @@
     "@reservationsQueuePosition": {
         "description": "Circulation — a member's place in the hold queue",
         "placeholders": {
-            "position": { "type": "String", "example": "2" }
+            "position": {
+                "type": "String",
+                "example": "2"
+            }
         }
     },
     "reservationsFilterReady": "Ready",
@@ -448,7 +455,6 @@
     "@reservationsEmptyBody": {
         "description": "Circulation — the reservations queue"
     },
-
     "finesHeading": "Fines",
     "finesSubtitle": "What members owe, what has been collected, and what was written off.",
     "finesSearchHint": "Search member or title",
@@ -478,8 +484,14 @@
     "@finesCollectBody": {
         "description": "Circulation — payment confirmation; amount is money.display()",
         "placeholders": {
-            "amount": { "type": "String", "example": "Rs 45" },
-            "member": { "type": "String", "example": "Anita Rai" }
+            "amount": {
+                "type": "String",
+                "example": "Rs 45"
+            },
+            "member": {
+                "type": "String",
+                "example": "Anita Rai"
+            }
         }
     },
     "finesWaiveTitle": "Waive this fine?",
@@ -489,13 +501,15 @@
     "@finesEmptyBody": {
         "description": "Circulation — the fines ledger"
     },
-
     "membersHeading": "Members",
     "membersSubtitle": "{count} borrowers on the register",
     "@membersSubtitle": {
         "description": "Members — count line under the heading",
         "placeholders": {
-            "count": { "type": "String", "example": "312" }
+            "count": {
+                "type": "String",
+                "example": "312"
+            }
         }
     },
     "membersSearchHint": "Search name, card number, phone",
@@ -526,7 +540,6 @@
     "@membersEmptyBody": {
         "description": "Members — the register list"
     },
-
     "memberDetailMembership": "Membership",
     "memberDetailContact": "Contact",
     "memberDetailLoansTitle": "On loan now",
@@ -555,7 +568,6 @@
     "@memberDetailStatBorrowed": {
         "description": "Members — the borrower detail page"
     },
-
     "fieldFullName": "Full name",
     "fieldEmail": "Email",
     "fieldPhone": "Phone",
@@ -569,7 +581,6 @@
     "@fieldGuardian": {
         "description": "Forms — field labels for a member record"
     },
-
     "memberFormNewHeading": "New member",
     "memberFormEditHeading": "Edit member",
     "memberFormIdentity": "Identity",
@@ -582,7 +593,6 @@
     "@memberFormSave": {
         "description": "Members — the borrower editor"
     },
-
     "settingsHeading": "Settings",
     "settingsSubtitle": "How this library runs: its details, its lending rules, and its backups.",
     "settingsLibraryTitle": "Library profile",
@@ -598,7 +608,6 @@
     "@settingsAboutBody": {
         "description": "Settings — the index of setting groups"
     },
-
     "settingsLibraryIdentity": "Identity",
     "settingsLibraryIdentityDescription": "What this installation calls itself, on receipts and on notices.",
     "settingsLibraryContact": "Contact",
@@ -614,7 +623,6 @@
     "@settingsLibrarySave": {
         "description": "Settings — the library profile form"
     },
-
     "settingsLoanPeriods": "Loan periods",
     "settingsLoanPeriodsDescription": "Defaults for a new loan. A member's category can override them.",
     "settingsLoanFines": "Fines",
@@ -636,13 +644,11 @@
     "@settingsLoanRulesSave": {
         "description": "Settings — the lending rules form"
     },
-
     "settingsAppearanceTheme": "Theme",
     "settingsAppearanceThemeDescription": "Applies to this device only — the setting is stored locally, not in the catalogue.",
     "@settingsAppearanceThemeDescription": {
         "description": "Settings — appearance page"
     },
-
     "settingsBackupExportTitle": "Export a backup",
     "settingsBackupExportBody": "Write the whole catalogue — titles, copies, members, loans — to one file.",
     "settingsBackupExportAction": "Export",
@@ -663,7 +669,6 @@
     "@settingsBackupEraseBody": {
         "description": "Settings — backup, restore and the destructive reset"
     },
-
     "settingsAboutVersion": "Version",
     "settingsAboutLicence": "Licence",
     "settingsAboutSource": "Source code",
@@ -671,7 +676,6 @@
     "@settingsAboutStorage": {
         "description": "Settings — about card rows"
     },
-
     "errorUnknown": "Something went wrong. Please try again.",
     "errorNotFound": "We could not find that record.",
     "errorDuplicateRecord": "A record with those details already exists.",
@@ -682,5 +686,411 @@
     "errorStorage": "A file could not be read or written.",
     "@errorStorage": {
         "description": "Errors — user-facing copy for every AppException case"
-    }
+    },
+    "navOpac": "Public search",
+    "navReports": "Reports",
+    "navUsers": "Staff",
+    "navMore": "More",
+    "@navMore": {
+        "description": "Navigation — the compact bottom bar entry that opens the sections the bar cannot hold"
+    },
+    "shellMoreTitle": "All sections",
+    "shellSearchHint": "Search titles, members, barcodes",
+    "shellNotifications": "Notifications",
+    "shellNotificationsTitle": "Notifications",
+    "shellNotificationsEmpty": "Nothing needs your attention right now.",
+    "shellAccountMenu": "Account",
+    "shellProfile": "Your profile",
+    "shellSignOut": "Sign out",
+    "shellHelp": "Help and shortcuts",
+    "shellFooterTitle": "Everything stays on this machine",
+    "shellFooterBody": "Khulla keeps the catalogue in a local database. Back it up so a lost machine is not a lost library.",
+    "shellFooterAction": "Back up now",
+    "@shellFooterAction": {
+        "description": "Shell — the rail footer card"
+    },
+    "navCatalogTitles": "Titles",
+    "navCatalogCopies": "Copies",
+    "navCatalogAuthors": "Authors",
+    "navCatalogLabels": "Labels and barcodes",
+    "navCirculationCheckOut": "Check out",
+    "navCirculationReturn": "Return",
+    "navCirculationReservations": "Reservations",
+    "navCirculationFines": "Fines",
+    "navReportsCirculation": "Circulation",
+    "navReportsCollection": "Collection",
+    "navReportsMembers": "Membership",
+    "navReportsFines": "Fines",
+    "navUsersAccounts": "Staff accounts",
+    "navUsersRoles": "Roles and permissions",
+    "navSettingsLibrary": "Library profile",
+    "navSettingsLoanRules": "Loan rules",
+    "navSettingsAppearance": "Appearance",
+    "navSettingsBackup": "Backup and restore",
+    "navSettingsSync": "Online sync",
+    "@navSettingsSync": {
+        "description": "Navigation — rail sub-sections"
+    },
+    "commonViewAll": "View all",
+    "commonExport": "Export",
+    "commonExportCsv": "Export CSV",
+    "commonExportPdf": "Export PDF",
+    "commonPrint": "Print",
+    "commonFilter": "Filter",
+    "commonSortBy": "Sort by",
+    "commonSortNewest": "Newest",
+    "commonSortOldest": "Oldest",
+    "commonSortPopular": "Most borrowed",
+    "commonSortTitle": "Title A–Z",
+    "commonApply": "Apply",
+    "commonReset": "Reset",
+    "commonRefresh": "Refresh",
+    "commonDone": "Done",
+    "commonRowsPerPage": "Show",
+    "commonGridView": "Grid view",
+    "commonListView": "Table view",
+    "commonToday": "Today",
+    "commonThisWeek": "This week",
+    "commonThisMonth": "This month",
+    "commonThisQuarter": "This quarter",
+    "commonThisYear": "This year",
+    "commonLastWeek": "vs last week",
+    "commonLastMonth": "vs last month",
+    "commonLastEightMonths": "Last 8 months",
+    "commonSelectPeriod": "Period",
+    "commonUnavailable": "—",
+    "@commonUnavailable": {
+        "description": "Common — the em dash standing in for a value a record does not have"
+    },
+    "commonShowingRange": "Showing {start}–{end} of {total}",
+    "@commonShowingRange": {
+        "description": "Common — the range label under a table",
+        "placeholders": {
+            "start": {
+                "type": "String",
+                "example": "1"
+            },
+            "end": {
+                "type": "String",
+                "example": "9"
+            },
+            "total": {
+                "type": "String",
+                "example": "36"
+            }
+        }
+    },
+    "commonResultCount": "{count} results",
+    "@commonResultCount": {
+        "description": "Common — a result tally beside a search field",
+        "placeholders": {
+            "count": {
+                "type": "String",
+                "example": "36"
+            }
+        }
+    },
+    "dashboardGreeting": "Good day, {name}",
+    "@dashboardGreeting": {
+        "description": "Dashboard — the greeting above the board",
+        "placeholders": {
+            "name": {
+                "type": "String",
+                "example": "Sangam"
+            }
+        }
+    },
+    "dashboardStatBorrowed": "Copies borrowed",
+    "dashboardStatReturned": "Copies returned",
+    "dashboardStatVisitors": "Visits logged",
+    "dashboardStatCollection": "Copies in collection",
+    "dashboardStatCaptionWeek": "this week",
+    "dashboardStatCaptionMonth": "this month",
+    "dashboardUsageTitle": "Library usage",
+    "dashboardUsageSubtitle": "Visits and loans, day by day",
+    "dashboardUsageVisitors": "Visits",
+    "dashboardUsageLoans": "Loans",
+    "dashboardFinesTitle": "Fines accrued",
+    "dashboardFinesSubtitle": "What overdue copies have cost members",
+    "dashboardCollectionTitle": "Collection at a glance",
+    "dashboardCollectionSubtitle": "Where every copy in the catalogue is right now",
+    "dashboardCollectionTotal": "copies",
+    "dashboardCategoriesTitle": "Subjects",
+    "dashboardCategoriesSubtitle": "How the catalogue divides by subject",
+    "dashboardTopTitlesTitle": "Most borrowed",
+    "dashboardTopMembersTitle": "Most active members",
+    "dashboardTopTitlesEmpty": "Nothing has been borrowed yet.",
+    "dashboardActivityColumnItem": "Item",
+    "dashboardActivityColumnMember": "Member",
+    "dashboardActivityColumnAction": "Activity",
+    "dashboardActivityColumnWhen": "When",
+    "dashboardActivityColumnDue": "Due",
+    "dashboardActivityBorrow": "Borrowed",
+    "dashboardActivityReturn": "Returned",
+    "dashboardActivityReserve": "Reserved",
+    "dashboardActivityFine": "Fine raised",
+    "dashboardBorrowCount": "{count} loans",
+    "@dashboardBorrowCount": {
+        "description": "Dashboard — a borrow tally under a title or member",
+        "placeholders": {
+            "count": {
+                "type": "String",
+                "example": "128"
+            }
+        }
+    },
+    "dashboardAttentionOverdue": "Overdue loans",
+    "dashboardAttentionHolds": "Holds waiting on the shelf",
+    "dashboardAttentionExpiring": "Memberships expiring this month",
+    "dashboardAttentionDamaged": "Copies reported damaged",
+    "dashboardAttentionAction": "Open",
+    "opacHeading": "Public catalogue",
+    "opacSubtitle": "What a reader sees: search the shelves, check what is in, and place a hold.",
+    "opacSearchHint": "Search by title, author, subject or ISBN",
+    "opacSearchAction": "Search",
+    "opacKioskTitle": "Kiosk mode",
+    "opacKioskBody": "Open this screen full-screen on the reading-room machine. It shows availability and never exposes member data.",
+    "opacKioskAction": "Open kiosk mode",
+    "opacFacetFormat": "Format",
+    "opacFacetSubject": "Subject",
+    "opacFacetAvailability": "Availability",
+    "opacFacetLanguage": "Language",
+    "opacFilterAvailableOnly": "On the shelf now",
+    "opacResultsTitle": "Results",
+    "opacResultsSubtitle": "{count} titles match",
+    "@opacResultsSubtitle": {
+        "description": "OPAC — result tally",
+        "placeholders": {
+            "count": {
+                "type": "String",
+                "example": "24"
+            }
+        }
+    },
+    "opacBrowseTitle": "Browse the shelves",
+    "opacBrowseSubtitle": "Start from a subject if you do not know what you are looking for",
+    "opacFeaturedTitle": "New this month",
+    "opacFeaturedSubtitle": "Recently catalogued and ready to borrow",
+    "opacPlaceHold": "Place a hold",
+    "opacViewDetails": "Details",
+    "opacCopiesAvailable": "{available} of {total} on the shelf",
+    "@opacCopiesAvailable": {
+        "description": "OPAC — availability line on a result",
+        "placeholders": {
+            "available": {
+                "type": "String",
+                "example": "2"
+            },
+            "total": {
+                "type": "String",
+                "example": "3"
+            }
+        }
+    },
+    "opacNoCopies": "All copies are out",
+    "opacEmptyTitle": "Nothing matched that search",
+    "opacEmptyBody": "Try a shorter phrase, an author’s surname, or browse by subject instead.",
+    "opacIdleTitle": "Search the catalogue",
+    "opacIdleBody": "Type a title, an author or a subject to see what the library holds.",
+    "reportsHeading": "Reports",
+    "reportsSubtitle": "What the library did over a period, and what it holds today.",
+    "reportsStatBorrowed": "Loans issued",
+    "reportsStatReturned": "Copies returned",
+    "reportsStatNewMembers": "New members",
+    "reportsStatFines": "Fines collected",
+    "reportsCirculationTitle": "Circulation over time",
+    "reportsCirculationSubtitle": "Loans issued against copies returned",
+    "reportsCollectionTitle": "Collection mix",
+    "reportsCollectionSubtitle": "Every catalogued copy by format",
+    "reportsMembersTitle": "Membership growth",
+    "reportsMembersSubtitle": "Members joining, month by month",
+    "reportsFinesTitle": "Fines",
+    "reportsFinesSubtitle": "Raised, collected and waived over the period",
+    "reportsTopTitlesTitle": "Most borrowed titles",
+    "reportsTopTitlesSubtitle": "Ranked over the selected period",
+    "reportsTopMembersTitle": "Most active members",
+    "reportsTopMembersSubtitle": "Ranked by copies borrowed",
+    "reportsColumnRank": "#",
+    "reportsColumnTitle": "Title",
+    "reportsColumnMember": "Member",
+    "reportsColumnLoans": "Loans",
+    "reportsColumnShare": "Share",
+    "reportsFinesRaised": "Raised",
+    "reportsFinesCollected": "Collected",
+    "reportsFinesWaived": "Waived",
+    "reportsSavedTitle": "Saved reports",
+    "reportsSavedSubtitle": "The reports a committee or a council asks for, ready to export",
+    "reportsSavedCirculation": "Monthly circulation summary",
+    "reportsSavedCirculationBody": "Loans, returns, renewals and overdue counts for one month.",
+    "reportsSavedCollection": "Collection inventory",
+    "reportsSavedCollectionBody": "Every title and copy, with shelf location and condition.",
+    "reportsSavedMembers": "Membership register",
+    "reportsSavedMembersBody": "Active, expiring and suspended members with their borrowing history.",
+    "reportsSavedFines": "Fine ledger",
+    "reportsSavedFinesBody": "Every fine raised, collected or waived, with the member and the reason.",
+    "reportsSavedOverdue": "Overdue notices",
+    "reportsSavedOverdueBody": "Members with copies past due, ready to print or email.",
+    "reportsSavedAcquisitions": "Acquisitions",
+    "reportsSavedAcquisitionsBody": "Titles added over a period, with cost and supplier.",
+    "reportsPlaceholderNote": "Figures are sample data until circulation is recording loans.",
+    "usersHeading": "Staff accounts",
+    "usersSubtitle": "{count} people can sign in to this library",
+    "@usersSubtitle": {
+        "description": "Staff — page subtitle",
+        "placeholders": {
+            "count": {
+                "type": "String",
+                "example": "6"
+            }
+        }
+    },
+    "usersAdd": "Invite staff",
+    "usersSearchHint": "Search staff by name or email",
+    "usersColumnName": "Name",
+    "usersColumnEmail": "Email",
+    "usersColumnRole": "Role",
+    "usersColumnLastActive": "Last active",
+    "usersStatusActive": "Active",
+    "usersStatusInvited": "Invited",
+    "usersStatusDisabled": "Disabled",
+    "usersFilterActive": "Active",
+    "usersFilterInvited": "Invited",
+    "usersFilterDisabled": "Disabled",
+    "usersEditRole": "Change role",
+    "usersResendInvite": "Resend invitation",
+    "usersResetPassword": "Reset password",
+    "usersDisable": "Disable account",
+    "usersEnable": "Enable account",
+    "usersEmptyTitle": "No staff accounts yet",
+    "usersEmptyBody": "Invite the people who work the desk. Each one signs in with their own account, so the ledger says who did what.",
+    "usersNeverSignedIn": "Never signed in",
+    "rolesHeading": "Roles and permissions",
+    "rolesSubtitle": "What each role is allowed to do",
+    "rolesAdd": "Add role",
+    "rolesColumnRole": "Role",
+    "rolesColumnPeople": "People",
+    "rolesColumnPermissions": "Permissions",
+    "rolesPeopleCount": "{count} people",
+    "@rolesPeopleCount": {
+        "description": "Roles — how many staff hold a role",
+        "placeholders": {
+            "count": {
+                "type": "String",
+                "example": "3"
+            }
+        }
+    },
+    "rolesPermissionCount": "{count} of {total} permissions",
+    "@rolesPermissionCount": {
+        "description": "Roles — permission tally",
+        "placeholders": {
+            "count": {
+                "type": "String",
+                "example": "6"
+            },
+            "total": {
+                "type": "String",
+                "example": "8"
+            }
+        }
+    },
+    "roleAdministrator": "Administrator",
+    "roleLibrarian": "Librarian",
+    "roleAssistant": "Desk assistant",
+    "roleReadOnly": "Read only",
+    "roleAdministratorBody": "Everything, including staff accounts, backups and library settings.",
+    "roleLibrarianBody": "The whole catalogue and circulation desk, plus fines and reports.",
+    "roleAssistantBody": "The circulation desk: check out, return, and look up a member.",
+    "roleReadOnlyBody": "Look at the catalogue and reports. Change nothing.",
+    "permissionCatalog": "Manage the catalogue",
+    "permissionCirculation": "Work the circulation desk",
+    "permissionMembers": "Manage members",
+    "permissionFines": "Collect and waive fines",
+    "permissionReports": "View reports",
+    "permissionSettings": "Change library settings",
+    "permissionUsers": "Manage staff accounts",
+    "permissionBackup": "Run backups and restores",
+    "rolesMatrixTitle": "Permission matrix",
+    "rolesMatrixSubtitle": "Every permission, against every role",
+    "settingsSyncTitle": "Online sync",
+    "settingsSyncBody": "Mirror the catalogue to a remote store so a second machine — or a replacement one — can pick it up.",
+    "syncHeading": "Online sync and backup",
+    "syncSubtitle": "Khulla works fully offline. Sync is an extra copy, never the source of truth.",
+    "syncStatusTitle": "Status",
+    "syncStatusConnected": "Connected",
+    "syncStatusOffline": "Offline",
+    "syncStatusPaused": "Paused",
+    "syncStatusNever": "Not set up",
+    "syncLastSynced": "Last synced",
+    "syncNextSync": "Next sync",
+    "syncNow": "Sync now",
+    "syncPause": "Pause syncing",
+    "syncResume": "Resume syncing",
+    "syncProviderTitle": "Where the copy goes",
+    "syncProviderDescription": "Pick the remote store the encrypted snapshot is written to.",
+    "syncProviderNone": "Not configured",
+    "syncProviderFolder": "A synced folder on this machine",
+    "syncProviderWebdav": "WebDAV server",
+    "syncProviderS3": "S3-compatible bucket",
+    "syncAutoTitle": "Sync automatically",
+    "syncAutoDescription": "Write a snapshot whenever the catalogue changes and the network is up.",
+    "syncEncryptTitle": "Encrypt the snapshot",
+    "syncEncryptDescription": "The snapshot is unreadable without this library’s passphrase. Losing the passphrase loses the backup.",
+    "syncWifiOnlyTitle": "Only over unmetered networks",
+    "syncWifiOnlyDescription": "Hold snapshots back while the machine is on a metered connection.",
+    "syncHistoryTitle": "Recent snapshots",
+    "syncHistorySubtitle": "What was written, when, and how large it was",
+    "syncColumnWhen": "When",
+    "syncColumnSize": "Size",
+    "syncColumnOutcome": "Outcome",
+    "syncOutcomeOk": "Written",
+    "syncOutcomeFailed": "Failed",
+    "syncOutcomeSkipped": "Skipped",
+    "syncHistoryEmptyTitle": "No snapshots yet",
+    "syncHistoryEmptyBody": "Once sync is configured, every snapshot is listed here with its size and outcome.",
+    "labelsHeading": "Labels and barcodes",
+    "labelsSubtitle": "Print spine labels and barcode stickers for copies as they are accessioned.",
+    "labelsScanTitle": "Scan or type a barcode",
+    "labelsScanSubtitle": "A handheld scanner types the barcode and presses enter — the queue below fills as you scan.",
+    "labelsScanHint": "Scan a barcode, or type one and press enter",
+    "labelsQueueTitle": "Print queue",
+    "labelsQueueSubtitle": "{count} labels queued",
+    "@labelsQueueSubtitle": {
+        "description": "Labels — queue tally",
+        "placeholders": {
+            "count": {
+                "type": "String",
+                "example": "12"
+            }
+        }
+    },
+    "labelsQueueEmptyTitle": "Nothing queued",
+    "labelsQueueEmptyBody": "Scan a copy’s barcode, or add a whole shelf from the copies list, to queue its label.",
+    "labelsColumnBarcode": "Barcode",
+    "labelsColumnTitle": "Title",
+    "labelsColumnShelf": "Shelf",
+    "labelsColumnCopies": "Labels",
+    "labelsLayoutTitle": "Label layout",
+    "labelsLayoutSubtitle": "What goes on the sticker, and how many fit a sheet",
+    "labelsSizeTitle": "Sticker size",
+    "labelsSizeSmall": "Small — 38 × 21 mm",
+    "labelsSizeMedium": "Medium — 63 × 38 mm",
+    "labelsSizeLarge": "Large — 99 × 57 mm",
+    "labelsIncludeTitle": "Print the title",
+    "labelsIncludeAuthor": "Print the author",
+    "labelsIncludeShelf": "Print the shelf mark",
+    "labelsIncludeLibrary": "Print the library name",
+    "labelsPreviewTitle": "Preview",
+    "labelsPreviewSubtitle": "One sticker, at the chosen size",
+    "labelsPrint": "Print sheet",
+    "labelsClearQueue": "Clear the queue",
+    "labelsRemove": "Remove from the queue",
+    "settingsAppearanceLanguage": "Language",
+    "settingsAppearanceLanguageDescription": "Khulla renders Nepali Unicode throughout — the catalogue, receipts and labels included.",
+    "settingsLanguageEnglish": "English",
+    "settingsLanguageNepali": "नेपाली",
+    "settingsAppearanceDensity": "Row density",
+    "settingsAppearanceDensityDescription": "How much room a table row takes. Comfortable suits a mouse; compact fits more on a laptop screen.",
+    "settingsDensityComfortable": "Comfortable",
+    "settingsDensityCompact": "Compact"
 }

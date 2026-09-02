@@ -1,51 +1,56 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The block at the top of a collection screen: what the list is, how big it
-/// is, and the one thing the screen is for.
+/// The heading row at the top of a collection card.
 ///
-/// One primary action, per the page recipe — everything else goes in
-/// [menuActions] behind an [AppMenuButton] rather than becoming a second
-/// button of equal weight. On a compact window the action drops below the
-/// title and stretches, because a 100px button beside a wrapped heading is
-/// the worst of both.
+/// The page's *name* is in the shell's top bar; this says what the card
+/// below it holds and offers the one action that adds to it. Secondary
+/// actions go in the overflow menu rather than becoming a row of equal
+/// buttons — a header with four buttons has no primary action at all.
 class CollectionHeader extends StatelessWidget {
   const CollectionHeader({
     required this.title,
     required this.subtitle,
     this.actionLabel,
+    this.actionIcon = Icons.add_rounded,
     this.onAction,
     this.menuActions = const [],
     this.menuTooltip,
     this.leading,
+    this.trailing,
     super.key,
   });
 
-  /// The collection's name.
+  /// What the card holds.
   final String title;
 
-  /// A count or a line of context under it.
+  /// The count, or a line about the collection.
   final String subtitle;
 
-  /// The primary action's label. Null renders no button.
+  /// The one primary action. Null leaves the header read-only.
   final String? actionLabel;
+
+  /// The glyph on the primary action.
+  final IconData actionIcon;
 
   /// Runs the primary action.
   final VoidCallback? onAction;
 
-  /// Secondary actions, shown behind an overflow menu.
+  /// Secondary actions, behind the overflow menu.
   final List<AppMenuAction> menuActions;
 
-  /// Tooltip for the overflow control, required whenever [menuActions] is
-  /// not empty.
+  /// Tooltip for the overflow menu. Required for the menu to appear.
   final String? menuTooltip;
 
-  /// A back control or breadcrumb shown above the title on a nested screen.
+  /// A widget above the heading — a banner, a back control.
   final Widget? leading;
+
+  /// A control between the heading and the actions — a view switch.
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
+    final colors = context.appColors;
     final label = actionLabel;
     final tooltip = menuTooltip;
 
@@ -55,29 +60,28 @@ class CollectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: context.textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.w500,
-            letterSpacing: -0.5,
-            color: context.appColors.textHigh,
+          style: context.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.4,
+            color: colors.textHigh,
           ),
         ),
-        SizedBox(height: spacing.xxs),
+        const SizedBox(height: 2),
         Text(
           subtitle,
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: scheme.onSurfaceVariant,
-            height: 1.4,
-          ),
+          style: context.textTheme.bodySmall?.copyWith(color: colors.textMuted),
         ),
       ],
     );
 
     final actions = <Widget>[
+      ?trailing,
       if (menuActions.isNotEmpty && tooltip != null)
         AppMenuButton(actions: menuActions, tooltip: tooltip),
       if (label != null)
         AppButton(
           size: AppButtonSize.medium,
+          icon: actionIcon,
           onPressed: onAction,
           child: Text(label),
         ),
@@ -93,7 +97,7 @@ class CollectionHeader extends StatelessWidget {
         if (context.formFactor.isCompact) ...[
           heading,
           if (actions.isNotEmpty) ...[
-            SizedBox(height: spacing.md),
+            SizedBox(height: spacing.sm),
             Row(
               children: [
                 for (final (index, action) in actions.indexed) ...[
@@ -105,21 +109,17 @@ class CollectionHeader extends StatelessWidget {
           ],
         ] else
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(child: heading),
               SizedBox(width: spacing.lg),
-              Padding(
-                padding: EdgeInsets.only(top: spacing.xs),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (final (index, action) in actions.indexed) ...[
-                      if (index > 0) SizedBox(width: spacing.xs),
-                      action,
-                    ],
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (final (index, action) in actions.indexed) ...[
+                    if (index > 0) SizedBox(width: spacing.xs),
+                    action,
                   ],
-                ),
+                ],
               ),
             ],
           ),

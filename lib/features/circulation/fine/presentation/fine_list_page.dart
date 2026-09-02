@@ -176,7 +176,6 @@ class _FineListPageState extends State<FineListPage> {
       items: matches,
       onRowTap: (fine) => context.go(Routes.member(fine.memberId)),
       compactBuilder: (context, fine) => _FineCard(fine: fine),
-      compactExtent: 116,
       columns: [
         AppTableColumn<FineRecord>(
           id: 'member',

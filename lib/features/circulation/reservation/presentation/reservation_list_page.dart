@@ -92,7 +92,6 @@ class _ReservationListPageState extends State<ReservationListPage> {
       items: matches,
       onRowTap: (hold) => context.go(Routes.catalogTitle(hold.titleId)),
       compactBuilder: (context, hold) => _ReservationCard(hold: hold),
-      compactExtent: 116,
       columns: [
         AppTableColumn<ReservationRecord>(
           id: 'queue',

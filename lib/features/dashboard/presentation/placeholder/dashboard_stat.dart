@@ -14,6 +14,9 @@ class DashboardStat {
     this.caption,
     this.tone = AppStatusTone.neutral,
     this.route,
+    this.trend,
+    this.trendValue = 0,
+    this.trendInverted = false,
   });
 
   /// What is being counted, already localized.
@@ -34,4 +37,13 @@ class DashboardStat {
   /// Where tapping the tile leads, when the list behind it exists. Null while
   /// the section is still a placeholder.
   final String? route;
+
+  /// The change against the previous period, already formatted (`+8.2%`).
+  final String? trend;
+
+  /// The change's sign. Only the sign is read; the text is [trend].
+  final num trendValue;
+
+  /// Whether a fall is the good news — overdue copies, fines outstanding.
+  final bool trendInverted;
 }

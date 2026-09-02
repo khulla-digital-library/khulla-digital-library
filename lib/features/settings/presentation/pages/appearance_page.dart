@@ -11,8 +11,22 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// [ThemeCubit] is an app-wide `@lazySingleton` with real storage behind it,
 /// so the choice made here survives a restart. It is a device setting, not a
 /// library one — nothing about it reaches the catalogue file.
-class AppearancePage extends StatelessWidget {
+/// The language the interface is drawn in.
+enum AppLanguage { english, nepali }
+
+/// How much room a table row takes.
+enum RowDensity { comfortable, compact }
+
+class AppearancePage extends StatefulWidget {
   const AppearancePage({super.key});
+
+  @override
+  State<AppearancePage> createState() => _AppearancePageState();
+}
+
+class _AppearancePageState extends State<AppearancePage> {
+  AppLanguage _language = AppLanguage.english;
+  RowDensity _density = RowDensity.comfortable;
 
   String _label(AppLocalizations l10n, ThemeMode mode) => switch (mode) {
     ThemeMode.system => l10n.themeModeSystem,
@@ -62,6 +76,42 @@ class AppearancePage extends StatelessWidget {
                     onChanged: (value) =>
                         context.read<ThemeCubit>().setThemeMode(value),
                   ),
+                ),
+              ),
+            ),
+            SizedBox(height: spacing.md),
+            SectionCard(
+              title: l10n.settingsAppearanceLanguage,
+              subtitle: l10n.settingsAppearanceLanguageDescription,
+              icon: Icons.translate_rounded,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: AppSegmentedControl<AppLanguage>(
+                  value: _language,
+                  items: AppLanguage.values,
+                  itemLabel: (value) => switch (value) {
+                    AppLanguage.english => l10n.settingsLanguageEnglish,
+                    AppLanguage.nepali => l10n.settingsLanguageNepali,
+                  },
+                  onChanged: (value) => setState(() => _language = value),
+                ),
+              ),
+            ),
+            SizedBox(height: spacing.md),
+            SectionCard(
+              title: l10n.settingsAppearanceDensity,
+              subtitle: l10n.settingsAppearanceDensityDescription,
+              icon: Icons.table_rows_outlined,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: AppSegmentedControl<RowDensity>(
+                  value: _density,
+                  items: RowDensity.values,
+                  itemLabel: (value) => switch (value) {
+                    RowDensity.comfortable => l10n.settingsDensityComfortable,
+                    RowDensity.compact => l10n.settingsDensityCompact,
+                  },
+                  onChanged: (value) => setState(() => _density = value),
                 ),
               ),
             ),

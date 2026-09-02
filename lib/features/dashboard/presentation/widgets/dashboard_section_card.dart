@@ -2,9 +2,9 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// A titled card holding one of the dashboard's board sections.
 ///
-/// It gives every section the same header, the same minimum height, and the
-/// same padding, so the board stays a grid rather than a stack of cards that
-/// each found their own size. [minBodyHeight] is a *minimum*, not a fixed
+/// Every section gets the same header, the same padding and the same optional
+/// trailing control, so the board stays a grid rather than a stack of cards
+/// that each found their own shape. [minBodyHeight] is a floor, not a fixed
 /// height: the card grows with text scaling instead of clipping it.
 class DashboardSectionCard extends StatelessWidget {
   const DashboardSectionCard({
@@ -13,14 +13,15 @@ class DashboardSectionCard extends StatelessWidget {
     this.subtitle,
     this.icon,
     this.trailing,
-    this.minBodyHeight = 200,
+    this.minBodyHeight = 0,
+    this.bodyPadding,
     super.key,
   });
 
   /// Section heading.
   final String title;
 
-  /// The section's body — today, an empty state.
+  /// The section's body.
   final Widget child;
 
   /// Supporting line under [title].
@@ -29,17 +30,26 @@ class DashboardSectionCard extends StatelessWidget {
   /// Glyph beside the heading.
   final IconData? icon;
 
-  /// The section's single action.
+  /// The section's single control — a period picker, a *view all* link.
   final Widget? trailing;
 
   /// Floor for the body's height, so two cards side by side start level.
   final double minBodyHeight;
 
+  /// Padding around the body. Zero-horizontal for a card holding a table,
+  /// which draws its own row insets.
+  final EdgeInsetsGeometry? bodyPadding;
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
+    final body = Padding(
+      padding: bodyPadding ?? EdgeInsets.zero,
+      child: child,
+    );
 
     return AppCard(
+      padding: EdgeInsets.all(spacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -52,10 +62,13 @@ class DashboardSectionCard extends StatelessWidget {
             dense: true,
           ),
           SizedBox(height: spacing.md),
-          ConstrainedBox(
-            constraints: BoxConstraints(minHeight: minBodyHeight),
-            child: Center(child: child),
-          ),
+          if (minBodyHeight > 0)
+            ConstrainedBox(
+              constraints: BoxConstraints(minHeight: minBodyHeight),
+              child: body,
+            )
+          else
+            body,
         ],
       ),
     );
