@@ -216,8 +216,8 @@ class _SheetCloseChip extends StatelessWidget {
             border: Border.all(color: colors.hairline),
             boxShadow: context.appShadows.card,
           ),
-          child: Icon(
-            Icons.close_rounded,
+          child: AppIcon(
+            AppIcons.close,
             size: context.appMetrics.iconLarge,
             color: colors.brand,
           ),

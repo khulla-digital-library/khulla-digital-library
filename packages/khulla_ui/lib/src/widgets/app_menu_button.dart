@@ -8,7 +8,7 @@ class AppMenuButton extends StatelessWidget {
   const AppMenuButton({
     required this.actions,
     required this.tooltip,
-    this.icon = Icons.more_horiz_rounded,
+    this.icon = AppIcons.more,
     super.key,
   });
 
@@ -19,7 +19,7 @@ class AppMenuButton extends StatelessWidget {
   final String tooltip;
 
   /// The trigger glyph.
-  final IconData icon;
+  final AppIconSpec icon;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class AppMenuButton extends StatelessWidget {
 
     return PopupMenuButton<AppMenuAction>(
       tooltip: tooltip,
-      icon: Icon(icon, size: metrics.icon, color: context.appColors.ink500),
+      icon: AppIcon(icon, size: metrics.icon, color: context.appColors.ink500),
       position: PopupMenuPosition.under,
       onSelected: (action) => action.onSelected(),
       itemBuilder: (menuContext) => [
@@ -61,7 +61,7 @@ class _MenuActionRow extends StatelessWidget {
     return Row(
       children: [
         if (glyph != null) ...[
-          Icon(glyph, size: context.appMetrics.icon, color: foreground),
+          AppIcon(glyph, size: context.appMetrics.icon, color: foreground),
           SizedBox(width: context.appSpacing.menuIconGap),
         ],
         Text(

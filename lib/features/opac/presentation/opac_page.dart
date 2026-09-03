@@ -123,7 +123,7 @@ class _OpacPageState extends State<OpacPage> with DisposeBag {
               ),
               sliver: SliverToBoxAdapter(
                 child: AppEmptyView(
-                  icon: Icons.search_off_rounded,
+                  icon: AppIcons.noResults,
                   title: l10n.opacEmptyTitle,
                   message: l10n.opacEmptyBody,
                   actionLabel: l10n.commonClearFilters,
@@ -164,8 +164,8 @@ class _OpacPageState extends State<OpacPage> with DisposeBag {
                 tone: AppStatusTone.info,
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.desktop_windows_outlined,
+                    AppIcon(
+                      AppIcons.desktop,
                       color: context.appColors.info,
                     ),
                     SizedBox(width: spacing.sm),

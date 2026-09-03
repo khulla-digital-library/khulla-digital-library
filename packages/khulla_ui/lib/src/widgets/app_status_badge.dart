@@ -30,7 +30,7 @@ class AppStatusBadge extends StatelessWidget {
   final AppStatusTone tone;
 
   /// Replaces the dot with a glyph, where one says more than a color does.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   /// Tightens the pill for use inside a table row.
   final bool dense;
@@ -60,7 +60,7 @@ class AppStatusBadge extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (glyph != null) ...[
-              Icon(
+              AppIcon(
                 glyph,
                 size: context.appMetrics.iconDense,
                 color: foreground,

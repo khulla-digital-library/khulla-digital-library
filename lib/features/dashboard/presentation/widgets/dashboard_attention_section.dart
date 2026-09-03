@@ -25,7 +25,7 @@ class DashboardAttentionSection extends StatelessWidget {
       subtitle: l10n.dashboardAttentionSubtitle,
       child: items.isEmpty
           ? AppEmptyView(
-              icon: Icons.check_circle_outline_rounded,
+              icon: AppIcons.success,
               title: l10n.dashboardAttentionEmptyTitle,
               message: l10n.dashboardAttentionEmptyBody,
             )
@@ -60,7 +60,7 @@ class _AttentionRow extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
+              AppIcon(
                 item.icon,
                 size: spacing.md + 2,
                 color: item.tone.foreground(context),
@@ -84,8 +84,8 @@ class _AttentionRow extends StatelessWidget {
                 ),
               ),
               SizedBox(width: spacing.xxs),
-              Icon(
-                Icons.chevron_right_rounded,
+              AppIcon(
+                AppIcons.chevronRight,
                 size: spacing.md + 2,
                 color: colors.textMuted,
               ),

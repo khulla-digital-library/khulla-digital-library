@@ -41,8 +41,8 @@ class CheckOutBasket extends StatelessWidget {
           AppTextField(
             controller: scanController,
             hintText: l10n.checkOutScanHint,
-            prefixIcon: Icon(
-              Icons.qr_code_scanner_rounded,
+            prefixIcon: AppIcon(
+              AppIcons.scan,
               size: spacing.md + 4,
               color: scheme.onSurfaceVariant,
             ),
@@ -92,7 +92,7 @@ class CheckOutBasket extends StatelessWidget {
                   width: 56,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, copy) => AppIconButton(
-                    icon: Icons.close_rounded,
+                    icon: AppIcons.close,
                     tooltip: l10n.checkOutRemoveCopy,
                     tone: AppStatusTone.danger,
                     onPressed: () => onRemove(copy),

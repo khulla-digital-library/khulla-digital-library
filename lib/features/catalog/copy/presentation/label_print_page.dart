@@ -93,7 +93,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
       focusNode: _scanFocus,
       autofocus: true,
       hintText: l10n.labelsScanHint,
-      prefixIcon: const Icon(Icons.barcode_reader),
+      prefixIcon: const AppIcon(AppIcons.barcode),
       textInputAction: TextInputAction.done,
       onChanged: (_) {},
       onSubmitted: _queueBarcode,
@@ -117,7 +117,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
             ),
       child: _queue.isEmpty
           ? AppEmptyView(
-              icon: Icons.qr_code_2_rounded,
+              icon: AppIcons.qrCode,
               title: l10n.labelsQueueEmptyTitle,
               message: l10n.labelsQueueEmptyBody,
               variant: AppFeedbackVariant.inline,
@@ -167,7 +167,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
                   width: 56,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, entry) => AppIconButton(
-                    icon: Icons.close_rounded,
+                    icon: AppIcons.close,
                     tooltip: l10n.labelsRemove,
                     onPressed: () => _remove(entry),
                   ),
@@ -249,7 +249,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
           ),
           SizedBox(height: spacing.md),
           AppButton(
-            icon: Icons.print_outlined,
+            icon: AppIcons.printer,
             onPressed: _queue.isEmpty ? null : () => showNotWiredToast(context),
             child: Text(l10n.labelsPrint),
           ),
@@ -356,13 +356,13 @@ class _CountStepper extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         AppIconButton(
-          icon: Icons.remove_rounded,
+          icon: AppIcons.remove,
           tooltip: l10n.commonDecrease,
           onPressed: count <= 1 ? null : () => onChanged(count - 1),
         ),
         Text('$count', style: context.textTheme.bodyMedium),
         AppIconButton(
-          icon: Icons.add_rounded,
+          icon: AppIcons.add,
           tooltip: l10n.commonIncrease,
           onPressed: () => onChanged(count + 1),
         ),

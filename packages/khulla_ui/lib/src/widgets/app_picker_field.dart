@@ -16,7 +16,7 @@ class AppPickerField extends StatelessWidget {
     this.label,
     this.hintText,
     this.errorText,
-    this.icon = Icons.expand_more_rounded,
+    this.icon = AppIcons.chevronDown,
     this.required = false,
     this.enabled = true,
     this.onClear,
@@ -39,9 +39,9 @@ class AppPickerField extends StatelessWidget {
   /// Validation message shown under the field.
   final String? errorText;
 
-  /// Trailing glyph. Use `Icons.calendar_today_rounded` for a date,
-  /// `Icons.search_rounded` for a lookup.
-  final IconData icon;
+  /// Trailing glyph. Use `AppIcons.calendar` for a date,
+  /// `AppIcons.search` for a lookup.
+  final AppIconSpec icon;
 
   /// When true, the label shows a required asterisk.
   final bool required;
@@ -84,11 +84,11 @@ class AppPickerField extends StatelessWidget {
               enabled: enabled,
               suffixIcon: hasValue && clear != null && clearLabel != null
                   ? AppIconButton(
-                      icon: Icons.close_rounded,
+                      icon: AppIcons.close,
                       tooltip: clearLabel,
                       onPressed: clear,
                     )
-                  : Icon(
+                  : AppIcon(
                       icon,
                       size: spacing.md + 4,
                       color: scheme.onSurfaceVariant,

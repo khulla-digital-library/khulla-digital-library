@@ -87,10 +87,10 @@ class AppButton extends StatefulWidget {
 
   /// A glyph before the label. Worth it on a verb — *Add title*, *Check
   /// out* — and never worth it as decoration.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   /// A glyph after the label, for a button that opens something.
-  final IconData? trailingIcon;
+  final AppIconSpec? trailingIcon;
 
   /// Stretches to the slot instead of hugging the label.
   final bool expand;
@@ -160,13 +160,13 @@ class _AppButtonState extends State<AppButton> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (widget.icon != null) ...[
-              Icon(widget.icon),
+              AppIcon(widget.icon!),
               SizedBox(width: gap),
             ],
             Flexible(child: widget.child),
             if (widget.trailingIcon != null) ...[
               SizedBox(width: gap),
-              Icon(widget.trailingIcon),
+              AppIcon(widget.trailingIcon!),
             ],
           ],
         ),

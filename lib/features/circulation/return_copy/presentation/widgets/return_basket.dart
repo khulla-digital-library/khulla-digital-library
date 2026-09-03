@@ -38,8 +38,8 @@ class ReturnBasket extends StatelessWidget {
           AppTextField(
             controller: scanController,
             hintText: l10n.returnsScanHint,
-            prefixIcon: Icon(
-              Icons.qr_code_scanner_rounded,
+            prefixIcon: AppIcon(
+              AppIcons.scan,
               size: spacing.md + 4,
               color: scheme.onSurfaceVariant,
             ),
@@ -127,7 +127,7 @@ class ReturnBasket extends StatelessWidget {
                   width: 56,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, loan) => AppIconButton(
-                    icon: Icons.close_rounded,
+                    icon: AppIcons.close,
                     tooltip: l10n.returnsRemoveCopy,
                     tone: AppStatusTone.danger,
                     onPressed: () => onRemove(loan),

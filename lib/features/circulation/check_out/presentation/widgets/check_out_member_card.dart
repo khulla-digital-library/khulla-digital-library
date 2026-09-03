@@ -106,7 +106,7 @@ class CheckOutMemberCard extends StatelessWidget {
                   AppStatusBadge(
                     label: outstandingFines.display(),
                     tone: AppStatusTone.danger,
-                    icon: Icons.account_balance_wallet_outlined,
+                    icon: AppIcons.wallet,
                   ),
               ],
             ),

@@ -6,7 +6,7 @@ import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Who is signed in, pinned to the trailing edge of the top bar.
+/// Who is signed in, at the foot of the rail.
 ///
 /// It shows the name *and* the role because a shared desk machine is the
 /// normal case in a library: the person about to waive a fine needs to see,
@@ -32,21 +32,21 @@ class ShellAccountChip extends StatelessWidget {
         PopupMenuItem<int>(
           onTap: () => showNotWiredToast(context),
           child: _MenuRow(
-            icon: Icons.person_outline_rounded,
+            icon: AppIcons.person,
             label: l10n.shellProfile,
           ),
         ),
         PopupMenuItem<int>(
           onTap: () => context.go(Routes.settings),
           child: _MenuRow(
-            icon: Icons.settings_outlined,
+            icon: AppIcons.settings,
             label: l10n.navSettings,
           ),
         ),
         PopupMenuItem<int>(
           onTap: () => showNotWiredToast(context),
           child: _MenuRow(
-            icon: Icons.help_outline_rounded,
+            icon: AppIcons.help,
             label: l10n.shellHelp,
           ),
         ),
@@ -54,7 +54,7 @@ class ShellAccountChip extends StatelessWidget {
         PopupMenuItem<int>(
           onTap: () => showNotWiredToast(context),
           child: _MenuRow(
-            icon: Icons.logout_rounded,
+            icon: AppIcons.signOut,
             label: l10n.shellSignOut,
             destructive: true,
           ),
@@ -71,28 +71,34 @@ class ShellAccountChip extends StatelessWidget {
             AppAvatar(initials: staff.initials, size: 34),
             if (!compact) ...[
               SizedBox(width: spacing.xs),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    staff.name,
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: colors.textHigh,
-                      fontWeight: FontWeight.w600,
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      staff.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: colors.textHigh,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  Text(
-                    staff.role.label(l10n),
-                    style: context.textTheme.labelSmall?.copyWith(
-                      color: colors.textMuted,
+                    Text(
+                      staff.role.label(l10n),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: colors.textMuted,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               SizedBox(width: spacing.xxs),
-              Icon(
-                Icons.keyboard_arrow_down_rounded,
+              AppIcon(
+                AppIcons.chevronDown,
                 size: 18,
                 color: colors.textMuted,
               ),
@@ -111,7 +117,7 @@ class _MenuRow extends StatelessWidget {
     this.destructive = false,
   });
 
-  final IconData icon;
+  final AppIconSpec icon;
   final String label;
   final bool destructive;
 
@@ -123,7 +129,7 @@ class _MenuRow extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(icon, size: 18, color: color),
+        AppIcon(icon, size: 18, color: color),
         SizedBox(width: context.appSpacing.xs),
         Text(
           label,

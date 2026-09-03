@@ -45,8 +45,8 @@ class AppBackButton extends StatelessWidget {
             borderRadius: radius,
             border: Border.all(color: colors.hairline),
           ),
-          child: Icon(
-            Icons.chevron_left_rounded,
+          child: AppIcon(
+            AppIcons.chevronLeft,
             size: metrics.icon,
             color: context.colorScheme.primary,
           ),

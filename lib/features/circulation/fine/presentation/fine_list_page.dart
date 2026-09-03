@@ -7,7 +7,6 @@ import 'package:khulla/features/circulation/shared/presentation/circulation_labe
 import 'package:khulla/features/circulation/shared/presentation/placeholder/circulation_placeholder.dart';
 import 'package:khulla/features/circulation/shared/presentation/placeholder/fine_record.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/collection_header.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -54,7 +53,7 @@ class _FineListPageState extends State<FineListPage> {
       context: context,
       title: l10n.finesCollectTitle,
       message: l10n.finesCollectBody(fine.amount.display(), fine.memberName),
-      icon: Icons.account_balance_wallet_outlined,
+      icon: AppIcons.wallet,
       actionsBuilder: (dialogContext) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -86,7 +85,7 @@ class _FineListPageState extends State<FineListPage> {
       message: l10n.finesWaiveBody,
       confirmLabel: l10n.finesWaive,
       cancelLabel: l10n.commonCancel,
-      icon: Icons.money_off_rounded,
+      icon: AppIcons.waiveFine,
     );
     if (!mounted || !confirmed) return;
     showNotWiredToast(context);
@@ -107,42 +106,34 @@ class _FineListPageState extends State<FineListPage> {
     }.length;
 
     return CollectionPageView<FineRecord>(
-      header: Column(
+      summary: l10n.finesSubtitle,
+      intro: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          CollectionHeader(
-            title: l10n.finesHeading,
-            subtitle: l10n.finesSubtitle,
-            leading: AppPageHeader(
-              title: l10n.circulationHeading,
-              onBackPressed: () => context.go(Routes.circulation),
-            ),
-          ),
-          SizedBox(height: spacing.lg),
           AppStatStrip(
             tiles: [
               AppStatTile(
                 label: l10n.finesStatOutstanding,
                 value: placeholderOutstandingFines.display(),
-                icon: Icons.account_balance_wallet_outlined,
+                icon: AppIcons.wallet,
                 tone: AppStatusTone.danger,
               ),
               AppStatTile(
                 label: l10n.finesStatCollected,
                 value: placeholderCollectedFines.display(),
-                icon: Icons.payments_outlined,
+                icon: AppIcons.payment,
                 tone: AppStatusTone.success,
               ),
               AppStatTile(
                 label: l10n.finesStatWaived,
                 value: placeholderWaivedFines.display(),
-                icon: Icons.money_off_rounded,
+                icon: AppIcons.waiveFine,
               ),
               AppStatTile(
                 label: l10n.finesStatMembersOwing,
                 value: '$owing',
-                icon: Icons.people_outline_rounded,
+                icon: AppIcons.people,
                 tone: AppStatusTone.warning,
               ),
             ],
@@ -190,7 +181,7 @@ class _FineListPageState extends State<FineListPage> {
           showFrom: FormFactor.medium,
           cellBuilder: (context, fine) => Row(
             children: [
-              Icon(
+              AppIcon(
                 fine.reason.icon,
                 size: spacing.md,
                 color: scheme.onSurfaceVariant,
@@ -250,18 +241,18 @@ class _FineListPageState extends State<FineListPage> {
             actions: [
               AppMenuAction(
                 label: l10n.finesCollect,
-                icon: Icons.payments_outlined,
+                icon: AppIcons.payment,
                 enabled: fine.status == FineStatus.unpaid,
                 onSelected: () => unawaited(_collect(fine)),
               ),
               AppMenuAction(
                 label: l10n.loansViewMember,
-                icon: Icons.person_outline_rounded,
+                icon: AppIcons.person,
                 onSelected: () => context.go(Routes.member(fine.memberId)),
               ),
               AppMenuAction(
                 label: l10n.finesWaive,
-                icon: Icons.money_off_rounded,
+                icon: AppIcons.waiveFine,
                 isDestructive: true,
                 enabled: fine.status == FineStatus.unpaid,
                 onSelected: () => unawaited(_waive(fine)),
@@ -272,14 +263,14 @@ class _FineListPageState extends State<FineListPage> {
       ],
       emptyState: _isFiltered
           ? AppEmptyView(
-              icon: Icons.search_off_rounded,
+              icon: AppIcons.noResults,
               title: l10n.commonNoMatchesTitle,
               message: l10n.commonNoMatchesBody,
               actionLabel: l10n.commonClearFilters,
               onAction: _clearFilters,
             )
           : AppEmptyView(
-              icon: Icons.account_balance_wallet_outlined,
+              icon: AppIcons.wallet,
               title: l10n.finesEmptyTitle,
               message: l10n.finesEmptyBody,
             ),

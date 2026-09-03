@@ -21,7 +21,7 @@ class AppTextButton extends StatelessWidget {
   final Widget child;
 
   /// An optional leading glyph.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   @override
   Widget build(BuildContext context) => AppButton(

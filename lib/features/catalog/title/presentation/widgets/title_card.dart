@@ -29,7 +29,7 @@ class TitleCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
+            AppIcon(
               title.format.icon,
               size: spacing.md + 4,
               color: scheme.onSurfaceVariant,

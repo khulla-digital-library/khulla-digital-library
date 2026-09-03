@@ -1,17 +1,14 @@
 import 'dart:async';
 
 import 'package:go_router/go_router.dart';
-import 'package:khulla/app/shell/widgets/shell_account_chip.dart';
 import 'package:khulla/app/shell/widgets/shell_brand_mark.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
-import 'package:khulla/app/shell/widgets/shell_footer_card.dart';
 import 'package:khulla/app/shell/widgets/shell_more_sheet.dart';
-import 'package:khulla/app/shell/widgets/shell_notifications_button.dart';
+import 'package:khulla/app/shell/widgets/shell_page_actions.dart';
 import 'package:khulla/app/shell/widgets/shell_page_title.dart';
-import 'package:khulla/app/shell/widgets/shell_theme_toggle.dart';
+import 'package:khulla/app/shell/widgets/shell_rail_footer.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The app's only shell, adapting its navigation to the window it is given.
@@ -23,10 +20,15 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// the breakpoint never reorders or drops a section.
 ///
 /// The shell owns the top bar, and the top bar sits *outside* the page's
-/// scroll view. That is the whole reason it lives here: the page title, the
-/// global search and the account control have to stay put while a catalogue
-/// of ten thousand titles scrolls, and no arrangement inside a page achieves
-/// that as simply.
+/// scroll view. That is the whole reason it lives here: the page title and
+/// the section's actions have to stay put while a catalogue of ten thousand
+/// titles scrolls, and no arrangement inside a page achieves that as simply.
+///
+/// The chrome is split by *scope*, not by convenience. The top bar carries
+/// only what changes with the page — its name, its trail, what you can do to
+/// it. Search, notifications, the theme switch and the account control are
+/// the same everywhere, so they sit at the foot of the rail with the rest of
+/// the app-wide furniture.
 class AppShell extends StatelessWidget {
   const AppShell({required this.navigationShell, super.key});
 
@@ -66,19 +68,11 @@ class AppShell extends StatelessWidget {
       breadcrumbs: page.crumbs.isEmpty
           ? null
           : AppBreadcrumbs(crumbs: page.crumbs),
-      search: AppSearchField(
-        hintText: l10n.shellSearchHint,
-        clearTooltip: l10n.commonClearSearch,
-        dense: true,
-        onChanged: (_) {},
-        onSubmitted: (_) => showNotWiredToast(context),
-      ),
-      actions: const [ShellNotificationsButton(), ShellThemeToggle()],
-      trailing: ShellAccountChip(compact: formFactor.isCompact),
+      actions: shellPageActions(context, location, l10n),
       leading: formFactor.usesNavigationRail
           ? null
           : AppIconButton(
-              icon: Icons.grid_view_rounded,
+              icon: AppIcons.gridView,
               tooltip: l10n.shellMoreTitle,
               onPressed: () => unawaited(
                 showShellMoreSheet(
@@ -119,13 +113,11 @@ class AppShell extends StatelessWidget {
           destinations: [
             for (final destination in compact)
               AppNavDestination(
-                icon: Icon(destination.icon),
-                selectedIcon: Icon(destination.selectedIcon),
+                icon: AppIcon(destination.icon),
                 label: destination.label,
               ),
             AppNavDestination(
-              icon: const Icon(Icons.grid_view_outlined),
-              selectedIcon: const Icon(Icons.grid_view_rounded),
+              icon: const AppIcon(AppIcons.gridView),
               label: l10n.navMore,
             ),
           ],
@@ -143,13 +135,11 @@ class AppShell extends StatelessWidget {
             onDestinationSelected: _goBranch,
             extended: extended,
             leading: ShellBrandMark(extended: extended),
-            trailing: extended ? null : const ShellThemeToggle(),
-            footer: extended ? const ShellFooterCard() : null,
+            footer: ShellRailFooter(extended: extended),
             destinations: [
               for (final destination in destinations)
                 AppNavDestination(
-                  icon: Icon(destination.icon),
-                  selectedIcon: Icon(destination.selectedIcon),
+                  icon: AppIcon(destination.icon),
                   label: destination.label,
                   children: [
                     for (final child in destination.children)

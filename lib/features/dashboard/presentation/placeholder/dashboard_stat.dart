@@ -26,7 +26,7 @@ class DashboardStat {
   final String value;
 
   /// Glyph in the tile's badge.
-  final IconData icon;
+  final AppIconSpec icon;
 
   /// A line of context under the figure.
   final String? caption;

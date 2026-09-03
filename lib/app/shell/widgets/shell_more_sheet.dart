@@ -51,7 +51,7 @@ class _MoreList extends StatelessWidget {
               padding: EdgeInsets.only(left: spacing.xlg),
               child: _MoreRow(
                 label: child.label,
-                icon: Icons.subdirectory_arrow_right_rounded,
+                icon: AppIcons.subEntry,
                 selected: Routes.isUnder(current, child.route),
                 route: child.route,
               ),
@@ -72,7 +72,7 @@ class _MoreRow extends StatelessWidget {
   });
 
   final String label;
-  final IconData icon;
+  final AppIconSpec icon;
   final bool selected;
   final String route;
 
@@ -99,7 +99,7 @@ class _MoreRow extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
+              AppIcon(
                 icon,
                 size: spacing.md + 2,
                 color: selected ? scheme.primary : colors.textMuted,

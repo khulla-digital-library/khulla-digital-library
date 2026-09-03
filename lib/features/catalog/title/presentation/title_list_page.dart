@@ -6,8 +6,6 @@ import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_title.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_card.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/collection_header.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -85,7 +83,7 @@ class _TitleListPageState extends State<TitleListPage> {
         sortable: true,
         cellBuilder: (context, title) => Row(
           children: [
-            Icon(
+            AppIcon(
               title.format.icon,
               size: context.appSpacing.md,
               color: scheme.onSurfaceVariant,
@@ -177,30 +175,7 @@ class _TitleListPageState extends State<TitleListPage> {
     final rows = matches.sublist(start, end);
 
     return CollectionPageView<CatalogTitle>(
-      header: CollectionHeader(
-        title: l10n.titlesHeading,
-        subtitle: l10n.titlesSubtitle('${placeholderTitles.length}'),
-        actionLabel: l10n.titlesAdd,
-        onAction: () => context.go(Routes.catalogTitleNew),
-        menuTooltip: l10n.commonMoreActions,
-        menuActions: [
-          AppMenuAction(
-            label: l10n.titlesImport,
-            icon: Icons.file_upload_outlined,
-            onSelected: () => showNotWiredToast(context),
-          ),
-          AppMenuAction(
-            label: l10n.titlesExport,
-            icon: Icons.file_download_outlined,
-            onSelected: () => showNotWiredToast(context),
-          ),
-          AppMenuAction(
-            label: l10n.titlesPrintLabels,
-            icon: Icons.print_outlined,
-            onSelected: () => showNotWiredToast(context),
-          ),
-        ],
-      ),
+      summary: l10n.titlesSubtitle('${placeholderTitles.length}'),
       toolbar: AppToolbar(
         search: AppSearchField(
           hintText: l10n.titlesSearchHint,
@@ -213,7 +188,7 @@ class _TitleListPageState extends State<TitleListPage> {
         filters: [
           AppFilterChip(
             label: l10n.statusAvailable,
-            icon: Icons.check_circle_outline_rounded,
+            icon: AppIcons.success,
             tone: AppStatusTone.success,
             selected: _availableOnly,
             onSelected: (selected) => setState(() {
@@ -254,14 +229,14 @@ class _TitleListPageState extends State<TitleListPage> {
       ),
       emptyState: _isFiltered
           ? AppEmptyView(
-              icon: Icons.search_off_rounded,
+              icon: AppIcons.noResults,
               title: l10n.commonNoMatchesTitle,
               message: l10n.commonNoMatchesBody,
               actionLabel: l10n.commonClearFilters,
               onAction: _clearFilters,
             )
           : AppEmptyView(
-              icon: Icons.menu_book_rounded,
+              icon: AppIcons.book,
               title: l10n.titlesEmptyTitle,
               message: l10n.titlesEmptyBody,
               actionLabel: l10n.titlesAdd,

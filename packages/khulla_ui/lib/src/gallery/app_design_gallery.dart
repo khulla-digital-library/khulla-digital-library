@@ -302,7 +302,7 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
               children: [
                 AppButton(
                   onPressed: () {},
-                  icon: Icons.add_rounded,
+                  icon: AppIcons.add,
                   child: const Text('Add title'),
                 ),
                 AppButton(
@@ -313,7 +313,7 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
                 AppButton(
                   onPressed: () {},
                   size: AppButtonSize.large,
-                  trailingIcon: Icons.arrow_forward_rounded,
+                  trailingIcon: AppIcons.arrowRight,
                   child: const Text('Large'),
                 ),
               ],
@@ -338,18 +338,18 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
               label: 'icon buttons',
               children: [
                 AppIconButton(
-                  icon: Icons.edit_outlined,
+                  icon: AppIcons.edit,
                   tooltip: 'Edit',
                   size: AppIconButtonSize.small,
                   onPressed: () {},
                 ),
                 AppIconButton(
-                  icon: Icons.print_outlined,
+                  icon: AppIcons.printer,
                   tooltip: 'Print labels',
                   onPressed: () {},
                 ),
                 AppIconButton(
-                  icon: Icons.notifications_none_rounded,
+                  icon: AppIcons.notifications,
                   tooltip: 'Notifications',
                   size: AppIconButtonSize.large,
                   badge: true,
@@ -360,17 +360,17 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
                   actions: [
                     AppMenuAction(
                       label: 'View',
-                      icon: Icons.visibility_outlined,
+                      icon: AppIcons.preview,
                       onSelected: () {},
                     ),
                     AppMenuAction(
                       label: 'Edit',
-                      icon: Icons.edit_outlined,
+                      icon: AppIcons.edit,
                       onSelected: () {},
                     ),
                     AppMenuAction(
                       label: 'Delete',
-                      icon: Icons.delete_outline_rounded,
+                      icon: AppIcons.delete,
                       isDestructive: true,
                       onSelected: () {},
                     ),
@@ -565,7 +565,7 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
                 AppStatusBadge(
                   label: 'Returned',
                   tone: AppStatusTone.success,
-                  icon: Icons.check_rounded,
+                  icon: AppIcons.check,
                 ),
               ],
             ),
@@ -754,7 +754,7 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
               'line of copy, one action.',
           children: [
             AppEmptyView(
-              icon: Icons.inventory_2_outlined,
+              icon: AppIcons.inventory,
               title: 'No copies yet',
               message:
                   'Add the first copy and it will show up here with its '

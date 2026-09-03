@@ -71,10 +71,8 @@ class _SyncPageState extends State<SyncPage> {
                   tone: connected ? AppStatusTone.success : null,
                   child: Row(
                     children: [
-                      Icon(
-                        connected
-                            ? Icons.cloud_done_outlined
-                            : Icons.cloud_off_outlined,
+                      AppIcon(
+                        connected ? AppIcons.cloudDone : AppIcons.cloudOff,
                         color: connected ? colors.success : colors.textMuted,
                       ),
                       SizedBox(width: spacing.sm),
@@ -117,7 +115,7 @@ class _SyncPageState extends State<SyncPage> {
                       SizedBox(width: spacing.sm),
                       AppButton(
                         size: AppButtonSize.medium,
-                        icon: Icons.sync_rounded,
+                        icon: AppIcons.renew,
                         onPressed: () => showNotWiredToast(context),
                         child: Text(l10n.syncNow),
                       ),
@@ -173,7 +171,7 @@ class _SyncPageState extends State<SyncPage> {
                   subtitle: l10n.syncHistorySubtitle,
                   child: placeholderSnapshots.isEmpty
                       ? AppEmptyView(
-                          icon: Icons.cloud_off_outlined,
+                          icon: AppIcons.cloudOff,
                           title: l10n.syncHistoryEmptyTitle,
                           message: l10n.syncHistoryEmptyBody,
                           variant: AppFeedbackVariant.inline,

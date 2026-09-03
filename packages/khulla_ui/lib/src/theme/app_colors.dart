@@ -76,9 +76,9 @@ class AppColors extends ThemeExtension<AppColors> {
     info: AppPalette.info,
     onInfo: AppPalette.ink100Light,
     infoSoft: _wash(AppPalette.info),
-    danger: AppPalette.brand,
+    danger: AppPalette.danger,
     onDanger: AppPalette.white100,
-    dangerSoft: _wash(AppPalette.brand),
+    dangerSoft: _wash(AppPalette.danger),
     neutralSoft: AppPalette.secondaryLight,
     brandSoft: _tint(AppPalette.accent, 0.2),
     brandStrong: AppPalette.brandButtonBorder,
@@ -116,9 +116,9 @@ class AppColors extends ThemeExtension<AppColors> {
     info: AppPalette.info,
     onInfo: AppPalette.ink100Light,
     infoSoft: _wash(AppPalette.info, 0.14, AppPalette.surfaceDark),
-    danger: AppPalette.brand,
+    danger: AppPalette.danger,
     onDanger: AppPalette.white100,
-    dangerSoft: _wash(AppPalette.brand, 0.18, AppPalette.surfaceDark),
+    dangerSoft: _wash(AppPalette.danger, 0.18, AppPalette.surfaceDark),
     neutralSoft: AppPalette.surfaceDark,
     brandSoft: _tint(AppPalette.accent, 0.16),
     brandStrong: AppPalette.brandButtonBorder,
@@ -195,7 +195,7 @@ class AppColors extends ThemeExtension<AppColors> {
   /// The wash an info badge sits on.
   final Color infoSoft;
 
-  /// Overdue, lost, destructive. Identical to [brand] by design — this product has one alarm color.
+  /// Overdue, lost, destructive. The one alarm color, distinct from [brand].
   final Color danger;
 
   /// Content on a solid [danger] fill.
@@ -410,7 +410,7 @@ extension type AppTints(AppColors _c) {
   Color get filterActive => _c.brand.withValues(alpha: 0.05);
 
   /// The hover fill under a destructive action.
-  Color get destructiveHover => _c.brand.withValues(alpha: 0.1);
+  Color get destructiveHover => _c.danger.withValues(alpha: 0.1);
 
   /// The switch track when on.
   Color get switchTrackOn => _c.accent.withValues(alpha: 0.3);

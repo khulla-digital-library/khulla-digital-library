@@ -27,17 +27,17 @@ class DashboardQuickActions extends StatelessWidget {
       children: [
         _QuickAction(
           label: l10n.dashboardReturnCopy,
-          icon: Icons.assignment_return_outlined,
+          icon: AppIcons.checkIn,
           route: Routes.circulationReturn,
         ),
         _QuickAction(
           label: l10n.dashboardAddTitle,
-          icon: Icons.library_add_outlined,
+          icon: AppIcons.addToCatalog,
           route: Routes.catalogTitleNew,
         ),
         _QuickAction(
           label: l10n.dashboardAddMember,
-          icon: Icons.person_add_alt_1_outlined,
+          icon: AppIcons.addPerson,
           route: Routes.memberNew,
         ),
       ],
@@ -53,7 +53,7 @@ class _QuickAction extends StatelessWidget {
   });
 
   final String label;
-  final IconData icon;
+  final AppIconSpec icon;
   final String route;
 
   @override

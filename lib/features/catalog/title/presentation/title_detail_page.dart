@@ -94,22 +94,22 @@ class TitleDetailPage extends StatelessWidget {
                   menuActions: [
                     AppMenuAction(
                       label: l10n.titleDetailAddCopy,
-                      icon: Icons.add_circle_outline_rounded,
+                      icon: AppIcons.addCircle,
                       onSelected: () => showNotWiredToast(context),
                     ),
                     AppMenuAction(
                       label: l10n.titleDetailPlaceHold,
-                      icon: Icons.bookmark_add_outlined,
+                      icon: AppIcons.addBookmark,
                       onSelected: () => showNotWiredToast(context),
                     ),
                     AppMenuAction(
                       label: l10n.titlesPrintLabels,
-                      icon: Icons.print_outlined,
+                      icon: AppIcons.printer,
                       onSelected: () => showNotWiredToast(context),
                     ),
                     AppMenuAction(
                       label: l10n.titleDetailDelete,
-                      icon: Icons.delete_outline_rounded,
+                      icon: AppIcons.delete,
                       isDestructive: true,
                       onSelected: () => unawaited(_confirmDelete(context)),
                     ),

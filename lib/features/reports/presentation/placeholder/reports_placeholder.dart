@@ -145,7 +145,7 @@ class SavedReport {
   final String body;
 
   /// The tile's glyph.
-  final IconData icon;
+  final AppIconSpec icon;
 
   /// The tile's tone.
   final AppStatusTone tone;
@@ -156,37 +156,37 @@ List<SavedReport> reportsSaved(AppLocalizations l10n) => [
   SavedReport(
     title: l10n.reportsSavedCirculation,
     body: l10n.reportsSavedCirculationBody,
-    icon: Icons.swap_horiz_rounded,
+    icon: AppIcons.transfer,
     tone: AppStatusTone.brand,
   ),
   SavedReport(
     title: l10n.reportsSavedCollection,
     body: l10n.reportsSavedCollectionBody,
-    icon: Icons.inventory_2_outlined,
+    icon: AppIcons.inventory,
     tone: AppStatusTone.info,
   ),
   SavedReport(
     title: l10n.reportsSavedMembers,
     body: l10n.reportsSavedMembersBody,
-    icon: Icons.people_outline_rounded,
+    icon: AppIcons.people,
     tone: AppStatusTone.success,
   ),
   SavedReport(
     title: l10n.reportsSavedFines,
     body: l10n.reportsSavedFinesBody,
-    icon: Icons.account_balance_wallet_outlined,
+    icon: AppIcons.wallet,
     tone: AppStatusTone.warning,
   ),
   SavedReport(
     title: l10n.reportsSavedOverdue,
     body: l10n.reportsSavedOverdueBody,
-    icon: Icons.error_outline_rounded,
+    icon: AppIcons.error,
     tone: AppStatusTone.danger,
   ),
   SavedReport(
     title: l10n.reportsSavedAcquisitions,
     body: l10n.reportsSavedAcquisitionsBody,
-    icon: Icons.local_shipping_outlined,
+    icon: AppIcons.delivery,
     tone: AppStatusTone.neutral,
   ),
 ];

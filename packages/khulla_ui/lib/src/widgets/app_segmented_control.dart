@@ -39,7 +39,7 @@ class AppSegmentedControl<T> extends StatelessWidget {
   final ValueChanged<T> onChanged;
 
   /// Optional per-choice glyph.
-  final IconData? Function(T value)? itemIcon;
+  final AppIconSpec? Function(T value)? itemIcon;
 
   /// Whether the selected segment shows a check mark. Off by default: the
   /// fill already says which one is active, and the tick costs width.
@@ -85,7 +85,7 @@ class _Segment extends StatelessWidget {
   });
 
   final String label;
-  final IconData? icon;
+  final AppIconSpec? icon;
   final bool selected;
   final bool showSelectedIcon;
   final VoidCallback onTap;
@@ -97,7 +97,7 @@ class _Segment extends StatelessWidget {
     final scheme = context.colorScheme;
     final radius = BorderRadius.circular(context.appRadius.item);
     final foreground = selected ? scheme.onPrimary : colors.ink400;
-    final glyph = selected && showSelectedIcon ? Icons.check_rounded : icon;
+    final glyph = selected && showSelectedIcon ? AppIcons.check : icon;
 
     return AppRipple(
       onTap: onTap,
@@ -118,7 +118,7 @@ class _Segment extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (glyph != null) ...[
-              Icon(
+              AppIcon(
                 glyph,
                 size: context.appMetrics.iconInButton,
                 color: foreground,

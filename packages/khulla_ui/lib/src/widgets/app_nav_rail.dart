@@ -204,7 +204,7 @@ class _RailItem extends StatelessWidget {
     final foreground = selected ? colors.brand : colors.ink400;
     final glyph = IconTheme.merge(
       data: IconThemeData(color: foreground, size: metrics.iconNav),
-      child: selected ? destination.selectedIcon : destination.icon,
+      child: destination.icon,
     );
 
     final row = _RailRowSurface(
@@ -239,8 +239,8 @@ class _RailItem extends StatelessWidget {
                       AnimatedRotation(
                         duration: context.appMotion.overlay,
                         turns: expanded ? 0 : -0.25,
-                        child: Icon(
-                          Icons.keyboard_arrow_down_rounded,
+                        child: AppIcon(
+                          AppIcons.chevronDown,
                           size: metrics.icon,
                           color: foreground,
                         ),

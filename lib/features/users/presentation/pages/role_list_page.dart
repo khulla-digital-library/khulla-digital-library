@@ -52,7 +52,7 @@ class RoleListPage extends StatelessWidget {
                   subtitle: l10n.rolesMatrixSubtitle,
                   trailing: AppButton(
                     variant: AppButtonVariant.outline,
-                    icon: Icons.add_rounded,
+                    icon: AppIcons.add,
                     onPressed: () => showNotWiredToast(context),
                     child: Text(l10n.rolesAdd),
                   ),
@@ -88,7 +88,7 @@ class _RoleCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              AppIcon(
                 role.icon,
                 size: spacing.lg - 4,
                 color: role.tone.foreground(context),

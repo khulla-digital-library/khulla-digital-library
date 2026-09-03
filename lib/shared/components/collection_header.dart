@@ -11,7 +11,7 @@ class CollectionHeader extends StatelessWidget {
     required this.title,
     required this.subtitle,
     this.actionLabel,
-    this.actionIcon = Icons.add_rounded,
+    this.actionIcon = AppIcons.add,
     this.onAction,
     this.menuActions = const [],
     this.menuTooltip,
@@ -30,7 +30,7 @@ class CollectionHeader extends StatelessWidget {
   final String? actionLabel;
 
   /// The glyph on the primary action.
-  final IconData actionIcon;
+  final AppIconSpec actionIcon;
 
   /// Runs the primary action.
   final VoidCallback? onAction;

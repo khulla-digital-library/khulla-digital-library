@@ -31,7 +31,7 @@ class AppEmptyView extends StatelessWidget {
 
   /// Drawn bare above the copy, muted. Omitted in
   /// [AppFeedbackVariant.inline], which has no room for it.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   /// Label for the action button. The button only appears when both this and
   /// [onAction] are set.
@@ -71,7 +71,7 @@ class AppEmptyView extends StatelessWidget {
             : CrossAxisAlignment.start,
         children: [
           if (isCentered && glyph != null) ...[
-            Icon(
+            AppIcon(
               glyph,
               size: spacing.xxlg,
               color: context.appColors.hairlineStrong,
@@ -102,7 +102,7 @@ class AppEmptyView extends StatelessWidget {
             SizedBox(height: isCentered ? spacing.lg : spacing.sm),
             AppButton(
               size: isCentered ? AppButtonSize.medium : AppButtonSize.small,
-              icon: Icons.add_rounded,
+              icon: AppIcons.add,
               onPressed: action,
               child: Text(label),
             ),

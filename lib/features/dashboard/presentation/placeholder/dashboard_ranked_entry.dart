@@ -1,5 +1,3 @@
-import 'package:khulla_ui/khulla_ui.dart';
-
 /// One row of a "most borrowed" or "most active" list.
 ///
 /// The figure is a string because the two lists count different things — a
@@ -10,7 +8,6 @@ class DashboardRankedEntry {
     required this.name,
     required this.detail,
     required this.figure,
-    this.tone = AppStatusTone.brand,
   });
 
   /// The title or the member.
@@ -22,10 +19,7 @@ class DashboardRankedEntry {
   /// The tally, already formatted.
   final String figure;
 
-  /// The tone of the leading chip.
-  final AppStatusTone tone;
-
-  /// The leading chip's two letters.
+  /// The leading tile's two letters.
   String get initials {
     final words = name.trim().split(RegExp(r'\s+'));
     final head = words.first.isEmpty ? '' : words.first.substring(0, 1);

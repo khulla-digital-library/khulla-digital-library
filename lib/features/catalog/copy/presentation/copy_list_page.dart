@@ -7,7 +7,6 @@ import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart'
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_copy.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_placeholder.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/collection_header.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -134,22 +133,22 @@ class _CopyListPageState extends State<CopyListPage> {
           actions: [
             AppMenuAction(
               label: l10n.commonOpen,
-              icon: Icons.open_in_new_rounded,
+              icon: AppIcons.openExternal,
               onSelected: () => context.go(Routes.catalogTitle(copy.titleId)),
             ),
             AppMenuAction(
               label: l10n.copiesMarkLost,
-              icon: Icons.help_outline_rounded,
+              icon: AppIcons.help,
               onSelected: () => showNotWiredToast(context),
             ),
             AppMenuAction(
               label: l10n.copiesMarkDamaged,
-              icon: Icons.report_gmailerrorred_rounded,
+              icon: AppIcons.damage,
               onSelected: () => showNotWiredToast(context),
             ),
             AppMenuAction(
               label: l10n.copiesWithdraw,
-              icon: Icons.delete_outline_rounded,
+              icon: AppIcons.delete,
               isDestructive: true,
               onSelected: () => showNotWiredToast(context),
             ),
@@ -169,12 +168,7 @@ class _CopyListPageState extends State<CopyListPage> {
     final end = (start + _pageSize).clamp(0, matches.length);
 
     return CollectionPageView<CatalogCopy>(
-      header: CollectionHeader(
-        title: l10n.copiesHeading,
-        subtitle: l10n.copiesSubtitle('${placeholderCopies.length}'),
-        actionLabel: l10n.copiesAdd,
-        onAction: () => showNotWiredToast(context),
-      ),
+      summary: l10n.copiesSubtitle('${placeholderCopies.length}'),
       toolbar: AppToolbar(
         search: AppSearchField(
           hintText: l10n.copiesSearchHint,
@@ -222,14 +216,14 @@ class _CopyListPageState extends State<CopyListPage> {
       ),
       emptyState: _isFiltered
           ? AppEmptyView(
-              icon: Icons.search_off_rounded,
+              icon: AppIcons.noResults,
               title: l10n.commonNoMatchesTitle,
               message: l10n.commonNoMatchesBody,
               actionLabel: l10n.commonClearFilters,
               onAction: _clearFilters,
             )
           : AppEmptyView(
-              icon: Icons.inventory_2_outlined,
+              icon: AppIcons.inventory,
               title: l10n.copiesEmptyTitle,
               message: l10n.copiesEmptyBody,
               actionLabel: l10n.copiesAdd,

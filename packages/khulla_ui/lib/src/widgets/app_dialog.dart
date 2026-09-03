@@ -79,7 +79,7 @@ class AppDialog extends StatelessWidget {
   final AppDialogWidth width;
 
   /// A glyph in a tinted circular badge above the title.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   /// A custom badge glyph, taking precedence over [icon].
   final Widget? iconWidget;
@@ -99,7 +99,7 @@ class AppDialog extends StatelessWidget {
     String? message,
     Widget? content,
     AppDialogWidth width = AppDialogWidth.md,
-    IconData? icon,
+    AppIconSpec? icon,
     Widget? iconWidget,
     AppStatusTone iconTone = AppStatusTone.danger,
     bool barrierDismissible = true,
@@ -127,7 +127,7 @@ class AppDialog extends StatelessWidget {
     required String message,
     required String confirmLabel,
     required String cancelLabel,
-    IconData? icon = Icons.delete_outline_rounded,
+    AppIconSpec? icon = AppIcons.delete,
     Widget? iconWidget,
   }) async {
     final confirmed = await show<bool>(
@@ -203,8 +203,8 @@ class AppDialog extends StatelessWidget {
         iconWidget ??
         (icon == null
             ? null
-            : Icon(
-                icon,
+            : AppIcon(
+                icon!,
                 color: iconTone.foreground(context),
                 size: context.appMetrics.iconLarge,
               ));
@@ -365,8 +365,8 @@ class _DialogCloseChipState extends State<_DialogCloseChip> {
               duration: motion.layout,
               curve: motion.standard,
               turns: _hovered ? 0.25 : 0,
-              child: Icon(
-                Icons.close_rounded,
+              child: AppIcon(
+                AppIcons.close,
                 size: metrics.icon,
                 color: colors.ink500,
               ),

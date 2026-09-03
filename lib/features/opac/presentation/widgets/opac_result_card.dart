@@ -54,7 +54,7 @@ class OpacResultCard extends StatelessWidget {
                   border: Border.all(color: colors.hairline),
                 ),
                 alignment: Alignment.center,
-                child: Icon(
+                child: AppIcon(
                   title.format.icon,
                   size: spacing.lg,
                   color: context.colorScheme.primary,

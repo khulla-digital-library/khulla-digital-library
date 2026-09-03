@@ -166,15 +166,15 @@ class _SortGlyphs extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.arrow_drop_up_rounded,
+          AppIcon(
+            AppIcons.caretUp,
             size: 14,
             color: direction ?? false ? active : rest,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: Icon(
-              Icons.arrow_drop_down_rounded,
+            child: AppIcon(
+              AppIcons.caretDown,
               size: 14,
               color: direction == false ? active : rest,
             ),

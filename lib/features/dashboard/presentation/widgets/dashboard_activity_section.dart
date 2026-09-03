@@ -134,7 +134,7 @@ class DashboardActivitySection extends StatelessWidget {
       ),
       child: entries.isEmpty
           ? AppEmptyView(
-              icon: Icons.swap_horiz_rounded,
+              icon: AppIcons.transfer,
               title: l10n.dashboardActivityEmptyTitle,
               message: l10n.dashboardActivityEmptyBody,
             )

@@ -101,7 +101,7 @@ class _NavBarItem extends StatelessWidget {
               color: foreground,
               size: context.appMetrics.iconLarge,
             ),
-            child: selected ? destination.selectedIcon : destination.icon,
+            child: destination.icon,
           ),
           SizedBox(height: context.appSpacing.xxs),
           Text(

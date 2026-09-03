@@ -8,17 +8,17 @@ import 'package:khulla_ui/khulla_ui.dart';
 class AppNavDestination {
   const AppNavDestination({
     required this.icon,
-    required this.selectedIcon,
     required this.label,
     this.badge,
     this.children = const [],
   });
 
-  /// Glyph shown while the destination is not selected.
+  /// The destination's glyph.
+  ///
+  /// One glyph serves both states: selection is carried by the icon's colour
+  /// and the surface behind it, never by swapping in a heavier weight. See
+  /// `AppIcons`.
   final Widget icon;
-
-  /// Glyph shown while the destination is selected.
-  final Widget selectedIcon;
 
   /// Short destination name. Doubles as the rail tooltip when collapsed.
   final String label;

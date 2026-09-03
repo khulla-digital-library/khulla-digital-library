@@ -31,8 +31,8 @@ class ShellBrandMark extends StatelessWidget {
         borderRadius: BorderRadius.circular(context.appRadius.container),
       ),
       alignment: Alignment.center,
-      child: Icon(
-        Icons.auto_stories_rounded,
+      child: AppIcon(
+        AppIcons.openBook,
         size: context.appMetrics.iconLarge,
         color: scheme.onPrimary,
       ),

@@ -59,10 +59,8 @@ class AppTrendPill extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (!flat) ...[
-              Icon(
-                rising
-                    ? Icons.arrow_upward_rounded
-                    : Icons.arrow_downward_rounded,
+              AppIcon(
+                rising ? AppIcons.arrowUp : AppIcons.arrowDown,
                 size: spacing.sm,
                 color: foreground,
               ),

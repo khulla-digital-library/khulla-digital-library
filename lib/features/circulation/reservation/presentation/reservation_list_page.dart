@@ -5,7 +5,6 @@ import 'package:khulla/features/circulation/shared/presentation/circulation_labe
 import 'package:khulla/features/circulation/shared/presentation/placeholder/circulation_placeholder.dart';
 import 'package:khulla/features/circulation/shared/presentation/placeholder/reservation_record.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/collection_header.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -55,16 +54,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
     );
 
     return CollectionPageView<ReservationRecord>(
-      header: CollectionHeader(
-        title: l10n.reservationsHeading,
-        subtitle: l10n.reservationsSubtitle,
-        actionLabel: l10n.reservationsPlace,
-        onAction: () => showNotWiredToast(context),
-        leading: AppPageHeader(
-          title: l10n.circulationHeading,
-          onBackPressed: () => context.go(Routes.circulation),
-        ),
-      ),
+      summary: l10n.reservationsSubtitle,
       toolbar: AppToolbar(
         search: AppSearchField(
           hintText: l10n.reservationsSearchHint,
@@ -152,17 +142,17 @@ class _ReservationListPageState extends State<ReservationListPage> {
             actions: [
               AppMenuAction(
                 label: l10n.reservationsMarkReady,
-                icon: Icons.notifications_active_outlined,
+                icon: AppIcons.notificationsActive,
                 onSelected: () => showNotWiredToast(context),
               ),
               AppMenuAction(
                 label: l10n.loansViewMember,
-                icon: Icons.person_outline_rounded,
+                icon: AppIcons.person,
                 onSelected: () => context.go(Routes.member(hold.memberId)),
               ),
               AppMenuAction(
                 label: l10n.reservationsCancel,
-                icon: Icons.close_rounded,
+                icon: AppIcons.close,
                 isDestructive: true,
                 onSelected: () => showNotWiredToast(context),
               ),
@@ -172,14 +162,14 @@ class _ReservationListPageState extends State<ReservationListPage> {
       ],
       emptyState: _isFiltered
           ? AppEmptyView(
-              icon: Icons.search_off_rounded,
+              icon: AppIcons.noResults,
               title: l10n.commonNoMatchesTitle,
               message: l10n.commonNoMatchesBody,
               actionLabel: l10n.commonClearFilters,
               onAction: _clearFilters,
             )
           : AppEmptyView(
-              icon: Icons.bookmark_border_rounded,
+              icon: AppIcons.bookmark,
               title: l10n.reservationsEmptyTitle,
               message: l10n.reservationsEmptyBody,
               actionLabel: l10n.reservationsPlace,

@@ -710,12 +710,6 @@
     "shellProfile": "Your profile",
     "shellSignOut": "Sign out",
     "shellHelp": "Help and shortcuts",
-    "shellFooterTitle": "Everything stays on this machine",
-    "shellFooterBody": "Khulla keeps the catalogue in a local database. Back it up so a lost machine is not a lost library.",
-    "shellFooterAction": "Back up now",
-    "@shellFooterAction": {
-        "description": "Shell — the rail footer card"
-    },
     "navCatalogTitles": "Titles",
     "navCatalogCopies": "Copies",
     "navCatalogAuthors": "Authors",

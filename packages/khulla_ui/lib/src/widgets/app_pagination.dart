@@ -123,7 +123,7 @@ class AppPagination extends StatelessWidget {
             children: [
               if (onPrevious != null)
                 AppIconButton(
-                  icon: Icons.chevron_left_rounded,
+                  icon: AppIcons.chevronLeft,
                   tooltip: previousTooltip,
                   onPressed: onPrevious,
                 ),
@@ -150,7 +150,7 @@ class AppPagination extends StatelessWidget {
                   ),
               if (onNext != null)
                 AppIconButton(
-                  icon: Icons.chevron_right_rounded,
+                  icon: AppIcons.chevronRight,
                   tooltip: nextTooltip,
                   onPressed: onNext,
                 ),

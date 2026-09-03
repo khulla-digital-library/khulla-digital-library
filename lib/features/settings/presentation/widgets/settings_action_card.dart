@@ -22,7 +22,7 @@ class SettingsActionCard extends StatelessWidget {
   final String description;
   final String actionLabel;
   final VoidCallback onAction;
-  final IconData icon;
+  final AppIconSpec icon;
   final bool isDestructive;
 
   @override
@@ -36,7 +36,7 @@ class SettingsActionCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: spacing.lg - 2, color: tone.foreground(context)),
+          AppIcon(icon, size: spacing.lg - 2, color: tone.foreground(context)),
           SizedBox(width: spacing.sm),
           Expanded(
             child: Column(

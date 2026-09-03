@@ -54,21 +54,21 @@ class ShellNotificationsButton extends StatelessWidget {
                 ),
               ),
               _NoticeRow(
-                icon: Icons.error_outline_rounded,
+                icon: AppIcons.error,
                 tone: AppStatusTone.danger,
                 label: l10n.dashboardAttentionOverdue,
                 count: '7',
                 route: Routes.circulation,
               ),
               _NoticeRow(
-                icon: Icons.bookmark_border_rounded,
+                icon: AppIcons.bookmark,
                 tone: AppStatusTone.info,
                 label: l10n.dashboardAttentionHolds,
                 count: '3',
                 route: Routes.circulationReservations,
               ),
               _NoticeRow(
-                icon: Icons.schedule_rounded,
+                icon: AppIcons.clock,
                 tone: AppStatusTone.warning,
                 label: l10n.dashboardAttentionExpiring,
                 count: '12',
@@ -79,7 +79,7 @@ class ShellNotificationsButton extends StatelessWidget {
         ),
       ],
       builder: (context, controller, _) => AppIconButton(
-        icon: Icons.notifications_none_rounded,
+        icon: AppIcons.notifications,
         tooltip: l10n.shellNotifications,
         badge: true,
         onPressed: () =>
@@ -98,7 +98,7 @@ class _NoticeRow extends StatelessWidget {
     required this.route,
   });
 
-  final IconData icon;
+  final AppIconSpec icon;
   final AppStatusTone tone;
   final String label;
   final String count;
@@ -131,7 +131,7 @@ class _NoticeRow extends StatelessWidget {
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(spacing.xs),
-                  child: Icon(
+                  child: AppIcon(
                     icon,
                     size: spacing.md,
                     color: tone.foreground(context),

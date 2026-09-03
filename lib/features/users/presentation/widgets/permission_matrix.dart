@@ -98,13 +98,13 @@ class PermissionMatrix extends StatelessWidget {
                                 (rolePermissions[role] ??
                                         const <StaffPermission>{})
                                     .contains(permission)
-                                ? Icon(
-                                    Icons.check_circle_rounded,
+                                ? AppIcon(
+                                    AppIcons.success,
                                     size: spacing.md + 2,
                                     color: colors.success,
                                   )
-                                : Icon(
-                                    Icons.remove_rounded,
+                                : AppIcon(
+                                    AppIcons.remove,
                                     size: spacing.md + 2,
                                     color: colors.hairlineStrong,
                                   ),

@@ -52,7 +52,7 @@ class AppDropdownField<T> extends StatelessWidget {
   final bool enabled;
 
   /// Optional per-choice glyph — a status dot, a format icon.
-  final IconData? Function(T value)? itemIcon;
+  final AppIconSpec? Function(T value)? itemIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -82,8 +82,8 @@ class AppDropdownField<T> extends StatelessWidget {
             onChanged: enabled ? onChanged : null,
             isExpanded: true,
             borderRadius: BorderRadius.circular(context.appRadius.container),
-            icon: Icon(
-              Icons.expand_more_rounded,
+            icon: AppIcon(
+              AppIcons.chevronDown,
               color: colors.ink500,
               size: metrics.icon,
             ),
@@ -98,7 +98,11 @@ class AppDropdownField<T> extends StatelessWidget {
                   child: Row(
                     children: [
                       if (iconFor?.call(item) case final glyph?) ...[
-                        Icon(glyph, size: metrics.icon, color: colors.ink500),
+                        AppIcon(
+                          glyph,
+                          size: metrics.icon,
+                          color: colors.ink500,
+                        ),
                         SizedBox(width: spacing.menuIconGap),
                       ],
                       Expanded(

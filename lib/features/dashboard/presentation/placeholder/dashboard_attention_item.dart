@@ -22,7 +22,7 @@ class DashboardAttentionItem {
   final String count;
 
   /// The leading glyph.
-  final IconData icon;
+  final AppIconSpec icon;
 
   /// How urgent it is.
   final AppStatusTone tone;

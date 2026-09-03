@@ -113,8 +113,8 @@ class _AppSearchFieldState extends State<AppSearchField> {
         decoration: InputDecoration(
           isDense: true,
           hintText: widget.hintText,
-          prefixIcon: Icon(
-            Icons.search_rounded,
+          prefixIcon: AppIcon(
+            AppIcons.search,
             size: metrics.icon,
             color: colors.mutedForeground,
           ),
@@ -124,7 +124,7 @@ class _AppSearchFieldState extends State<AppSearchField> {
           ),
           suffixIcon: value.text.isNotEmpty && clearLabel != null
               ? AppIconButton(
-                  icon: Icons.close_rounded,
+                  icon: AppIcons.close,
                   tooltip: clearLabel,
                   size: AppIconButtonSize.small,
                   onPressed: _clear,

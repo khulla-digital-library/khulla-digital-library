@@ -164,7 +164,7 @@ class _MemberFormPageState extends State<MemberFormPage> with DisposeBag {
                     AppPickerField(
                       label: l10n.fieldExpires,
                       value: _expires,
-                      icon: Icons.calendar_today_rounded,
+                      icon: AppIcons.calendar,
                       onTap: () => showNotWiredToast(context),
                     ),
                   ],

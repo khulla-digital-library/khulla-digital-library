@@ -38,7 +38,7 @@ class AppFilterChip extends StatelessWidget {
   final int? count;
 
   /// Optional leading glyph.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   /// Which semantic family the selected state draws from. Use
   /// [AppStatusTone.danger] for an *Overdue* chip so the row reads at a
@@ -68,7 +68,7 @@ class AppFilterChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (glyph != null) ...[
-            Icon(glyph, size: metrics.iconInButton, color: foreground),
+            AppIcon(glyph, size: metrics.iconInButton, color: foreground),
             SizedBox(width: spacing.xs - 2),
           ],
           Text(

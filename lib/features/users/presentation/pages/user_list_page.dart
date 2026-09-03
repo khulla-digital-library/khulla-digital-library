@@ -1,12 +1,9 @@
-import 'package:go_router/go_router.dart';
-import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/users/domain/user_status.dart';
 import 'package:khulla/features/users/presentation/placeholder/staff_record.dart';
 import 'package:khulla/features/users/presentation/placeholder/users_placeholder.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
 import 'package:khulla/features/users/presentation/widgets/staff_card.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/collection_header.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -124,7 +121,7 @@ class _UserListPageState extends State<UserListPage> {
         showFrom: FormFactor.medium,
         cellBuilder: (context, staff) => Row(
           children: [
-            Icon(
+            AppIcon(
               staff.role.icon,
               size: spacing.md,
               color: staff.role.tone.foreground(context),
@@ -165,25 +162,25 @@ class _UserListPageState extends State<UserListPage> {
           actions: [
             AppMenuAction(
               label: l10n.usersEditRole,
-              icon: Icons.badge_outlined,
+              icon: AppIcons.idCard,
               onSelected: () => showNotWiredToast(context),
             ),
             if (staff.status == UserStatus.invited)
               AppMenuAction(
                 label: l10n.usersResendInvite,
-                icon: Icons.mail_outline_rounded,
+                icon: AppIcons.email,
                 onSelected: () => showNotWiredToast(context),
               ),
             AppMenuAction(
               label: l10n.usersResetPassword,
-              icon: Icons.lock_reset_rounded,
+              icon: AppIcons.resetPassword,
               onSelected: () => showNotWiredToast(context),
             ),
             AppMenuAction(
               label: staff.status == UserStatus.disabled
                   ? l10n.usersEnable
                   : l10n.usersDisable,
-              icon: Icons.block_rounded,
+              icon: AppIcons.blocked,
               isDestructive: staff.status != UserStatus.disabled,
               onSelected: () => showNotWiredToast(context),
             ),
@@ -203,25 +200,7 @@ class _UserListPageState extends State<UserListPage> {
     final end = (start + _pageSize).clamp(0, matches.length);
 
     return CollectionPageView<StaffRecord>(
-      header: CollectionHeader(
-        title: l10n.usersHeading,
-        subtitle: l10n.usersSubtitle('${placeholderStaff.length}'),
-        actionLabel: l10n.usersAdd,
-        onAction: () => showNotWiredToast(context),
-        menuTooltip: l10n.commonMoreActions,
-        menuActions: [
-          AppMenuAction(
-            label: l10n.rolesHeading,
-            icon: Icons.shield_outlined,
-            onSelected: () => context.go(Routes.usersRoles),
-          ),
-          AppMenuAction(
-            label: l10n.commonExportCsv,
-            icon: Icons.file_download_outlined,
-            onSelected: () => showNotWiredToast(context),
-          ),
-        ],
-      ),
+      summary: l10n.usersSubtitle('${placeholderStaff.length}'),
       toolbar: AppToolbar(
         search: AppSearchField(
           hintText: l10n.usersSearchHint,
@@ -273,14 +252,14 @@ class _UserListPageState extends State<UserListPage> {
       compactBuilder: (context, staff) => StaffCard(staff: staff),
       emptyState: _isFiltered
           ? AppEmptyView(
-              icon: Icons.search_off_rounded,
+              icon: AppIcons.noResults,
               title: l10n.commonNoMatchesTitle,
               message: l10n.commonNoMatchesBody,
               actionLabel: l10n.commonClearFilters,
               onAction: _clearFilters,
             )
           : AppEmptyView(
-              icon: Icons.badge_outlined,
+              icon: AppIcons.idCard,
               title: l10n.usersEmptyTitle,
               message: l10n.usersEmptyBody,
               actionLabel: l10n.usersAdd,

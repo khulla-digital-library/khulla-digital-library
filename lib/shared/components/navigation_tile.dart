@@ -32,7 +32,7 @@ class NavigationTile extends StatelessWidget {
   final String? count;
 
   /// Glyph identifying the destination, drawn bare.
-  final IconData icon;
+  final AppIconSpec icon;
 
   /// Where the tile leads.
   final String route;
@@ -54,7 +54,7 @@ class NavigationTile extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(icon, size: spacing.lg - 4, color: colors.textMuted),
+              AppIcon(icon, size: spacing.lg - 4, color: colors.textMuted),
               SizedBox(width: spacing.sm),
               Expanded(
                 child: Column(
@@ -93,8 +93,8 @@ class NavigationTile extends StatelessWidget {
                 ),
               ],
               SizedBox(width: spacing.xs),
-              Icon(
-                Icons.chevron_right_rounded,
+              AppIcon(
+                AppIcons.chevronRight,
                 size: spacing.lg - 6,
                 color: colors.textMuted,
               ),

@@ -83,7 +83,7 @@ class MemberFinesCard extends StatelessWidget {
                   width: 56,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, fine) => AppIconButton(
-                    icon: Icons.payments_outlined,
+                    icon: AppIcons.payment,
                     tooltip: l10n.finesCollect,
                     onPressed: fine.isPaid ? null : () => onCollect(fine),
                   ),

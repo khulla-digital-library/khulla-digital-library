@@ -85,7 +85,7 @@ class OpacSearchPanel extends StatelessWidget {
               children: [
                 AppFilterChip(
                   label: l10n.opacFilterAvailableOnly,
-                  icon: Icons.check_circle_outline_rounded,
+                  icon: AppIcons.success,
                   tone: AppStatusTone.success,
                   selected: availableOnly,
                   onSelected: onAvailableOnlyChanged,

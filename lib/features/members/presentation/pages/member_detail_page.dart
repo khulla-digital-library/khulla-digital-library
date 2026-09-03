@@ -89,22 +89,22 @@ class MemberDetailPage extends StatelessWidget {
                   menuActions: [
                     AppMenuAction(
                       label: l10n.memberDetailEdit,
-                      icon: Icons.edit_outlined,
+                      icon: AppIcons.edit,
                       onSelected: () => context.go(Routes.memberEdit(memberId)),
                     ),
                     AppMenuAction(
                       label: l10n.memberDetailRenewMembership,
-                      icon: Icons.autorenew_rounded,
+                      icon: AppIcons.renew,
                       onSelected: () => showNotWiredToast(context),
                     ),
                     AppMenuAction(
                       label: l10n.memberDetailSuspend,
-                      icon: Icons.block_rounded,
+                      icon: AppIcons.blocked,
                       onSelected: () => showNotWiredToast(context),
                     ),
                     AppMenuAction(
                       label: l10n.memberDetailDelete,
-                      icon: Icons.delete_outline_rounded,
+                      icon: AppIcons.delete,
                       isDestructive: true,
                       onSelected: () => unawaited(_confirmDelete(context)),
                     ),
@@ -116,13 +116,13 @@ class MemberDetailPage extends StatelessWidget {
                     AppStatTile(
                       label: l10n.memberDetailStatLoans,
                       value: '${member.loansOut}',
-                      icon: Icons.swap_horiz_rounded,
+                      icon: AppIcons.transfer,
                       tone: AppStatusTone.brand,
                     ),
                     AppStatTile(
                       label: l10n.memberDetailStatOverdue,
                       value: '${member.overdue}',
-                      icon: Icons.error_outline_rounded,
+                      icon: AppIcons.error,
                       tone: member.overdue > 0
                           ? AppStatusTone.danger
                           : AppStatusTone.neutral,
@@ -130,7 +130,7 @@ class MemberDetailPage extends StatelessWidget {
                     AppStatTile(
                       label: l10n.memberDetailStatFines,
                       value: member.finesOwed.display(),
-                      icon: Icons.account_balance_wallet_outlined,
+                      icon: AppIcons.wallet,
                       tone: member.finesOwed.isPositive
                           ? AppStatusTone.danger
                           : AppStatusTone.neutral,
@@ -138,7 +138,7 @@ class MemberDetailPage extends StatelessWidget {
                     AppStatTile(
                       label: l10n.memberDetailStatBorrowed,
                       value: '${member.borrowedAllTime}',
-                      icon: Icons.menu_book_rounded,
+                      icon: AppIcons.book,
                     ),
                   ],
                 ),

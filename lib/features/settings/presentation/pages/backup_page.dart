@@ -26,7 +26,7 @@ class BackupPage extends StatelessWidget {
       message: l10n.settingsBackupEraseBody,
       confirmLabel: l10n.settingsBackupEraseAction,
       cancelLabel: l10n.commonCancel,
-      icon: Icons.warning_amber_rounded,
+      icon: AppIcons.warning,
     );
     if (!context.mounted || !confirmed) return;
     showNotWiredToast(context);
@@ -87,21 +87,21 @@ class BackupPage extends StatelessWidget {
                       title: l10n.settingsBackupExportTitle,
                       description: l10n.settingsBackupExportBody,
                       actionLabel: l10n.settingsBackupExportAction,
-                      icon: Icons.file_download_outlined,
+                      icon: AppIcons.download,
                       onAction: () => showNotWiredToast(context),
                     ),
                     SettingsActionCard(
                       title: l10n.settingsBackupRestoreTitle,
                       description: l10n.settingsBackupRestoreBody,
                       actionLabel: l10n.settingsBackupRestoreAction,
-                      icon: Icons.restore_rounded,
+                      icon: AppIcons.restore,
                       onAction: () => showNotWiredToast(context),
                     ),
                     SettingsActionCard(
                       title: l10n.settingsBackupImportTitle,
                       description: l10n.settingsBackupImportBody,
                       actionLabel: l10n.settingsBackupImportAction,
-                      icon: Icons.file_upload_outlined,
+                      icon: AppIcons.upload,
                       onAction: () => showNotWiredToast(context),
                     ),
                   ],
@@ -110,14 +110,14 @@ class BackupPage extends StatelessWidget {
                 AppSectionHeader(
                   title: l10n.settingsBackupDangerTitle,
                   subtitle: l10n.settingsBackupDangerDescription,
-                  icon: Icons.warning_amber_rounded,
+                  icon: AppIcons.warning,
                 ),
                 SizedBox(height: spacing.md),
                 SettingsActionCard(
                   title: l10n.settingsBackupEraseTitle,
                   description: l10n.settingsBackupEraseBody,
                   actionLabel: l10n.settingsBackupEraseAction,
-                  icon: Icons.delete_forever_outlined,
+                  icon: AppIcons.deleteForever,
                   isDestructive: true,
                   onAction: () => unawaited(_confirmErase(context)),
                 ),

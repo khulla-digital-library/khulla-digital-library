@@ -38,8 +38,8 @@ class AppBreadcrumbs extends StatelessWidget {
           if (index > 0)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Icon(
-                Icons.chevron_right_rounded,
+              child: AppIcon(
+                AppIcons.chevronRight,
                 size: 14,
                 color: colors.textMuted,
               ),

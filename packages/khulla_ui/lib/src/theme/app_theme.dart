@@ -320,20 +320,23 @@ abstract final class AppTheme {
         unselectedLabelStyle: typography.label,
         indicatorSize: TabBarIndicatorSize.label,
       ),
-      // A desktop window has no fling gesture to reveal a scrollbar, so the
-      // thumb stays visible wherever a pointer is the primary input.
+      // The thumb is a hint, not furniture: it fades in while the view is
+      // moving or the pointer is over it, and is gone otherwise. A permanent
+      // 8px slab down the middle of a constrained page reads as a seam
+      // between two panes rather than as a scrollbar.
       scrollbarTheme: ScrollbarThemeData(
-        thickness: const WidgetStatePropertyAll(8),
+        thumbVisibility: const WidgetStatePropertyAll(false),
+        thickness: const WidgetStatePropertyAll(6),
         radius: Radius.circular(radius.pill),
         thumbColor: WidgetStateProperty.resolveWith((states) {
           final base = appColors.ink100;
           if (states.contains(WidgetState.dragged)) {
-            return base.withValues(alpha: 0.4);
+            return base.withValues(alpha: 0.36);
           }
           if (states.contains(WidgetState.hovered)) {
-            return base.withValues(alpha: 0.28);
+            return base.withValues(alpha: 0.24);
           }
-          return base.withValues(alpha: 0.14);
+          return base.withValues(alpha: 0.12);
         }),
       ),
       // A light tooltip with a hairline, not Material's dark slab.
@@ -375,10 +378,10 @@ abstract final class AppTheme {
         onTertiary: AppPalette.white100,
         tertiaryContainer: AppPalette.brandTintFaint,
         onTertiaryContainer: AppPalette.brandDeep,
-        error: AppPalette.brand,
-        onError: AppPalette.onBrand,
-        errorContainer: AppPalette.brandTint,
-        onErrorContainer: AppPalette.brand,
+        error: AppPalette.danger,
+        onError: AppPalette.white100,
+        errorContainer: AppPalette.dangerTint,
+        onErrorContainer: AppPalette.dangerStrong,
         surface: AppPalette.white100,
         onSurface: AppPalette.ink100Light,
         onSurfaceVariant: AppPalette.ink500Light,
@@ -409,10 +412,10 @@ abstract final class AppTheme {
       onTertiary: AppPalette.ink100Light,
       tertiaryContainer: AppPalette.surfaceDark,
       onTertiaryContainer: AppPalette.accent,
-      error: AppPalette.brand,
-      onError: AppPalette.onBrand,
+      error: AppPalette.danger,
+      onError: AppPalette.white100,
       errorContainer: AppPalette.surfaceDark,
-      onErrorContainer: AppPalette.accent,
+      onErrorContainer: AppPalette.danger,
       surface: AppPalette.backgroundDark,
       onSurface: AppPalette.ink100Dark,
       onSurfaceVariant: AppPalette.ink500Dark,

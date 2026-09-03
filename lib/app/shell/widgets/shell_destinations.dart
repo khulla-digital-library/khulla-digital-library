@@ -12,7 +12,6 @@ class ShellDestination {
   const ShellDestination({
     required this.label,
     required this.icon,
-    required this.selectedIcon,
     required this.route,
     this.children = const [],
     this.primary = false,
@@ -21,11 +20,9 @@ class ShellDestination {
   /// The section's name.
   final String label;
 
-  /// Glyph while the section is not the one showing.
-  final IconData icon;
-
-  /// Glyph while it is.
-  final IconData selectedIcon;
+  /// The section's glyph. One glyph serves both states — selection reads
+  /// through colour, not through a heavier weight.
+  final AppIconSpec icon;
 
   /// The branch's root route.
   final String route;
@@ -59,15 +56,13 @@ class ShellChild {
 List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
   ShellDestination(
     label: l10n.navDashboard,
-    icon: Icons.space_dashboard_outlined,
-    selectedIcon: Icons.space_dashboard_rounded,
+    icon: AppIcons.dashboard,
     route: Routes.dashboard,
     primary: true,
   ),
   ShellDestination(
     label: l10n.navCatalog,
-    icon: Icons.menu_book_outlined,
-    selectedIcon: Icons.menu_book_rounded,
+    icon: AppIcons.book,
     route: Routes.catalog,
     primary: true,
     children: [
@@ -79,8 +74,7 @@ List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
   ),
   ShellDestination(
     label: l10n.navCirculation,
-    icon: Icons.swap_horiz_outlined,
-    selectedIcon: Icons.swap_horiz_rounded,
+    icon: AppIcons.transfer,
     route: Routes.circulation,
     primary: true,
     children: [
@@ -104,27 +98,23 @@ List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
   ),
   ShellDestination(
     label: l10n.navMembers,
-    icon: Icons.people_outline_rounded,
-    selectedIcon: Icons.people_rounded,
+    icon: AppIcons.people,
     route: Routes.members,
     primary: true,
   ),
   ShellDestination(
     label: l10n.navOpac,
-    icon: Icons.travel_explore_outlined,
-    selectedIcon: Icons.travel_explore_rounded,
+    icon: AppIcons.discover,
     route: Routes.opac,
   ),
   ShellDestination(
     label: l10n.navReports,
-    icon: Icons.insights_outlined,
-    selectedIcon: Icons.insights_rounded,
+    icon: AppIcons.insights,
     route: Routes.reports,
   ),
   ShellDestination(
     label: l10n.navUsers,
-    icon: Icons.badge_outlined,
-    selectedIcon: Icons.badge_rounded,
+    icon: AppIcons.idCard,
     route: Routes.users,
     children: [
       ShellChild(label: l10n.navUsersAccounts, route: Routes.users),
@@ -133,8 +123,7 @@ List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
   ),
   ShellDestination(
     label: l10n.navSettings,
-    icon: Icons.settings_outlined,
-    selectedIcon: Icons.settings_rounded,
+    icon: AppIcons.settings,
     route: Routes.settings,
     children: [
       ShellChild(

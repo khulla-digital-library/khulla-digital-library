@@ -26,11 +26,11 @@ extension UserRoleX on UserRole {
     UserRole.readOnly => AppStatusTone.neutral,
   };
 
-  IconData get icon => switch (this) {
-    UserRole.administrator => Icons.admin_panel_settings_outlined,
-    UserRole.librarian => Icons.local_library_outlined,
-    UserRole.assistant => Icons.support_agent_outlined,
-    UserRole.readOnly => Icons.visibility_outlined,
+  AppIconSpec get icon => switch (this) {
+    UserRole.administrator => AppIcons.admin,
+    UserRole.librarian => AppIcons.library,
+    UserRole.assistant => AppIcons.support,
+    UserRole.readOnly => AppIcons.preview,
   };
 }
 

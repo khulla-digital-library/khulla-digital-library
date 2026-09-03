@@ -4,7 +4,6 @@ import 'package:khulla/features/catalog/author/presentation/widgets/author_card.
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_author.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_placeholder.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/collection_header.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -55,12 +54,7 @@ class _AuthorListPageState extends State<AuthorListPage> {
     );
 
     return CollectionPageView<CatalogAuthor>(
-      header: CollectionHeader(
-        title: l10n.authorsHeading,
-        subtitle: l10n.authorsSubtitle('${placeholderAuthors.length}'),
-        actionLabel: l10n.authorsAdd,
-        onAction: () => showNotWiredToast(context),
-      ),
+      summary: l10n.authorsSubtitle('${placeholderAuthors.length}'),
       toolbar: AppToolbar(
         search: AppSearchField(
           hintText: l10n.authorsSearchHint,
@@ -119,14 +113,14 @@ class _AuthorListPageState extends State<AuthorListPage> {
       ],
       emptyState: _query.isEmpty
           ? AppEmptyView(
-              icon: Icons.people_outline_rounded,
+              icon: AppIcons.people,
               title: l10n.authorsEmptyTitle,
               message: l10n.authorsEmptyBody,
               actionLabel: l10n.authorsAdd,
               onAction: () => showNotWiredToast(context),
             )
           : AppEmptyView(
-              icon: Icons.search_off_rounded,
+              icon: AppIcons.noResults,
               title: l10n.commonNoMatchesTitle,
               message: l10n.commonNoMatchesBody,
               actionLabel: l10n.commonClearFilters,

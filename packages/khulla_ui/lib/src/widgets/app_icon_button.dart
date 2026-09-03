@@ -25,7 +25,7 @@ class AppIconButton extends StatelessWidget {
   });
 
   /// The glyph. Use the `_rounded` set.
-  final IconData icon;
+  final AppIconSpec icon;
 
   /// What the control does, already localized. Doubles as the semantics
   /// label.
@@ -85,7 +85,7 @@ class AppIconButton extends StatelessWidget {
               : Colors.transparent,
           borderRadius: radius,
         ),
-        child: Icon(icon, size: metrics.icon, color: foreground),
+        child: AppIcon(icon, size: metrics.icon, color: foreground),
       ),
     );
 

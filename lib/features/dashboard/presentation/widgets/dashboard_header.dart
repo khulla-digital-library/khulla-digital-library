@@ -44,7 +44,7 @@ class DashboardHeader extends StatelessWidget {
 
     final checkOut = AppButton(
       size: AppButtonSize.medium,
-      icon: Icons.qr_code_scanner_rounded,
+      icon: AppIcons.scan,
       onPressed: () => context.go(Routes.circulationCheckOut),
       child: Text(l10n.dashboardCheckOut),
     );

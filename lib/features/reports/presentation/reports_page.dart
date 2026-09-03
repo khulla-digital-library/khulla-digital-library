@@ -74,22 +74,6 @@ class _ReportsPageState extends State<ReportsPage> {
                 CollectionHeader(
                   title: l10n.reportsHeading,
                   subtitle: l10n.reportsSubtitle,
-                  actionLabel: l10n.commonExportPdf,
-                  actionIcon: Icons.picture_as_pdf_outlined,
-                  onAction: () => showNotWiredToast(context),
-                  menuTooltip: l10n.commonMoreActions,
-                  menuActions: [
-                    AppMenuAction(
-                      label: l10n.commonExportCsv,
-                      icon: Icons.file_download_outlined,
-                      onSelected: () => showNotWiredToast(context),
-                    ),
-                    AppMenuAction(
-                      label: l10n.commonPrint,
-                      icon: Icons.print_outlined,
-                      onSelected: () => showNotWiredToast(context),
-                    ),
-                  ],
                   trailing: AppSegmentedControl<ReportPeriod>(
                     value: _period,
                     items: ReportPeriod.values,
@@ -107,7 +91,7 @@ class _ReportsPageState extends State<ReportsPage> {
                     AppStatTile(
                       label: l10n.reportsStatBorrowed,
                       value: '934',
-                      icon: Icons.outbound_outlined,
+                      icon: AppIcons.checkOut,
                       tone: AppStatusTone.brand,
                       trend: '+7.1%',
                       trendValue: 7.1,
@@ -116,7 +100,7 @@ class _ReportsPageState extends State<ReportsPage> {
                     AppStatTile(
                       label: l10n.reportsStatReturned,
                       value: '901',
-                      icon: Icons.assignment_turned_in_outlined,
+                      icon: AppIcons.returned,
                       tone: AppStatusTone.success,
                       trend: '+6.4%',
                       trendValue: 6.4,
@@ -125,7 +109,7 @@ class _ReportsPageState extends State<ReportsPage> {
                     AppStatTile(
                       label: l10n.reportsStatNewMembers,
                       value: '52',
-                      icon: Icons.person_add_alt_1_outlined,
+                      icon: AppIcons.addPerson,
                       tone: AppStatusTone.info,
                       trend: '+13%',
                       trendValue: 13,
@@ -134,7 +118,7 @@ class _ReportsPageState extends State<ReportsPage> {
                     AppStatTile(
                       label: l10n.reportsStatFines,
                       value: Money.major(3160).display(),
-                      icon: Icons.payments_outlined,
+                      icon: AppIcons.payment,
                       tone: AppStatusTone.warning,
                       trend: '-3.2%',
                       trendValue: -3.2,
@@ -324,7 +308,7 @@ class _SavedReportTile extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.only(top: spacing.xxs / 2),
-          child: Icon(
+          child: AppIcon(
             report.icon,
             size: spacing.lg - 4,
             color: report.tone.foreground(context),
@@ -363,14 +347,14 @@ class _SavedReportTile extends StatelessWidget {
     final exports = [
       AppButton(
         variant: AppButtonVariant.outline,
-        icon: Icons.picture_as_pdf_outlined,
+        icon: AppIcons.pdf,
         onPressed: () => showNotWiredToast(context),
         child: Text(l10n.commonExportPdf),
       ),
       SizedBox(width: spacing.xs),
       AppButton(
         variant: AppButtonVariant.outline,
-        icon: Icons.table_view_outlined,
+        icon: AppIcons.tableView,
         onPressed: () => showNotWiredToast(context),
         child: Text(l10n.commonExportCsv),
       ),

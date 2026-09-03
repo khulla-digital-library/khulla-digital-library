@@ -33,7 +33,7 @@ class DashboardSectionCard extends StatelessWidget {
   final String? subtitle;
 
   /// Glyph beside the heading.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   /// The section's single control — a period picker, a *view all* link.
   final Widget? trailing;

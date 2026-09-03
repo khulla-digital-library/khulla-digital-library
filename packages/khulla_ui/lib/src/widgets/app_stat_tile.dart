@@ -38,7 +38,7 @@ class AppStatTile extends StatelessWidget {
   final String? caption;
 
   /// The glyph on the trailing edge of the label row.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   /// The tone of the glyph, and of the figure when it is not neutral.
   final AppStatusTone tone;
@@ -88,7 +88,7 @@ class AppStatTile extends StatelessWidget {
             ),
             if (glyph != null) ...[
               SizedBox(width: spacing.xs),
-              Icon(
+              AppIcon(
                 glyph,
                 size: context.appMetrics.icon,
                 color: tone.foreground(context),

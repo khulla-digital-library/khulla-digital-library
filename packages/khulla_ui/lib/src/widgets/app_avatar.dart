@@ -1,19 +1,23 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The initials circle standing in for a person or a record.
+/// The initials tile standing in for a person or a record.
+///
+/// A rounded square, not a circle, and neutral by default. A column of
+/// tinted circles down the left of a list reads as status — which is what
+/// tint means everywhere else in this app — so the avatar stays quiet and
+/// leaves color to the badge beside it.
 ///
 /// It takes the initials rather than a name: deriving them is a locale
 /// question — a Nepali name does not split the way an English one does — and
 /// that belongs to the feature that owns the record, not to the design system.
 ///
-/// [tone] is how a list of members stays scannable: passing a stable tone per
-/// record (derived from its id) gives each person a consistent color without
-/// anyone choosing one.
+/// [tone] exists for the rare avatar that genuinely carries standing — a
+/// suspended member. Do not vary it per record to make a list colorful.
 class AppAvatar extends StatelessWidget {
   const AppAvatar({
     required this.initials,
     this.size = 40,
-    this.tone = AppStatusTone.brand,
+    this.tone = AppStatusTone.neutral,
     this.badge,
     this.badgeTone = AppStatusTone.success,
     super.key,
@@ -22,7 +26,7 @@ class AppAvatar extends StatelessWidget {
   /// One or two characters, already cased.
   final String initials;
 
-  /// The circle's diameter.
+  /// The tile's edge length.
   final double size;
 
   /// Which wash and ink to paint.
@@ -30,7 +34,7 @@ class AppAvatar extends StatelessWidget {
 
   /// A glyph pinned to the bottom-trailing edge — a verified check, a
   /// suspended block. Null draws no badge.
-  final IconData? badge;
+  final AppIconSpec? badge;
 
   /// The badge's tone.
   final AppStatusTone badgeTone;
@@ -40,12 +44,12 @@ class AppAvatar extends StatelessWidget {
     final scheme = context.colorScheme;
     final glyph = badge;
 
-    final circle = Container(
+    final tile = Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         color: tone.background(context),
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(context.appRadius.control),
         border: Border.all(color: tone.border(context)),
       ),
       alignment: Alignment.center,
@@ -61,7 +65,7 @@ class AppAvatar extends StatelessWidget {
       ),
     );
 
-    if (glyph == null) return circle;
+    if (glyph == null) return tile;
 
     return SizedBox(
       width: size,
@@ -69,7 +73,7 @@ class AppAvatar extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          circle,
+          tile,
           Positioned(
             right: -1,
             bottom: -1,
@@ -79,7 +83,7 @@ class AppAvatar extends StatelessWidget {
                 color: scheme.surface,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: AppIcon(
                 glyph,
                 size: size * 0.36,
                 color: badgeTone.foreground(context),

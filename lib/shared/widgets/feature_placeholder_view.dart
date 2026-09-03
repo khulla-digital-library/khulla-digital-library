@@ -17,7 +17,7 @@ class FeaturePlaceholderView extends StatelessWidget {
   final String section;
 
   /// The destination's glyph, matching its navigation entry.
-  final IconData icon;
+  final AppIconSpec icon;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,11 @@ class FeaturePlaceholderView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, size: spacing.xxlg, color: scheme.onSurfaceVariant),
+                AppIcon(
+                  icon,
+                  size: spacing.xxlg,
+                  color: scheme.onSurfaceVariant,
+                ),
                 SizedBox(height: spacing.md),
                 Text(
                   l10n.sectionComingSoonTitle(section),

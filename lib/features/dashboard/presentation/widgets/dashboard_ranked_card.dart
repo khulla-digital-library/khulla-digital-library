@@ -61,7 +61,7 @@ class DashboardRankedCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: spacing.xs),
-                AppAvatar(initials: entry.initials, size: 32, tone: entry.tone),
+                AppAvatar(initials: entry.initials, size: 32),
                 SizedBox(width: spacing.sm),
                 Expanded(
                   child: Column(

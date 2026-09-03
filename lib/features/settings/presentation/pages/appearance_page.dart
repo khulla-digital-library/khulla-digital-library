@@ -34,10 +34,10 @@ class _AppearancePageState extends State<AppearancePage> {
     ThemeMode.dark => l10n.themeModeDark,
   };
 
-  IconData _icon(ThemeMode mode) => switch (mode) {
-    ThemeMode.system => Icons.brightness_auto_outlined,
-    ThemeMode.light => Icons.light_mode_outlined,
-    ThemeMode.dark => Icons.dark_mode_outlined,
+  AppIconSpec _icon(ThemeMode mode) => switch (mode) {
+    ThemeMode.system => AppIcons.systemMode,
+    ThemeMode.light => AppIcons.lightMode,
+    ThemeMode.dark => AppIcons.darkMode,
   };
 
   @override

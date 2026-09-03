@@ -34,7 +34,7 @@ class AppSectionHeader extends StatelessWidget {
   /// put a second surface inside the card the header already sits on, and a
   /// page of six headers each wearing one reads as decoration rather than
   /// structure.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   /// Uses the card heading ramp rather than the section one. Set inside a
   /// card, where the page-level size is too loud.
@@ -53,7 +53,7 @@ class AppSectionHeader extends StatelessWidget {
     return Row(
       children: [
         if (glyph != null) ...[
-          Icon(
+          AppIcon(
             glyph,
             size: context.appMetrics.icon,
             color: tone.foreground(context),
