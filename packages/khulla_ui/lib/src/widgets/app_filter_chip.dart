@@ -61,7 +61,9 @@ class AppFilterChip extends StatelessWidget {
       height: metrics.buttonHeightSmall,
       padding: EdgeInsets.symmetric(horizontal: spacing.sm),
       decoration: BoxDecoration(
-        color: selected ? tone.background(context) : Colors.transparent,
+        color: selected
+            ? tone.background(context)
+            : accent.withValues(alpha: 0.06),
         borderRadius: radius,
       ),
       child: Row(
@@ -93,7 +95,7 @@ class AppFilterChip extends StatelessWidget {
       borderRadius: radius,
       pressScale: 1,
       child: AppDashedBorder(
-        color: selected ? accent : colors.hairline,
+        color: selected ? accent : accent.withValues(alpha: 0.35),
         child: body,
       ),
     );

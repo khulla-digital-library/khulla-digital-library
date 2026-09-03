@@ -29,6 +29,7 @@ class ShellBrandMark extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.primary,
         borderRadius: BorderRadius.circular(context.appRadius.container),
+        boxShadow: context.appShadows.raised,
       ),
       alignment: Alignment.center,
       child: AppIcon(
@@ -57,6 +58,8 @@ class ShellBrandMark extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: context.appTextStyles.sectionTitle.copyWith(
                   color: context.appColors.ink100,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
                 ),
               ),
               Text(
