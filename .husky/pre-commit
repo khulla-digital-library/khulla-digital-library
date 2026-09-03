@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+# Block direct commits to protected branches
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+PROHIBITED_BRANCHES="prod dev"
+
+for prohibited_branch in $PROHIBITED_BRANCHES; do
+  if [ "$BRANCH_NAME" = "$prohibited_branch" ]; then
+    echo "Error: Committing directly to '$BRANCH_NAME' is not allowed. Please create a new branch for your changes."
+    exit 1
+  fi
+done
+
+exit 0

@@ -1,0 +1,36 @@
+# Root package lint config.
+#
+# The shared rule set lives in analysis_options_base.yaml so
+# `packages/khulla_ui` can inherit the same strictness without depending on
+# bloc_lint. Only bloc configuration and this package's excludes belong here.
+#
+# The exclude list is repeated in full rather than inherited: an including
+# file's `analyzer.exclude` replaces the included one's rather than merging,
+# and `flutter pub get` appends the platform directories here if they are
+# missing — which would silently drop the generated-file globs.
+include:
+  - analysis_options_base.yaml
+  - package:bloc_lint/recommended.yaml
+
+analyzer:
+  exclude:
+    - lib/l10n/gen/*
+    - lib/gen/*
+    - "**/*.g.dart"
+    - "**/*.config.dart"
+    - "**/*.freezed.dart"
+    - "**/*.mocks.dart"
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
+
+# Cubit methods return Future so callers can await (bootstrap) or wrap with
+# unawaited() (UI). That collides with prefer_void_public_cubit_methods, which
+# would also force `void foo() async` and trip avoid_void_async.
+bloc:
+  rules:
+    prefer_void_public_cubit_methods: false
