@@ -17,7 +17,6 @@ class TitleHistoryCard extends StatelessWidget {
     return SectionCard(
       title: l10n.titleDetailHistoryTitle,
       subtitle: l10n.titleDetailHistorySubtitle,
-      icon: Icons.history_rounded,
       child: entries.isEmpty
           ? AppEmptyView(
               variant: AppFeedbackVariant.inline,

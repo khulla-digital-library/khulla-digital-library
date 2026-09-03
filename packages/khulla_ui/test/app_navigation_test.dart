@@ -2,22 +2,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 final _destinations = <AppNavDestination>[
-  const AppNavDestination(
-    icon: Icon(Icons.circle_outlined),
-    selectedIcon: Icon(Icons.circle),
-    label: 'First',
-  ),
-  const AppNavDestination(
-    icon: Icon(Icons.square_outlined),
-    selectedIcon: Icon(Icons.square),
-    label: 'Second',
-  ),
+  const AppNavDestination(icon: AppIcon(AppIcons.book), label: 'First'),
+  const AppNavDestination(icon: AppIcon(AppIcons.people), label: 'Second'),
 ];
+
+/// `find.byIcon` only knows Material's `Icon`; the app draws `AppIcon`.
+Finder _icon(AppIconSpec spec) => find.byWidgetPredicate(
+  (widget) => widget is AppIcon && widget.spec == spec,
+);
 
 Widget _host(Widget child, {Size size = const Size(1400, 900)}) => MediaQuery(
   data: MediaQueryData(size: size),
   child: MaterialApp(
-    theme: AppTheme.light(FormFactor.large),
+    theme: AppTheme.light(AppDensity.comfortable),
     home: Scaffold(
       body: Row(
         children: [
@@ -44,15 +41,23 @@ void main() {
             selectedIndex: 0,
             onDestinationSelected: (_) {},
             destinations: _destinations,
-            leading: const Icon(Icons.book),
-            trailing: const Icon(Icons.settings),
+            leading: const AppIcon(AppIcons.library),
+            trailing: const AppIcon(AppIcons.settings),
           ),
         ),
       );
 
       expect(tester.takeException(), isNull);
-      expect(find.text('First'), findsOneWidget);
-      expect(find.byIcon(Icons.settings), findsOneWidget);
+      // Collapsed, a destination is its glyph and a tooltip — the label is
+      // not painted, which is the whole point of the narrow rail.
+      expect(_icon(AppIcons.book), findsOneWidget);
+      expect(find.text('First'), findsNothing);
+      expect(
+        find.byTooltip('First'),
+        findsOneWidget,
+        reason: 'a collapsed destination must still name itself on hover',
+      );
+      expect(_icon(AppIcons.settings), findsOneWidget);
     });
 
     testWidgets('lays out extended', (tester) async {
@@ -63,7 +68,7 @@ void main() {
             onDestinationSelected: (_) {},
             destinations: _destinations,
             extended: true,
-            trailing: const Icon(Icons.settings),
+            trailing: const AppIcon(AppIcons.settings),
           ),
         ),
       );
@@ -84,7 +89,7 @@ void main() {
         ),
       );
 
-      await tester.tap(find.text('Second'));
+      await tester.tap(_icon(AppIcons.people));
       expect(selected, 1);
     });
   });

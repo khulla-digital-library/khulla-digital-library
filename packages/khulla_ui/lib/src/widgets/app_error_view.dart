@@ -56,8 +56,8 @@ class AppErrorView extends StatelessWidget {
             : CrossAxisAlignment.start,
         children: [
           if (isCentered) ...[
-            Icon(
-              Icons.error_outline_rounded,
+            AppIcon(
+              AppIcons.error,
               size: spacing.xlg,
               color: scheme.onSurfaceVariant,
             ),

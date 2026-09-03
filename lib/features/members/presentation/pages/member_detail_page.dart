@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
+import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/features/members/presentation/placeholder/members_placeholder.dart';
 import 'package:khulla/features/members/presentation/widgets/member_detail_header.dart';
 import 'package:khulla/features/members/presentation/widgets/member_fines_card.dart';
@@ -78,51 +79,47 @@ class MemberDetailPage extends StatelessWidget {
             ),
             sliver: SliverList.list(
               children: [
-                AppPageHeader(
-                  title: l10n.membersHeading,
-                  onBackPressed: () => context.go(Routes.members),
-                ),
-                SizedBox(height: spacing.md),
                 MemberDetailHeader(
                   member: member,
                   onCheckOut: () => context.go(Routes.circulationCheckOut),
                   menuActions: [
                     AppMenuAction(
                       label: l10n.memberDetailEdit,
-                      icon: Icons.edit_outlined,
-                      onSelected: () => context.go(Routes.memberEdit(memberId)),
+                      icon: AppIcons.edit,
+                      onSelected: () =>
+                          MemberFormDialog.show(context, memberId: memberId),
                     ),
                     AppMenuAction(
                       label: l10n.memberDetailRenewMembership,
-                      icon: Icons.autorenew_rounded,
+                      icon: AppIcons.renew,
                       onSelected: () => showNotWiredToast(context),
                     ),
                     AppMenuAction(
                       label: l10n.memberDetailSuspend,
-                      icon: Icons.block_rounded,
+                      icon: AppIcons.blocked,
                       onSelected: () => showNotWiredToast(context),
                     ),
                     AppMenuAction(
                       label: l10n.memberDetailDelete,
-                      icon: Icons.delete_outline_rounded,
+                      icon: AppIcons.delete,
                       isDestructive: true,
                       onSelected: () => unawaited(_confirmDelete(context)),
                     ),
                   ],
                 ),
                 SizedBox(height: spacing.md),
-                AppResponsiveGrid(
-                  children: [
+                AppStatStrip(
+                  tiles: [
                     AppStatTile(
                       label: l10n.memberDetailStatLoans,
                       value: '${member.loansOut}',
-                      icon: Icons.swap_horiz_rounded,
+                      icon: AppIcons.transfer,
                       tone: AppStatusTone.brand,
                     ),
                     AppStatTile(
                       label: l10n.memberDetailStatOverdue,
                       value: '${member.overdue}',
-                      icon: Icons.error_outline_rounded,
+                      icon: AppIcons.error,
                       tone: member.overdue > 0
                           ? AppStatusTone.danger
                           : AppStatusTone.neutral,
@@ -130,7 +127,7 @@ class MemberDetailPage extends StatelessWidget {
                     AppStatTile(
                       label: l10n.memberDetailStatFines,
                       value: member.finesOwed.display(),
-                      icon: Icons.account_balance_wallet_outlined,
+                      icon: AppIcons.wallet,
                       tone: member.finesOwed.isPositive
                           ? AppStatusTone.danger
                           : AppStatusTone.neutral,
@@ -138,7 +135,7 @@ class MemberDetailPage extends StatelessWidget {
                     AppStatTile(
                       label: l10n.memberDetailStatBorrowed,
                       value: '${member.borrowedAllTime}',
-                      icon: Icons.menu_book_rounded,
+                      icon: AppIcons.book,
                     ),
                   ],
                 ),
@@ -202,7 +199,6 @@ class _MemberDetailsCard extends StatelessWidget {
       children: [
         SectionCard(
           title: l10n.memberDetailMembership,
-          icon: Icons.card_membership_rounded,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
@@ -225,7 +221,6 @@ class _MemberDetailsCard extends StatelessWidget {
         SizedBox(height: spacing.md),
         SectionCard(
           title: l10n.memberDetailContact,
-          icon: Icons.contact_page_outlined,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,

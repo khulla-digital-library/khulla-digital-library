@@ -34,7 +34,6 @@ class CheckOutBasket extends StatelessWidget {
 
     return SectionCard(
       title: l10n.checkOutCopiesSection,
-      icon: Icons.inventory_2_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -42,9 +41,9 @@ class CheckOutBasket extends StatelessWidget {
           AppTextField(
             controller: scanController,
             hintText: l10n.checkOutScanHint,
-            prefixIcon: Icon(
-              Icons.qr_code_scanner_rounded,
-              size: spacing.md + 4,
+            prefixIcon: AppIcon(
+              AppIcons.scan,
+              size: context.appMetrics.icon,
               color: scheme.onSurfaceVariant,
             ),
             textInputAction: TextInputAction.done,
@@ -93,7 +92,7 @@ class CheckOutBasket extends StatelessWidget {
                   width: 56,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, copy) => AppIconButton(
-                    icon: Icons.close_rounded,
+                    icon: AppIcons.close,
                     tooltip: l10n.checkOutRemoveCopy,
                     tone: AppStatusTone.danger,
                     onPressed: () => onRemove(copy),

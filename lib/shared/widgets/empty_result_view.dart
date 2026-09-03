@@ -10,7 +10,7 @@ class EmptyResultView extends StatelessWidget {
     required this.title,
     required this.subtitle,
     super.key,
-    this.icon = Icons.search_off_rounded,
+    this.icon = AppIcons.noResults,
     this.variant = AppFeedbackVariant.centered,
   });
 
@@ -21,7 +21,7 @@ class EmptyResultView extends StatelessWidget {
   final String subtitle;
 
   /// Badge icon, shown only in [AppFeedbackVariant.centered].
-  final IconData icon;
+  final AppIconSpec icon;
 
   /// Layout: centered for a whole screen or section, inline inside a card.
   final AppFeedbackVariant variant;

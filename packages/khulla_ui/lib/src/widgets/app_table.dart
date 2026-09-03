@@ -22,8 +22,8 @@ class AppTable<T> extends StatelessWidget {
     this.sort,
     this.onSort,
     this.compactBuilder,
-    this.rowHeight = 52,
-    this.headerHeight = 44,
+    this.rowHeight,
+    this.headerHeight,
     this.showHeader = true,
     super.key,
   });
@@ -50,11 +50,11 @@ class AppTable<T> extends StatelessWidget {
   /// Renders one record as a card on a compact window, in place of a row.
   final Widget Function(BuildContext context, T item)? compactBuilder;
 
-  /// Height of each row.
-  final double rowHeight;
+  /// Height of each row. Null resolves to the density's row height.
+  final double? rowHeight;
 
-  /// Height of the heading row.
-  final double headerHeight;
+  /// Height of the heading row. Null resolves to the density's header height.
+  final double? headerHeight;
 
   /// Whether to render the heading row at all. Turn it off for a two-column
   /// summary table inside a card, where the headings say nothing.
@@ -92,9 +92,9 @@ class AppTable<T> extends StatelessWidget {
         for (final (index, item) in items.indexed)
           AppTableRow<T>(
             item: item,
+            index: index,
             columns: columns,
             height: rowHeight,
-            divided: index < items.length - 1,
             selected: isSelected?.call(item) ?? false,
             onTap: onRowTap == null ? null : () => onRowTap!(item),
           ),

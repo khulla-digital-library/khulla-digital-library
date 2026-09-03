@@ -48,7 +48,6 @@ class CheckOutMemberCard extends StatelessWidget {
 
     return SectionCard(
       title: l10n.checkOutMemberSection,
-      icon: Icons.badge_outlined,
       trailing: name == null
           ? null
           : AppTextButton(
@@ -107,7 +106,7 @@ class CheckOutMemberCard extends StatelessWidget {
                   AppStatusBadge(
                     label: outstandingFines.display(),
                     tone: AppStatusTone.danger,
-                    icon: Icons.account_balance_wallet_outlined,
+                    icon: AppIcons.wallet,
                   ),
               ],
             ),

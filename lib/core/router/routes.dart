@@ -25,15 +25,13 @@ abstract final class Routes {
   static const String titlesSegment = 'titles';
   static const String copiesSegment = 'copies';
   static const String authorsSegment = 'authors';
-  static const String newSegment = 'new';
-  static const String editSegment = 'edit';
   static const String idSegment = ':id';
 
   /// Every work the library holds.
-  static const String catalogTitles = '$catalog/$titlesSegment';
+  /// Label and barcode printing, under the catalogue.
+  static const String labelsSegment = 'labels';
 
-  /// The title editor, opened empty.
-  static const String catalogTitleNew = '$catalogTitles/$newSegment';
+  static const String catalogTitles = '$catalog/$titlesSegment';
 
   /// Every physical item, across every title.
   static const String catalogCopies = '$catalog/$copiesSegment';
@@ -41,12 +39,11 @@ abstract final class Routes {
   /// The people and organisations credited on a title.
   static const String catalogAuthors = '$catalog/$authorsSegment';
 
+  /// The label and barcode desk.
+  static const String catalogLabels = '$catalog/$labelsSegment';
+
   /// One title's record.
   static String catalogTitle(String id) => '$catalogTitles/$id';
-
-  /// The title editor, opened on an existing record.
-  static String catalogTitleEdit(String id) =>
-      '$catalogTitles/$id/$editSegment';
 
   /// One author's record.
   static String catalogAuthor(String id) => '$catalogAuthors/$id';
@@ -73,16 +70,25 @@ abstract final class Routes {
   static const String circulationFines = '$circulation/$finesSegment';
 
   /// Members: borrower records and their standing.
-  static const String members = '/members';
+  /// The reader-facing catalogue search.
+  static const String opac = '/opac';
 
-  /// The borrower editor, opened empty.
-  static const String memberNew = '$members/$newSegment';
+  /// Reports and statistics.
+  static const String reports = '/reports';
+
+  /// Staff accounts and the roles they hold.
+  static const String users = '/users';
+
+  /// The role and permission matrix, under staff.
+  static const String rolesSegment = 'roles';
+
+  /// The role list.
+  static const String usersRoles = '$users/$rolesSegment';
+
+  static const String members = '/members';
 
   /// One borrower's record.
   static String member(String id) => '$members/$id';
-
-  /// The borrower editor, opened on an existing record.
-  static String memberEdit(String id) => '$members/$id/$editSegment';
 
   /// Settings: library profile, loan rules, backup, appearance.
   static const String settings = '/settings';
@@ -91,6 +97,12 @@ abstract final class Routes {
   static const String loanRulesSegment = 'loan-rules';
   static const String appearanceSegment = 'appearance';
   static const String backupSegment = 'backup';
+
+  /// Online sync, under settings.
+  static const String syncSegment = 'sync';
+
+  /// The component gallery, under settings. Registered by the dev build only.
+  static const String designSystemSegment = 'design-system';
 
   /// Library profile — name, branch, contact, currency.
   static const String settingsLibrary = '$settings/$librarySegment';
@@ -103,6 +115,13 @@ abstract final class Routes {
 
   /// Export, restore, import, and the destructive reset.
   static const String settingsBackup = '$settings/$backupSegment';
+
+  /// The online sync and remote backup screen.
+  static const String settingsSync = '$settings/$syncSegment';
+
+  /// The design-system gallery. Only reachable in the dev flavor — the
+  /// release build declares neither the route nor the door to it.
+  static const String settingsDesignSystem = '$settings/$designSystemSegment';
 
   /// Whether [location] is [prefix] or nested under it.
   static bool isUnder(String location, String prefix) =>

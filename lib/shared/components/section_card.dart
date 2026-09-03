@@ -29,7 +29,7 @@ class SectionCard extends StatelessWidget {
   final String? subtitle;
 
   /// Glyph beside the heading.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   /// The section's single action — a button, or an [AppMenuButton].
   final Widget? trailing;

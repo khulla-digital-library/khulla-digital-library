@@ -73,8 +73,9 @@ class AppBreakpoints extends ThemeExtension<AppBreakpoints> {
     this.compact = 600,
     this.medium = 840,
     this.expanded = 1200,
+    this.comfortable = 1600,
     this.contentMaxWidth = 720,
-    this.wideContentMaxWidth = 1280,
+    this.wideContentMaxWidth = 1600,
   });
 
   /// Compact upper bound, exclusive. Matches Material's compact class.
@@ -86,13 +87,26 @@ class AppBreakpoints extends ThemeExtension<AppBreakpoints> {
   /// Expanded upper bound, exclusive. Large starts here.
   final double expanded;
 
+  /// The density step-up. Not a layout breakpoint: at this width the UI
+  /// steps type, control height, icon size and gap up by exactly one notch
+  /// and reflows nothing. It is the only width [AppDensity] is read from.
+  final double comfortable;
+
   /// Max width for reading content — prose, forms, a book's detail pane.
   /// Roughly 75 characters at the body ramp, which is the readable ceiling.
   final double contentMaxWidth;
 
   /// Max width for dense content that genuinely uses the room: catalogue
   /// tables, circulation boards, dashboards.
+  ///
+  /// Set at the density step, so a maximised 1600px window fills edge to edge
+  /// with the roomier rung rather than growing margins, and anything wider
+  /// stops there instead of stretching a table across a 2560px monitor.
   final double wideContentMaxWidth;
+
+  /// Resolves [width] to an [AppDensity].
+  AppDensity densityFor(double width) =>
+      width >= comfortable ? AppDensity.comfortable : AppDensity.compact;
 
   /// Resolves [width] to a [FormFactor].
   FormFactor formFactorFor(double width) {
@@ -107,6 +121,7 @@ class AppBreakpoints extends ThemeExtension<AppBreakpoints> {
     double? compact,
     double? medium,
     double? expanded,
+    double? comfortable,
     double? contentMaxWidth,
     double? wideContentMaxWidth,
   }) {
@@ -114,6 +129,7 @@ class AppBreakpoints extends ThemeExtension<AppBreakpoints> {
       compact: compact ?? this.compact,
       medium: medium ?? this.medium,
       expanded: expanded ?? this.expanded,
+      comfortable: comfortable ?? this.comfortable,
       contentMaxWidth: contentMaxWidth ?? this.contentMaxWidth,
       wideContentMaxWidth: wideContentMaxWidth ?? this.wideContentMaxWidth,
     );
@@ -126,6 +142,7 @@ class AppBreakpoints extends ThemeExtension<AppBreakpoints> {
       compact: lerpDouble(compact, other.compact, t)!,
       medium: lerpDouble(medium, other.medium, t)!,
       expanded: lerpDouble(expanded, other.expanded, t)!,
+      comfortable: lerpDouble(comfortable, other.comfortable, t)!,
       contentMaxWidth: lerpDouble(contentMaxWidth, other.contentMaxWidth, t)!,
       wideContentMaxWidth: lerpDouble(
         wideContentMaxWidth,

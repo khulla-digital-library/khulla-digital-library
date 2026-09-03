@@ -24,7 +24,7 @@ class AppMenuAction {
   final VoidCallback onSelected;
 
   /// Optional leading glyph.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   /// Draws the entry in [ColorScheme.error]. A destructive entry belongs at
   /// the bottom of the menu, away from the ones people use daily, and must

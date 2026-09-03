@@ -4,8 +4,12 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// A checkbox with its label and optional explanation, laid out as one row
 /// that is entirely tappable.
 ///
-/// The whole row is the target, not just the 20px box — a checkbox alone is
-/// well under the 44px minimum and is the control people miss most.
+/// The whole row is the target, not just the 16px box — a checkbox alone is
+/// well under any reasonable minimum and is the control people miss most.
+///
+/// The box itself is a **tick in an outlined square, not a filled block**:
+/// checked, the border and the tick turn brand and the fill stays empty. In a
+/// list of fifteen permissions, fifteen filled red squares is a wall.
 /// {@endtemplate}
 class AppCheckboxField extends StatelessWidget {
   /// {@macro app_checkbox_field}
@@ -40,43 +44,46 @@ class AppCheckboxField extends StatelessWidget {
     final enabled = onChanged != null;
     final caption = description;
 
-    return InkWell(
+    return AppRipple(
       onTap: enabled ? () => onChanged!(!(value ?? false)) : null,
-      borderRadius: BorderRadius.circular(context.appRadius.control),
+      borderRadius: BorderRadius.circular(context.appRadius.container),
+      pressScale: 1,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: spacing.xxs),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Checkbox(
-              value: value,
-              tristate: tristate,
-              onChanged: onChanged,
-              visualDensity: VisualDensity.standard,
+            SizedBox.square(
+              dimension: context.appMetrics.checkbox,
+              child: Checkbox(
+                value: value,
+                tristate: tristate,
+                onChanged: onChanged,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
             ),
-            SizedBox(width: spacing.xs),
+            SizedBox(width: spacing.sm),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(top: spacing.sm - spacing.xxs),
+                padding: const EdgeInsets.only(top: 1),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       label,
-                      style: context.textTheme.bodyMedium?.copyWith(
+                      style: context.appTextStyles.body.copyWith(
                         color: enabled
                             ? scheme.onSurface
-                            : scheme.onSurfaceVariant,
+                            : context.appColors.ink500,
                       ),
                     ),
                     if (caption != null) ...[
                       SizedBox(height: spacing.xxs),
                       Text(
                         caption,
-                        style: context.textTheme.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                          height: 1.35,
+                        style: context.appTextStyles.caption.copyWith(
+                          color: context.appColors.mutedForeground,
                         ),
                       ),
                     ],

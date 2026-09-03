@@ -3,6 +3,7 @@ import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_placeholder.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_title.dart';
 import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/components/record_header.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -39,72 +40,27 @@ class AuthorDetailPage extends StatelessWidget {
             ),
             sliver: SliverList.list(
               children: [
-                AppPageHeader(
-                  title: l10n.authorsHeading,
-                  onBackPressed: () => context.go(Routes.catalogAuthors),
-                ),
-                SizedBox(height: spacing.md),
-                AppCard(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppAvatar(initials: author.initials, size: 56),
-                      SizedBox(width: spacing.md),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              author.name,
-                              style: context.textTheme.headlineMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: -0.5,
-                                color: context.appColors.textHigh,
-                              ),
-                            ),
-                            SizedBox(height: spacing.xs),
-                            Wrap(
-                              spacing: spacing.xs,
-                              runSpacing: spacing.xs,
-                              children: [
-                                if (author.lifespan case final lifespan?)
-                                  AppStatusBadge(
-                                    label: lifespan,
-                                    icon: Icons.schedule_rounded,
-                                  ),
-                                if (author.nationality case final nationality?)
-                                  AppStatusBadge(
-                                    label: nationality,
-                                    icon: Icons.public_rounded,
-                                  ),
-                                AppStatusBadge(
-                                  label: l10n.authorsSubtitle(
-                                    '${author.titleCount}',
-                                  ),
-                                  icon: Icons.menu_book_rounded,
-                                  tone: AppStatusTone.brand,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: spacing.md),
-                      AppButton(
-                        size: AppButtonSize.medium,
-                        variant: AppButtonVariant.outline,
-                        onPressed: () => showNotWiredToast(context),
-                        child: Text(l10n.authorDetailEdit),
-                      ),
-                    ],
-                  ),
+                RecordHeader(
+                  title: author.name,
+                  initials: author.initials,
+                  facts: [
+                    ?author.lifespan,
+                    ?author.nationality,
+                    l10n.authorsSubtitle('${author.titleCount}'),
+                  ],
+                  actions: [
+                    AppButton(
+                      size: AppButtonSize.medium,
+                      variant: AppButtonVariant.outline,
+                      onPressed: () => showNotWiredToast(context),
+                      child: Text(l10n.authorDetailEdit),
+                    ),
+                  ],
                 ),
                 if (biography != null) ...[
                   SizedBox(height: spacing.md),
                   SectionCard(
                     title: l10n.authorDetailBiography,
-                    icon: Icons.person_outline_rounded,
                     child: Text(
                       biography,
                       style: context.textTheme.bodyMedium?.copyWith(
@@ -118,7 +74,6 @@ class AuthorDetailPage extends StatelessWidget {
                 SectionCard(
                   title: l10n.authorDetailTitlesTitle,
                   subtitle: l10n.authorDetailTitlesSubtitle,
-                  icon: Icons.menu_book_rounded,
                   child: titles.isEmpty
                       ? AppEmptyView(
                           variant: AppFeedbackVariant.inline,

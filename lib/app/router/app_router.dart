@@ -7,8 +7,8 @@ import 'package:khulla/features/catalog/author/presentation/author_detail_page.d
 import 'package:khulla/features/catalog/author/presentation/author_list_page.dart';
 import 'package:khulla/features/catalog/catalog/presentation/catalog_page.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_list_page.dart';
+import 'package:khulla/features/catalog/copy/presentation/label_print_page.dart';
 import 'package:khulla/features/catalog/title/presentation/title_detail_page.dart';
-import 'package:khulla/features/catalog/title/presentation/title_form_page.dart';
 import 'package:khulla/features/catalog/title/presentation/title_list_page.dart';
 import 'package:khulla/features/circulation/check_out/presentation/check_out_page.dart';
 import 'package:khulla/features/circulation/circulation/presentation/circulation_page.dart';
@@ -17,13 +17,17 @@ import 'package:khulla/features/circulation/reservation/presentation/reservation
 import 'package:khulla/features/circulation/return_copy/presentation/return_page.dart';
 import 'package:khulla/features/dashboard/presentation/dashboard_page.dart';
 import 'package:khulla/features/members/presentation/pages/member_detail_page.dart';
-import 'package:khulla/features/members/presentation/pages/member_form_page.dart';
 import 'package:khulla/features/members/presentation/pages/member_list_page.dart';
+import 'package:khulla/features/opac/presentation/opac_page.dart';
+import 'package:khulla/features/reports/presentation/reports_page.dart';
 import 'package:khulla/features/settings/presentation/pages/appearance_page.dart';
 import 'package:khulla/features/settings/presentation/pages/backup_page.dart';
 import 'package:khulla/features/settings/presentation/pages/library_profile_page.dart';
 import 'package:khulla/features/settings/presentation/pages/loan_rules_page.dart';
 import 'package:khulla/features/settings/presentation/pages/settings_page.dart';
+import 'package:khulla/features/settings/presentation/pages/sync_page.dart';
+import 'package:khulla/features/users/presentation/pages/role_list_page.dart';
+import 'package:khulla/features/users/presentation/pages/user_list_page.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Owns the single [GoRouter] instance.
@@ -79,31 +83,21 @@ class AppRouter {
                       path: Routes.titlesSegment,
                       builder: (context, _) => const TitleListPage(),
                       routes: [
-                        // Declared before `:id` so /titles/new opens the
-                        // editor rather than a record with the id "new".
-                        GoRoute(
-                          path: Routes.newSegment,
-                          builder: (context, _) => const TitleFormPage(),
-                        ),
                         GoRoute(
                           path: Routes.idSegment,
                           builder: (context, state) => TitleDetailPage(
                             titleId: state.pathParameters['id'] ?? '',
                           ),
-                          routes: [
-                            GoRoute(
-                              path: Routes.editSegment,
-                              builder: (context, state) => TitleFormPage(
-                                titleId: state.pathParameters['id'],
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
                     GoRoute(
                       path: Routes.copiesSegment,
                       builder: (context, _) => const CopyListPage(),
+                    ),
+                    GoRoute(
+                      path: Routes.labelsSegment,
+                      builder: (context, _) => const LabelPrintPage(),
                     ),
                     GoRoute(
                       path: Routes.authorsSegment,
@@ -154,22 +148,40 @@ class AppRouter {
                   builder: (context, _) => const MemberListPage(),
                   routes: [
                     GoRoute(
-                      path: Routes.newSegment,
-                      builder: (context, _) => const MemberFormPage(),
-                    ),
-                    GoRoute(
                       path: Routes.idSegment,
                       builder: (context, state) => MemberDetailPage(
                         memberId: state.pathParameters['id'] ?? '',
                       ),
-                      routes: [
-                        GoRoute(
-                          path: Routes.editSegment,
-                          builder: (context, state) => MemberFormPage(
-                            memberId: state.pathParameters['id'],
-                          ),
-                        ),
-                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.opac,
+                  builder: (context, _) => const OpacPage(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.reports,
+                  builder: (context, _) => const ReportsPage(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.users,
+                  builder: (context, _) => const UserListPage(),
+                  routes: [
+                    GoRoute(
+                      path: Routes.rolesSegment,
+                      builder: (context, _) => const RoleListPage(),
                     ),
                   ],
                 ),
@@ -179,7 +191,8 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: Routes.settings,
-                  builder: (context, _) => const SettingsPage(),
+                  builder: (context, _) =>
+                      SettingsPage(showDesignSystem: !_config.isProduction),
                   routes: [
                     GoRoute(
                       path: Routes.librarySegment,
@@ -197,6 +210,18 @@ class AppRouter {
                       path: Routes.backupSegment,
                       builder: (context, _) => const BackupPage(),
                     ),
+                    GoRoute(
+                      path: Routes.syncSegment,
+                      builder: (context, _) => const SyncPage(),
+                    ),
+                    // The component gallery is a development surface: the
+                    // release build never declares the route, so there is no
+                    // way to reach it by typing the URL either.
+                    if (!_config.isProduction)
+                      GoRoute(
+                        path: Routes.designSystemSegment,
+                        builder: (context, _) => const AppDesignGallery(),
+                      ),
                   ],
                 ),
               ],

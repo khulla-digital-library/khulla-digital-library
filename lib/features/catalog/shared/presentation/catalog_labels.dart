@@ -19,13 +19,13 @@ extension CatalogFormatX on CatalogFormat {
     CatalogFormat.digital => l10n.formatDigital,
   };
 
-  IconData get icon => switch (this) {
-    CatalogFormat.book => Icons.menu_book_rounded,
-    CatalogFormat.journal => Icons.article_rounded,
-    CatalogFormat.magazine => Icons.auto_stories_rounded,
-    CatalogFormat.audio => Icons.headphones_rounded,
-    CatalogFormat.video => Icons.movie_rounded,
-    CatalogFormat.digital => Icons.devices_rounded,
+  AppIconSpec get icon => switch (this) {
+    CatalogFormat.book => AppIcons.book,
+    CatalogFormat.journal => AppIcons.article,
+    CatalogFormat.magazine => AppIcons.openBook,
+    CatalogFormat.audio => AppIcons.audio,
+    CatalogFormat.video => AppIcons.video,
+    CatalogFormat.digital => AppIcons.devices,
   };
 }
 

@@ -1,93 +1,71 @@
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
+import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The four things a desk shift starts with, as pressable tiles.
+/// The other things a desk shift starts with, as buttons rather than tiles.
 ///
-/// Each one lands on the screen that does the task — the checkout desk, the
-/// returns desk, an empty title editor, an empty member editor — rather than
-/// on the section that contains it.
+/// These are actions, not content, and drawing each as a bordered card with
+/// its own tinted glyph made four verbs look like four features. A wrap of
+/// outline buttons says the same thing in a third of the height and reads as
+/// something to press.
+///
+/// Checking a copy out is missing on purpose: it is the board's one primary
+/// action and already sits in the control strip at the top. Repeating it here
+/// would leave the page with two equally-weighted copies of the same button.
 class DashboardQuickActions extends StatelessWidget {
   const DashboardQuickActions({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final spacing = context.appSpacing;
 
-    return AppResponsiveGrid(
-      compactColumns: 2,
-      expandedColumns: 4,
+    return Wrap(
+      spacing: spacing.xs,
+      runSpacing: spacing.xs,
       children: [
-        _QuickActionTile(
-          label: l10n.dashboardCheckOut,
-          icon: Icons.qr_code_scanner_rounded,
-          route: Routes.circulationCheckOut,
-        ),
-        _QuickActionTile(
+        _QuickAction(
           label: l10n.dashboardReturnCopy,
-          icon: Icons.assignment_return_outlined,
-          route: Routes.circulationReturn,
+          icon: AppIcons.checkIn,
+          onPressed: () => context.go(Routes.circulationReturn),
         ),
-        _QuickActionTile(
+        _QuickAction(
           label: l10n.dashboardAddTitle,
-          icon: Icons.library_add_outlined,
-          route: Routes.catalogTitleNew,
+          icon: AppIcons.addToCatalog,
+          onPressed: () => TitleFormDialog.show(context),
         ),
-        _QuickActionTile(
+        _QuickAction(
           label: l10n.dashboardAddMember,
-          icon: Icons.person_add_alt_1_outlined,
-          route: Routes.memberNew,
+          icon: AppIcons.addPerson,
+          onPressed: () => MemberFormDialog.show(context),
         ),
       ],
     );
   }
 }
 
-class _QuickActionTile extends StatelessWidget {
-  const _QuickActionTile({
+class _QuickAction extends StatelessWidget {
+  const _QuickAction({
     required this.label,
     required this.icon,
-    required this.route,
+    required this.onPressed,
   });
 
   final String label;
-  final IconData icon;
-  final String route;
+  final AppIconSpec icon;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
-
-    return AppCard(
-      onTap: () => context.go(route),
-      child: Row(
-        children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: scheme.primary.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(context.appRadius.tile),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(spacing.xs),
-              child: Icon(icon, size: spacing.md + 4, color: scheme.primary),
-            ),
-          ),
-          SizedBox(width: spacing.sm),
-          Expanded(
-            child: Text(
-              label,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: scheme.onSurface,
-              ),
-            ),
-          ),
-        ],
-      ),
+    return AppButton(
+      size: AppButtonSize.medium,
+      variant: AppButtonVariant.outline,
+      icon: icon,
+      onPressed: onPressed,
+      child: Text(label),
     );
   }
 }

@@ -36,9 +36,10 @@ class AppSwitchField extends StatelessWidget {
     final enabled = onChanged != null;
     final caption = description;
 
-    return InkWell(
+    return AppRipple(
       onTap: enabled ? () => onChanged!(!value) : null,
-      borderRadius: BorderRadius.circular(context.appRadius.control),
+      borderRadius: BorderRadius.circular(context.appRadius.container),
+      pressScale: 1,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: spacing.xs),
         child: Row(
@@ -50,20 +51,18 @@ class AppSwitchField extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: context.textTheme.bodyMedium?.copyWith(
+                    style: context.appTextStyles.label.copyWith(
                       color: enabled
                           ? scheme.onSurface
-                          : scheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
+                          : context.appColors.ink500,
                     ),
                   ),
                   if (caption != null) ...[
                     SizedBox(height: spacing.xxs),
                     Text(
                       caption,
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                        height: 1.35,
+                      style: context.appTextStyles.caption.copyWith(
+                        color: context.appColors.mutedForeground,
                       ),
                     ),
                   ],

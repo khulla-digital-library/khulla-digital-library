@@ -1,30 +1,33 @@
 import 'package:khulla_ui/khulla_ui.dart';
-import 'package:khulla_ui/src/theme/app_button_interaction.dart';
 
-/// [TextButton] with app-wide press scale and overlay feedback.
+/// A low-emphasis inline action: *Clear filters*, *View all*, *Change
+/// member*.
+///
+/// A named preset over [AppButton]'s ghost variant rather than a component of
+/// its own, so that the dozen "quiet action beside a heading" call sites in
+/// the app cannot drift apart from each other.
 class AppTextButton extends StatelessWidget {
   const AppTextButton({
     required this.onPressed,
     required this.child,
-    this.style,
+    this.icon,
     super.key,
   });
 
+  /// Called on press. Null disables the action.
   final VoidCallback? onPressed;
+
+  /// The label.
   final Widget child;
-  final ButtonStyle? style;
+
+  /// An optional leading glyph.
+  final AppIconSpec? icon;
 
   @override
-  Widget build(BuildContext context) {
-    final themeStyle = Theme.of(context).textButtonTheme.style;
-
-    return AppPressable(
-      enabled: onPressed != null,
-      child: TextButton(
-        onPressed: onPressed,
-        style: AppButtonInteraction.text(style ?? themeStyle),
-        child: child,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => AppButton(
+    onPressed: onPressed,
+    variant: AppButtonVariant.ghost,
+    icon: icon,
+    child: child,
+  );
 }

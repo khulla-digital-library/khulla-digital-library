@@ -23,7 +23,6 @@ class TitleDetailsCard extends StatelessWidget {
 
     return SectionCard(
       title: l10n.titleDetailOverview,
-      icon: Icons.info_outline_rounded,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

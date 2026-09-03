@@ -33,7 +33,6 @@ class TitleCopiesCard extends StatelessWidget {
     return SectionCard(
       title: l10n.titleDetailCopiesTitle,
       subtitle: l10n.titleDetailCopiesSubtitle,
-      icon: Icons.inventory_2_outlined,
       trailing: AppTextButton(
         onPressed: onAddCopy,
         child: Text(l10n.titleDetailAddCopy),
@@ -115,17 +114,17 @@ class TitleCopiesCard extends StatelessWidget {
                     actions: [
                       AppMenuAction(
                         label: l10n.copiesMarkLost,
-                        icon: Icons.help_outline_rounded,
+                        icon: AppIcons.help,
                         onSelected: () => onCopyAction(copy),
                       ),
                       AppMenuAction(
                         label: l10n.copiesMarkDamaged,
-                        icon: Icons.report_gmailerrorred_rounded,
+                        icon: AppIcons.damage,
                         onSelected: () => onCopyAction(copy),
                       ),
                       AppMenuAction(
                         label: l10n.copiesWithdraw,
-                        icon: Icons.delete_outline_rounded,
+                        icon: AppIcons.delete,
                         isDestructive: true,
                         onSelected: () => onCopyAction(copy),
                       ),

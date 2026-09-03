@@ -41,7 +41,6 @@ class CheckOutSummaryCard extends StatelessWidget {
 
     return SectionCard(
       title: l10n.checkOutSummarySection,
-      icon: Icons.receipt_long_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

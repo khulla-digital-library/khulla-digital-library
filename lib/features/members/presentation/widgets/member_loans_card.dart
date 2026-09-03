@@ -39,7 +39,6 @@ class MemberLoansCard extends StatelessWidget {
     return SectionCard(
       title: title,
       subtitle: subtitle,
-      icon: isHistory ? Icons.history_rounded : Icons.swap_horiz_rounded,
       child: loans.isEmpty
           ? AppEmptyView(
               variant: AppFeedbackVariant.inline,
