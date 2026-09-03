@@ -1,0 +1,373 @@
+# Shared lint baseline for every package in the workspace.
+#
+# The root package layers `package:bloc_lint/recommended.yaml` on top of this
+# in its own analysis_options.yaml; `packages/khulla_ui` has no blocs and
+# includes this file directly.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - lib/l10n/gen/*
+    - lib/gen/*
+    - "**/*.g.dart"
+    - "**/*.config.dart"
+    - "**/*.freezed.dart"
+    - "**/*.mocks.dart"
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
+
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+  errors:
+    # Generated files may not exist until build_runner runs.
+    uri_has_not_been_generated: ignore
+    missing_required_param: error
+    missing_return: error
+    record_literal_one_positional_no_trailing_comma: error
+    invalid_assignment: error
+
+formatter:
+  trailing_commas: preserve
+
+linter:
+  rules:
+    # ---------------------------------------------------------------------------
+    # API / TYPE SAFETY
+    # ---------------------------------------------------------------------------
+
+    always_declare_return_types: true
+    always_put_required_named_parameters_first: true
+    always_use_package_imports: true
+
+    annotate_overrides: true
+    annotate_redeclares: true
+
+    avoid_annotating_with_dynamic: true
+    avoid_double_and_int_checks: true
+    avoid_dynamic_calls: true
+    avoid_futureor_void: true
+    avoid_implementing_value_types: true
+    avoid_shadowing_type_parameters: true
+    avoid_types_as_parameter_names: true
+    avoid_types_on_closure_parameters: true
+
+    cast_nullable_to_non_nullable: true
+    collection_methods_unrelated_type: true
+    library_private_types_in_public_api: true
+    matching_super_parameters: true
+    null_check_on_nullable_type_parameter: true
+    overridden_fields: true
+    specify_nonobvious_property_types: true
+    strict_top_level_inference: true
+    tighten_type_of_initializing_formals: true
+    type_annotate_public_apis: true
+    type_init_formals: true
+    unrelated_type_equality_checks: true
+    void_checks: true
+
+    # ---------------------------------------------------------------------------
+    # ERROR-PRONE CODE
+    # ---------------------------------------------------------------------------
+
+    avoid_catching_errors: true
+    avoid_catches_without_on_clauses: true
+    avoid_empty_else: true
+    avoid_equals_and_hash_code_on_mutable_classes: true
+    avoid_init_to_null: true
+    avoid_multiple_declarations_per_line: true
+    avoid_print: true
+    avoid_returning_null_for_void: true
+    avoid_setters_without_getters: true
+    avoid_slow_async_io: true
+    avoid_type_to_string: true
+    avoid_unused_constructor_parameters: true
+    avoid_void_async: true
+
+    await_only_futures: true
+    cancel_subscriptions: true
+    close_sinks: true
+    control_flow_in_finally: true
+    empty_catches: true
+    empty_statements: true
+    exhaustive_cases: true
+    hash_and_equals: true
+    invalid_case_patterns: true
+    invalid_runtime_check_with_js_interop_types: true
+    literal_only_boolean_expressions: true
+    no_default_cases: true
+    no_duplicate_case_values: true
+    no_runtimeType_toString: true
+    no_self_assignments: true
+    only_throw_errors: true
+    recursive_getters: true
+    test_types_in_equals: true
+    throw_in_finally: true
+    unreachable_from_main: true
+    valid_regexps: true
+
+    # ---------------------------------------------------------------------------
+    # ASYNC / FLUTTER SAFETY
+    # ---------------------------------------------------------------------------
+
+    async_return_with_no_await: true
+    avoid_web_libraries_in_flutter: true
+    discarded_futures: true
+    unawaited_futures: true
+    unnecessary_unawaited: true
+    use_build_context_synchronously: true
+
+    # ---------------------------------------------------------------------------
+    # IMPORTS / LIBRARIES
+    # ---------------------------------------------------------------------------
+
+    avoid_relative_lib_imports: true
+    combinators_ordering: true
+    conditional_uri_does_not_exist: true
+    depend_on_referenced_packages: true
+    directives_ordering: true
+    do_not_use_environment: true
+    implementation_imports: true
+    library_annotations: true
+    library_names: true
+    library_prefixes: true
+    no_leading_underscores_for_library_prefixes: true
+    package_prefixed_library_names: true
+    secure_pubspec_urls: true
+    simple_directive_paths: true
+    use_string_in_part_of_directives: true
+
+    # ---------------------------------------------------------------------------
+    # NAMING
+    # ---------------------------------------------------------------------------
+
+    camel_case_extensions: true
+    camel_case_types: true
+    constant_identifier_names: true
+    file_names: true
+    no_leading_underscores_for_local_identifiers: true
+    non_constant_identifier_names: true
+    package_names: true
+
+    # ---------------------------------------------------------------------------
+    # CONTROL FLOW / STRUCTURE
+    # ---------------------------------------------------------------------------
+
+    curly_braces_in_flow_control_structures: true
+    empty_constructor_bodies: true
+    join_return_with_assignment: true
+    no_logic_in_create_state: true
+    no_wildcard_variable_uses: true
+    switch_on_type: true
+    unnecessary_breaks: true
+
+    # ---------------------------------------------------------------------------
+    # VARIABLES / IMMUTABILITY
+    # ---------------------------------------------------------------------------
+
+    initialize_in_field_declaration: true
+    parameter_assignments: true
+    prefer_final_fields: true
+    prefer_final_in_for_each: true
+    prefer_final_locals: true
+    prefer_initializing_formals: true
+    prefer_typing_uninitialized_variables: true
+    use_late_for_private_fields_and_variables: true
+
+    omit_local_variable_types: true
+    omit_obvious_local_variable_types: true
+
+    # ---------------------------------------------------------------------------
+    # CONST
+    # ---------------------------------------------------------------------------
+
+    prefer_const_constructors: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+    unnecessary_const: true
+    unnecessary_const_in_enum_constructor: true
+
+    # ---------------------------------------------------------------------------
+    # COLLECTIONS / EXPRESSIONS
+    # ---------------------------------------------------------------------------
+
+    avoid_bool_literals_in_conditional_expressions: true
+    avoid_function_literals_in_foreach_calls: true
+    avoid_redundant_argument_values: true
+    prefer_collection_literals: true
+    prefer_conditional_assignment: true
+    prefer_contains: true
+    prefer_for_elements_to_map_fromIterable: true
+    prefer_foreach: true
+    prefer_if_elements_to_conditional_expressions: true
+    prefer_if_null_operators: true
+    prefer_inlined_adds: true
+    prefer_int_literals: true
+    prefer_is_empty: true
+    prefer_is_not_empty: true
+    prefer_is_not_operator: true
+    prefer_iterable_whereType: true
+    prefer_null_aware_method_calls: true
+    prefer_null_aware_operators: true
+    prefer_spread_collections: true
+    simplify_variable_pattern: true
+    use_null_aware_elements: true
+
+    # ---------------------------------------------------------------------------
+    # FUNCTIONS / METHODS
+    # ---------------------------------------------------------------------------
+
+    avoid_renaming_method_parameters: true
+    avoid_return_types_on_setters: true
+    avoid_returning_this: true
+    prefer_constructors_over_static_methods: true
+    prefer_function_declarations_over_variables: true
+    prefer_generic_function_type_aliases: true
+    prefer_mixin: true
+    prefer_void_to_null: true
+
+    use_function_type_syntax_for_parameters: true
+    use_setters_to_change_properties: true
+    use_super_parameters: true
+
+    # ---------------------------------------------------------------------------
+    # STRINGS
+    # ---------------------------------------------------------------------------
+
+    avoid_escaping_inner_quotes: true
+    leading_newlines_in_multiline_strings: true
+    prefer_adjacent_string_concatenation: true
+    prefer_interpolation_to_compose_strings: true
+    prefer_single_quotes: true
+
+    unnecessary_brace_in_string_interps: true
+    unnecessary_raw_strings: true
+    unnecessary_string_escapes: true
+    unnecessary_string_interpolations: true
+
+    use_raw_strings: true
+    use_string_buffers: true
+
+    # ---------------------------------------------------------------------------
+    # FLUTTER
+    # ---------------------------------------------------------------------------
+
+    avoid_unnecessary_containers: true
+    empty_container_bodies: true
+    sized_box_for_whitespace: true
+    sized_box_shrink_expand: true
+    sort_child_properties_last: true
+    sort_constructors_first: true
+    sort_unnamed_constructors_first: true
+
+    use_colored_box: true
+    use_decorated_box: true
+    use_full_hex_values_for_flutter_colors: true
+    use_key_in_widget_constructors: true
+    use_named_constants: true
+
+    # ---------------------------------------------------------------------------
+    # NULL SAFETY
+    # ---------------------------------------------------------------------------
+
+    null_closures: true
+    unnecessary_late: true
+    unnecessary_null_aware_assignments: true
+    unnecessary_null_aware_operator_on_extension_on_nullable: true
+    unnecessary_null_checks: true
+    unnecessary_null_in_if_null_operators: true
+    unnecessary_nullable_for_final_variable_declarations: true
+
+    # ---------------------------------------------------------------------------
+    # SIMPLIFICATION
+    # ---------------------------------------------------------------------------
+
+    avoid_field_initializers_in_const_classes: true
+    avoid_single_cascade_in_expression_statements: true
+    cascade_invocations: true
+    unnecessary_constructor_name: true
+    unnecessary_getters_setters: true
+    unnecessary_ignore: true
+    unnecessary_lambdas: true
+    unnecessary_library_directive: true
+    unnecessary_library_name: true
+    unnecessary_new: true
+    unnecessary_overrides: true
+    unnecessary_parenthesis: true
+    unnecessary_primary_constructor_body: true
+    unnecessary_statements: true
+    unnecessary_this: true
+    unnecessary_to_list_in_spreads: true
+    unnecessary_underscores: true
+
+    # ---------------------------------------------------------------------------
+    # DOCUMENTATION / MAINTAINABILITY
+    # ---------------------------------------------------------------------------
+
+    comment_references: true
+    dangling_library_doc_comments: true
+    deprecated_consistency: true
+    deprecated_member_use_from_same_package: true
+    document_ignores: true
+    # eol_at_end_of_file: true
+    flutter_style_todos: true
+    missing_code_block_language_in_doc_comment: true
+    provide_deprecation_message: true
+    slash_for_doc_comments: true
+    unintended_html_in_doc_comment: true
+
+    # Public API documentation is intentionally not required.
+    public_member_api_docs: false
+
+    # ---------------------------------------------------------------------------
+    # DART / LANGUAGE QUALITY
+    # ---------------------------------------------------------------------------
+
+    implicit_call_tearoffs: true
+    implicit_reopen: true
+    missing_whitespace_between_adjacent_strings: true
+    no_adjacent_strings_in_list: true
+    no_literal_bool_comparisons: true
+    noop_primitive_operations: true
+    prefer_asserts_in_initializer_lists: true
+    prefer_asserts_with_message: true
+    type_literal_in_constant_pattern: true
+    use_enums: true
+    use_is_even_rather_than_modulo: true
+    use_rethrow_when_possible: true
+    use_test_throws_matchers: true
+    use_to_and_as_if_applicable: true
+    use_truncating_division: true
+
+    # ---------------------------------------------------------------------------
+    # INTENTIONALLY DISABLED
+    # ---------------------------------------------------------------------------
+
+    # Named parameters already cover this; enabling it is noisy for Formz/DI.
+    avoid_positional_boolean_parameters: false
+
+    # Abstract-final namespace classes (AppColors, AppSpacing) are the Dart 3
+    # idiom and would be flagged incorrectly.
+    avoid_classes_with_only_static_members: false
+
+    # Grouped by domain in pubspec.yaml, not alphabetically.
+    sort_pub_dependencies: false
+
+    # dart format line length is enough; 80-col lint fights Flutter widget trees.
+    lines_longer_than_80_chars: false
+
+    # Conflicts with formatter: trailing_commas: preserve.
+    require_trailing_commas: false
+
+    # Dart 3.13 declaring constructors (`this()`). Adopting it would rewrite
+    # every constructor; enable together with use_declaring_parameters later.
+    unnecessary_type_name_in_constructor: false
+    use_declaring_parameters: false

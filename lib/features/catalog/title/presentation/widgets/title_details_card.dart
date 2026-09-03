@@ -1,0 +1,53 @@
+import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
+import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_title.dart';
+import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/components/section_card.dart';
+import 'package:khulla_ui/khulla_ui.dart';
+
+/// The bibliographic record, as label/value pairs.
+///
+/// [AppDetailRow] stacks its label above its value when the slot is narrow,
+/// so the same card works in a half-width column beside the copies table and
+/// full width on a phone.
+class TitleDetailsCard extends StatelessWidget {
+  const TitleDetailsCard({required this.title, super.key});
+
+  final CatalogTitle title;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final spacing = context.appSpacing;
+    final notSet = l10n.commonNotSet;
+    final pages = title.pages;
+
+    return SectionCard(
+      title: l10n.titleDetailOverview,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final (index, row) in <(String, String)>[
+            (l10n.fieldIsbn, title.isbn),
+            (l10n.fieldPublisher, title.publisher),
+            (l10n.fieldPublishedYear, title.year),
+            (l10n.fieldEdition, title.edition ?? notSet),
+            (l10n.fieldLanguage, title.language),
+            (l10n.fieldFormat, title.format.label(l10n)),
+            (l10n.fieldPages, pages == null ? notSet : '$pages'),
+            (
+              l10n.fieldSubjects,
+              title.subjects.isEmpty ? notSet : title.subjects.join(', '),
+            ),
+            (l10n.fieldShelf, title.shelf),
+            (l10n.fieldReplacementCost, title.replacementCost.display()),
+            (l10n.fieldAddedOn, title.addedOn),
+          ].indexed) ...[
+            if (index > 0) SizedBox(height: spacing.sm),
+            AppDetailRow(label: row.$1, child: Text(row.$2)),
+          ],
+        ],
+      ),
+    );
+  }
+}
