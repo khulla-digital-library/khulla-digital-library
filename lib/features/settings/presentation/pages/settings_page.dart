@@ -1,16 +1,22 @@
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/settings/presentation/placeholder/settings_placeholder.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/collection_header.dart';
+import 'package:khulla/shared/components/navigation_group.dart';
 import 'package:khulla/shared/components/navigation_tile.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The index of everything configurable about this installation.
 ///
-/// Five doors and one card. The card is *About*, which has nowhere to go —
-/// it is three read-only facts, and a page holding only those would be a
-/// click for nothing.
+/// Five doors and one card. The doors are one list, not a grid of tiles: they
+/// are alternatives to each other, and a shared frame with a hairline between
+/// rows says that where five equal rectangles said the opposite. The card is
+/// *About*, which has nowhere to go — three read-only facts, and a page
+/// holding only those would be a click for nothing.
+///
+/// It takes the reading width rather than the wide cap. A settings index is
+/// prose with links in it; stretched across a maximised window every row
+/// becomes a label at one edge and a chevron a foot away at the other.
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
@@ -20,7 +26,6 @@ class SettingsPage extends StatelessWidget {
     final spacing = context.appSpacing;
 
     return AppPageBody(
-      wide: true,
       child: CustomScrollView(
         slivers: [
           SliverPadding(
@@ -32,12 +37,7 @@ class SettingsPage extends StatelessWidget {
             ),
             sliver: SliverList.list(
               children: [
-                CollectionHeader(
-                  title: l10n.settingsHeading,
-                  subtitle: l10n.settingsSubtitle,
-                ),
-                SizedBox(height: spacing.lg),
-                AppResponsiveGrid(
+                NavigationGroup(
                   children: [
                     NavigationTile(
                       label: l10n.settingsLibraryTitle,
@@ -98,7 +98,6 @@ class _AboutCard extends StatelessWidget {
     return SectionCard(
       title: l10n.settingsAboutTitle,
       subtitle: l10n.settingsAboutBody,
-      icon: Icons.info_outline_rounded,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

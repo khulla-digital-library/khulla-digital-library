@@ -1,0 +1,137 @@
+import 'package:khulla_ui/khulla_ui.dart';
+
+/// The identity block at the top of a record's detail screen.
+///
+/// It does not draw a card. The record *is* the page, so boxing its name
+/// makes it one panel among the panels below it and leaves the screen with no
+/// focal point; on the canvas, under the hairline that closes it, the name is
+/// unmistakably what everything beneath is about.
+///
+/// The split between [facts] and [badges] is the other half of the fix. A
+/// badge is a standing — *Overdue*, *Suspended*, *Reference only* — and it
+/// earns its color and its pill. A lifespan, a card number, a format or a
+/// copy count is a fact, and rendering it as a badge spends the same emphasis
+/// on something nobody needs to react to. Facts go in one muted line;
+/// badges stay a short row of real statuses.
+class RecordHeader extends StatelessWidget {
+  const RecordHeader({
+    required this.title,
+    required this.actions,
+    this.subtitle,
+    this.initials,
+    this.facts = const [],
+    this.badges = const [],
+    this.note,
+    super.key,
+  });
+
+  /// The record's name — the page's focal point.
+  final String title;
+
+  /// The line under the name: a subtitle, an author, a role.
+  final Widget? subtitle;
+
+  /// Initials for the leading avatar. Null draws no avatar — a book has no
+  /// face, and a two-letter circle beside a title is decoration.
+  final String? initials;
+
+  /// Identifying facts, already formatted and localized, joined into one
+  /// muted line.
+  final List<String> facts;
+
+  /// Standings worth reacting to. Keep it short; four pills is a toolbar.
+  final List<Widget> badges;
+
+  /// A free line under the block — a member's note, a shelving remark.
+  final String? note;
+
+  /// The record's actions: the primary control, and an overflow menu.
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.appSpacing;
+    final colors = context.appColors;
+    final avatar = initials;
+    final caption = subtitle;
+    final remark = note;
+
+    final identity = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          title,
+          style: context.textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.6,
+            color: colors.textHigh,
+          ),
+        ),
+        if (caption != null) ...[SizedBox(height: spacing.xxs), caption],
+        if (facts.isNotEmpty) ...[
+          SizedBox(height: spacing.xs),
+          Text(
+            facts.join('  ·  '),
+            style: context.textTheme.bodySmall?.copyWith(
+              color: colors.textMuted,
+            ),
+          ),
+        ],
+        if (badges.isNotEmpty) ...[
+          SizedBox(height: spacing.sm),
+          Wrap(spacing: spacing.xs, runSpacing: spacing.xs, children: badges),
+        ],
+        if (remark != null) ...[
+          SizedBox(height: spacing.sm),
+          Text(
+            remark,
+            style: context.textTheme.bodySmall?.copyWith(
+              color: colors.textMuted,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ],
+    );
+
+    final lead = avatar == null
+        ? identity
+        : Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppAvatar(initials: avatar, size: 52),
+              SizedBox(width: spacing.md),
+              Expanded(child: identity),
+            ],
+          );
+
+    final compact = context.formFactor.isCompact;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (compact) ...[
+          lead,
+          if (actions.isNotEmpty) ...[
+            SizedBox(height: spacing.md),
+            Row(children: actions),
+          ],
+        ] else
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: lead),
+              if (actions.isNotEmpty) ...[
+                SizedBox(width: spacing.lg),
+                Row(mainAxisSize: MainAxisSize.min, children: actions),
+              ],
+            ],
+          ),
+        SizedBox(height: spacing.md),
+        Divider(height: 1, color: colors.hairlineStrong),
+      ],
+    );
+  }
+}

@@ -1,15 +1,17 @@
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
-import 'package:khulla/features/users/presentation/placeholder/users_placeholder.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The dashboard's greeting, its period switch and its one primary action.
+/// The board's controls: which period its figures cover, and the one action
+/// a shift starts with.
 ///
-/// The greeting is not decoration: on a shared desk machine it is the second
-/// place — after the account chip — that says who the till is open as. The
-/// period switch governs every figure on the board below, so it belongs
-/// here rather than repeated on each card.
+/// No greeting and no page title. The shell's top bar already names the page
+/// and the account chip already says who the till is open as, so a headline
+/// here would be a second title that scrolls away — the exact thing putting
+/// the bar in the shell was meant to prevent. What is left is a control
+/// strip: the period switch governs every figure below it, so it belongs
+/// once at the top rather than on each card.
 class DashboardHeader extends StatelessWidget {
   const DashboardHeader({
     required this.period,
@@ -27,82 +29,43 @@ class DashboardHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
-    final colors = context.appColors;
     final stacked = context.formFactor.isCompact;
-    final firstName = signedInStaff.name.split(' ').first;
 
-    final title = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          l10n.dashboardGreeting(firstName),
-          style: context.textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.8,
-            color: colors.textHigh,
-          ),
-        ),
-        SizedBox(height: spacing.xxs),
-        Text(
-          l10n.dashboardSubtitle,
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: colors.textMuted,
-            height: 1.4,
-          ),
-        ),
-      ],
+    final periods = AppSegmentedControl<DashboardPeriod>(
+      value: period,
+      items: DashboardPeriod.values,
+      itemLabel: (item) => switch (item) {
+        DashboardPeriod.today => l10n.commonToday,
+        DashboardPeriod.week => l10n.commonThisWeek,
+        DashboardPeriod.month => l10n.commonThisMonth,
+      },
+      onChanged: onPeriodChanged,
     );
 
-    final controls = [
-      AppSegmentedControl<DashboardPeriod>(
-        value: period,
-        items: DashboardPeriod.values,
-        itemLabel: (item) => switch (item) {
-          DashboardPeriod.today => l10n.commonToday,
-          DashboardPeriod.week => l10n.commonThisWeek,
-          DashboardPeriod.month => l10n.commonThisMonth,
-        },
-        onChanged: onPeriodChanged,
-      ),
-      AppButton(
-        size: AppButtonSize.medium,
-        icon: Icons.qr_code_scanner_rounded,
-        onPressed: () => context.go(Routes.circulationCheckOut),
-        child: Text(l10n.dashboardCheckOut),
-      ),
-    ];
+    final checkOut = AppButton(
+      size: AppButtonSize.medium,
+      icon: Icons.qr_code_scanner_rounded,
+      onPressed: () => context.go(Routes.circulationCheckOut),
+      child: Text(l10n.dashboardCheckOut),
+    );
 
     if (stacked) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          title,
-          SizedBox(height: spacing.md),
-          controls.first,
+          periods,
           SizedBox(height: spacing.xs),
-          controls.last,
+          checkOut,
         ],
       );
     }
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: title),
-        SizedBox(width: spacing.lg),
-        Padding(
-          padding: EdgeInsets.only(top: spacing.xxs),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              controls.first,
-              SizedBox(width: spacing.xs),
-              controls.last,
-            ],
-          ),
-        ),
+        periods,
+        const Spacer(),
+        checkOut,
       ],
     );
   }

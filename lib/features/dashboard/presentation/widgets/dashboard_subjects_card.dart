@@ -18,9 +18,9 @@ class DashboardSubjectsCard extends StatelessWidget {
     final subjects = dashboardSubjectShares();
 
     return DashboardSectionCard(
+      framed: false,
       title: l10n.dashboardCategoriesTitle,
       subtitle: l10n.dashboardCategoriesSubtitle,
-      icon: Icons.category_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

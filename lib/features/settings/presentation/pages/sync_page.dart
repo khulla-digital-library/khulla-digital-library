@@ -71,24 +71,11 @@ class _SyncPageState extends State<SyncPage> {
                   tone: connected ? AppStatusTone.success : null,
                   child: Row(
                     children: [
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: context.colorScheme.surface,
-                          borderRadius: BorderRadius.circular(
-                            context.appRadius.tile,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(spacing.sm),
-                          child: Icon(
-                            connected
-                                ? Icons.cloud_done_outlined
-                                : Icons.cloud_off_outlined,
-                            color: connected
-                                ? colors.success
-                                : colors.textMuted,
-                          ),
-                        ),
+                      Icon(
+                        connected
+                            ? Icons.cloud_done_outlined
+                            : Icons.cloud_off_outlined,
+                        color: connected ? colors.success : colors.textMuted,
                       ),
                       SizedBox(width: spacing.sm),
                       Expanded(
@@ -141,7 +128,6 @@ class _SyncPageState extends State<SyncPage> {
                 SectionCard(
                   title: l10n.syncProviderTitle,
                   subtitle: l10n.syncProviderDescription,
-                  icon: Icons.cloud_upload_outlined,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
@@ -185,7 +171,6 @@ class _SyncPageState extends State<SyncPage> {
                 SectionCard(
                   title: l10n.syncHistoryTitle,
                   subtitle: l10n.syncHistorySubtitle,
-                  icon: Icons.history_rounded,
                   child: placeholderSnapshots.isEmpty
                       ? AppEmptyView(
                           icon: Icons.cloud_off_outlined,

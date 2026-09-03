@@ -37,16 +37,26 @@ void main() {
       );
     });
 
-    test('keeps the scaffold and chrome surfaces distinct', () {
-      // The shell paints its rail on the chrome color and the page on the
-      // scaffold color. If the two collapse to the same value the rail's edge
-      // disappears and the layout reads as one undifferentiated slab.
-      final light = AppTheme.light(FormFactor.expanded);
-      expect(
-        light.scaffoldBackgroundColor,
-        isNot(light.colorScheme.surface),
-      );
-    });
+    test(
+      'separates canvas from card by hairline in light, by fill in dark',
+      () {
+        // Light: depth comes from the hairline, so the page and a card sit on
+        // the same white and only the 1px border tells them apart. Dark: a
+        // hairline on near-black is too weak to carry an edge on its own, so
+        // the canvas drops below the card instead. Both are deliberate; the
+        // thing neither may do is leave the two indistinguishable.
+        final light = AppTheme.light(FormFactor.expanded);
+        expect(light.scaffoldBackgroundColor, light.colorScheme.surface);
+        expect(
+          light.extension<AppColors>()!.hairline,
+          isNot(light.colorScheme.surface),
+          reason: 'the hairline has to be visible against the canvas',
+        );
+
+        final dark = AppTheme.dark(FormFactor.expanded);
+        expect(dark.scaffoldBackgroundColor, isNot(dark.colorScheme.surface));
+      },
+    );
   });
 
   group('AppBreakpoints', () {

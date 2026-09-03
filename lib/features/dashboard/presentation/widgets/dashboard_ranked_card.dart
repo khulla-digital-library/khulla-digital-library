@@ -11,7 +11,6 @@ class DashboardRankedCard extends StatelessWidget {
   const DashboardRankedCard({
     required this.title,
     required this.entries,
-    required this.icon,
     this.subtitle,
     this.trailing,
     super.key,
@@ -22,9 +21,6 @@ class DashboardRankedCard extends StatelessWidget {
 
   /// The ranked rows, best first.
   final List<DashboardRankedEntry> entries;
-
-  /// The heading's glyph.
-  final IconData icon;
 
   /// Supporting line under the heading.
   final String? subtitle;
@@ -38,16 +34,20 @@ class DashboardRankedCard extends StatelessWidget {
     final colors = context.appColors;
 
     return DashboardSectionCard(
+      framed: false,
       title: title,
       subtitle: subtitle,
-      icon: icon,
       trailing: trailing,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
           for (final (index, entry) in entries.indexed) ...[
-            if (index > 0) SizedBox(height: spacing.sm),
+            if (index > 0) ...[
+              SizedBox(height: spacing.sm),
+              Divider(height: 1, color: colors.hairline),
+              SizedBox(height: spacing.sm),
+            ],
             Row(
               children: [
                 SizedBox(

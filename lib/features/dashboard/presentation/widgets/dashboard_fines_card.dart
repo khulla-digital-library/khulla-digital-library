@@ -22,7 +22,6 @@ class DashboardFinesCard extends StatelessWidget {
     return DashboardSectionCard(
       title: l10n.dashboardFinesTitle,
       subtitle: l10n.dashboardFinesSubtitle,
-      icon: Icons.trending_up_rounded,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

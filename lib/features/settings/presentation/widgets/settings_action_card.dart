@@ -32,23 +32,11 @@ class SettingsActionCard extends StatelessWidget {
     final tone = isDestructive ? AppStatusTone.danger : AppStatusTone.brand;
 
     return AppCard(
+      tone: isDestructive ? AppStatusTone.danger : null,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: tone.background(context),
-              borderRadius: BorderRadius.circular(context.appRadius.tile),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(spacing.xs),
-              child: Icon(
-                icon,
-                size: spacing.md + 4,
-                color: tone.foreground(context),
-              ),
-            ),
-          ),
+          Icon(icon, size: spacing.lg - 2, color: tone.foreground(context)),
           SizedBox(width: spacing.sm),
           Expanded(
             child: Column(

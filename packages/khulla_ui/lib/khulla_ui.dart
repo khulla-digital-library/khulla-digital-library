@@ -62,6 +62,7 @@ export 'src/widgets/app_segmented_control.dart';
 export 'src/widgets/app_side_sheet.dart';
 export 'src/widgets/app_skeleton.dart';
 export 'src/widgets/app_sliver_table.dart';
+export 'src/widgets/app_stat_strip.dart';
 export 'src/widgets/app_stat_tile.dart';
 export 'src/widgets/app_status_badge.dart';
 export 'src/widgets/app_status_tone.dart';

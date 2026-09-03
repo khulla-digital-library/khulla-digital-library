@@ -30,14 +30,17 @@ class AppSectionHeader extends StatelessWidget {
   /// [AppIconButton].
   final Widget? trailing;
 
-  /// Glyph shown before [title] in a tinted square.
+  /// Glyph shown before [title]. Drawn bare: a filled chip around it would
+  /// put a second surface inside the card the header already sits on, and a
+  /// page of six headers each wearing one reads as decoration rather than
+  /// structure.
   final IconData? icon;
 
   /// Uses the card heading ramp rather than the section one. Set inside a
   /// card, where the page-level size is too loud.
   final bool dense;
 
-  /// The tone of the leading icon chip.
+  /// The tone of the leading glyph.
   final AppStatusTone tone;
 
   @override
@@ -50,21 +53,8 @@ class AppSectionHeader extends StatelessWidget {
     return Row(
       children: [
         if (glyph != null) ...[
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: tone.background(context),
-              borderRadius: BorderRadius.circular(context.appRadius.tile),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(spacing.xs),
-              child: Icon(
-                glyph,
-                size: spacing.md + 2,
-                color: tone.foreground(context),
-              ),
-            ),
-          ),
-          SizedBox(width: spacing.sm),
+          Icon(glyph, size: spacing.md + 2, color: tone.foreground(context)),
+          SizedBox(width: spacing.xs),
         ],
         Expanded(
           child: Column(

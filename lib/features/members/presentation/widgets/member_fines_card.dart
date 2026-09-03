@@ -22,7 +22,6 @@ class MemberFinesCard extends StatelessWidget {
     return SectionCard(
       title: l10n.memberDetailFinesTitle,
       subtitle: l10n.memberDetailFinesSubtitle,
-      icon: Icons.account_balance_wallet_outlined,
       child: fines.isEmpty
           ? AppEmptyView(
               variant: AppFeedbackVariant.inline,

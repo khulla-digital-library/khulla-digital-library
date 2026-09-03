@@ -88,7 +88,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
   Widget _scanCard(AppLocalizations l10n) => SectionCard(
     title: l10n.labelsScanTitle,
     subtitle: l10n.labelsScanSubtitle,
-    icon: Icons.qr_code_scanner_rounded,
     child: AppTextField(
       controller: _scanController,
       focusNode: _scanFocus,
@@ -110,7 +109,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
     return SectionCard(
       title: l10n.labelsQueueTitle,
       subtitle: l10n.labelsQueueSubtitle('$_labelCount'),
-      icon: Icons.local_printshop_outlined,
       trailing: _queue.isEmpty
           ? null
           : AppTextButton(
@@ -185,7 +183,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
     return SectionCard(
       title: l10n.labelsLayoutTitle,
       subtitle: l10n.labelsLayoutSubtitle,
-      icon: Icons.tune_rounded,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -235,7 +232,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
     return SectionCard(
       title: l10n.labelsPreviewTitle,
       subtitle: l10n.labelsPreviewSubtitle,
-      icon: Icons.crop_free_rounded,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

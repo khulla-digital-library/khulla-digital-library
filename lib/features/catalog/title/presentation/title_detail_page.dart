@@ -61,7 +61,6 @@ class TitleDetailPage extends StatelessWidget {
         ? null
         : SectionCard(
             title: l10n.titleDetailDescription,
-            icon: Icons.notes_rounded,
             child: Text(
               description,
               style: context.textTheme.bodyMedium?.copyWith(

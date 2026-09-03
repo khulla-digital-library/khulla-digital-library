@@ -1,11 +1,16 @@
 import 'package:go_router/go_router.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// A door from a section's overview into one of the lists behind it.
+/// One door from a section's overview into a list behind it, as a row.
 ///
-/// A tile rather than a nav item: an overview page is where a librarian
-/// decides what they are working on, and each door carries the count or the
-/// standing that makes the decision.
+/// A row rather than a card: a section overview offers a handful of doors
+/// that differ only in destination, and rendering each as its own floating
+/// surface makes five equal choices look like five unrelated features. Stack
+/// them in a `NavigationGroup` and the hairline between rows does the work a
+/// border around each one was doing badly.
+///
+/// The count is the reason a door is a row and not a nav item — it is what a
+/// librarian reads before deciding which list to open.
 class NavigationTile extends StatelessWidget {
   const NavigationTile({
     required this.label,
@@ -26,7 +31,7 @@ class NavigationTile extends StatelessWidget {
   /// a door into a desk flow is not counting anything.
   final String? count;
 
-  /// Glyph in the tinted square.
+  /// Glyph identifying the destination, drawn bare.
   final IconData icon;
 
   /// Where the tile leads.
@@ -35,63 +40,67 @@ class NavigationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
+    final colors = context.appColors;
 
-    return AppCard(
-      onTap: () => context.go(route),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: () => context.go(route),
+        focusColor: context.colorScheme.primary.withValues(alpha: 0.06),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: spacing.md,
+            vertical: spacing.sm,
+          ),
+          child: Row(
             children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: scheme.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(context.appRadius.tile),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(spacing.xs),
-                  child: Icon(
-                    icon,
-                    size: spacing.md + 4,
-                    color: scheme.primary,
-                  ),
-                ),
-              ),
+              Icon(icon, size: spacing.lg - 4, color: colors.textMuted),
               SizedBox(width: spacing.sm),
               Expanded(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: scheme.onSurface,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: colors.textHigh,
+                      ),
+                    ),
+                    Text(
+                      description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: colors.textMuted,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              if (count case final figure?)
+              if (count case final figure?) ...[
+                SizedBox(width: spacing.sm),
                 Text(
                   figure,
-                  style: context.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: context.appColors.textHigh,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colors.textHigh,
                   ),
                 ),
+              ],
+              SizedBox(width: spacing.xs),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: spacing.lg - 6,
+                color: colors.textMuted,
+              ),
             ],
           ),
-          SizedBox(height: spacing.sm),
-          Text(
-            description,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: context.textTheme.bodySmall?.copyWith(
-              color: scheme.onSurfaceVariant,
-              height: 1.4,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

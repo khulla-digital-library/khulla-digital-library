@@ -21,7 +21,6 @@ class DashboardCollectionCard extends StatelessWidget {
     return DashboardSectionCard(
       title: l10n.dashboardCollectionTitle,
       subtitle: l10n.dashboardCollectionSubtitle,
-      icon: Icons.donut_small_rounded,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final legend = Column(

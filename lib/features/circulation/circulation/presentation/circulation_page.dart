@@ -6,6 +6,7 @@ import 'package:khulla/features/circulation/shared/presentation/placeholder/circ
 import 'package:khulla/features/circulation/shared/presentation/placeholder/loan_record.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/collection_header.dart';
+import 'package:khulla/shared/components/navigation_group.dart';
 import 'package:khulla/shared/components/navigation_tile.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
@@ -189,8 +190,8 @@ class _CirculationPageState extends State<CirculationPage> {
             onAction: () => context.go(Routes.circulationCheckOut),
           ),
           SizedBox(height: spacing.lg),
-          AppResponsiveGrid(
-            children: [
+          AppStatStrip(
+            tiles: [
               AppStatTile(
                 label: l10n.circulationStatOnLoan,
                 value: '${placeholderLoans.length}',
@@ -227,7 +228,7 @@ class _CirculationPageState extends State<CirculationPage> {
             subtitle: l10n.circulationDeskSubtitle,
           ),
           SizedBox(height: spacing.md),
-          AppResponsiveGrid(
+          NavigationGroup(
             children: [
               NavigationTile(
                 label: l10n.circulationCheckOut,

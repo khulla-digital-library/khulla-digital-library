@@ -24,7 +24,7 @@ class AppEmptyView extends StatelessWidget {
   /// Supporting copy shown below [title].
   final String message;
 
-  /// Shown in a tinted circle above the copy. Omitted in
+  /// Drawn bare above the copy, muted. Omitted in
   /// [AppFeedbackVariant.inline], which has no room for it.
   final IconData? icon;
 
@@ -66,21 +66,8 @@ class AppEmptyView extends StatelessWidget {
             : CrossAxisAlignment.start,
         children: [
           if (isCentered && glyph != null) ...[
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                shape: BoxShape.circle,
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(spacing.md),
-                child: Icon(
-                  glyph,
-                  size: spacing.lg,
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-            SizedBox(height: spacing.md),
+            Icon(glyph, size: spacing.lg, color: context.appColors.textMuted),
+            SizedBox(height: spacing.sm),
           ],
           Text(
             title,

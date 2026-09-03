@@ -3,6 +3,7 @@ import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_att
 import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_placeholder.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_section_card.dart';
 import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/components/navigation_group.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Overdue loans, unfilled holds, memberships lapsing, copies reported lost.
@@ -16,27 +17,21 @@ class DashboardAttentionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final spacing = context.appSpacing;
     final items = dashboardAttentionItems(l10n);
 
     return DashboardSectionCard(
+      framed: false,
       title: l10n.dashboardAttentionTitle,
       subtitle: l10n.dashboardAttentionSubtitle,
-      icon: Icons.notification_important_outlined,
       child: items.isEmpty
           ? AppEmptyView(
               icon: Icons.check_circle_outline_rounded,
               title: l10n.dashboardAttentionEmptyTitle,
               message: l10n.dashboardAttentionEmptyBody,
             )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
+          : NavigationGroup(
               children: [
-                for (final (index, item) in items.indexed) ...[
-                  if (index > 0) SizedBox(height: spacing.xs),
-                  _AttentionRow(item: item),
-                ],
+                for (final item in items) _AttentionRow(item: item),
               ],
             ),
     );
@@ -52,41 +47,30 @@ class _AttentionRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
     final colors = context.appColors;
-    final radius = BorderRadius.circular(context.appRadius.control);
 
     return Material(
-      color: Colors.transparent,
-      borderRadius: radius,
+      type: MaterialType.transparency,
       child: InkWell(
         onTap: () => context.go(item.route),
-        borderRadius: radius,
+        focusColor: context.colorScheme.primary.withValues(alpha: 0.06),
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: spacing.xs,
-            vertical: spacing.xs,
+            horizontal: spacing.md,
+            vertical: spacing.sm,
           ),
           child: Row(
             children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: item.tone.background(context),
-                  borderRadius: BorderRadius.circular(context.appRadius.tile),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(spacing.xs),
-                  child: Icon(
-                    item.icon,
-                    size: spacing.md,
-                    color: item.tone.foreground(context),
-                  ),
-                ),
+              Icon(
+                item.icon,
+                size: spacing.md + 2,
+                color: item.tone.foreground(context),
               ),
               SizedBox(width: spacing.sm),
               Expanded(
                 child: Text(
                   item.label,
                   maxLines: 2,
-                  style: context.textTheme.bodySmall?.copyWith(
+                  style: context.textTheme.bodyMedium?.copyWith(
                     color: colors.textHigh,
                   ),
                 ),
@@ -99,9 +83,10 @@ class _AttentionRow extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              SizedBox(width: spacing.xxs),
               Icon(
                 Icons.chevron_right_rounded,
-                size: 18,
+                size: spacing.md + 2,
                 color: colors.textMuted,
               ),
             ],

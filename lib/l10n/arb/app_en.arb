@@ -93,7 +93,7 @@
         "description": "Dashboard — empty state for the attention section"
     },
     "dashboardQuickActionsTitle": "Quick actions",
-    "dashboardQuickActionsSubtitle": "The four things a desk shift starts with",
+    "dashboardQuickActionsSubtitle": "Take a return, or open an empty record",
     "@dashboardQuickActionsSubtitle": {
         "description": "Dashboard — quick actions section heading"
     },
@@ -564,6 +564,13 @@
     "memberDetailStatLoans": "On loan",
     "memberDetailStatOverdue": "Overdue",
     "memberDetailStatFines": "Fines owed",
+    "memberDetailOwes": "Owes {amount}",
+    "@memberDetailOwes": {
+        "description": "Members — the fines badge on a member's detail header",
+        "placeholders": {
+            "amount": { "type": "String" }
+        }
+    },
     "memberDetailStatBorrowed": "Borrowed all time",
     "@memberDetailStatBorrowed": {
         "description": "Members — the borrower detail page"

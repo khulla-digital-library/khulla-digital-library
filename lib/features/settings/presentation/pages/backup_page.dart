@@ -36,7 +36,6 @@ class BackupPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
 
     return AppPageBody(
       wide: true,
@@ -59,7 +58,6 @@ class BackupPage extends StatelessWidget {
                 SectionCard(
                   title: l10n.settingsBackupTitle,
                   subtitle: l10n.settingsBackupBody,
-                  icon: Icons.backup_outlined,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
@@ -115,23 +113,13 @@ class BackupPage extends StatelessWidget {
                   icon: Icons.warning_amber_rounded,
                 ),
                 SizedBox(height: spacing.md),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: scheme.error.withValues(alpha: 0.4),
-                    ),
-                    borderRadius: BorderRadius.circular(
-                      context.appRadius.card,
-                    ),
-                  ),
-                  child: SettingsActionCard(
-                    title: l10n.settingsBackupEraseTitle,
-                    description: l10n.settingsBackupEraseBody,
-                    actionLabel: l10n.settingsBackupEraseAction,
-                    icon: Icons.delete_forever_outlined,
-                    isDestructive: true,
-                    onAction: () => unawaited(_confirmErase(context)),
-                  ),
+                SettingsActionCard(
+                  title: l10n.settingsBackupEraseTitle,
+                  description: l10n.settingsBackupEraseBody,
+                  actionLabel: l10n.settingsBackupEraseAction,
+                  icon: Icons.delete_forever_outlined,
+                  isDestructive: true,
+                  onAction: () => unawaited(_confirmErase(context)),
                 ),
               ],
             ),

@@ -1,11 +1,16 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// One figure on a board: what it counts, what it is, and which way it moved.
+/// One figure on a board: what it counts, the number, and which way it moved.
 ///
-/// The layout is fixed on purpose — glyph and label on one line, the figure
-/// beneath it, the delta and its caption last — so a row of six tiles reads
-/// as one instrument panel instead of six differently-arranged cards. The
-/// figure is the only thing allowed to be large.
+/// The figure is the only loud thing in the tile. The label sits above it in
+/// muted body copy and the glyph is drawn bare on the trailing edge, because
+/// a tinted square around an icon puts a second surface inside a tile that is
+/// already a surface, and a row of four of them reads as decoration competing
+/// with the numbers it is supposed to introduce.
+///
+/// Set [framed] to false to drop the card and let a host draw the surface —
+/// that is how [AppStatStrip] turns a row of figures into one instrument
+/// panel divided by hairlines rather than four separate floating cards.
 class AppStatTile extends StatelessWidget {
   const AppStatTile({
     required this.label,
@@ -18,6 +23,7 @@ class AppStatTile extends StatelessWidget {
     this.trendInverted = false,
     this.onTap,
     this.isLoading = false,
+    this.framed = true,
     super.key,
   });
 
@@ -31,10 +37,10 @@ class AppStatTile extends StatelessWidget {
   /// measured against.
   final String? caption;
 
-  /// The glyph in the tile's leading chip.
+  /// The glyph on the trailing edge of the label row.
   final IconData? icon;
 
-  /// The tone of the glyph chip, and of the figure when it is not neutral.
+  /// The tone of the glyph, and of the figure when it is not neutral.
   final AppStatusTone tone;
 
   /// The delta label, if this figure has a comparison period (`+8.2%`).
@@ -52,6 +58,10 @@ class AppStatTile extends StatelessWidget {
   /// Renders the figure as a skeleton while the query is in flight.
   final bool isLoading;
 
+  /// Whether the tile draws its own card. False when a host surface — an
+  /// [AppStatStrip] — already provides one.
+  final bool framed;
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
@@ -60,87 +70,91 @@ class AppStatTile extends StatelessWidget {
     final captionText = caption;
     final delta = trend;
 
-    return AppCard(
-      onTap: onTap,
-      padding: EdgeInsets.all(spacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: colors.textMuted,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            if (glyph != null) ...[
+              SizedBox(width: spacing.xs),
+              Icon(glyph, size: spacing.md, color: tone.foreground(context)),
+            ],
+          ],
+        ),
+        SizedBox(height: spacing.xs),
+        if (isLoading)
+          const AppSkeleton(width: 96, height: 30)
+        else
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.8,
+              color: colors.textHigh,
+            ),
+          ),
+        if (delta != null || captionText != null) ...[
+          SizedBox(height: spacing.xs),
           Row(
             children: [
-              if (glyph != null) ...[
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: tone.background(context),
-                    borderRadius: BorderRadius.circular(context.appRadius.tile),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(spacing.xs),
-                    child: Icon(
-                      glyph,
-                      size: spacing.md,
-                      color: tone.foreground(context),
+              if (delta != null) ...[
+                AppTrendPill(
+                  label: delta,
+                  value: trendValue,
+                  inverted: trendInverted,
+                  dense: true,
+                ),
+                SizedBox(width: spacing.xs),
+              ],
+              if (captionText != null)
+                Expanded(
+                  child: Text(
+                    captionText,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: colors.textMuted,
                     ),
                   ),
                 ),
-                SizedBox(width: spacing.xs + 2),
-              ],
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: colors.textMuted,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
             ],
           ),
-          SizedBox(height: spacing.sm),
-          if (isLoading)
-            const AppSkeleton(width: 96, height: 30)
-          else
-            Text(
-              value,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.8,
-                color: colors.textHigh,
-              ),
-            ),
-          if (delta != null || captionText != null) ...[
-            SizedBox(height: spacing.xs),
-            Row(
-              children: [
-                if (delta != null) ...[
-                  AppTrendPill(
-                    label: delta,
-                    value: trendValue,
-                    inverted: trendInverted,
-                    dense: true,
-                  ),
-                  SizedBox(width: spacing.xs),
-                ],
-                if (captionText != null)
-                  Expanded(
-                    child: Text(
-                      captionText,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: colors.textMuted,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ],
         ],
+      ],
+    );
+
+    if (framed) {
+      return AppCard(
+        onTap: onTap,
+        padding: EdgeInsets.all(spacing.md),
+        child: body,
+      );
+    }
+
+    final tap = onTap;
+    final padded = Padding(padding: EdgeInsets.all(spacing.md), child: body);
+    if (tap == null) return padded;
+
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: tap,
+        focusColor: context.colorScheme.primary.withValues(alpha: 0.06),
+        child: padded,
       ),
     );
   }

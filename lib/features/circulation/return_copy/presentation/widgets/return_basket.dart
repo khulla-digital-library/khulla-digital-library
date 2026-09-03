@@ -31,7 +31,6 @@ class ReturnBasket extends StatelessWidget {
 
     return SectionCard(
       title: l10n.returnsListSection,
-      icon: Icons.assignment_return_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

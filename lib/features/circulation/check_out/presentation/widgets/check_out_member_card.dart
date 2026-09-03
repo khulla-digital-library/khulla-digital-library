@@ -48,7 +48,6 @@ class CheckOutMemberCard extends StatelessWidget {
 
     return SectionCard(
       title: l10n.checkOutMemberSection,
-      icon: Icons.badge_outlined,
       trailing: name == null
           ? null
           : AppTextButton(

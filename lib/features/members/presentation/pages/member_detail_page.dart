@@ -111,8 +111,8 @@ class MemberDetailPage extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: spacing.md),
-                AppResponsiveGrid(
-                  children: [
+                AppStatStrip(
+                  tiles: [
                     AppStatTile(
                       label: l10n.memberDetailStatLoans,
                       value: '${member.loansOut}',
@@ -202,7 +202,6 @@ class _MemberDetailsCard extends StatelessWidget {
       children: [
         SectionCard(
           title: l10n.memberDetailMembership,
-          icon: Icons.card_membership_rounded,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
@@ -225,7 +224,6 @@ class _MemberDetailsCard extends StatelessWidget {
         SizedBox(height: spacing.md),
         SectionCard(
           title: l10n.memberDetailContact,
-          icon: Icons.contact_page_outlined,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,

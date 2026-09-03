@@ -120,8 +120,8 @@ class _FineListPageState extends State<FineListPage> {
             ),
           ),
           SizedBox(height: spacing.lg),
-          AppResponsiveGrid(
-            children: [
+          AppStatStrip(
+            tiles: [
               AppStatTile(
                 label: l10n.finesStatOutstanding,
                 value: placeholderOutstandingFines.display(),

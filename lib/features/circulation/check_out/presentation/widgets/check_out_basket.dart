@@ -34,7 +34,6 @@ class CheckOutBasket extends StatelessWidget {
 
     return SectionCard(
       title: l10n.checkOutCopiesSection,
-      icon: Icons.inventory_2_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

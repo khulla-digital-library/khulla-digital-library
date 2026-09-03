@@ -64,7 +64,6 @@ class _AppearancePageState extends State<AppearancePage> {
             SectionCard(
               title: l10n.settingsAppearanceTheme,
               subtitle: l10n.settingsAppearanceThemeDescription,
-              icon: Icons.palette_outlined,
               child: BlocBuilder<ThemeCubit, ThemeMode>(
                 builder: (context, mode) => Align(
                   alignment: Alignment.centerLeft,
@@ -83,7 +82,6 @@ class _AppearancePageState extends State<AppearancePage> {
             SectionCard(
               title: l10n.settingsAppearanceLanguage,
               subtitle: l10n.settingsAppearanceLanguageDescription,
-              icon: Icons.translate_rounded,
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: AppSegmentedControl<AppLanguage>(
@@ -101,7 +99,6 @@ class _AppearancePageState extends State<AppearancePage> {
             SectionCard(
               title: l10n.settingsAppearanceDensity,
               subtitle: l10n.settingsAppearanceDensityDescription,
-              icon: Icons.table_rows_outlined,
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: AppSegmentedControl<RowDensity>(

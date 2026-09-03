@@ -50,7 +50,6 @@ class RoleListPage extends StatelessWidget {
                 SectionCard(
                   title: l10n.rolesMatrixTitle,
                   subtitle: l10n.rolesMatrixSubtitle,
-                  icon: Icons.grid_on_rounded,
                   trailing: AppButton(
                     size: AppButtonSize.small,
                     variant: AppButtonVariant.outline,
@@ -90,19 +89,10 @@ class _RoleCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: role.tone.background(context),
-                  borderRadius: BorderRadius.circular(context.appRadius.tile),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(spacing.xs),
-                  child: Icon(
-                    role.icon,
-                    size: spacing.md + 2,
-                    color: role.tone.foreground(context),
-                  ),
-                ),
+              Icon(
+                role.icon,
+                size: spacing.lg - 4,
+                color: role.tone.foreground(context),
               ),
               SizedBox(width: spacing.sm),
               Expanded(

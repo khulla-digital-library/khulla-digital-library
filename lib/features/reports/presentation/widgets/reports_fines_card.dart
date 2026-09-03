@@ -20,7 +20,6 @@ class ReportsFinesCard extends StatelessWidget {
     return SectionCard(
       title: l10n.reportsFinesTitle,
       subtitle: l10n.reportsFinesSubtitle,
-      icon: Icons.account_balance_wallet_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

@@ -20,7 +20,6 @@ class DashboardUsageCard extends StatelessWidget {
     return DashboardSectionCard(
       title: l10n.dashboardUsageTitle,
       subtitle: l10n.dashboardUsageSubtitle,
-      icon: Icons.bar_chart_rounded,
       trailing: Wrap(
         spacing: spacing.sm,
         children: [

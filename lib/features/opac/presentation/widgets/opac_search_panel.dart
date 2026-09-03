@@ -46,15 +46,10 @@ class OpacSearchPanel extends StatelessWidget {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
     final colors = context.appColors;
-    final scheme = context.colorScheme;
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [colors.brandSoft, scheme.surface],
-        ),
+        color: colors.brandSoft,
         borderRadius: BorderRadius.circular(context.appRadius.banner),
         border: Border.all(color: colors.hairline),
       ),
@@ -66,10 +61,9 @@ class OpacSearchPanel extends StatelessWidget {
           children: [
             Text(
               l10n.opacHeading,
-              style: context.textTheme.headlineMedium?.copyWith(
+              style: context.textTheme.titleMedium?.copyWith(
                 color: colors.textHigh,
                 fontWeight: FontWeight.w600,
-                letterSpacing: -0.8,
               ),
             ),
             SizedBox(height: spacing.xxs),

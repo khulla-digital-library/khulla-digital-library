@@ -4,6 +4,7 @@ import 'package:khulla/features/reports/presentation/widgets/reports_fines_card.
 import 'package:khulla/features/reports/presentation/widgets/reports_ranked_table.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/collection_header.dart';
+import 'package:khulla/shared/components/navigation_group.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -42,7 +43,6 @@ class _ReportsPageState extends State<ReportsPage> {
       SectionCard(
         title: l10n.reportsTopTitlesTitle,
         subtitle: l10n.reportsTopTitlesSubtitle,
-        icon: Icons.local_fire_department_outlined,
         child: ReportsRankedTable(
           rows: reportsTopTitles(),
           nameLabel: l10n.reportsColumnTitle,
@@ -51,7 +51,6 @@ class _ReportsPageState extends State<ReportsPage> {
       SectionCard(
         title: l10n.reportsTopMembersTitle,
         subtitle: l10n.reportsTopMembersSubtitle,
-        icon: Icons.emoji_events_outlined,
         child: ReportsRankedTable(
           rows: reportsTopMembers(),
           nameLabel: l10n.reportsColumnMember,
@@ -103,8 +102,8 @@ class _ReportsPageState extends State<ReportsPage> {
                   ),
                 ),
                 SizedBox(height: spacing.lg),
-                AppResponsiveGrid(
-                  children: [
+                AppStatStrip(
+                  tiles: [
                     AppStatTile(
                       label: l10n.reportsStatBorrowed,
                       value: '934',
@@ -147,7 +146,6 @@ class _ReportsPageState extends State<ReportsPage> {
                 SectionCard(
                   title: l10n.reportsCirculationTitle,
                   subtitle: l10n.reportsCirculationSubtitle,
-                  icon: Icons.stacked_bar_chart_rounded,
                   trailing: Wrap(
                     spacing: spacing.sm,
                     children: [
@@ -178,7 +176,6 @@ class _ReportsPageState extends State<ReportsPage> {
                           child: SectionCard(
                             title: l10n.reportsMembersTitle,
                             subtitle: l10n.reportsMembersSubtitle,
-                            icon: Icons.show_chart_rounded,
                             child: AppLineChart(
                               series: reportsMembershipSeries(l10n),
                               showDots: true,
@@ -199,7 +196,6 @@ class _ReportsPageState extends State<ReportsPage> {
                   SectionCard(
                     title: l10n.reportsMembersTitle,
                     subtitle: l10n.reportsMembersSubtitle,
-                    icon: Icons.show_chart_rounded,
                     child: AppLineChart(
                       series: reportsMembershipSeries(l10n),
                       showDots: true,
@@ -232,11 +228,9 @@ class _ReportsPageState extends State<ReportsPage> {
                 AppSectionHeader(
                   title: l10n.reportsSavedTitle,
                   subtitle: l10n.reportsSavedSubtitle,
-                  icon: Icons.folder_copy_outlined,
                 ),
                 SizedBox(height: spacing.md),
-                AppResponsiveGrid(
-                  largeColumns: 3,
+                NavigationGroup(
                   children: [
                     for (final report in reportsSaved(l10n))
                       _SavedReportTile(report: report),
@@ -273,7 +267,6 @@ class _CollectionMixCard extends StatelessWidget {
     return SectionCard(
       title: l10n.reportsCollectionTitle,
       subtitle: l10n.reportsCollectionSubtitle,
-      icon: Icons.donut_large_rounded,
       child: Row(
         children: [
           AppDonutChart(
@@ -307,7 +300,13 @@ class _CollectionMixCard extends StatelessWidget {
   }
 }
 
-/// One saved report, ready to export.
+/// One saved report, as a row with its two export actions.
+///
+/// A row rather than a card in a grid. Six identical rectangles said the six
+/// reports were six different kinds of thing, and putting a tap on the card
+/// while also putting two buttons inside it left no honest answer to what
+/// clicking the middle of it should do. A report is a document you export, so
+/// the row names it and the two verbs sit at the end of the line.
 class _SavedReportTile extends StatelessWidget {
   const _SavedReportTile({required this.report});
 
@@ -318,74 +317,89 @@ class _SavedReportTile extends StatelessWidget {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
     final colors = context.appColors;
+    final stacked = context.formFactor.isCompact;
 
-    return AppCard(
-      onTap: () => showNotWiredToast(context),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
+    final identity = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: spacing.xxs / 2),
+          child: Icon(
+            report.icon,
+            size: spacing.lg - 4,
+            color: report.tone.foreground(context),
+          ),
+        ),
+        SizedBox(width: spacing.sm),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: report.tone.background(context),
-                  borderRadius: BorderRadius.circular(context.appRadius.tile),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(spacing.xs),
-                  child: Icon(
-                    report.icon,
-                    size: spacing.md + 2,
-                    color: report.tone.foreground(context),
-                  ),
+              Text(
+                report.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: colors.textHigh,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(width: spacing.sm),
-              Expanded(
-                child: Text(
-                  report.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.titleSmall?.copyWith(
-                    color: colors.textHigh,
-                    fontWeight: FontWeight.w600,
-                  ),
+              Text(
+                report.body,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: colors.textMuted,
+                  height: 1.4,
                 ),
               ),
             ],
           ),
-          SizedBox(height: spacing.sm),
-          Text(
-            report.body,
-            maxLines: 3,
-            style: context.textTheme.bodySmall?.copyWith(
-              color: colors.textMuted,
-              height: 1.4,
-            ),
-          ),
-          SizedBox(height: spacing.sm),
-          Row(
-            children: [
-              AppButton(
-                size: AppButtonSize.small,
-                variant: AppButtonVariant.outline,
-                icon: Icons.picture_as_pdf_outlined,
-                onPressed: () => showNotWiredToast(context),
-                child: Text(l10n.commonExportPdf),
-              ),
-              SizedBox(width: spacing.xs),
-              AppButton(
-                size: AppButtonSize.small,
-                variant: AppButtonVariant.outline,
-                icon: Icons.table_view_outlined,
-                onPressed: () => showNotWiredToast(context),
-                child: Text(l10n.commonExportCsv),
-              ),
-            ],
-          ),
-        ],
+        ),
+      ],
+    );
+
+    final exports = [
+      AppButton(
+        size: AppButtonSize.small,
+        variant: AppButtonVariant.outline,
+        icon: Icons.picture_as_pdf_outlined,
+        onPressed: () => showNotWiredToast(context),
+        child: Text(l10n.commonExportPdf),
       ),
+      SizedBox(width: spacing.xs),
+      AppButton(
+        size: AppButtonSize.small,
+        variant: AppButtonVariant.outline,
+        icon: Icons.table_view_outlined,
+        onPressed: () => showNotWiredToast(context),
+        child: Text(l10n.commonExportCsv),
+      ),
+    ];
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.md,
+        vertical: spacing.sm,
+      ),
+      child: stacked
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                identity,
+                SizedBox(height: spacing.sm),
+                Row(children: exports),
+              ],
+            )
+          : Row(
+              children: [
+                Expanded(child: identity),
+                SizedBox(width: spacing.md),
+                Row(mainAxisSize: MainAxisSize.min, children: exports),
+              ],
+            ),
     );
   }
 }

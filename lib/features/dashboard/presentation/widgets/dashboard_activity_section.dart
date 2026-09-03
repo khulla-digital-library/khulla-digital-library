@@ -128,7 +128,6 @@ class DashboardActivitySection extends StatelessWidget {
     return DashboardSectionCard(
       title: l10n.dashboardActivityTitle,
       subtitle: l10n.dashboardActivitySubtitle,
-      icon: Icons.history_rounded,
       trailing: AppTextButton(
         onPressed: () => context.go(Routes.circulation),
         child: Text(l10n.commonViewAll),

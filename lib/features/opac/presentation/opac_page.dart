@@ -105,9 +105,6 @@ class _OpacPageState extends State<OpacPage> with DisposeBag {
                   subtitle: _isSearching
                       ? l10n.opacResultsSubtitle('${matches.length}')
                       : l10n.opacFeaturedSubtitle,
-                  icon: _isSearching
-                      ? Icons.manage_search_rounded
-                      : Icons.auto_awesome_outlined,
                   trailing: _isSearching
                       ? AppTextButton(
                           onPressed: _clear,
