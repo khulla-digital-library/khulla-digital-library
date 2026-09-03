@@ -59,10 +59,12 @@ class AppTopBar extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: context.appTextStyles.pageHeader.copyWith(
             color: colors.ink100,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.2,
           ),
         ),
         if (crumbs != null) ...[
-          const SizedBox(height: 2),
+          const SizedBox(height: 3),
           crumbs,
         ],
       ],
@@ -72,6 +74,7 @@ class AppTopBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surface,
         border: Border(bottom: BorderSide(color: colors.hairline)),
+        boxShadow: context.appShadows.card,
       ),
       child: SafeArea(
         bottom: false,
