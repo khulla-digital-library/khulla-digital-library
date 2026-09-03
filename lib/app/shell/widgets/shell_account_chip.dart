@@ -12,6 +12,9 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// normal case in a library: the person about to waive a fine needs to see,
 /// without opening a menu, whether they are signed in as themselves or as
 /// whoever worked the morning shift.
+///
+/// The menu opens above the full footer row, not from the avatar alone — the
+/// whole row is the tap target and the panel anchors to its width.
 class ShellAccountChip extends StatelessWidget {
   const ShellAccountChip({this.compact = false, super.key});
 
@@ -27,7 +30,8 @@ class ShellAccountChip extends StatelessWidget {
 
     return PopupMenuButton<int>(
       tooltip: l10n.shellAccountMenu,
-      position: PopupMenuPosition.under,
+      position: PopupMenuPosition.over,
+      constraints: const BoxConstraints(minWidth: 220),
       itemBuilder: (context) => [
         PopupMenuItem<int>(
           onTap: () => showNotWiredToast(context),
@@ -37,7 +41,7 @@ class ShellAccountChip extends StatelessWidget {
           ),
         ),
         PopupMenuItem<int>(
-          onTap: () => context.go(Routes.settings),
+          onTap: () => context.go(Routes.settingsAppearance),
           child: _MenuRow(
             icon: AppIcons.settings,
             label: l10n.navSettings,
@@ -60,50 +64,52 @@ class ShellAccountChip extends StatelessWidget {
           ),
         ),
       ],
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: spacing.xxs,
-          vertical: spacing.xxs,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AppAvatar(initials: staff.initials, size: 34),
-            if (!compact) ...[
-              SizedBox(width: spacing.xs),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: compact ? spacing.xxs : spacing.sm,
+            vertical: spacing.xxs,
+          ),
+          child: compact
+              ? Center(child: AppAvatar(initials: staff.initials, size: 34))
+              : Row(
                   children: [
-                    Text(
-                      staff.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: colors.textHigh,
-                        fontWeight: FontWeight.w600,
+                    AppAvatar(initials: staff.initials, size: 34),
+                    SizedBox(width: spacing.xs),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            staff.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: context.textTheme.bodySmall?.copyWith(
+                              color: colors.textHigh,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            staff.role.label(l10n),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: context.textTheme.labelSmall?.copyWith(
+                              color: colors.textMuted,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      staff.role.label(l10n),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: context.textTheme.labelSmall?.copyWith(
-                        color: colors.textMuted,
-                      ),
+                    SizedBox(width: spacing.xxs),
+                    AppIcon(
+                      AppIcons.chevronDown,
+                      size: 18,
+                      color: colors.textMuted,
                     ),
                   ],
                 ),
-              ),
-              SizedBox(width: spacing.xxs),
-              AppIcon(
-                AppIcons.chevronDown,
-                size: 18,
-                color: colors.textMuted,
-              ),
-            ],
-          ],
         ),
       ),
     );
