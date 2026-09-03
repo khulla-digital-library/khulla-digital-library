@@ -1,7 +1,5 @@
-import 'package:go_router/go_router.dart';
 import 'package:khulla/core/lifecycle/dispose_bag.dart';
 import 'package:khulla/core/money/money.dart';
-import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/circulation/return_copy/presentation/widgets/return_basket.dart';
 import 'package:khulla/features/circulation/return_copy/presentation/widgets/return_summary_card.dart';
@@ -91,10 +89,6 @@ class _ReturnPageState extends State<ReturnPage> with DisposeBag {
                 CollectionHeader(
                   title: l10n.returnsHeading,
                   subtitle: l10n.returnsSubtitle,
-                  leading: AppPageHeader(
-                    title: l10n.circulationHeading,
-                    onBackPressed: () => context.go(Routes.circulation),
-                  ),
                 ),
                 SizedBox(height: spacing.lg),
                 if (twoPane)

@@ -1,6 +1,4 @@
-import 'package:go_router/go_router.dart';
 import 'package:khulla/core/lifecycle/dispose_bag.dart';
-import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/copy/presentation/label_size.dart';
 import 'package:khulla/features/catalog/copy/presentation/placeholder/label_queue_entry.dart';
 import 'package:khulla/features/catalog/copy/presentation/placeholder/labels_placeholder.dart';
@@ -281,11 +279,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
             ),
             sliver: SliverList.list(
               children: [
-                AppPageHeader(
-                  title: l10n.labelsHeading,
-                  onBackPressed: () => context.go(Routes.catalogCopies),
-                ),
-                SizedBox(height: spacing.sm),
                 Text(
                   l10n.labelsSubtitle,
                   style: context.textTheme.bodyMedium?.copyWith(

@@ -43,7 +43,7 @@ class CheckOutBasket extends StatelessWidget {
             hintText: l10n.checkOutScanHint,
             prefixIcon: AppIcon(
               AppIcons.scan,
-              size: spacing.md + 4,
+              size: context.appMetrics.icon,
               color: scheme.onSurfaceVariant,
             ),
             textInputAction: TextInputAction.done,

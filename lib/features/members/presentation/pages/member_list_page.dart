@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/members/domain/member_status.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
+import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/features/members/presentation/placeholder/member_record.dart';
 import 'package:khulla/features/members/presentation/placeholder/members_placeholder.dart';
 import 'package:khulla/features/members/presentation/widgets/member_card.dart';
@@ -190,7 +191,8 @@ class _MemberListPageState extends State<MemberListPage> {
             AppMenuAction(
               label: l10n.memberDetailEdit,
               icon: AppIcons.edit,
-              onSelected: () => context.go(Routes.memberEdit(member.id)),
+              onSelected: () =>
+                  MemberFormDialog.show(context, memberId: member.id),
             ),
             AppMenuAction(
               label: l10n.memberDetailRenewMembership,
@@ -303,7 +305,7 @@ class _MemberListPageState extends State<MemberListPage> {
               title: l10n.membersEmptyTitle,
               message: l10n.membersEmptyBody,
               actionLabel: l10n.membersAdd,
-              onAction: () => context.go(Routes.memberNew),
+              onAction: () => MemberFormDialog.show(context),
             ),
       footer: AppPagination(
         rangeLabel: l10n.commonShowingRange(

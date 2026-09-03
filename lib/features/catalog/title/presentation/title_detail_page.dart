@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:go_router/go_router.dart';
-import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_placeholder.dart';
 import 'package:khulla/features/catalog/title/presentation/placeholder/title_history_entry.dart';
+import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_copies_card.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_detail_header.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_details_card.dart';
@@ -83,14 +82,9 @@ class TitleDetailPage extends StatelessWidget {
             ),
             sliver: SliverList.list(
               children: [
-                AppPageHeader(
-                  title: l10n.titlesHeading,
-                  onBackPressed: () => context.go(Routes.catalogTitles),
-                ),
-                SizedBox(height: spacing.md),
                 TitleDetailHeader(
                   title: title,
-                  onEdit: () => context.go(Routes.catalogTitleEdit(titleId)),
+                  onEdit: () => TitleFormDialog.show(context, titleId: titleId),
                   menuActions: [
                     AppMenuAction(
                       label: l10n.titleDetailAddCopy,

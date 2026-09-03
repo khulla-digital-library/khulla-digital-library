@@ -113,23 +113,31 @@ class _AppSearchFieldState extends State<AppSearchField> {
         decoration: InputDecoration(
           isDense: true,
           hintText: widget.hintText,
-          prefixIcon: AppIcon(
-            AppIcons.search,
-            size: metrics.icon,
-            color: colors.mutedForeground,
+          prefixIcon: AppFieldAffix(
+            child: AppIcon(
+              AppIcons.search,
+              size: metrics.icon,
+              color: colors.mutedForeground,
+            ),
           ),
           prefixIconConstraints: BoxConstraints(
             minWidth: metrics.fieldHeight,
             minHeight: metrics.fieldHeight,
           ),
-          suffixIcon: value.text.isNotEmpty && clearLabel != null
-              ? AppIconButton(
-                  icon: AppIcons.close,
-                  tooltip: clearLabel,
-                  size: AppIconButtonSize.small,
-                  onPressed: _clear,
-                )
-              : widget.trailing,
+          suffixIcon: switch ((value.text.isNotEmpty, clearLabel)) {
+            (true, final label?) => AppFieldAffix(
+              child: AppIconButton(
+                icon: AppIcons.close,
+                tooltip: label,
+                size: AppIconButtonSize.small,
+                onPressed: _clear,
+              ),
+            ),
+            _ => switch (widget.trailing) {
+              final trailing? => AppFieldAffix(child: trailing),
+              _ => null,
+            },
+          },
           contentPadding: EdgeInsets.symmetric(
             horizontal: spacing.sm,
             vertical: widget.dense ? spacing.xs : spacing.sm,

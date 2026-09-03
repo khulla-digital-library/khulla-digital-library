@@ -40,11 +40,6 @@ class AuthorDetailPage extends StatelessWidget {
             ),
             sliver: SliverList.list(
               children: [
-                AppPageHeader(
-                  title: l10n.authorsHeading,
-                  onBackPressed: () => context.go(Routes.catalogAuthors),
-                ),
-                SizedBox(height: spacing.md),
                 RecordHeader(
                   title: author.name,
                   initials: author.initials,

@@ -1,5 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
+import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -28,17 +30,17 @@ class DashboardQuickActions extends StatelessWidget {
         _QuickAction(
           label: l10n.dashboardReturnCopy,
           icon: AppIcons.checkIn,
-          route: Routes.circulationReturn,
+          onPressed: () => context.go(Routes.circulationReturn),
         ),
         _QuickAction(
           label: l10n.dashboardAddTitle,
           icon: AppIcons.addToCatalog,
-          route: Routes.catalogTitleNew,
+          onPressed: () => TitleFormDialog.show(context),
         ),
         _QuickAction(
           label: l10n.dashboardAddMember,
           icon: AppIcons.addPerson,
-          route: Routes.memberNew,
+          onPressed: () => MemberFormDialog.show(context),
         ),
       ],
     );
@@ -49,12 +51,12 @@ class _QuickAction extends StatelessWidget {
   const _QuickAction({
     required this.label,
     required this.icon,
-    required this.route,
+    required this.onPressed,
   });
 
   final String label;
   final AppIconSpec icon;
-  final String route;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +64,7 @@ class _QuickAction extends StatelessWidget {
       size: AppButtonSize.medium,
       variant: AppButtonVariant.outline,
       icon: icon,
-      onPressed: () => context.go(route),
+      onPressed: onPressed,
       child: Text(label),
     );
   }

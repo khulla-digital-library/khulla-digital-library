@@ -40,7 +40,7 @@ class ReturnBasket extends StatelessWidget {
             hintText: l10n.returnsScanHint,
             prefixIcon: AppIcon(
               AppIcons.scan,
-              size: spacing.md + 4,
+              size: context.appMetrics.icon,
               color: scheme.onSurfaceVariant,
             ),
             textInputAction: TextInputAction.done,

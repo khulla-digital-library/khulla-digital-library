@@ -114,16 +114,17 @@ class _AppNavRailState extends State<AppNavRail> {
               SizedBox(
                 height: context.appMetrics.topBarHeight,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: extended ? spacing.sm : spacing.xs,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: spacing.sm),
                   child: Center(child: head),
                 ),
               ),
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: extended ? spacing.sm : spacing.sm + 2,
+                padding: EdgeInsets.fromLTRB(
+                  spacing.sm,
+                  spacing.xs,
+                  spacing.sm,
+                  spacing.xs,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -152,9 +153,9 @@ class _AppNavRailState extends State<AppNavRail> {
             if (tail != null)
               Padding(
                 padding: EdgeInsets.fromLTRB(
-                  extended ? spacing.sm : spacing.sm + 2,
+                  spacing.sm,
                   spacing.xs,
-                  extended ? spacing.sm : spacing.sm + 2,
+                  spacing.sm,
                   spacing.xs,
                 ),
                 child: tail,
@@ -162,9 +163,9 @@ class _AppNavRailState extends State<AppNavRail> {
             if (bottom != null)
               Padding(
                 padding: EdgeInsets.fromLTRB(
-                  extended ? spacing.sm : spacing.xs,
+                  spacing.sm,
                   spacing.xs,
-                  extended ? spacing.sm : spacing.xs,
+                  spacing.sm,
                   spacing.sm,
                 ),
                 child: bottom,
@@ -218,7 +219,10 @@ class _RailItem extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: spacing.sm),
                 child: Row(
                   children: [
-                    glyph,
+                    SizedBox(
+                      width: metrics.iconNav,
+                      child: Center(child: glyph),
+                    ),
                     SizedBox(width: spacing.navIconGap),
                     Expanded(
                       child: Text(
@@ -265,7 +269,7 @@ class _RailItem extends StatelessWidget {
     final showChildren = extended && expanded && children.isNotEmpty;
 
     return Padding(
-      padding: EdgeInsets.only(bottom: spacing.xxs + 2),
+      padding: EdgeInsets.only(bottom: spacing.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -376,8 +380,19 @@ class _RailChildRow extends StatelessWidget {
     final spacing = context.appSpacing;
     final colors = context.appColors;
     final radius = BorderRadius.circular(context.appRadius.container);
+    final metrics = context.appMetrics;
     final active = child.selected;
     final foreground = active ? colors.brand : colors.ink300;
+
+    // Line the sub-item's label up with its parent's, so the rail reads as
+    // one text column rather than two: the parent's inset, its glyph and the
+    // icon gap, less what the bullet and its own gap already take.
+    final indent =
+        spacing.sm +
+        metrics.iconNav +
+        spacing.navIconGap -
+        metrics.iconDense -
+        spacing.xs;
 
     return AppRipple(
       onTap: child.onSelected,
@@ -389,7 +404,7 @@ class _RailChildRow extends StatelessWidget {
           borderRadius: radius,
         ),
         child: Padding(
-          padding: EdgeInsets.only(left: spacing.lg, right: spacing.sm),
+          padding: EdgeInsets.only(left: indent, right: spacing.sm),
           child: IntrinsicHeight(
             child: Row(
               children: [

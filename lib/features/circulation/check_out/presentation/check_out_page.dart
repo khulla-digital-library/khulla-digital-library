@@ -1,7 +1,5 @@
-import 'package:go_router/go_router.dart';
 import 'package:khulla/core/lifecycle/dispose_bag.dart';
 import 'package:khulla/core/money/money.dart';
-import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_copy.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_placeholder.dart';
 import 'package:khulla/features/circulation/check_out/presentation/widgets/check_out_basket.dart';
@@ -112,10 +110,6 @@ class _CheckOutPageState extends State<CheckOutPage> with DisposeBag {
                 CollectionHeader(
                   title: l10n.checkOutHeading,
                   subtitle: l10n.checkOutSubtitle,
-                  leading: AppPageHeader(
-                    title: l10n.circulationHeading,
-                    onBackPressed: () => context.go(Routes.circulation),
-                  ),
                 ),
                 SizedBox(height: spacing.lg),
                 if (twoPane)

@@ -4,6 +4,7 @@ import 'package:khulla/features/catalog/shared/domain/catalog_format.dart';
 import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_placeholder.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_title.dart';
+import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_card.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
@@ -240,7 +241,7 @@ class _TitleListPageState extends State<TitleListPage> {
               title: l10n.titlesEmptyTitle,
               message: l10n.titlesEmptyBody,
               actionLabel: l10n.titlesAdd,
-              onAction: () => context.go(Routes.catalogTitleNew),
+              onAction: () => TitleFormDialog.show(context),
             ),
       footer: AppPagination(
         rangeLabel: l10n.commonShowingRange(

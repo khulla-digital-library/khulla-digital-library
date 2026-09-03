@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
+import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/features/members/presentation/placeholder/members_placeholder.dart';
 import 'package:khulla/features/members/presentation/widgets/member_detail_header.dart';
 import 'package:khulla/features/members/presentation/widgets/member_fines_card.dart';
@@ -78,11 +79,6 @@ class MemberDetailPage extends StatelessWidget {
             ),
             sliver: SliverList.list(
               children: [
-                AppPageHeader(
-                  title: l10n.membersHeading,
-                  onBackPressed: () => context.go(Routes.members),
-                ),
-                SizedBox(height: spacing.md),
                 MemberDetailHeader(
                   member: member,
                   onCheckOut: () => context.go(Routes.circulationCheckOut),
@@ -90,7 +86,8 @@ class MemberDetailPage extends StatelessWidget {
                     AppMenuAction(
                       label: l10n.memberDetailEdit,
                       icon: AppIcons.edit,
-                      onSelected: () => context.go(Routes.memberEdit(memberId)),
+                      onSelected: () =>
+                          MemberFormDialog.show(context, memberId: memberId),
                     ),
                     AppMenuAction(
                       label: l10n.memberDetailRenewMembership,

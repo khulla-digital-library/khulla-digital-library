@@ -82,17 +82,19 @@ class AppPickerField extends StatelessWidget {
               hintText: hintText,
               errorText: errorText,
               enabled: enabled,
-              suffixIcon: hasValue && clear != null && clearLabel != null
-                  ? AppIconButton(
-                      icon: AppIcons.close,
-                      tooltip: clearLabel,
-                      onPressed: clear,
-                    )
-                  : AppIcon(
-                      icon,
-                      size: spacing.md + 4,
-                      color: scheme.onSurfaceVariant,
-                    ),
+              suffixIcon: AppFieldAffix(
+                child: hasValue && clear != null && clearLabel != null
+                    ? AppIconButton(
+                        icon: AppIcons.close,
+                        tooltip: clearLabel,
+                        onPressed: clear,
+                      )
+                    : AppIcon(
+                        icon,
+                        size: context.appMetrics.icon,
+                        color: scheme.onSurfaceVariant,
+                      ),
+              ),
             ),
             child: hasValue
                 ? Text(

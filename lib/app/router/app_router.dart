@@ -9,7 +9,6 @@ import 'package:khulla/features/catalog/catalog/presentation/catalog_page.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_list_page.dart';
 import 'package:khulla/features/catalog/copy/presentation/label_print_page.dart';
 import 'package:khulla/features/catalog/title/presentation/title_detail_page.dart';
-import 'package:khulla/features/catalog/title/presentation/title_form_page.dart';
 import 'package:khulla/features/catalog/title/presentation/title_list_page.dart';
 import 'package:khulla/features/circulation/check_out/presentation/check_out_page.dart';
 import 'package:khulla/features/circulation/circulation/presentation/circulation_page.dart';
@@ -18,7 +17,6 @@ import 'package:khulla/features/circulation/reservation/presentation/reservation
 import 'package:khulla/features/circulation/return_copy/presentation/return_page.dart';
 import 'package:khulla/features/dashboard/presentation/dashboard_page.dart';
 import 'package:khulla/features/members/presentation/pages/member_detail_page.dart';
-import 'package:khulla/features/members/presentation/pages/member_form_page.dart';
 import 'package:khulla/features/members/presentation/pages/member_list_page.dart';
 import 'package:khulla/features/opac/presentation/opac_page.dart';
 import 'package:khulla/features/reports/presentation/reports_page.dart';
@@ -85,25 +83,11 @@ class AppRouter {
                       path: Routes.titlesSegment,
                       builder: (context, _) => const TitleListPage(),
                       routes: [
-                        // Declared before `:id` so /titles/new opens the
-                        // editor rather than a record with the id "new".
-                        GoRoute(
-                          path: Routes.newSegment,
-                          builder: (context, _) => const TitleFormPage(),
-                        ),
                         GoRoute(
                           path: Routes.idSegment,
                           builder: (context, state) => TitleDetailPage(
                             titleId: state.pathParameters['id'] ?? '',
                           ),
-                          routes: [
-                            GoRoute(
-                              path: Routes.editSegment,
-                              builder: (context, state) => TitleFormPage(
-                                titleId: state.pathParameters['id'],
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
@@ -164,22 +148,10 @@ class AppRouter {
                   builder: (context, _) => const MemberListPage(),
                   routes: [
                     GoRoute(
-                      path: Routes.newSegment,
-                      builder: (context, _) => const MemberFormPage(),
-                    ),
-                    GoRoute(
                       path: Routes.idSegment,
                       builder: (context, state) => MemberDetailPage(
                         memberId: state.pathParameters['id'] ?? '',
                       ),
-                      routes: [
-                        GoRoute(
-                          path: Routes.editSegment,
-                          builder: (context, state) => MemberFormPage(
-                            memberId: state.pathParameters['id'],
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),

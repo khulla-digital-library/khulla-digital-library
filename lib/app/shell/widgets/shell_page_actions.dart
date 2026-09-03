@@ -1,5 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
+import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -27,6 +29,12 @@ List<Widget> shellPageActions(
   AppButton go(String label, AppIconSpec icon, String route) =>
       primary(label, icon, () => context.go(route));
 
+  AppButton modal(
+    String label,
+    AppIconSpec icon,
+    Future<void> Function() open,
+  ) => primary(label, icon, open);
+
   AppButton soon(String label, AppIconSpec icon) =>
       primary(label, icon, () => showNotWiredToast(context));
 
@@ -41,14 +49,17 @@ List<Widget> shellPageActions(
 
   // Longest path first: `/catalog/titles` must not be answered by `/catalog`.
   return switch (location) {
-    _ when Routes.isUnder(location, Routes.catalogTitleNew) => const [],
     _ when Routes.isUnder(location, Routes.catalogTitles) => [
       menu([
         item(l10n.titlesImport, AppIcons.upload),
         item(l10n.titlesExport, AppIcons.download),
         item(l10n.titlesPrintLabels, AppIcons.printer),
       ]),
-      go(l10n.titlesAdd, AppIcons.add, Routes.catalogTitleNew),
+      modal(
+        l10n.titlesAdd,
+        AppIcons.add,
+        () => TitleFormDialog.show(context),
+      ),
     ],
     _ when Routes.isUnder(location, Routes.catalogCopies) => [
       soon(l10n.copiesAdd, AppIcons.add),
@@ -57,7 +68,11 @@ List<Widget> shellPageActions(
       soon(l10n.authorsAdd, AppIcons.add),
     ],
     _ when Routes.isUnder(location, Routes.catalog) => [
-      go(l10n.titlesAdd, AppIcons.add, Routes.catalogTitleNew),
+      modal(
+        l10n.titlesAdd,
+        AppIcons.add,
+        () => TitleFormDialog.show(context),
+      ),
     ],
     _ when Routes.isUnder(location, Routes.circulationReservations) => [
       soon(l10n.reservationsPlace, AppIcons.add),
@@ -71,13 +86,16 @@ List<Widget> shellPageActions(
         Routes.circulationCheckOut,
       ),
     ],
-    _ when Routes.isUnder(location, Routes.memberNew) => const [],
     _ when Routes.isUnder(location, Routes.members) => [
       menu([
         item(l10n.membersImport, AppIcons.upload),
         item(l10n.membersExport, AppIcons.download),
       ]),
-      go(l10n.membersAdd, AppIcons.addPerson, Routes.memberNew),
+      modal(
+        l10n.membersAdd,
+        AppIcons.addPerson,
+        () => MemberFormDialog.show(context),
+      ),
     ],
     _ when Routes.isUnder(location, Routes.usersRoles) => const [],
     _ when Routes.isUnder(location, Routes.users) => [

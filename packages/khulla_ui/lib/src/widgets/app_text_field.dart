@@ -218,9 +218,15 @@ class _AppTextFieldState extends State<AppTextField> {
             style: typography.body.copyWith(color: colors.ink100),
             decoration: InputDecoration(
               hintText: widget.hintText,
-              prefixIcon: widget.prefixIcon,
+              prefixIcon: switch (widget.prefixIcon) {
+                final prefix? => AppFieldAffix(child: prefix),
+                _ => null,
+              },
               prefixIconConstraints: widget.prefixIconConstraints,
-              suffixIcon: widget.suffixIcon,
+              suffixIcon: switch (widget.suffixIcon) {
+                final suffix? => AppFieldAffix(child: suffix),
+                _ => null,
+              },
               counterText: '',
               // The signature interaction: focus moves the text 2px right
               // rather than lighting up a ring.

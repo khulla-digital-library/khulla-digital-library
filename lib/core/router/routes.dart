@@ -25,8 +25,6 @@ abstract final class Routes {
   static const String titlesSegment = 'titles';
   static const String copiesSegment = 'copies';
   static const String authorsSegment = 'authors';
-  static const String newSegment = 'new';
-  static const String editSegment = 'edit';
   static const String idSegment = ':id';
 
   /// Every work the library holds.
@@ -34,9 +32,6 @@ abstract final class Routes {
   static const String labelsSegment = 'labels';
 
   static const String catalogTitles = '$catalog/$titlesSegment';
-
-  /// The title editor, opened empty.
-  static const String catalogTitleNew = '$catalogTitles/$newSegment';
 
   /// Every physical item, across every title.
   static const String catalogCopies = '$catalog/$copiesSegment';
@@ -49,10 +44,6 @@ abstract final class Routes {
 
   /// One title's record.
   static String catalogTitle(String id) => '$catalogTitles/$id';
-
-  /// The title editor, opened on an existing record.
-  static String catalogTitleEdit(String id) =>
-      '$catalogTitles/$id/$editSegment';
 
   /// One author's record.
   static String catalogAuthor(String id) => '$catalogAuthors/$id';
@@ -96,14 +87,8 @@ abstract final class Routes {
 
   static const String members = '/members';
 
-  /// The borrower editor, opened empty.
-  static const String memberNew = '$members/$newSegment';
-
   /// One borrower's record.
   static String member(String id) => '$members/$id';
-
-  /// The borrower editor, opened on an existing record.
-  static String memberEdit(String id) => '$members/$id/$editSegment';
 
   /// Settings: library profile, loan rules, backup, appearance.
   static const String settings = '/settings';
