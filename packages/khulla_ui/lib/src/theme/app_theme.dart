@@ -66,7 +66,7 @@ abstract final class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
-      fontFamily: AppFonts.lexend,
+      fontFamily: AppFonts.poppins,
       colorScheme: colorScheme,
       textTheme: textTheme,
       scaffoldBackgroundColor: canvas,
