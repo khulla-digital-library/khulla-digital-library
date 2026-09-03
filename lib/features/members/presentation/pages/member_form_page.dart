@@ -63,6 +63,7 @@ class _MemberFormPageState extends State<MemberFormPage> with DisposeBag {
     final spacing = context.appSpacing;
 
     return AppPageBody(
+      wide: true,
       child: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(
           spacing.page,

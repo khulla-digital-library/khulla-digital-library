@@ -1,5 +1,3 @@
-import 'package:go_router/go_router.dart';
-import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/settings/presentation/placeholder/sync_placeholder.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
@@ -54,11 +52,6 @@ class _SyncPageState extends State<SyncPage> {
             ),
             sliver: SliverList.list(
               children: [
-                AppPageHeader(
-                  title: l10n.syncHeading,
-                  onBackPressed: () => context.go(Routes.settings),
-                ),
-                SizedBox(height: spacing.sm),
                 Text(
                   l10n.syncSubtitle,
                   style: context.textTheme.bodyMedium?.copyWith(

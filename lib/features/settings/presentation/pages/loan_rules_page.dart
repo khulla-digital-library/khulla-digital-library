@@ -52,6 +52,7 @@ class _LoanRulesPageState extends State<LoanRulesPage> with DisposeBag {
     const numberInput = TextInputType.number;
 
     return AppPageBody(
+      wide: true,
       child: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(
           spacing.page,
@@ -62,11 +63,6 @@ class _LoanRulesPageState extends State<LoanRulesPage> with DisposeBag {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            AppPageHeader(
-              title: l10n.settingsLoanRulesTitle,
-              onBackPressed: () => context.go(Routes.settings),
-            ),
-            SizedBox(height: spacing.lg),
             AppFormSection(
               title: l10n.settingsLoanPeriods,
               description: l10n.settingsLoanPeriodsDescription,

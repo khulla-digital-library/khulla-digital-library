@@ -52,6 +52,7 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
     final spacing = context.appSpacing;
 
     return AppPageBody(
+      wide: true,
       child: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(
           spacing.page,
@@ -62,27 +63,26 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            AppPageHeader(
-              title: l10n.settingsLibraryTitle,
-              onBackPressed: () => context.go(Routes.settings),
-            ),
-            SizedBox(height: spacing.lg),
             AppFormSection(
               title: l10n.settingsLibraryIdentity,
               description: l10n.settingsLibraryIdentityDescription,
               children: [
-                AppTextField(
-                  label: l10n.fieldLibraryName,
-                  required: true,
-                  controller: _name,
-                  textCapitalization: TextCapitalization.words,
-                  onChanged: (_) {},
-                ),
-                AppTextField(
-                  label: l10n.fieldBranch,
-                  controller: _branch,
-                  textCapitalization: TextCapitalization.words,
-                  onChanged: (_) {},
+                AppFormRow(
+                  children: [
+                    AppTextField(
+                      label: l10n.fieldLibraryName,
+                      required: true,
+                      controller: _name,
+                      textCapitalization: TextCapitalization.words,
+                      onChanged: (_) {},
+                    ),
+                    AppTextField(
+                      label: l10n.fieldBranch,
+                      controller: _branch,
+                      textCapitalization: TextCapitalization.words,
+                      onChanged: (_) {},
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -107,17 +107,20 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
                     ),
                   ],
                 ),
-                AppTextField(
-                  label: l10n.fieldAddress,
-                  controller: _address,
-                  maxLines: 2,
-                  textCapitalization: TextCapitalization.words,
-                  onChanged: (_) {},
-                ),
-                AppTextField(
-                  label: l10n.fieldOpeningHours,
-                  controller: _openingHours,
-                  onChanged: (_) {},
+                AppFormRow(
+                  children: [
+                    AppTextField(
+                      label: l10n.fieldAddress,
+                      controller: _address,
+                      textCapitalization: TextCapitalization.words,
+                      onChanged: (_) {},
+                    ),
+                    AppTextField(
+                      label: l10n.fieldOpeningHours,
+                      controller: _openingHours,
+                      onChanged: (_) {},
+                    ),
+                  ],
                 ),
               ],
             ),

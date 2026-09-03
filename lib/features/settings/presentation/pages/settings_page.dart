@@ -31,6 +31,7 @@ class SettingsPage extends StatelessWidget {
     final spacing = context.appSpacing;
 
     return AppPageBody(
+      wide: true,
       child: CustomScrollView(
         slivers: [
           SliverPadding(

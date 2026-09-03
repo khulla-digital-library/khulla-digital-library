@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:go_router/go_router.dart';
-import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/settings/presentation/placeholder/settings_placeholder.dart';
 import 'package:khulla/features/settings/presentation/widgets/settings_action_card.dart';
 import 'package:khulla/l10n/l10n.dart';
@@ -50,11 +48,6 @@ class BackupPage extends StatelessWidget {
             ),
             sliver: SliverList.list(
               children: [
-                AppPageHeader(
-                  title: l10n.settingsBackupTitle,
-                  onBackPressed: () => context.go(Routes.settings),
-                ),
-                SizedBox(height: spacing.lg),
                 SectionCard(
                   title: l10n.settingsBackupTitle,
                   subtitle: l10n.settingsBackupBody,

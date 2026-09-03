@@ -172,9 +172,7 @@ class CollectionPageView<T> extends StatelessWidget {
           children: [
             ...head,
             Expanded(
-              child: items.isEmpty
-                  ? table
-                  : CustomScrollView(slivers: [table]),
+              child: items.isEmpty ? table : CustomScrollView(slivers: [table]),
             ),
             if (end != null) ...[
               SizedBox(height: spacing.xs),
