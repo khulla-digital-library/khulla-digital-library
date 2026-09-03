@@ -22,7 +22,6 @@ class MemberFinesCard extends StatelessWidget {
     return SectionCard(
       title: l10n.memberDetailFinesTitle,
       subtitle: l10n.memberDetailFinesSubtitle,
-      icon: Icons.account_balance_wallet_outlined,
       child: fines.isEmpty
           ? AppEmptyView(
               variant: AppFeedbackVariant.inline,
@@ -84,7 +83,7 @@ class MemberFinesCard extends StatelessWidget {
                   width: 56,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, fine) => AppIconButton(
-                    icon: Icons.payments_outlined,
+                    icon: AppIcons.payment,
                     tooltip: l10n.finesCollect,
                     onPressed: fine.isPaid ? null : () => onCollect(fine),
                   ),

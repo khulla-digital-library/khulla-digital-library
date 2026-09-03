@@ -8,7 +8,7 @@ class AppMenuButton extends StatelessWidget {
   const AppMenuButton({
     required this.actions,
     required this.tooltip,
-    this.icon = Icons.more_horiz_rounded,
+    this.icon = AppIcons.more,
     super.key,
   });
 
@@ -19,29 +19,27 @@ class AppMenuButton extends StatelessWidget {
   final String tooltip;
 
   /// The trigger glyph.
-  final IconData icon;
+  final AppIconSpec icon;
 
   @override
   Widget build(BuildContext context) {
-    final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
+    final metrics = context.appMetrics;
 
     return PopupMenuButton<AppMenuAction>(
       tooltip: tooltip,
-      icon: Icon(icon, size: spacing.md + 4, color: scheme.onSurfaceVariant),
+      icon: AppIcon(icon, size: metrics.icon, color: context.appColors.ink500),
       position: PopupMenuPosition.under,
       onSelected: (action) => action.onSelected(),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(context.appRadius.card),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      color: scheme.surface,
-      elevation: 3,
       itemBuilder: (menuContext) => [
         for (final action in actions)
           PopupMenuItem<AppMenuAction>(
             value: action,
             enabled: action.enabled,
+            height: 0,
+            padding: EdgeInsets.symmetric(
+              horizontal: context.appSpacing.xs,
+              vertical: context.appSpacing.xs + 2,
+            ),
             child: _MenuActionRow(action: action),
           ),
       ],
@@ -56,20 +54,19 @@ class _MenuActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
-    final foreground = action.isDestructive ? scheme.error : scheme.onSurface;
+    final colors = context.appColors;
+    final foreground = action.isDestructive ? colors.danger : colors.ink200;
     final glyph = action.icon;
 
     return Row(
       children: [
         if (glyph != null) ...[
-          Icon(glyph, size: spacing.md + 2, color: foreground),
-          SizedBox(width: spacing.sm),
+          AppIcon(glyph, size: context.appMetrics.icon, color: foreground),
+          SizedBox(width: context.appSpacing.menuIconGap),
         ],
         Text(
           action.label,
-          style: context.textTheme.bodyMedium?.copyWith(color: foreground),
+          style: context.appTextStyles.label.copyWith(color: foreground),
         ),
       ],
     );

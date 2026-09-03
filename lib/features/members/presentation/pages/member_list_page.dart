@@ -2,11 +2,11 @@ import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/members/domain/member_status.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
+import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/features/members/presentation/placeholder/member_record.dart';
 import 'package:khulla/features/members/presentation/placeholder/members_placeholder.dart';
 import 'package:khulla/features/members/presentation/widgets/member_card.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/collection_header.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -110,7 +110,7 @@ class _MemberListPageState extends State<MemberListPage> {
         showFrom: FormFactor.expanded,
         cellBuilder: (context, member) => Row(
           children: [
-            Icon(
+            AppIcon(
               member.category.icon,
               size: spacing.md,
               color: scheme.onSurfaceVariant,
@@ -185,22 +185,23 @@ class _MemberListPageState extends State<MemberListPage> {
           actions: [
             AppMenuAction(
               label: l10n.memberDetailCheckOut,
-              icon: Icons.qr_code_scanner_rounded,
+              icon: AppIcons.scan,
               onSelected: () => context.go(Routes.circulationCheckOut),
             ),
             AppMenuAction(
               label: l10n.memberDetailEdit,
-              icon: Icons.edit_outlined,
-              onSelected: () => context.go(Routes.memberEdit(member.id)),
+              icon: AppIcons.edit,
+              onSelected: () =>
+                  MemberFormDialog.show(context, memberId: member.id),
             ),
             AppMenuAction(
               label: l10n.memberDetailRenewMembership,
-              icon: Icons.autorenew_rounded,
+              icon: AppIcons.renew,
               onSelected: () => showNotWiredToast(context),
             ),
             AppMenuAction(
               label: l10n.memberDetailSuspend,
-              icon: Icons.block_rounded,
+              icon: AppIcons.blocked,
               isDestructive: true,
               onSelected: () => showNotWiredToast(context),
             ),
@@ -220,25 +221,7 @@ class _MemberListPageState extends State<MemberListPage> {
     final end = (start + _pageSize).clamp(0, matches.length);
 
     return CollectionPageView<MemberRecord>(
-      header: CollectionHeader(
-        title: l10n.membersHeading,
-        subtitle: l10n.membersSubtitle('${placeholderMembers.length}'),
-        actionLabel: l10n.membersAdd,
-        onAction: () => context.go(Routes.memberNew),
-        menuTooltip: l10n.commonMoreActions,
-        menuActions: [
-          AppMenuAction(
-            label: l10n.membersImport,
-            icon: Icons.file_upload_outlined,
-            onSelected: () => showNotWiredToast(context),
-          ),
-          AppMenuAction(
-            label: l10n.membersExport,
-            icon: Icons.file_download_outlined,
-            onSelected: () => showNotWiredToast(context),
-          ),
-        ],
-      ),
+      summary: l10n.membersSubtitle('${placeholderMembers.length}'),
       toolbar: AppToolbar(
         search: AppSearchField(
           hintText: l10n.membersSearchHint,
@@ -251,7 +234,7 @@ class _MemberListPageState extends State<MemberListPage> {
         filters: [
           AppFilterChip(
             label: l10n.membersFilterWithLoans,
-            icon: Icons.swap_horiz_rounded,
+            icon: AppIcons.transfer,
             selected: _withLoans,
             onSelected: (selected) => setState(() {
               _withLoans = selected;
@@ -260,7 +243,7 @@ class _MemberListPageState extends State<MemberListPage> {
           ),
           AppFilterChip(
             label: l10n.membersFilterOwesFines,
-            icon: Icons.account_balance_wallet_outlined,
+            icon: AppIcons.wallet,
             tone: AppStatusTone.danger,
             selected: _owesFines,
             onSelected: (selected) => setState(() {
@@ -270,7 +253,7 @@ class _MemberListPageState extends State<MemberListPage> {
           ),
           AppFilterChip(
             label: l10n.membersFilterExpiring,
-            icon: Icons.schedule_rounded,
+            icon: AppIcons.clock,
             tone: AppStatusTone.warning,
             selected: _expiring,
             onSelected: (selected) => setState(() {
@@ -280,7 +263,7 @@ class _MemberListPageState extends State<MemberListPage> {
           ),
           AppFilterChip(
             label: l10n.membersFilterSuspended,
-            icon: Icons.block_rounded,
+            icon: AppIcons.blocked,
             tone: AppStatusTone.danger,
             selected: _suspended,
             onSelected: (selected) => setState(() {
@@ -311,27 +294,30 @@ class _MemberListPageState extends State<MemberListPage> {
       ),
       emptyState: _isFiltered
           ? AppEmptyView(
-              icon: Icons.search_off_rounded,
+              icon: AppIcons.noResults,
               title: l10n.commonNoMatchesTitle,
               message: l10n.commonNoMatchesBody,
               actionLabel: l10n.commonClearFilters,
               onAction: _clearFilters,
             )
           : AppEmptyView(
-              icon: Icons.people_outline_rounded,
+              icon: AppIcons.people,
               title: l10n.membersEmptyTitle,
               message: l10n.membersEmptyBody,
               actionLabel: l10n.membersAdd,
-              onAction: () => context.go(Routes.memberNew),
+              onAction: () => MemberFormDialog.show(context),
             ),
       footer: AppPagination(
-        rangeLabel: l10n.commonRangeLabel(
+        rangeLabel: l10n.commonShowingRange(
           '${start + 1}',
           '$end',
           '${matches.length}',
         ),
         previousTooltip: l10n.commonPreviousPage,
         nextTooltip: l10n.commonNextPage,
+        pageCount: pageCount,
+        currentPage: page,
+        onPageSelected: (next) => setState(() => _page = next),
         onPrevious: page == 0 ? null : () => setState(() => _page = page - 1),
         onNext: page >= pageCount - 1
             ? null

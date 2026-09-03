@@ -16,6 +16,7 @@ class AppSectionHeader extends StatelessWidget {
     this.trailing,
     this.icon,
     this.dense = false,
+    this.tone = AppStatusTone.brand,
     super.key,
   });
 
@@ -29,35 +30,35 @@ class AppSectionHeader extends StatelessWidget {
   /// [AppIconButton].
   final Widget? trailing;
 
-  /// Glyph shown before [title] in a tinted square.
-  final IconData? icon;
+  /// Glyph shown before [title]. Drawn bare: a filled chip around it would
+  /// put a second surface inside the card the header already sits on, and a
+  /// page of six headers each wearing one reads as decoration rather than
+  /// structure.
+  final AppIconSpec? icon;
 
   /// Uses the card heading ramp rather than the section one. Set inside a
   /// card, where the page-level size is too loud.
   final bool dense;
 
+  /// The tone of the leading glyph.
+  final AppStatusTone tone;
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
-    final textTheme = context.textTheme;
+    final type = context.appTextStyles;
     final glyph = icon;
     final caption = subtitle;
 
     return Row(
       children: [
         if (glyph != null) ...[
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: scheme.primary.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(context.appRadius.tile),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(spacing.xs),
-              child: Icon(glyph, size: spacing.md + 2, color: scheme.primary),
-            ),
+          AppIcon(
+            glyph,
+            size: context.appMetrics.icon,
+            color: tone.foreground(context),
           ),
-          SizedBox(width: spacing.sm),
+          SizedBox(width: spacing.xs),
         ],
         Expanded(
           child: Column(
@@ -68,12 +69,9 @@ class AppSectionHeader extends StatelessWidget {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: (dense ? textTheme.titleSmall : textTheme.titleMedium)
-                    ?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: -0.2,
-                      color: scheme.onSurface,
-                    ),
+                style: (dense ? type.sectionTitle : type.title).copyWith(
+                  color: context.appColors.ink100,
+                ),
               ),
               if (caption != null) ...[
                 SizedBox(height: spacing.xxs),
@@ -81,8 +79,8 @@ class AppSectionHeader extends StatelessWidget {
                   caption,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
+                  style: type.body.copyWith(
+                    color: context.appColors.mutedForeground,
                   ),
                 ),
               ],

@@ -1,18 +1,29 @@
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/settings/presentation/placeholder/settings_placeholder.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/collection_header.dart';
+import 'package:khulla/shared/components/navigation_group.dart';
 import 'package:khulla/shared/components/navigation_tile.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The index of everything configurable about this installation.
 ///
-/// Five doors and one card. The card is *About*, which has nowhere to go —
-/// it is three read-only facts, and a page holding only those would be a
-/// click for nothing.
+/// Five doors and one card. The doors are one list, not a grid of tiles: they
+/// are alternatives to each other, and a shared frame with a hairline between
+/// rows says that where five equal rectangles said the opposite. The card is
+/// *About*, which has nowhere to go — three read-only facts, and a page
+/// holding only those would be a click for nothing.
+///
+/// It takes the reading width rather than the wide cap. A settings index is
+/// prose with links in it; stretched across a maximised window every row
+/// becomes a label at one edge and a chevron a foot away at the other.
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({this.showDesignSystem = false, super.key});
+
+  /// Whether to offer the design-system gallery. The router passes the
+  /// flavor's answer, so the door and the route it opens are gated on the
+  /// same fact.
+  final bool showDesignSystem;
 
   @override
   Widget build(BuildContext context) {
@@ -32,37 +43,45 @@ class SettingsPage extends StatelessWidget {
             ),
             sliver: SliverList.list(
               children: [
-                CollectionHeader(
-                  title: l10n.settingsHeading,
-                  subtitle: l10n.settingsSubtitle,
-                ),
-                SizedBox(height: spacing.lg),
-                AppResponsiveGrid(
+                NavigationGroup(
                   children: [
                     NavigationTile(
                       label: l10n.settingsLibraryTitle,
                       description: l10n.settingsLibraryBody,
-                      icon: Icons.local_library_outlined,
+                      icon: AppIcons.library,
                       route: Routes.settingsLibrary,
                     ),
                     NavigationTile(
                       label: l10n.settingsLoanRulesTitle,
                       description: l10n.settingsLoanRulesBody,
-                      icon: Icons.rule_rounded,
+                      icon: AppIcons.rules,
                       route: Routes.settingsLoanRules,
                     ),
                     NavigationTile(
                       label: l10n.settingsAppearanceTitle,
                       description: l10n.settingsAppearanceBody,
-                      icon: Icons.palette_outlined,
+                      icon: AppIcons.appearance,
                       route: Routes.settingsAppearance,
                     ),
                     NavigationTile(
                       label: l10n.settingsBackupTitle,
                       description: l10n.settingsBackupBody,
-                      icon: Icons.backup_outlined,
+                      icon: AppIcons.backup,
                       route: Routes.settingsBackup,
                     ),
+                    NavigationTile(
+                      label: l10n.settingsSyncTitle,
+                      description: l10n.settingsSyncBody,
+                      icon: AppIcons.cloudSync,
+                      route: Routes.settingsSync,
+                    ),
+                    if (showDesignSystem)
+                      NavigationTile(
+                        label: l10n.settingsDesignSystemTitle,
+                        description: l10n.settingsDesignSystemBody,
+                        icon: AppIcons.design,
+                        route: Routes.settingsDesignSystem,
+                      ),
                   ],
                 ),
                 SizedBox(height: spacing.lg),
@@ -92,7 +111,6 @@ class _AboutCard extends StatelessWidget {
     return SectionCard(
       title: l10n.settingsAboutTitle,
       subtitle: l10n.settingsAboutBody,
-      icon: Icons.info_outline_rounded,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

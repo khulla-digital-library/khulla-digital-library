@@ -6,6 +6,9 @@
     "editor.codeActionsOnSave": { "source.fixAll": "explicit" }
   },
   "dart.lineLength": 80,
+  "dart.env": {
+    "CHROME_EXECUTABLE": "/usr/bin/microsoft-edge-stable"
+  },
   "files.exclude": {
     "**/.dart_tool": true,
     "**/build": true

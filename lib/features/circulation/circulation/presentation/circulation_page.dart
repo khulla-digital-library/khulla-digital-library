@@ -5,7 +5,7 @@ import 'package:khulla/features/circulation/shared/presentation/circulation_labe
 import 'package:khulla/features/circulation/shared/presentation/placeholder/circulation_placeholder.dart';
 import 'package:khulla/features/circulation/shared/presentation/placeholder/loan_record.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/collection_header.dart';
+import 'package:khulla/shared/components/navigation_group.dart';
 import 'package:khulla/shared/components/navigation_tile.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
@@ -146,22 +146,22 @@ class _CirculationPageState extends State<CirculationPage> {
           actions: [
             AppMenuAction(
               label: l10n.loansReturn,
-              icon: Icons.assignment_return_outlined,
+              icon: AppIcons.checkIn,
               onSelected: () => context.go(Routes.circulationReturn),
             ),
             AppMenuAction(
               label: l10n.loansRenew,
-              icon: Icons.refresh_rounded,
+              icon: AppIcons.refresh,
               onSelected: () => showNotWiredToast(context),
             ),
             AppMenuAction(
               label: l10n.loansViewMember,
-              icon: Icons.person_outline_rounded,
+              icon: AppIcons.person,
               onSelected: () => context.go(Routes.member(loan.memberId)),
             ),
             AppMenuAction(
               label: l10n.loansMarkLost,
-              icon: Icons.help_outline_rounded,
+              icon: AppIcons.help,
               isDestructive: true,
               onSelected: () => showNotWiredToast(context),
             ),
@@ -178,44 +178,37 @@ class _CirculationPageState extends State<CirculationPage> {
     final matches = _matches;
 
     return CollectionPageView<LoanRecord>(
-      header: Column(
+      intro: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          CollectionHeader(
-            title: l10n.circulationHeading,
-            subtitle: l10n.circulationSubtitle,
-            actionLabel: l10n.circulationCheckOut,
-            onAction: () => context.go(Routes.circulationCheckOut),
-          ),
-          SizedBox(height: spacing.lg),
-          AppResponsiveGrid(
-            children: [
+          AppStatStrip(
+            tiles: [
               AppStatTile(
                 label: l10n.circulationStatOnLoan,
                 value: '${placeholderLoans.length}',
-                icon: Icons.swap_horiz_rounded,
+                icon: AppIcons.transfer,
                 tone: AppStatusTone.brand,
                 onTap: () => _selectStatus(null),
               ),
               AppStatTile(
                 label: l10n.circulationStatDueToday,
                 value: '${placeholderLoansWith(LoanStatus.dueToday).length}',
-                icon: Icons.event_rounded,
+                icon: AppIcons.event,
                 tone: AppStatusTone.warning,
                 onTap: () => _selectStatus(LoanStatus.dueToday),
               ),
               AppStatTile(
                 label: l10n.circulationStatOverdue,
                 value: '${placeholderLoansWith(LoanStatus.overdue).length}',
-                icon: Icons.error_outline_rounded,
+                icon: AppIcons.error,
                 tone: AppStatusTone.danger,
                 onTap: () => _selectStatus(LoanStatus.overdue),
               ),
               AppStatTile(
                 label: l10n.circulationStatHolds,
                 value: '${placeholderReservations.length}',
-                icon: Icons.bookmark_border_rounded,
+                icon: AppIcons.bookmark,
                 tone: AppStatusTone.info,
                 onTap: () => context.go(Routes.circulationReservations),
               ),
@@ -227,32 +220,32 @@ class _CirculationPageState extends State<CirculationPage> {
             subtitle: l10n.circulationDeskSubtitle,
           ),
           SizedBox(height: spacing.md),
-          AppResponsiveGrid(
+          NavigationGroup(
             children: [
               NavigationTile(
                 label: l10n.circulationCheckOut,
                 description: l10n.checkOutSubtitle,
-                icon: Icons.qr_code_scanner_rounded,
+                icon: AppIcons.scan,
                 route: Routes.circulationCheckOut,
               ),
               NavigationTile(
                 label: l10n.circulationReturn,
                 description: l10n.returnsSubtitle,
-                icon: Icons.assignment_return_outlined,
+                icon: AppIcons.checkIn,
                 route: Routes.circulationReturn,
               ),
               NavigationTile(
                 label: l10n.circulationReservations,
                 description: l10n.reservationsSubtitle,
                 count: '${placeholderReservations.length}',
-                icon: Icons.bookmark_border_rounded,
+                icon: AppIcons.bookmark,
                 route: Routes.circulationReservations,
               ),
               NavigationTile(
                 label: l10n.circulationFines,
                 description: l10n.finesSubtitle,
                 count: placeholderOutstandingFines.display(),
-                icon: Icons.account_balance_wallet_outlined,
+                icon: AppIcons.wallet,
                 route: Routes.circulationFines,
               ),
             ],
@@ -273,14 +266,14 @@ class _CirculationPageState extends State<CirculationPage> {
         filters: [
           AppFilterChip(
             label: l10n.circulationFilterOnLoan,
-            icon: Icons.swap_horiz_rounded,
+            icon: AppIcons.transfer,
             selected: _status == LoanStatus.onLoan,
             onSelected: (selected) =>
                 _selectStatus(selected ? LoanStatus.onLoan : null),
           ),
           AppFilterChip(
             label: l10n.circulationFilterDueToday,
-            icon: Icons.event_rounded,
+            icon: AppIcons.event,
             tone: AppStatusTone.warning,
             selected: _status == LoanStatus.dueToday,
             onSelected: (selected) =>
@@ -288,7 +281,7 @@ class _CirculationPageState extends State<CirculationPage> {
           ),
           AppFilterChip(
             label: l10n.circulationFilterOverdue,
-            icon: Icons.error_outline_rounded,
+            icon: AppIcons.error,
             tone: AppStatusTone.danger,
             selected: _status == LoanStatus.overdue,
             onSelected: (selected) =>
@@ -317,14 +310,14 @@ class _CirculationPageState extends State<CirculationPage> {
       compactBuilder: (context, loan) => _LoanCard(loan: loan),
       emptyState: _isFiltered
           ? AppEmptyView(
-              icon: Icons.search_off_rounded,
+              icon: AppIcons.noResults,
               title: l10n.commonNoMatchesTitle,
               message: l10n.commonNoMatchesBody,
               actionLabel: l10n.commonClearFilters,
               onAction: _clearFilters,
             )
           : AppEmptyView(
-              icon: Icons.swap_horiz_rounded,
+              icon: AppIcons.transfer,
               title: l10n.circulationLoansEmptyTitle,
               message: l10n.circulationLoansEmptyBody,
               actionLabel: l10n.circulationCheckOut,

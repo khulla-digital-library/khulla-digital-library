@@ -25,11 +25,11 @@ extension LoanStatusX on LoanStatus {
     LoanStatus.returned => AppStatusTone.success,
   };
 
-  IconData get icon => switch (this) {
-    LoanStatus.onLoan => Icons.swap_horiz_rounded,
-    LoanStatus.dueToday => Icons.event_rounded,
-    LoanStatus.overdue => Icons.error_outline_rounded,
-    LoanStatus.returned => Icons.check_circle_outline_rounded,
+  AppIconSpec get icon => switch (this) {
+    LoanStatus.onLoan => AppIcons.transfer,
+    LoanStatus.dueToday => AppIcons.event,
+    LoanStatus.overdue => AppIcons.error,
+    LoanStatus.returned => AppIcons.success,
   };
 }
 
@@ -69,10 +69,10 @@ extension FineReasonX on FineReason {
     FineReason.membership => l10n.finesReasonMembership,
   };
 
-  IconData get icon => switch (this) {
-    FineReason.overdue => Icons.schedule_rounded,
-    FineReason.damage => Icons.report_gmailerrorred_rounded,
-    FineReason.lost => Icons.help_outline_rounded,
-    FineReason.membership => Icons.card_membership_rounded,
+  AppIconSpec get icon => switch (this) {
+    FineReason.overdue => AppIcons.clock,
+    FineReason.damage => AppIcons.damage,
+    FineReason.lost => AppIcons.help,
+    FineReason.membership => AppIcons.membership,
   };
 }

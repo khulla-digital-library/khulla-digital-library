@@ -3,45 +3,48 @@ import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The dashboard's title block and its single primary action.
+/// The board's controls: which period its figures cover, and the one action
+/// a shift starts with.
 ///
-/// One action, per the page recipe: everything else a shift starts with is a
-/// quick-action tile further down, not a fourth button competing here.
+/// No greeting and no page title. The shell's top bar already names the page
+/// and the account chip already says who the till is open as, so a headline
+/// here would be a second title that scrolls away — the exact thing putting
+/// the bar in the shell was meant to prevent. What is left is a control
+/// strip: the period switch governs every figure below it, so it belongs
+/// once at the top rather than on each card.
 class DashboardHeader extends StatelessWidget {
-  const DashboardHeader({super.key});
+  const DashboardHeader({
+    required this.period,
+    required this.onPeriodChanged,
+    super.key,
+  });
+
+  /// Which period the board's figures cover.
+  final DashboardPeriod period;
+
+  /// Called when the operator picks another period.
+  final ValueChanged<DashboardPeriod> onPeriodChanged;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
     final stacked = context.formFactor.isCompact;
 
-    final title = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          l10n.dashboardTitle,
-          style: context.textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.w500,
-            letterSpacing: -0.5,
-            color: context.appColors.textHigh,
-          ),
-        ),
-        SizedBox(height: spacing.xxs),
-        Text(
-          l10n.dashboardSubtitle,
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: scheme.onSurfaceVariant,
-            height: 1.4,
-          ),
-        ),
-      ],
+    final periods = AppSegmentedControl<DashboardPeriod>(
+      value: period,
+      items: DashboardPeriod.values,
+      itemLabel: (item) => switch (item) {
+        DashboardPeriod.today => l10n.commonToday,
+        DashboardPeriod.week => l10n.commonThisWeek,
+        DashboardPeriod.month => l10n.commonThisMonth,
+      },
+      onChanged: onPeriodChanged,
     );
 
-    final action = AppButton(
+    final checkOut = AppButton(
       size: AppButtonSize.medium,
+      icon: AppIcons.scan,
       onPressed: () => context.go(Routes.circulationCheckOut),
       child: Text(l10n.dashboardCheckOut),
     );
@@ -51,23 +54,22 @@ class DashboardHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          title,
-          SizedBox(height: spacing.md),
-          action,
+          periods,
+          SizedBox(height: spacing.xs),
+          checkOut,
         ],
       );
     }
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: title),
-        SizedBox(width: spacing.lg),
-        Padding(
-          padding: EdgeInsets.only(top: spacing.xs),
-          child: action,
-        ),
+        periods,
+        const Spacer(),
+        checkOut,
       ],
     );
   }
 }
+
+/// The window of time the board's figures cover.
+enum DashboardPeriod { today, week, month }

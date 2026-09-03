@@ -16,7 +16,7 @@ class AppPickerField extends StatelessWidget {
     this.label,
     this.hintText,
     this.errorText,
-    this.icon = Icons.expand_more_rounded,
+    this.icon = AppIcons.chevronDown,
     this.required = false,
     this.enabled = true,
     this.onClear,
@@ -39,9 +39,9 @@ class AppPickerField extends StatelessWidget {
   /// Validation message shown under the field.
   final String? errorText;
 
-  /// Trailing glyph. Use `Icons.calendar_today_rounded` for a date,
-  /// `Icons.search_rounded` for a lookup.
-  final IconData icon;
+  /// Trailing glyph. Use `AppIcons.calendar` for a date,
+  /// `AppIcons.search` for a lookup.
+  final AppIconSpec icon;
 
   /// When true, the label shows a required asterisk.
   final bool required;
@@ -75,24 +75,26 @@ class AppPickerField extends StatelessWidget {
         ],
         InkWell(
           onTap: enabled ? onTap : null,
-          borderRadius: BorderRadius.circular(context.appRadius.field),
+          borderRadius: BorderRadius.circular(context.appRadius.container),
           child: InputDecorator(
             isEmpty: !hasValue,
             decoration: InputDecoration(
               hintText: hintText,
               errorText: errorText,
               enabled: enabled,
-              suffixIcon: hasValue && clear != null && clearLabel != null
-                  ? AppIconButton(
-                      icon: Icons.close_rounded,
-                      tooltip: clearLabel,
-                      onPressed: clear,
-                    )
-                  : Icon(
-                      icon,
-                      size: spacing.md + 4,
-                      color: scheme.onSurfaceVariant,
-                    ),
+              suffixIcon: AppFieldAffix(
+                child: hasValue && clear != null && clearLabel != null
+                    ? AppIconButton(
+                        icon: AppIcons.close,
+                        tooltip: clearLabel,
+                        onPressed: clear,
+                      )
+                    : AppIcon(
+                        icon,
+                        size: context.appMetrics.icon,
+                        color: scheme.onSurfaceVariant,
+                      ),
+              ),
             ),
             child: hasValue
                 ? Text(

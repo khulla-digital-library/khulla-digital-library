@@ -1,7 +1,12 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Shared modal bottom sheet chrome: rounded top corners, a title row with a
-/// close button, and keyboard-safe padding.
+/// The modal bottom sheet: 10px top corners, a grab handle, and keyboard-safe
+/// padding, over a scrim that dims hard.
+///
+/// The handle is the whole dismiss affordance — a 100×8 bar 16px from the top
+/// edge — rather than a floating close button. On a phone the gesture is the
+/// drag, and a chip in the corner is both a smaller target and a second way
+/// to say the same thing.
 ///
 /// Pass [actions] to pin a button row to the bottom of the sheet. Actions sit
 /// outside the scrolling body, so a sheet whose content grows — an extra field,
@@ -82,7 +87,7 @@ class AppBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
+    final colors = context.appColors;
     final captionText = caption;
     final trailing = titleTrailing;
     final actionRow = actions;
@@ -90,114 +95,77 @@ class AppBottomSheet extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: expandBody ? double.infinity : null,
-      child: Stack(
-        clipBehavior: Clip.none,
+      child: Column(
+        mainAxisSize: expandBody ? MainAxisSize.max : MainAxisSize.min,
         children: [
           Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.viewInsetsOf(context).bottom,
+            padding: EdgeInsets.only(top: spacing.md, bottom: spacing.xs),
+            child: Container(
+              width: 100,
+              height: 8,
+              decoration: BoxDecoration(
+                color: colors.muted,
+                borderRadius: BorderRadius.circular(context.appRadius.pill),
+              ),
             ),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  spacing.page,
-                  spacing.md,
-                  spacing.page,
-                  spacing.md,
-                ),
-                child: Column(
-                  mainAxisSize: expandBody
-                      ? MainAxisSize.max
-                      : MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: -0.2,
-                              color: scheme.onSurface,
+          ),
+          Flexible(
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.viewInsetsOf(context).bottom,
+              ),
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    spacing.page,
+                    spacing.xs,
+                    spacing.page,
+                    spacing.md,
+                  ),
+                  child: Column(
+                    mainAxisSize: expandBody
+                        ? MainAxisSize.max
+                        : MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.appTextStyles.title.copyWith(
+                                color: colors.ink200,
+                              ),
                             ),
                           ),
-                        ),
-                        ?trailing,
-                        SizedBox(
-                          width: trailing == null
-                              ? spacing.sm + _AppBottomSheetCloseButton.diameter
-                              : spacing.xxs +
-                                    _AppBottomSheetCloseButton.diameter,
+                          ?trailing,
+                        ],
+                      ),
+                      if (captionText != null) ...[
+                        SizedBox(height: spacing.xxs),
+                        Text(
+                          captionText,
+                          style: context.appTextStyles.body.copyWith(
+                            color: colors.mutedForeground,
+                          ),
                         ),
                       ],
-                    ),
-                    if (captionText != null) ...[
-                      SizedBox(height: spacing.xxs),
-                      Text(
-                        captionText,
-                        style: context.textTheme.labelSmall?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                          height: 1.35,
-                        ),
-                      ),
-                    ],
-                    SizedBox(height: spacing.md),
-                    if (expandBody) Expanded(child: child) else child,
-                    if (actionRow != null) ...[
                       SizedBox(height: spacing.md),
-                      actionRow,
+                      if (expandBody) Expanded(child: child) else child,
+                      if (actionRow != null) ...[
+                        SizedBox(height: spacing.md),
+                        actionRow,
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-          Positioned(
-            top: -_AppBottomSheetCloseButton.diameter / 2,
-            right: spacing.page,
-            child: _AppBottomSheetCloseButton(
-              onTap: () => Navigator.of(context).pop(),
-            ),
-          ),
         ],
-      ),
-    );
-  }
-}
-
-class _AppBottomSheetCloseButton extends StatelessWidget {
-  const _AppBottomSheetCloseButton({required this.onTap});
-
-  static const double _iconPadding = 8;
-  static const double _iconSize = 18;
-  static const double diameter = _iconPadding * 2 + _iconSize;
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = context.colorScheme;
-
-    return Material(
-      color: scheme.surface,
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      elevation: 3,
-      shadowColor: Colors.black.withValues(alpha: 0.25),
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(_iconPadding),
-          child: Icon(
-            Icons.close_rounded,
-            size: _iconSize,
-            color: scheme.onSurface,
-          ),
-        ),
       ),
     );
   }

@@ -4,10 +4,15 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// A small set of mutually exclusive choices, all visible at once — *All /
 /// On loan / Overdue*, or a list/grid view switch.
 ///
+/// A brand pill on a grey track: the track is the secondary surface with a
+/// hairline, the items sit at the item radius inside it, and the active one
+/// is a filled brand chip. Deliberately not Material's outlined segmented
+/// button, whose per-segment borders read as four buttons rather than one
+/// control.
+///
 /// Use it up to about four choices where the options matter enough to stay on
 /// screen. Past that, or where the set is data-driven, use
-/// [AppDropdownField]. It is built on Material's `SegmentedButton`, so
-/// keyboard traversal and screen-reader grouping come for free.
+/// [AppDropdownField].
 /// {@endtemplate}
 class AppSegmentedControl<T> extends StatelessWidget {
   /// {@macro app_segmented_control}
@@ -34,49 +39,97 @@ class AppSegmentedControl<T> extends StatelessWidget {
   final ValueChanged<T> onChanged;
 
   /// Optional per-choice glyph.
-  final IconData? Function(T value)? itemIcon;
+  final AppIconSpec? Function(T value)? itemIcon;
 
   /// Whether the selected segment shows a check mark. Off by default: the
   /// fill already says which one is active, and the tick costs width.
   final bool showSelectedIcon;
 
-  Widget? _iconFor(T item) {
-    final glyph = itemIcon?.call(item);
-    return glyph == null ? null : Icon(glyph);
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.appSpacing;
+    final colors = context.appColors;
+    final radius = context.appRadius;
+
+    return Container(
+      padding: EdgeInsets.all(spacing.xxs),
+      decoration: BoxDecoration(
+        color: colors.secondary,
+        borderRadius: BorderRadius.circular(radius.container),
+        border: Border.all(color: colors.hairline),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final item in items)
+            _Segment(
+              label: itemLabel(item),
+              icon: itemIcon?.call(item),
+              selected: item == value,
+              showSelectedIcon: showSelectedIcon,
+              onTap: () => onChanged(item),
+            ),
+        ],
+      ),
+    );
   }
+}
+
+class _Segment extends StatelessWidget {
+  const _Segment({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.showSelectedIcon,
+    required this.onTap,
+  });
+
+  final String label;
+  final AppIconSpec? icon;
+  final bool selected;
+  final bool showSelectedIcon;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
+    final colors = context.appColors;
     final scheme = context.colorScheme;
+    final radius = BorderRadius.circular(context.appRadius.item);
+    final foreground = selected ? scheme.onPrimary : colors.ink400;
+    final glyph = selected && showSelectedIcon ? AppIcons.check : icon;
 
-    return SegmentedButton<T>(
-      segments: [
-        for (final item in items)
-          ButtonSegment<T>(
-            value: item,
-            label: Text(itemLabel(item)),
-            icon: _iconFor(item),
-          ),
-      ],
-      selected: {value},
-      onSelectionChanged: (selection) => onChanged(selection.first),
-      showSelectedIcon: showSelectedIcon,
-      style: ButtonStyle(
-        visualDensity: VisualDensity.standard,
-        textStyle: WidgetStatePropertyAll(
-          context.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w500),
+    return AppRipple(
+      onTap: onTap,
+      borderRadius: radius,
+      pressScale: 1,
+      child: AnimatedContainer(
+        duration: context.appMotion.color,
+        padding: EdgeInsets.symmetric(
+          horizontal: spacing.sm,
+          vertical: spacing.xxs + 2,
         ),
-        padding: WidgetStatePropertyAll(
-          EdgeInsets.symmetric(horizontal: spacing.sm, vertical: spacing.xs),
+        decoration: BoxDecoration(
+          color: selected ? scheme.primary : Colors.transparent,
+          borderRadius: radius,
+          boxShadow: selected ? context.appShadows.card : null,
         ),
-        side: WidgetStatePropertyAll(
-          BorderSide(color: scheme.outlineVariant),
-        ),
-        shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(context.appRadius.field),
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (glyph != null) ...[
+              AppIcon(
+                glyph,
+                size: context.appMetrics.iconInButton,
+                color: foreground,
+              ),
+              SizedBox(width: spacing.xs - 2),
+            ],
+            Text(
+              label,
+              style: context.appTextStyles.label.copyWith(color: foreground),
+            ),
+          ],
         ),
       ),
     );

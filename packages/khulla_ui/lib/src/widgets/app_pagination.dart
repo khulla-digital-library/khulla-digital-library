@@ -1,16 +1,22 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// {@template app_pagination}
-/// The footer under a table: which rows are showing, and the controls to
-/// move a page either way.
+/// The footer under a table: how much is showing, and how to move.
 ///
-/// [rangeLabel] arrives ready-made — "1–25 of 1,204" is a sentence with a
-/// locale's number grouping in it, which the design system does not own.
-/// Pass null to [onPrevious] or [onNext] at the ends of the range rather than
-/// hiding the control, so the footer does not change width as it is used.
-/// {@endtemplate}
+/// The range label is handed in ready-made — "Showing 1–9 of 36" is a
+/// sentence with plurals and digit grouping in it, which is an ARB's job, not
+/// a widget's.
+///
+/// Numbered pages appear only when [pageCount] is set. They matter on a
+/// catalogue: "jump to page 7" is how a librarian returns to where they were
+/// before answering the phone, and prev/next alone cannot do it. Past seven
+/// pages the run is elided around the current one, so the footer never wraps.
+///
+/// Two conventions here run against the usual instinct and are deliberate.
+/// The **current page is outlined, not filled** — a filled chip in a row of
+/// numbers reads as the primary action of the page, which it is not. And the
+/// prev/next controls are **hidden at the ends rather than disabled**, so
+/// there is no permanently greyed-out control sitting under the table.
 class AppPagination extends StatelessWidget {
-  /// {@macro app_pagination}
   const AppPagination({
     required this.rangeLabel,
     required this.onPrevious,
@@ -18,64 +24,184 @@ class AppPagination extends StatelessWidget {
     required this.previousTooltip,
     required this.nextTooltip,
     this.pageSizeControl,
+    this.pageCount = 0,
+    this.currentPage = 0,
+    this.onPageSelected,
     super.key,
   });
 
-  /// Which rows are on screen, already formatted.
+  /// "Showing 1–9 of 36 titles", already localized.
   final String rangeLabel;
 
-  /// Moves back one page. Null on the first page.
+  /// Null disables the control — the first page has nowhere back to go.
   final VoidCallback? onPrevious;
 
-  /// Moves forward one page. Null on the last page.
+  /// Null disables the control.
   final VoidCallback? onNext;
 
-  /// Tooltip for the back control.
+  /// Tooltip for the previous control.
   final String previousTooltip;
 
-  /// Tooltip for the forward control.
+  /// Tooltip for the next control.
   final String nextTooltip;
 
-  /// Optional rows-per-page control, typically an [AppDropdownField].
+  /// The rows-per-page picker, if the screen offers one.
   final Widget? pageSizeControl;
+
+  /// How many pages there are. Zero hides the numbered run.
+  final int pageCount;
+
+  /// The active page, zero-based.
+  final int currentPage;
+
+  /// Called with a zero-based page index.
+  final ValueChanged<int>? onPageSelected;
+
+  /// Which page numbers to draw for a run of [count] around [current].
+  ///
+  /// A null entry is an ellipsis. Kept static and pure so the elision rule is
+  /// testable without pumping a widget.
+  static List<int?> pageWindow(int count, int current, {int maxVisible = 7}) {
+    if (count <= maxVisible) return List<int?>.generate(count, (i) => i);
+
+    final pages = <int?>[0];
+    var start = current - 1;
+    var end = current + 1;
+    if (current <= 2) {
+      start = 1;
+      end = 3;
+    } else if (current >= count - 3) {
+      start = count - 4;
+      end = count - 2;
+    }
+
+    if (start > 1) pages.add(null);
+    for (var page = start; page <= end; page++) {
+      if (page > 0 && page < count - 1) pages.add(page);
+    }
+    if (end < count - 2) pages.add(null);
+    pages.add(count - 1);
+    return pages;
+  }
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
+    final colors = context.appColors;
     final sizeControl = pageSizeControl;
+    final selectPage = onPageSelected;
+    final showNumbers = pageCount > 1 && selectPage != null;
 
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: spacing.md,
-        vertical: spacing.xs,
+        vertical: spacing.sm,
       ),
-      child: Row(
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        runSpacing: spacing.sm,
+        spacing: spacing.md,
         children: [
-          if (sizeControl != null) ...[
-            sizeControl,
-            SizedBox(width: spacing.md),
-          ],
-          Expanded(
-            child: Text(
-              rangeLabel,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: scheme.onSurfaceVariant,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (sizeControl != null) ...[
+                sizeControl,
+                SizedBox(width: spacing.sm),
+              ],
+              Text(
+                rangeLabel,
+                style: context.appTextStyles.body.copyWith(
+                  color: colors.mutedForeground,
+                ),
               ),
-            ),
+            ],
           ),
-          AppIconButton(
-            icon: Icons.chevron_left_rounded,
-            tooltip: previousTooltip,
-            onPressed: onPrevious,
-          ),
-          SizedBox(width: spacing.xxs),
-          AppIconButton(
-            icon: Icons.chevron_right_rounded,
-            tooltip: nextTooltip,
-            onPressed: onNext,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (onPrevious != null)
+                AppIconButton(
+                  icon: AppIcons.chevronLeft,
+                  tooltip: previousTooltip,
+                  onPressed: onPrevious,
+                ),
+              if (showNumbers)
+                for (final page in pageWindow(pageCount, currentPage))
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: spacing.xxs / 2),
+                    child: page == null
+                        ? SizedBox(
+                            width: context.appMetrics.iconButtonMedium,
+                            child: Text(
+                              '…',
+                              textAlign: TextAlign.center,
+                              style: context.appTextStyles.body.copyWith(
+                                color: colors.mutedForeground,
+                              ),
+                            ),
+                          )
+                        : _PageButton(
+                            page: page,
+                            selected: page == currentPage,
+                            onTap: () => selectPage(page),
+                          ),
+                  ),
+              if (onNext != null)
+                AppIconButton(
+                  icon: AppIcons.chevronRight,
+                  tooltip: nextTooltip,
+                  onPressed: onNext,
+                ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PageButton extends StatelessWidget {
+  const _PageButton({
+    required this.page,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final int page;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final metrics = context.appMetrics;
+    final radius = BorderRadius.circular(context.appRadius.container);
+    final side = metrics.paginationItem;
+
+    return AppRipple(
+      onTap: onTap,
+      borderRadius: radius,
+      pressScale: 1,
+      child: Container(
+        constraints: BoxConstraints(minWidth: side, minHeight: side),
+        alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(horizontal: context.appSpacing.xs),
+        decoration: BoxDecoration(
+          color: selected ? context.colorScheme.surface : Colors.transparent,
+          borderRadius: radius,
+          border: Border.all(
+            color: selected ? colors.hairline : Colors.transparent,
+          ),
+          boxShadow: selected ? context.appShadows.card : null,
+        ),
+        child: Text(
+          '${page + 1}',
+          style: context.appTextStyles.label.copyWith(
+            color: selected ? colors.ink100 : colors.ink500,
+          ),
+        ),
       ),
     );
   }

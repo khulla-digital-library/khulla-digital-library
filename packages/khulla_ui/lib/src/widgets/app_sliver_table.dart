@@ -28,9 +28,9 @@ class AppSliverTable<T> extends StatelessWidget {
     this.sort,
     this.onSort,
     this.compactBuilder,
-    this.compactExtent = 96,
-    this.rowHeight = 52,
-    this.headerHeight = 44,
+    this.compactExtent = 108,
+    this.rowHeight,
+    this.headerHeight,
     this.pinHeader = true,
     super.key,
   });
@@ -61,11 +61,12 @@ class AppSliverTable<T> extends StatelessWidget {
   /// the scrollbar stays honest. Cards must not exceed it.
   final double compactExtent;
 
-  /// Height of each row.
-  final double rowHeight;
+  /// Height of each row. Null resolves to the density's row height, which is
+  /// what keeps a catalogue at the same rhythm as every other table.
+  final double? rowHeight;
 
-  /// Height of the heading row.
-  final double headerHeight;
+  /// Height of the heading row. Null resolves to the density's.
+  final double? headerHeight;
 
   /// Whether the heading row stays on screen as the rows scroll under it.
   final bool pinHeader;
@@ -74,18 +75,21 @@ class AppSliverTable<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final compact = compactBuilder;
     final asCards = context.formFactor.isCompact && compact != null;
+    final metrics = context.appMetrics;
+    final resolvedRowHeight = rowHeight ?? metrics.tableHeaderHeight - 4;
+    final resolvedHeaderHeight = headerHeight ?? metrics.tableHeaderHeight;
 
     final list = SliverFixedExtentList.builder(
-      itemExtent: asCards ? compactExtent : rowHeight,
+      itemExtent: asCards ? compactExtent : resolvedRowHeight,
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
         if (asCards) return compact(context, item);
         return AppTableRow<T>(
           item: item,
+          index: index,
           columns: columns,
-          height: rowHeight,
-          divided: index < items.length - 1,
+          height: resolvedRowHeight,
           selected: isSelected?.call(item) ?? false,
           onTap: onRowTap == null ? null : () => onRowTap!(item),
         );
@@ -99,12 +103,12 @@ class AppSliverTable<T> extends StatelessWidget {
         SliverPersistentHeader(
           pinned: pinHeader,
           delegate: _TableHeaderDelegate<T>(
-            height: headerHeight,
+            height: resolvedHeaderHeight,
             header: AppTableHeader<T>(
               columns: columns,
               sort: sort,
               onSort: onSort,
-              height: headerHeight,
+              height: resolvedHeaderHeight,
             ),
           ),
         ),

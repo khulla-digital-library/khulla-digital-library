@@ -10,6 +10,15 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// [FormFactor.medium] it hands off to [AppBottomSheet] unchanged, so the
 /// compact behaviour stays exactly what the rest of the app does.
 ///
+/// The close control is a **chip floating outside the panel's leading edge**,
+/// not a button in its corner. It costs nothing inside the panel, which is
+/// where the form needs the room, and it reads as "this closes the whole
+/// thing" rather than as one more control in the header.
+///
+/// It opens over 500ms and closes over 300ms — the one deliberately slow
+/// movement in the product, and asymmetric because dismissal should never
+/// feel like waiting.
+///
 /// Actions are pinned below the scrolling body: a form that grows an extra
 /// field must never scroll its *Save* out of reach.
 /// {@endtemplate}
@@ -21,7 +30,7 @@ class AppSideSheet extends StatelessWidget {
     required this.closeTooltip,
     this.caption,
     this.actions,
-    this.width = 480,
+    this.width = 448,
     super.key,
   });
 
@@ -55,7 +64,7 @@ class AppSideSheet extends StatelessWidget {
     required WidgetBuilder builder,
     String? caption,
     WidgetBuilder? actionsBuilder,
-    double width = 480,
+    double width = 448,
     bool barrierDismissible = true,
     String barrierLabel = 'Dismiss',
   }) {
@@ -74,8 +83,8 @@ class AppSideSheet extends StatelessWidget {
       context: context,
       barrierDismissible: barrierDismissible,
       barrierLabel: barrierLabel,
-      barrierColor: Colors.black.withValues(alpha: 0.35),
-      transitionDuration: const Duration(milliseconds: 220),
+      barrierColor: context.appColors.tints.scrimDialog,
+      transitionDuration: context.appMotion.sheetOpen,
       pageBuilder: (dialogContext, _, _) => Align(
         alignment: AlignmentDirectional.centerEnd,
         child: AppSideSheet(
@@ -95,7 +104,10 @@ class AppSideSheet extends StatelessWidget {
               begin: const Offset(1, 0),
               end: Offset.zero,
             ).animate(
-              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+              CurvedAnimation(
+                parent: animation,
+                curve: context.appMotion.standard,
+              ),
             ),
         child: child,
       ),
@@ -106,19 +118,15 @@ class AppSideSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
-    final radius = context.appRadius;
+    final colors = context.appColors;
     final captionText = caption;
     final actionRow = actions;
-    final panelWidth = width.clamp(0.0, MediaQuery.sizeOf(context).width * 0.9);
+    final windowWidth = MediaQuery.sizeOf(context).width;
+    final panelWidth = width.clamp(0.0, windowWidth * 0.75);
 
-    return Material(
+    final panel = Material(
       color: scheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusDirectional.horizontal(
-          start: Radius.circular(radius.banner),
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
+      shape: BorderDirectional(start: BorderSide(color: colors.hairline)),
       child: SizedBox(
         width: panelWidth,
         height: double.infinity,
@@ -128,43 +136,21 @@ class AppSideSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            title,
-                            style: context.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: -0.2,
-                              color: scheme.onSurface,
-                            ),
-                          ),
-                          if (captionText != null) ...[
-                            SizedBox(height: spacing.xxs),
-                            Text(
-                              captionText,
-                              style: context.textTheme.bodySmall?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                                height: 1.35,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: spacing.sm),
-                    AppIconButton(
-                      icon: Icons.close_rounded,
-                      tooltip: closeTooltip,
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
+                Text(
+                  title,
+                  style: context.appTextStyles.formTitle.copyWith(
+                    color: colors.ink200,
+                  ),
                 ),
+                if (captionText != null) ...[
+                  SizedBox(height: spacing.xxs),
+                  Text(
+                    captionText,
+                    style: context.appTextStyles.body.copyWith(
+                      color: colors.mutedForeground,
+                    ),
+                  ),
+                ],
                 SizedBox(height: spacing.lg),
                 Expanded(child: SingleChildScrollView(child: child)),
                 if (actionRow != null) ...[
@@ -173,6 +159,67 @@ class AppSideSheet extends StatelessWidget {
                 ],
               ],
             ),
+          ),
+        ),
+      ),
+    );
+
+    // The chip only fits outside the panel when there is page left to hang it
+    // over; on a narrow window it moves inside the header instead.
+    final chipFits = windowWidth - panelWidth > 96;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (chipFits)
+          Padding(
+            padding: EdgeInsets.only(top: spacing.lg, right: spacing.lg),
+            child: _SheetCloseChip(
+              tooltip: closeTooltip,
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+        panel,
+      ],
+    );
+  }
+}
+
+/// The close chip that hangs beside a side sheet: a 45px bordered square with
+/// a brand glyph.
+class _SheetCloseChip extends StatelessWidget {
+  const _SheetCloseChip({required this.tooltip, required this.onPressed});
+
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  static const double _size = 45;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final radius = BorderRadius.circular(context.appRadius.container);
+
+    return Tooltip(
+      message: tooltip,
+      child: AppRipple(
+        onTap: onPressed,
+        borderRadius: radius,
+        child: Container(
+          width: _size,
+          height: _size,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: context.colorScheme.surface,
+            borderRadius: radius,
+            border: Border.all(color: colors.hairline),
+            boxShadow: context.appShadows.card,
+          ),
+          child: AppIcon(
+            AppIcons.close,
+            size: context.appMetrics.iconLarge,
+            color: colors.brand,
           ),
         ),
       ),

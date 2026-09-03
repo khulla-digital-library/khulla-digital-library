@@ -2,6 +2,11 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// A collection that came back with nothing, with an optional first action.
 ///
+/// Generous on purpose: 96px of vertical padding, a large muted glyph, an
+/// 18px bold heading, one line of description and at most one button. An
+/// empty table is the screen a new library sees most, and a cramped one reads
+/// as an error rather than an invitation.
+///
 /// Takes ready-made copy rather than a domain type: the design system has no
 /// opinion on what was empty or on localization, so the caller resolves both
 /// and this only lays them out.
@@ -24,9 +29,9 @@ class AppEmptyView extends StatelessWidget {
   /// Supporting copy shown below [title].
   final String message;
 
-  /// Shown in a tinted circle above the copy. Omitted in
+  /// Drawn bare above the copy, muted. Omitted in
   /// [AppFeedbackVariant.inline], which has no room for it.
-  final IconData? icon;
+  final AppIconSpec? icon;
 
   /// Label for the action button. The button only appears when both this and
   /// [onAction] are set.
@@ -56,7 +61,7 @@ class AppEmptyView extends StatelessWidget {
           (isCentered
               ? EdgeInsets.symmetric(
                   horizontal: spacing.page,
-                  vertical: spacing.xlg,
+                  vertical: spacing.emptyStateVertical,
                 )
               : EdgeInsets.zero),
       child: Column(
@@ -66,43 +71,38 @@ class AppEmptyView extends StatelessWidget {
             : CrossAxisAlignment.start,
         children: [
           if (isCentered && glyph != null) ...[
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                shape: BoxShape.circle,
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(spacing.md),
-                child: Icon(
-                  glyph,
-                  size: spacing.lg,
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
+            AppIcon(
+              glyph,
+              size: spacing.xxlg,
+              color: context.appColors.hairlineStrong,
             ),
-            SizedBox(height: spacing.md),
+            SizedBox(height: spacing.lg),
           ],
           Text(
             title,
             textAlign: isCentered ? TextAlign.center : TextAlign.start,
-            style: context.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w500,
-              color: scheme.onSurface,
-            ),
+            style: isCentered
+                ? context.appTextStyles.title.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: scheme.onSurface,
+                  )
+                : context.appTextStyles.sectionTitle.copyWith(
+                    color: scheme.onSurface,
+                  ),
           ),
-          SizedBox(height: spacing.xxs),
+          SizedBox(height: spacing.xs),
           Text(
             message,
             textAlign: isCentered ? TextAlign.center : TextAlign.start,
-            style: context.textTheme.bodySmall?.copyWith(
-              color: scheme.onSurfaceVariant,
-              height: 1.4,
+            style: context.appTextStyles.body.copyWith(
+              color: context.appColors.mutedForeground,
             ),
           ),
           if (label != null && action != null) ...[
-            SizedBox(height: isCentered ? spacing.md : spacing.sm),
+            SizedBox(height: isCentered ? spacing.lg : spacing.sm),
             AppButton(
               size: isCentered ? AppButtonSize.medium : AppButtonSize.small,
+              icon: AppIcons.add,
               onPressed: action,
               child: Text(label),
             ),

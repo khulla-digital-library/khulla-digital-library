@@ -28,10 +28,10 @@ extension MemberCategoryX on MemberCategory {
     MemberCategory.child => l10n.membersCategoryChild,
   };
 
-  IconData get icon => switch (this) {
-    MemberCategory.student => Icons.school_outlined,
-    MemberCategory.teacher => Icons.co_present_outlined,
-    MemberCategory.public => Icons.person_outline_rounded,
-    MemberCategory.child => Icons.child_care_outlined,
+  AppIconSpec get icon => switch (this) {
+    MemberCategory.student => AppIcons.education,
+    MemberCategory.teacher => AppIcons.teacher,
+    MemberCategory.public => AppIcons.person,
+    MemberCategory.child => AppIcons.child,
   };
 }

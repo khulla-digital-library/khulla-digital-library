@@ -1,50 +1,96 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// {@template app_avatar}
-/// A circular initials badge for a person or an organisation.
+/// The initials tile standing in for a person or a record.
 ///
-/// Takes ready-made [initials] rather than a name: deriving two letters from
-/// a name is locale-sensitive, and the design system does not do locale. The
-/// caller trims and cases them.
-/// {@endtemplate}
+/// A rounded square, not a circle, and neutral by default. A column of
+/// tinted circles down the left of a list reads as status — which is what
+/// tint means everywhere else in this app — so the avatar stays quiet and
+/// leaves color to the badge beside it.
+///
+/// It takes the initials rather than a name: deriving them is a locale
+/// question — a Nepali name does not split the way an English one does — and
+/// that belongs to the feature that owns the record, not to the design system.
+///
+/// [tone] exists for the rare avatar that genuinely carries standing — a
+/// suspended member. Do not vary it per record to make a list colorful.
 class AppAvatar extends StatelessWidget {
-  /// {@macro app_avatar}
   const AppAvatar({
     required this.initials,
     this.size = 40,
-    this.tone = AppStatusTone.brand,
+    this.tone = AppStatusTone.neutral,
+    this.badge,
+    this.badgeTone = AppStatusTone.success,
     super.key,
   });
 
-  /// One or two characters, already cased by the caller.
+  /// One or two characters, already cased.
   final String initials;
 
-  /// Diameter in logical pixels.
+  /// The tile's edge length.
   final double size;
 
-  /// Which semantic family the badge draws from. Vary it to tell record
-  /// kinds apart — staff from borrowers — never to encode identity.
+  /// Which wash and ink to paint.
   final AppStatusTone tone;
+
+  /// A glyph pinned to the bottom-trailing edge — a verified check, a
+  /// suspended block. Null draws no badge.
+  final AppIconSpec? badge;
+
+  /// The badge's tone.
+  final AppStatusTone badgeTone;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.square(
-      dimension: size,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: tone.background(context),
-          shape: BoxShape.circle,
+    final scheme = context.colorScheme;
+    final glyph = badge;
+
+    final tile = Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: tone.background(context),
+        borderRadius: BorderRadius.circular(context.appRadius.control),
+        border: Border.all(color: tone.border(context)),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        initials,
+        maxLines: 1,
+        style: context.textTheme.labelSmall?.copyWith(
+          fontSize: size * 0.36,
+          height: 1,
+          color: tone.foreground(context),
+          fontWeight: FontWeight.w600,
         ),
-        child: Center(
-          child: Text(
-            initials,
-            maxLines: 1,
-            style: context.textTheme.labelMedium?.copyWith(
-              color: tone.foreground(context),
-              fontWeight: FontWeight.w500,
+      ),
+    );
+
+    if (glyph == null) return tile;
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          tile,
+          Positioned(
+            right: -1,
+            bottom: -1,
+            child: Container(
+              padding: const EdgeInsets.all(1),
+              decoration: BoxDecoration(
+                color: scheme.surface,
+                shape: BoxShape.circle,
+              ),
+              child: AppIcon(
+                glyph,
+                size: size * 0.36,
+                color: badgeTone.foreground(context),
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

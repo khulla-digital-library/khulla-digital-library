@@ -22,7 +22,7 @@ class SettingsActionCard extends StatelessWidget {
   final String description;
   final String actionLabel;
   final VoidCallback onAction;
-  final IconData icon;
+  final AppIconSpec icon;
   final bool isDestructive;
 
   @override
@@ -32,23 +32,11 @@ class SettingsActionCard extends StatelessWidget {
     final tone = isDestructive ? AppStatusTone.danger : AppStatusTone.brand;
 
     return AppCard(
+      tone: isDestructive ? AppStatusTone.danger : null,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: tone.background(context),
-              borderRadius: BorderRadius.circular(context.appRadius.tile),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(spacing.xs),
-              child: Icon(
-                icon,
-                size: spacing.md + 4,
-                color: tone.foreground(context),
-              ),
-            ),
-          ),
+          AppIcon(icon, size: spacing.lg - 2, color: tone.foreground(context)),
           SizedBox(width: spacing.sm),
           Expanded(
             child: Column(
@@ -74,7 +62,6 @@ class SettingsActionCard extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: AppButton(
-                    size: AppButtonSize.small,
                     variant: AppButtonVariant.outline,
                     onPressed: onAction,
                     child: Text(actionLabel),

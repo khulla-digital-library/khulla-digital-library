@@ -133,6 +133,17 @@ class _AppToastCard extends StatelessWidget {
   final String message;
   final String? description;
   final ToastificationType type;
+
+  /// The catalog glyph for a toast type.
+  ///
+  /// `ToastificationType.icon` hands back a Material `IconData`, which the app
+  /// does not draw — see `AppIcons`.
+  static AppIconSpec _glyphFor(ToastificationType type) => switch (type) {
+    ToastificationType.success => AppIcons.success,
+    ToastificationType.warning => AppIcons.warning,
+    ToastificationType.error => AppIcons.error,
+    ToastificationType.info || _ => AppIcons.info,
+  };
   final ToastificationStyle style;
 
   bool get _isMutedInfo =>
@@ -158,9 +169,9 @@ class _AppToastCard extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: _backgroundColor(scheme),
-        borderRadius: BorderRadius.circular(context.appRadius.card),
+        borderRadius: BorderRadius.circular(context.appRadius.container),
         border: _border(scheme),
-        boxShadow: _boxShadow(scheme),
+        boxShadow: _boxShadow(context),
       ),
       child: Padding(
         padding: EdgeInsets.fromLTRB(
@@ -172,7 +183,7 @@ class _AppToastCard extends StatelessWidget {
         child: Row(
           children: [
             _ToastIcon(
-              icon: isMutedInfo ? Icons.info_outline_rounded : type.icon,
+              icon: isMutedInfo ? AppIcons.info : _glyphFor(type),
               color: iconColor,
               size: isMutedInfo ? AppToast._mutedIconSize : AppToast._iconSize,
               bordered: !isMutedInfo,
@@ -219,17 +230,13 @@ class _AppToastCard extends StatelessWidget {
     );
   }
 
-  List<BoxShadow>? _boxShadow(ColorScheme scheme) {
+  List<BoxShadow>? _boxShadow(BuildContext context) {
     if (style == ToastificationStyle.simple || _isMutedInfo) {
       return null;
     }
-    return [
-      BoxShadow(
-        color: scheme.shadow.withValues(alpha: 0.08),
-        blurRadius: 16,
-        offset: const Offset(0, 4),
-      ),
-    ];
+    // A toast floats over the page, so it takes the overlay depth — the same
+    // one a dialog and a side sheet use.
+    return context.appShadows.overlay;
   }
 
   Color _titleColor(ColorScheme scheme) {
@@ -237,7 +244,7 @@ class _AppToastCard extends StatelessWidget {
       return scheme.onInverseSurface;
     }
     if (style == ToastificationStyle.fillColored) {
-      return Colors.white;
+      return scheme.onPrimary;
     }
     return scheme.onSurface;
   }
@@ -247,7 +254,7 @@ class _AppToastCard extends StatelessWidget {
       return scheme.onInverseSurface.withValues(alpha: 0.75);
     }
     if (style == ToastificationStyle.fillColored) {
-      return Colors.white.withValues(alpha: 0.85);
+      return scheme.onPrimary.withValues(alpha: 0.85);
     }
     return scheme.onSurfaceVariant;
   }
@@ -293,14 +300,14 @@ class _ToastIcon extends StatelessWidget {
     this.bordered = true,
   });
 
-  final IconData icon;
+  final AppIconSpec icon;
   final Color color;
   final double size;
   final bool bordered;
 
   @override
   Widget build(BuildContext context) {
-    final child = Icon(icon, size: size, color: color);
+    final child = AppIcon(icon, size: size, color: color);
 
     if (!bordered) {
       return child;
@@ -331,7 +338,7 @@ class _ToastCloseButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () => toastification.dismiss(holder),
-      icon: Icon(Icons.close_rounded, size: AppToast._iconSize, color: color),
+      icon: AppIcon(AppIcons.close, size: AppToast._iconSize, color: color),
       padding: EdgeInsets.zero,
       visualDensity: VisualDensity.compact,
       constraints: const BoxConstraints.tightFor(width: 28, height: 28),

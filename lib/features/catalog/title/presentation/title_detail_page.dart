@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:go_router/go_router.dart';
-import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_placeholder.dart';
 import 'package:khulla/features/catalog/title/presentation/placeholder/title_history_entry.dart';
+import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_copies_card.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_detail_header.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_details_card.dart';
@@ -61,7 +60,6 @@ class TitleDetailPage extends StatelessWidget {
         ? null
         : SectionCard(
             title: l10n.titleDetailDescription,
-            icon: Icons.notes_rounded,
             child: Text(
               description,
               style: context.textTheme.bodyMedium?.copyWith(
@@ -84,33 +82,28 @@ class TitleDetailPage extends StatelessWidget {
             ),
             sliver: SliverList.list(
               children: [
-                AppPageHeader(
-                  title: l10n.titlesHeading,
-                  onBackPressed: () => context.go(Routes.catalogTitles),
-                ),
-                SizedBox(height: spacing.md),
                 TitleDetailHeader(
                   title: title,
-                  onEdit: () => context.go(Routes.catalogTitleEdit(titleId)),
+                  onEdit: () => TitleFormDialog.show(context, titleId: titleId),
                   menuActions: [
                     AppMenuAction(
                       label: l10n.titleDetailAddCopy,
-                      icon: Icons.add_circle_outline_rounded,
+                      icon: AppIcons.addCircle,
                       onSelected: () => showNotWiredToast(context),
                     ),
                     AppMenuAction(
                       label: l10n.titleDetailPlaceHold,
-                      icon: Icons.bookmark_add_outlined,
+                      icon: AppIcons.addBookmark,
                       onSelected: () => showNotWiredToast(context),
                     ),
                     AppMenuAction(
                       label: l10n.titlesPrintLabels,
-                      icon: Icons.print_outlined,
+                      icon: AppIcons.printer,
                       onSelected: () => showNotWiredToast(context),
                     ),
                     AppMenuAction(
                       label: l10n.titleDetailDelete,
-                      icon: Icons.delete_outline_rounded,
+                      icon: AppIcons.delete,
                       isDestructive: true,
                       onSelected: () => unawaited(_confirmDelete(context)),
                     ),

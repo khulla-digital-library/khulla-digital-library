@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:go_router/go_router.dart';
 import 'package:khulla/app/shell/widgets/shell_brand_mark.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
-import 'package:khulla/app/shell/widgets/shell_theme_toggle.dart';
+import 'package:khulla/app/shell/widgets/shell_more_sheet.dart';
+import 'package:khulla/app/shell/widgets/shell_page_actions.dart';
+import 'package:khulla/app/shell/widgets/shell_page_title.dart';
+import 'package:khulla/app/shell/widgets/shell_rail_footer.dart';
+import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -12,6 +18,17 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// compile time: a rail from [FormFactor.medium] up, a bottom bar below it.
 /// Both are driven by the same [shellDestinations] list, so resizing across
 /// the breakpoint never reorders or drops a section.
+///
+/// The shell owns the top bar, and the top bar sits *outside* the page's
+/// scroll view. That is the whole reason it lives here: the page title and
+/// the section's actions have to stay put while a catalogue of ten thousand
+/// titles scrolls, and no arrangement inside a page achieves that as simply.
+///
+/// The chrome is split by *scope*, not by convenience. The top bar carries
+/// only what changes with the page — its name, its trail, what you can do to
+/// it. Search, notifications, the theme switch and the account control are
+/// the same everywhere, so they sit at the foot of the rail with the rest of
+/// the app-wide furniture.
 class AppShell extends StatelessWidget {
   const AppShell({required this.navigationShell, super.key});
 
@@ -20,29 +37,90 @@ class AppShell extends StatelessWidget {
   /// away in another.
   final StatefulNavigationShell navigationShell;
 
-  void _onDestinationSelected(int index) => navigationShell.goBranch(
+  /// How many sections the compact bottom bar shows before *More*.
+  static const int _compactSlots = 4;
+
+  void _goBranch(int index) => navigationShell.goBranch(
     index,
     // Tapping the active destination returns to the top of that branch, the
     // behaviour every tabbed app has trained people to expect.
     initialLocation: index == navigationShell.currentIndex,
   );
 
+  void _goRoute(BuildContext context, String route) => context.go(route);
+
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final formFactor = context.formFactor;
-    final destinations = shellDestinations(context.l10n);
+    final destinations = shellDestinations(l10n);
+    final location = GoRouterState.of(context).uri.path;
+
+    final page = shellPageTitle(
+      context,
+      location,
+      l10n,
+      onNavigate: (route) => _goRoute(context, route),
+    );
+
+    final topBar = AppTopBar(
+      title: page.title,
+      breadcrumbs: page.crumbs.isEmpty
+          ? null
+          : AppBreadcrumbs(crumbs: page.crumbs),
+      actions: shellPageActions(context, location, l10n),
+      leading: formFactor.usesNavigationRail
+          ? null
+          : AppIconButton(
+              icon: AppIcons.gridView,
+              tooltip: l10n.shellMoreTitle,
+              onPressed: () => unawaited(
+                showShellMoreSheet(
+                  context,
+                  destinations: destinations,
+                  current: location,
+                ),
+              ),
+            ),
+    );
 
     if (!formFactor.usesNavigationRail) {
+      final compact = destinations.where((d) => d.primary).toList();
+      final index = navigationShell.currentIndex;
+
       return Scaffold(
-        appBar: AppBar(
-          title: Text(context.l10n.appName),
-          actions: const [ShellThemeToggle(), SizedBox(width: 4)],
+        body: Column(
+          children: [
+            topBar,
+            Expanded(child: navigationShell),
+          ],
         ),
-        body: navigationShell,
         bottomNavigationBar: AppNavBar(
-          selectedIndex: navigationShell.currentIndex,
-          onDestinationSelected: _onDestinationSelected,
-          destinations: destinations,
+          selectedIndex: index < _compactSlots ? index : _compactSlots,
+          onDestinationSelected: (selected) {
+            if (selected < _compactSlots) {
+              _goBranch(selected);
+              return;
+            }
+            unawaited(
+              showShellMoreSheet(
+                context,
+                destinations: destinations,
+                current: location,
+              ),
+            );
+          },
+          destinations: [
+            for (final destination in compact)
+              AppNavDestination(
+                icon: AppIcon(destination.icon),
+                label: destination.label,
+              ),
+            AppNavDestination(
+              icon: const AppIcon(AppIcons.gridView),
+              label: l10n.navMore,
+            ),
+          ],
         ),
       );
     }
@@ -54,13 +132,34 @@ class AppShell extends StatelessWidget {
         children: [
           AppNavRail(
             selectedIndex: navigationShell.currentIndex,
-            onDestinationSelected: _onDestinationSelected,
-            destinations: destinations,
+            onDestinationSelected: _goBranch,
             extended: extended,
             leading: ShellBrandMark(extended: extended),
-            trailing: const ShellThemeToggle(),
+            footer: ShellRailFooter(extended: extended),
+            destinations: [
+              for (final destination in destinations)
+                AppNavDestination(
+                  icon: AppIcon(destination.icon),
+                  label: destination.label,
+                  children: [
+                    for (final child in destination.children)
+                      AppNavChild(
+                        label: child.label,
+                        selected: Routes.isUnder(location, child.route),
+                        onSelected: () => _goRoute(context, child.route),
+                      ),
+                  ],
+                ),
+            ],
           ),
-          Expanded(child: navigationShell),
+          Expanded(
+            child: Column(
+              children: [
+                topBar,
+                Expanded(child: navigationShell),
+              ],
+            ),
+          ),
         ],
       ),
     );

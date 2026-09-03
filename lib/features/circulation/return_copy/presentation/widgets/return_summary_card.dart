@@ -47,7 +47,6 @@ class ReturnSummaryCard extends StatelessWidget {
 
     return SectionCard(
       title: l10n.returnsSummarySection,
-      icon: Icons.receipt_long_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
