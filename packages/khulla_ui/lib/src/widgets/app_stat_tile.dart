@@ -81,15 +81,18 @@ class AppStatTile extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: colors.textMuted,
-                  fontWeight: FontWeight.w500,
+                style: context.appTextStyles.label.copyWith(
+                  color: colors.ink500,
                 ),
               ),
             ),
             if (glyph != null) ...[
               SizedBox(width: spacing.xs),
-              Icon(glyph, size: spacing.md, color: tone.foreground(context)),
+              Icon(
+                glyph,
+                size: context.appMetrics.icon,
+                color: tone.foreground(context),
+              ),
             ],
           ],
         ),
@@ -101,10 +104,8 @@ class AppStatTile extends StatelessWidget {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: context.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.8,
-              color: colors.textHigh,
+            style: context.appTextStyles.displaySmall.copyWith(
+              color: colors.ink100,
             ),
           ),
         if (delta != null || captionText != null) ...[
@@ -126,8 +127,8 @@ class AppStatTile extends StatelessWidget {
                     captionText,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: colors.textMuted,
+                    style: context.appTextStyles.body.copyWith(
+                      color: colors.mutedForeground,
                     ),
                   ),
                 ),
@@ -149,13 +150,11 @@ class AppStatTile extends StatelessWidget {
     final padded = Padding(padding: EdgeInsets.all(spacing.md), child: body);
     if (tap == null) return padded;
 
-    return Material(
-      type: MaterialType.transparency,
-      child: InkWell(
-        onTap: tap,
-        focusColor: context.colorScheme.primary.withValues(alpha: 0.06),
-        child: padded,
-      ),
+    return AppRipple(
+      onTap: tap,
+      pressScale: 1,
+      borderRadius: BorderRadius.circular(context.appRadius.container),
+      child: padded,
     );
   }
 }

@@ -5,13 +5,15 @@
       "name": "Khulla Digital Library (dev)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main_dev.dart"
+      "program": "lib/main_dev.dart",
+      "deviceId": "linux"
     },
     {
       "name": "Khulla Digital Library (prod)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main_prod.dart"
-    },
+      "program": "lib/main_prod.dart",
+      "deviceId": "linux"
+    }
   ]
 }

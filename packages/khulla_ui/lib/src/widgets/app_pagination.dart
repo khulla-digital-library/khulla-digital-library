@@ -10,6 +10,12 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// catalogue: "jump to page 7" is how a librarian returns to where they were
 /// before answering the phone, and prev/next alone cannot do it. Past seven
 /// pages the run is elided around the current one, so the footer never wraps.
+///
+/// Two conventions here run against the usual instinct and are deliberate.
+/// The **current page is outlined, not filled** — a filled chip in a row of
+/// numbers reads as the primary action of the page, which it is not. And the
+/// prev/next controls are **hidden at the ends rather than disabled**, so
+/// there is no permanently greyed-out control sitting under the table.
 class AppPagination extends StatelessWidget {
   const AppPagination({
     required this.rangeLabel,
@@ -106,8 +112,8 @@ class AppPagination extends StatelessWidget {
               ],
               Text(
                 rangeLabel,
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: colors.textMuted,
+                style: context.appTextStyles.body.copyWith(
+                  color: colors.mutedForeground,
                 ),
               ),
             ],
@@ -115,20 +121,25 @@ class AppPagination extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AppIconButton(
-                icon: Icons.chevron_left_rounded,
-                tooltip: previousTooltip,
-                onPressed: onPrevious,
-              ),
+              if (onPrevious != null)
+                AppIconButton(
+                  icon: Icons.chevron_left_rounded,
+                  tooltip: previousTooltip,
+                  onPressed: onPrevious,
+                ),
               if (showNumbers)
                 for (final page in pageWindow(pageCount, currentPage))
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    padding: EdgeInsets.symmetric(horizontal: spacing.xxs / 2),
                     child: page == null
-                        ? Text(
-                            '…',
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: colors.textMuted,
+                        ? SizedBox(
+                            width: context.appMetrics.iconButtonMedium,
+                            child: Text(
+                              '…',
+                              textAlign: TextAlign.center,
+                              style: context.appTextStyles.body.copyWith(
+                                color: colors.mutedForeground,
+                              ),
                             ),
                           )
                         : _PageButton(
@@ -137,11 +148,12 @@ class AppPagination extends StatelessWidget {
                             onTap: () => selectPage(page),
                           ),
                   ),
-              AppIconButton(
-                icon: Icons.chevron_right_rounded,
-                tooltip: nextTooltip,
-                onPressed: onNext,
-              ),
+              if (onNext != null)
+                AppIconButton(
+                  icon: Icons.chevron_right_rounded,
+                  tooltip: nextTooltip,
+                  onPressed: onNext,
+                ),
             ],
           ),
         ],
@@ -163,26 +175,31 @@ class _PageButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = context.colorScheme;
     final colors = context.appColors;
-    final radius = BorderRadius.circular(context.appRadius.control);
+    final metrics = context.appMetrics;
+    final radius = BorderRadius.circular(context.appRadius.container);
+    final side = metrics.paginationItem;
 
-    return Material(
-      color: selected ? scheme.primary : Colors.transparent,
+    return AppRipple(
+      onTap: onTap,
       borderRadius: radius,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: Container(
-          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Text(
-            '${page + 1}',
-            style: context.textTheme.bodySmall?.copyWith(
-              color: selected ? scheme.onPrimary : colors.textMuted,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-            ),
+      pressScale: 1,
+      child: Container(
+        constraints: BoxConstraints(minWidth: side, minHeight: side),
+        alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(horizontal: context.appSpacing.xs),
+        decoration: BoxDecoration(
+          color: selected ? context.colorScheme.surface : Colors.transparent,
+          borderRadius: radius,
+          border: Border.all(
+            color: selected ? colors.hairline : Colors.transparent,
+          ),
+          boxShadow: selected ? context.appShadows.card : null,
+        ),
+        child: Text(
+          '${page + 1}',
+          style: context.appTextStyles.label.copyWith(
+            color: selected ? colors.ink100 : colors.ink500,
           ),
         ),
       ),

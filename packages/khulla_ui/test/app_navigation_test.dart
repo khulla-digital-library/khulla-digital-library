@@ -17,7 +17,7 @@ final _destinations = <AppNavDestination>[
 Widget _host(Widget child, {Size size = const Size(1400, 900)}) => MediaQuery(
   data: MediaQueryData(size: size),
   child: MaterialApp(
-    theme: AppTheme.light(FormFactor.large),
+    theme: AppTheme.light(AppDensity.comfortable),
     home: Scaffold(
       body: Row(
         children: [

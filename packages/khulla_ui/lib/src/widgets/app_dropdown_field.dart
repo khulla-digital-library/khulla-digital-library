@@ -58,60 +58,66 @@ class AppDropdownField<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
+    final colors = context.appColors;
+    final metrics = context.appMetrics;
     final fieldLabel = label;
     final iconFor = itemIcon;
+    final error = errorText;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (fieldLabel != null) ...[
-          AppFieldLabel(label: fieldLabel, required: required),
-          SizedBox(height: spacing.xs),
+          AppFieldLabel(
+            label: fieldLabel,
+            required: required,
+            hasError: error != null,
+          ),
+          SizedBox(height: metrics.labelToControlGap),
         ],
-        DropdownButtonFormField<T>(
-          initialValue: value,
-          onChanged: enabled ? onChanged : null,
-          isExpanded: true,
-          borderRadius: BorderRadius.circular(context.appRadius.field),
-          icon: Icon(
-            Icons.expand_more_rounded,
-            color: scheme.onSurfaceVariant,
-            size: spacing.md + 4,
-          ),
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: scheme.onSurface,
-          ),
-          decoration: InputDecoration(
-            hintText: hintText,
-            errorText: errorText,
-            enabled: enabled,
-          ),
-          items: [
-            for (final item in items)
-              DropdownMenuItem<T>(
-                value: item,
-                child: Row(
-                  children: [
-                    if (iconFor?.call(item) case final glyph?) ...[
-                      Icon(
-                        glyph,
-                        size: spacing.md,
-                        color: scheme.onSurfaceVariant,
+        ConstrainedBox(
+          constraints: BoxConstraints(minHeight: metrics.fieldHeight),
+          child: DropdownButtonFormField<T>(
+            initialValue: value,
+            onChanged: enabled ? onChanged : null,
+            isExpanded: true,
+            borderRadius: BorderRadius.circular(context.appRadius.container),
+            icon: Icon(
+              Icons.expand_more_rounded,
+              color: colors.ink500,
+              size: metrics.icon,
+            ),
+            style: context.appTextStyles.body.copyWith(
+              color: scheme.onSurface,
+            ),
+            decoration: InputDecoration(hintText: hintText, enabled: enabled),
+            items: [
+              for (final item in items)
+                DropdownMenuItem<T>(
+                  value: item,
+                  child: Row(
+                    children: [
+                      if (iconFor?.call(item) case final glyph?) ...[
+                        Icon(glyph, size: metrics.icon, color: colors.ink500),
+                        SizedBox(width: spacing.menuIconGap),
+                      ],
+                      Expanded(
+                        child: Text(
+                          itemLabel(item),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      SizedBox(width: spacing.xs),
                     ],
-                    Expanded(
-                      child: Text(
-                        itemLabel(item),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
+        if (error != null) ...[
+          SizedBox(height: spacing.xxs + 2),
+          AppFieldError(message: error),
+        ],
       ],
     );
   }

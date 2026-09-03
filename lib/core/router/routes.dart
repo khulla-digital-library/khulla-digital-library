@@ -116,6 +116,9 @@ abstract final class Routes {
   /// Online sync, under settings.
   static const String syncSegment = 'sync';
 
+  /// The component gallery, under settings. Registered by the dev build only.
+  static const String designSystemSegment = 'design-system';
+
   /// Library profile — name, branch, contact, currency.
   static const String settingsLibrary = '$settings/$librarySegment';
 
@@ -130,6 +133,10 @@ abstract final class Routes {
 
   /// The online sync and remote backup screen.
   static const String settingsSync = '$settings/$syncSegment';
+
+  /// The design-system gallery. Only reachable in the dev flavor — the
+  /// release build declares neither the route nor the door to it.
+  static const String settingsDesignSystem = '$settings/$designSystemSegment';
 
   /// Whether [location] is [prefix] or nested under it.
   static bool isUnder(String location, String prefix) =>

@@ -1,12 +1,17 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The standard raised surface: white on the canvas, hairline, soft shadow.
+/// A bordered block: 1px hairline, 6px corners, 16px of padding, **no
+/// shadow and no fill**.
 ///
-/// Everything on a page that is not the page itself is one of these. The
-/// depth is deliberately shallow — a hairline plus a whisper of shadow —
-/// because a screen holding twelve cards with real drop shadows reads as a
-/// mockup rather than a tool. Hovering a tappable card lifts it one step, so
-/// "this responds to a click" is shown rather than only implied.
+/// This is the product's real card, and it is not the shadcn/Material one. A
+/// dashboard holding twelve surfaces with drop shadows and grey fills reads
+/// as a mockup; the same twelve separated by hairlines read as a tool. Set
+/// [filled] for the rarer variant that does carry a fill and a shadow — a
+/// standalone panel with nothing around it to give it an edge.
+///
+/// Hovering a tappable card raises its hairline rather than lifting it, which
+/// says "this responds to a click" without adding a second depth level to
+/// every list.
 class AppCard extends StatefulWidget {
   const AppCard({
     required this.child,
@@ -14,7 +19,7 @@ class AppCard extends StatefulWidget {
     this.onTap,
     this.selected = false,
     this.bordered = true,
-    this.elevated = true,
+    this.filled = false,
     this.tone,
     this.clipBehavior = Clip.antiAlias,
     super.key,
@@ -36,8 +41,9 @@ class AppCard extends StatefulWidget {
   /// another surface that already has one.
   final bool bordered;
 
-  /// Whether to cast the ambient card shadow.
-  final bool elevated;
+  /// Switches to the filled variant: the grey card surface plus the small
+  /// shadow. Use it for a surface with no neighbours to define its edge.
+  final bool filled;
 
   /// Tints the card's fill and hairline with a status wash — a warning
   /// banner, a danger panel. Null keeps the neutral surface.
@@ -65,12 +71,12 @@ class _AppCardState extends State<AppCard> {
     final lifted = interactive && _hovered;
 
     final fill = switch (tone) {
-      null => scheme.surface,
+      null => widget.filled ? scheme.surfaceContainerHigh : Colors.transparent,
       final value => value.background(context),
     };
     final borderColor = switch (tone) {
       _ when widget.selected => scheme.primary,
-      null => colors.hairlineStrong,
+      null => colors.hairline,
       final value => value.border(context),
     };
 
@@ -84,32 +90,30 @@ class _AppCardState extends State<AppCard> {
       onEnter: interactive ? (_) => setState(() => _hovered = true) : null,
       onExit: interactive ? (_) => setState(() => _hovered = false) : null,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 140),
-        curve: Curves.easeOut,
+        duration: context.appMotion.color,
+        curve: context.appMotion.standard,
         decoration: BoxDecoration(
           color: fill,
-          borderRadius: BorderRadius.circular(context.appRadius.card),
+          borderRadius: BorderRadius.circular(context.appRadius.container),
           border: widget.bordered
               ? Border.all(
                   color: lifted && !widget.selected
                       ? colors.hairlineStrong
                       : borderColor,
-                  width: widget.selected ? 1.5 : 1,
                 )
               : null,
-          boxShadow: widget.elevated
-              ? (lifted ? shadows.raised : shadows.card)
-              : null,
+          boxShadow: widget.filled ? shadows.card : null,
         ),
-        child: Material(
-          type: MaterialType.transparency,
-          borderRadius: BorderRadius.circular(context.appRadius.card),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(context.appRadius.container),
           clipBehavior: widget.clipBehavior,
           child: interactive
-              ? InkWell(
+              ? AppRipple(
                   onTap: widget.onTap,
-                  hoverColor: Colors.transparent,
-                  focusColor: scheme.primary.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(
+                    context.appRadius.container,
+                  ),
+                  pressScale: 1,
                   child: body,
                 )
               : body,

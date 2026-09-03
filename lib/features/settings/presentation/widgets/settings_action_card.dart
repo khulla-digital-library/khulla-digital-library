@@ -62,7 +62,6 @@ class SettingsActionCard extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: AppButton(
-                    size: AppButtonSize.small,
                     variant: AppButtonVariant.outline,
                     onPressed: onAction,
                     child: Text(actionLabel),

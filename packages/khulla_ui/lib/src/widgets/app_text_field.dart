@@ -2,9 +2,21 @@ import 'package:flutter/services.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// {@template app_text_field}
-/// A text field with an external label and onboarding-style decoration.
+/// The system's text field: a label above, a hairline box, an error below.
+///
+/// Two things about it are deliberate and easy to undo by accident.
+///
+/// **There is no focus ring, and the border never changes color** — not on
+/// focus, not on error. Focus is signalled by the text nudging 2px to the
+/// right over 300ms, which is quiet enough to live on a form of twenty fields
+/// without the screen lighting up. On error the *label* turns red and the
+/// message appears below; the box stays as it was.
+///
+/// **The field is 40px tall (44 at the wide density), not Material's 56.**
+/// Two fields per row at 40px is what makes a form fit in a dialog without
+/// scrolling.
 /// {@endtemplate}
-class AppTextField extends StatelessWidget {
+class AppTextField extends StatefulWidget {
   /// {@macro app_text_field}
   const AppTextField({
     required this.onChanged,
@@ -118,63 +130,113 @@ class AppTextField extends StatelessWidget {
   /// tap fields.
   final bool enableInteractiveSelection;
 
-  /// Vertical extent of the decorated field body (no external label).
-  static double heightOf(AppSpacing spacing) {
-    // Prefix/suffix icons use the standard 48px Material touch target.
-    return spacing.lg + spacing.lg;
+  @override
+  State<AppTextField> createState() => _AppTextFieldState();
+}
+
+class _AppTextFieldState extends State<AppTextField> {
+  FocusNode? _ownedNode;
+  bool _focused = false;
+
+  FocusNode get _node => widget.focusNode ?? (_ownedNode ??= FocusNode());
+
+  @override
+  void initState() {
+    super.initState();
+    _node.addListener(_onFocusChanged);
+  }
+
+  @override
+  void didUpdateWidget(covariant AppTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.focusNode != widget.focusNode) {
+      oldWidget.focusNode?.removeListener(_onFocusChanged);
+      _node.addListener(_onFocusChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    _node.removeListener(_onFocusChanged);
+    _ownedNode?.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChanged() {
+    if (_focused == _node.hasFocus) return;
+    setState(() => _focused = _node.hasFocus);
   }
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
-    final fieldLabel = label;
+    final colors = context.appColors;
+    final metrics = context.appMetrics;
+    final typography = context.appTextStyles;
+    final fieldLabel = widget.label;
+    final error = widget.errorText;
+    final multiline = widget.maxLines == null || widget.maxLines! > 1;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (fieldLabel != null) ...[
-          AppFieldLabel(label: fieldLabel, required: required),
-          SizedBox(height: spacing.xs),
-        ],
-        TextFormField(
-          initialValue: initialValue,
-          controller: controller,
-          focusNode: focusNode,
-          enabled: enabled,
-          readOnly: readOnly,
-          onTap: onTap,
-          showCursor: showCursor ?? (!readOnly && onTap == null),
-          enableInteractiveSelection:
-              !(readOnly && onTap != null) && enableInteractiveSelection,
-          autofocus: autofocus,
-          textCapitalization: textCapitalization,
-          onChanged: onChanged,
-          onFieldSubmitted: onSubmitted,
-          obscureText: obscureText,
-          keyboardType: keyboardType,
-          textInputAction: textInputAction,
-          maxLength: maxLength,
-          maxLines: maxLines,
-          minLines: minLines,
-          inputFormatters: inputFormatters,
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: scheme.onSurface,
-            fontWeight: FontWeight.w400,
+          AppFieldLabel(
+            label: fieldLabel,
+            required: widget.required,
+            hasError: error != null,
           ),
-          decoration: InputDecoration(
-            hintText: hintText,
-            errorText: errorText,
-            errorStyle: context.textTheme.bodySmall?.copyWith(
-              color: scheme.error,
-              fontWeight: FontWeight.normal,
+          SizedBox(height: metrics.labelToControlGap),
+        ],
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: multiline ? 0 : metrics.fieldHeight,
+          ),
+          child: TextFormField(
+            initialValue: widget.initialValue,
+            controller: widget.controller,
+            focusNode: _node,
+            enabled: widget.enabled,
+            readOnly: widget.readOnly,
+            onTap: widget.onTap,
+            showCursor:
+                widget.showCursor ?? (!widget.readOnly && widget.onTap == null),
+            enableInteractiveSelection:
+                !(widget.readOnly && widget.onTap != null) &&
+                widget.enableInteractiveSelection,
+            autofocus: widget.autofocus,
+            textCapitalization: widget.textCapitalization,
+            onChanged: widget.onChanged,
+            onFieldSubmitted: widget.onSubmitted,
+            obscureText: widget.obscureText,
+            keyboardType: widget.keyboardType,
+            textInputAction: widget.textInputAction,
+            maxLength: widget.maxLength,
+            maxLines: widget.maxLines,
+            minLines: widget.minLines,
+            inputFormatters: widget.inputFormatters,
+            style: typography.body.copyWith(color: colors.ink100),
+            decoration: InputDecoration(
+              hintText: widget.hintText,
+              prefixIcon: widget.prefixIcon,
+              prefixIconConstraints: widget.prefixIconConstraints,
+              suffixIcon: widget.suffixIcon,
+              counterText: '',
+              // The signature interaction: focus moves the text 2px right
+              // rather than lighting up a ring.
+              contentPadding: EdgeInsetsDirectional.only(
+                start: _focused ? spacing.sm + 2 : spacing.sm,
+                end: spacing.sm,
+                top: spacing.xs,
+                bottom: spacing.xs,
+              ),
             ),
-            prefixIcon: prefixIcon,
-            prefixIconConstraints: prefixIconConstraints,
-            suffixIcon: suffixIcon,
-            counterText: '',
           ),
         ),
+        if (error != null) ...[
+          SizedBox(height: spacing.xxs + 2),
+          AppFieldError(message: error),
+        ],
       ],
     );
   }

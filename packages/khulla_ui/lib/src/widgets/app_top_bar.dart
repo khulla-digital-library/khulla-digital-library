@@ -65,10 +65,8 @@ class AppTopBar extends StatelessWidget {
           title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: context.textTheme.titleMedium?.copyWith(
-            color: colors.textHigh,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.4,
+          style: context.appTextStyles.pageHeader.copyWith(
+            color: colors.ink100,
           ),
         ),
         if (crumbs != null) ...[
@@ -101,23 +99,31 @@ class AppTopBar extends StatelessWidget {
 
             return Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: spacing.md + spacing.xxs,
-                vertical: spacing.sm,
+                horizontal: spacing.page,
+                vertical: spacing.xs,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    children: [
-                      if (lead != null) ...[lead, SizedBox(width: spacing.xs)],
-                      Expanded(child: titleBlock),
-                      if (searchField != null && !tight) ...[
-                        SizedBox(width: spacing.md),
-                        SizedBox(width: searchWidth, child: searchField),
-                        SizedBox(width: spacing.xs),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: context.appMetrics.topBarHeight,
+                    ),
+                    child: Row(
+                      children: [
+                        if (lead != null) ...[
+                          lead,
+                          SizedBox(width: spacing.xs),
+                        ],
+                        Expanded(child: titleBlock),
+                        if (searchField != null && !tight) ...[
+                          SizedBox(width: spacing.md),
+                          SizedBox(width: searchWidth, child: searchField),
+                          SizedBox(width: spacing.xs),
+                        ],
+                        ...trailingRow,
                       ],
-                      ...trailingRow,
-                    ],
+                    ),
                   ),
                   if (searchField != null && tight) ...[
                     SizedBox(height: spacing.sm),

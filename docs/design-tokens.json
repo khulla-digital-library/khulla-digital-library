@@ -1,0 +1,566 @@
+{
+  "$meta": {
+    "name": "RestroX Design Tokens",
+    "version": "1.0.0",
+    "extractedFrom": "packages/ui/src/globals.css, packages/ui/tailwind.config.ts, packages/ui/src/components/ui/**",
+    "generatedFor": "Flutter reimplementation",
+    "baseUnit": 4,
+    "unitNote": "All spacing/size values are px. Tailwind rem values are resolved at the default 16px root.",
+    "colorNote": "hsl = raw CSS variable channels; hex = resolved sRGB. Prefer hex in Flutter. Values suffixed with an alpha byte (e.g. #e0f9ec15) are 8-digit RGBA.",
+    "defaultMode": "light",
+    "darkModeShipped": false,
+    "darkModeNote": "A .dark block exists and next-themes is wired, but apps/web and apps/connect hard-code <html class=\"light\">. Dark values are recorded for completeness only."
+  },
+
+  "colors": {
+    "brand": {
+      "primary":     { "hsl": "355 93% 44%", "hex": "#D90819", "role": "brand / primary action / destructive / focus ring" },
+      "primary200":  { "hsl": "5 76% 54%",   "hex": "#E33F31" },
+      "primary300":  { "hsl": "7 80% 60%",   "hex": "#EB5A47" },
+      "primary400":  { "hsl": "9 85% 66%",   "hex": "#F2755F" },
+      "primary500":  { "hsl": "10 90% 72%",  "hex": "#F88D77" },
+      "primary600":  { "hsl": "11 95% 78%",  "hex": "#FCA592", "role": "identical to accent; source of all warm tints" },
+      "primary650":  { "hsl": "5 92% 95%",   "hex": "#FEE8E7" },
+      "primary700":  { "hsl": "0 100% 99%",  "hex": "#FFFAFA" },
+      "primaryForeground": { "hsl": "0 0% 100%", "hex": "#FFFFFF" }
+    },
+
+    "ink": {
+      "$comment": "Tailwind name is `dark`. Rename to `ink` in Flutter: it is a text ramp that inverts in dark mode.",
+      "ink100": { "light": "#121212", "dark": "#FFFFFF", "hsl": "0 0% 7%",     "role": "primary text" },
+      "ink200": { "light": "#292929", "dark": "#F5F5F5", "hsl": "0 0% 16%",    "role": "form labels, dialog titles" },
+      "ink300": { "light": "#404040", "dark": "#DEDEDE", "hsl": "0 0% 25%",    "role": "sub-navigation text" },
+      "ink400": { "light": "#575757", "dark": "#C9C9C9", "hsl": "0 0% 34%",    "role": "sidebar link rest state, filter labels" },
+      "ink500": { "light": "#707070", "dark": "#B5B5B5", "hsl": "0 0% 44%",    "role": "secondary/meta text, outline button text" },
+      "ink600": { "light": "#8C8C8C", "dark": "#9E9E9E", "hsl": "0 0% 55%",    "role": "tertiary text, unchecked dot fill" },
+      "ink700": { "light": "#CED4DA", "dark": "#CED4DA", "hsl": "210 14% 83%", "role": "line colour: checkbox border, zebra base, connectors", "invertsInDark": false }
+    },
+
+    "neutral": {
+      "$comment": "Tailwind name is `white`. Fixed ramp - does NOT invert in dark mode.",
+      "white100": { "hex": "#FFFFFF", "hsl": "0 0% 100%" },
+      "white200": { "hex": "#F5F5F5", "hsl": "0 0% 96%" },
+      "white300": { "hex": "#DEDEDE", "hsl": "0 0% 87%" },
+      "white400": { "hex": "#C9C9C9", "hsl": "0 0% 79%" },
+      "white500": { "hex": "#B5B5B5", "hsl": "0 0% 71%" },
+      "white600": { "hex": "#9E9E9E", "hsl": "0 0% 62%", "role": "input leading-icon colour; unchecked switch track at 50%" }
+    },
+
+    "semantic": {
+      "background":          { "light": "#FFFFFF", "dark": "#121212" },
+      "foreground":          { "light": "#121212", "dark": "#FFFFFF" },
+      "card":                { "light": "#F5F5F5", "dark": "#292929", "note": "greyer than the page surface" },
+      "cardForeground":      { "light": "#121212", "dark": "#FFFFFF" },
+      "popover":             { "light": "#FFFFFF", "dark": "#292929" },
+      "popoverForeground":   { "light": "#121212", "dark": "#FFFFFF" },
+      "secondary":           { "light": "#F2F4F7", "dark": "#F2F4F7", "hsl": "216 24% 96%", "role": "secondary button, ghost hover, tab track" },
+      "secondaryForeground": { "light": "#121212", "declared": "0 0 0%", "defect": "missing % on saturation - invalid CSS; use foreground" },
+      "muted":               { "light": "#DEDEDE", "dark": "#404040" },
+      "mutedForeground":     { "light": "#999999", "dark": "#DEDEDE", "role": "placeholders, captions, table head, selection count" },
+      "accent":              { "light": "#FCA592", "dark": "#C9C9C9", "role": "TINT SOURCE - used at 10/20/30% for hover, active and selected surfaces" },
+      "accentForeground":    { "light": "#FFFFFF", "dark": "#121212" },
+      "destructive":         { "light": "#D90819", "dark": "#D90819" },
+      "destructiveForeground": { "light": "#121212", "dark": "#FFFFFF", "defect": "near-black on red; never exercised because destructive is an outline button. Use #FFFFFF if a filled destructive is needed." },
+      "border":              { "light": "#EBE9F1", "dark": "#333333", "hsl": "255 22% 93%", "role": "the single hairline colour" },
+      "input":               { "light": "#D90819", "dark": "#292929", "defect": "brand red; used by SelectTrigger and RadioGroupItem border. Use `border` (#EBE9F1) in Flutter." },
+      "ring":                { "light": "#D90819", "dark": "#292929" },
+      "role":                { "light": "#00C4FF", "hsl": "194 100% 50%" },
+      "premium":             { "light": "#FDB021", "hsl": "39 98% 56%" }
+    },
+
+    "status": {
+      "success500": { "hex": "#11B650", "hsl": "143 83% 39%" },
+      "success600": { "hex": "#0F993D", "hsl": "140 82% 33%" },
+      "warn500":    { "hex": "#E08A00", "hsl": "37 100% 44%" },
+      "warn600":    { "hex": "#E68F3D", "hsl": "29 77% 57%" }
+    },
+
+    "hardcoded": {
+      "$comment": "Intentional literals in badge.tsx / table/row.tsx. 8-digit values carry an alpha byte.",
+      "statusActive":     { "bg": "#e0f9ec15", "fg": "#32d583", "border": "#e0f9ec" },
+      "statusInactive":   { "bg": "#f7001915", "fg": "#da0819", "border": "#f7001950" },
+      "statusPending":    { "bg": "#FDB02215", "fg": "#FDB022", "border": "#FDB02215" },
+      "statusOpen":       { "bg": "#00C2FF15", "fg": "#00C2FF", "border": "#00C2FF15" },
+      "statusViolet":     { "bg": "#efe3ff15", "fg": "#ad6eff" },
+      "statusRole":       { "bg": "#28C76F1F", "fg": "#28C76F", "border": "#e0f9ec" },
+      "statusPaymentOut": { "bg": "#fff0f2",   "fg": "#da0819", "border": "#cd1d2c1b" },
+      "stickyRowOdd":      "#fafafb",
+      "stickyRowSelected": "#fef6f4",
+      "stickyRowHover":    "#ededee",
+      "stickyRowDark":     "#252526",
+      "skeleton":          "#F1F5F9",
+      "avatarFallbackBg":  "#E1E6FF",
+      "buttonSuccessFill": "#22C55E",
+      "buttonLinkText":    "#1D4ED8",
+      "subscriptionGradient": "linear-gradient(90deg, #423a8f 0%, #d50a1d 100%)",
+      "dashedBorderStroke":       "#ebe9f1",
+      "dashedBorderActiveStroke": "#d90819"
+    },
+
+    "tints": {
+      "$comment": "Every hover/active/selected surface in the app is one of these alpha composites. Reproduce with alpha, not with a pre-mixed opaque colour.",
+      "navHover":        { "base": "#FCA592", "alpha": 0.20, "usage": "sidebar link hover AND active" },
+      "rowSelected":     { "base": "#FCA592", "alpha": 0.10 },
+      "switchTrackOn":   { "base": "#FCA592", "alpha": 0.30 },
+      "switchTrackOnPrimary": { "base": "#FCA592", "alpha": 0.10 },
+      "tableHeaderDefault": { "base": "#FCA592", "alpha": 0.03 },
+      "tableHeaderUsed":    { "base": "#707070", "alpha": 0.05 },
+      "tableFooter":     { "base": "#707070", "alpha": 0.10 },
+      "rowZebra":        { "base": "#CED4DA", "alpha": 0.10 },
+      "tabTrack":        { "base": "#CED4DA", "alpha": 0.10 },
+      "rowHover":        { "base": "#DEDEDE", "alpha": 0.50 },
+      "menuItemFocus":   { "base": "#F2F4F7", "alpha": 0.50 },
+      "rowHighlight":    { "base": "#D90819", "alpha": 0.10 },
+      "filterActive":    { "base": "#D90819", "alpha": 0.05 },
+      "destructiveHover":{ "base": "#D90819", "alpha": 0.10 },
+      "successSoft":     { "base": "#11B650", "alpha": 0.10 },
+      "scrimDialog":     { "base": "#000000", "alpha": 0.40 },
+      "scrimDrawer":     { "base": "#000000", "alpha": 0.80 },
+      "scrimSearch":     { "base": "#000000", "alpha": 0.20, "blur": 1 }
+    }
+  },
+
+  "typography": {
+    "fontFamilies": {
+      "primary": { "name": "Poppins", "source": "next/font/google", "weights": [100,200,300,400,500,600,700,800,900], "display": "swap", "note": "applied globally to every element" },
+      "printer": { "name": "Merchant Copy", "source": "local ttf", "usage": "receipt / KOT preview only" },
+      "pdf":     { "name": "DejaVu Sans", "usage": "PDF export only" }
+    },
+    "weights": {
+      "regular":  { "value": 400, "usage": "body, table values, sidebar links" },
+      "medium":   { "value": 500, "usage": "DEFAULT for interactive text: buttons, labels, tabs, page headers, dialog titles (form variant), error text" },
+      "semibold": { "value": 600, "usage": "table column headers, menu labels, CardTitle, badges, stat titles" },
+      "bold":     { "value": 700, "usage": "empty-state heading only" }
+    },
+    "scale": {
+      "$comment": "px. `wide` applies at >= 1600px (the 3xl breakpoint).",
+      "micro":      { "base": 10, "wide": 12, "class": "text-[10px] 3xl:text-xs",  "usage": "badges, form error messages" },
+      "body":       { "base": 12, "wide": 14, "class": "text-xs 3xl:text-sm",      "usage": "DEFAULT body, inputs, selects, table cells, labels, menu items" },
+      "bodyLarge":  { "base": 14, "wide": 16, "class": "text-sm 3xl:text-base",    "usage": "sidebar links, section text, tooltips" },
+      "title":      { "base": 18, "wide": 20, "class": "text-lg 3xl:text-xl",      "usage": "dialog title, sheet title, empty-state heading" },
+      "pageHeader": { "base": 18, "wide": 22, "class": "text-lg 3xl:text-[22px]",  "usage": "data-table page header" },
+      "formTitle":  { "base": 20, "wide": 24, "class": "text-xl 3xl:text-2xl",     "usage": "form modal title" },
+      "sheetTitle": { "base": 30, "wide": 30, "class": "text-3xl",                 "usage": "sheet form title" },
+      "cardTitle":  { "base": 24, "wide": 24, "class": "text-2xl",                 "usage": "Card primitive title" }
+    },
+    "rawSizes": { "10": 10, "xs": 12, "sm": 14, "base": 16, "lg": 18, "px22": 22, "2xl": 24, "3xl": 30, "4xl": 36 },
+    "lineHeight": { "none": 1.0, "default": 1.5, "note": "leading-none on CardTitle, DialogTitle, Label" },
+    "letterSpacing": { "tight": -0.4, "widest": 1.6, "note": "tracking-tight on titles; tracking-widest on kbd hints" }
+  },
+
+  "spacing": {
+    "0.5": 2, "1": 4, "1.5": 6, "2": 8, "2.5": 10, "3": 12, "3.5": 14,
+    "4": 16, "5": 20, "6": 24, "7": 28, "8": 32, "9": 36, "10": 40, "12": 48, "16": 64, "24": 96,
+    "semantic": {
+      "pageHorizontal":     24,
+      "pageVertical":       20,
+      "sectionStackGap":    12,
+      "formRowGap":         { "base": 12, "wide": 16 },
+      "formFieldGap":       { "base": 12, "wide": 16 },
+      "labelToControlGap":  { "base": 8,  "wide": 12 },
+      "buttonIconGap":      8,
+      "buttonIconGapSmall": 6,
+      "menuItemIconGap":    10,
+      "sidebarIconGap":     16,
+      "sidebarListPadding": 8,
+      "sidebarItemGap":     6,
+      "dialogPadding":      { "primitive": 24, "formVariant": 32 },
+      "dialogChildGap":     16,
+      "sheetPadding":       { "primitive": 24, "wrapper": 24, "formVariant": 32, "formVariantNarrow": 16 },
+      "cardPadding":        { "primitive": 24, "productPattern": 16 },
+      "emptyStatePaddingY": { "default": 96, "small": 36 },
+      "emptyStateStackGap": 24
+    }
+  },
+
+  "radius": {
+    "$base": 8,
+    "$comment": "--radius: 0.5rem. sm = base-4, md = base-2, lg = base.",
+    "sm":   { "value": 4,  "usage": "menu items, select items, tab triggers, dialog close chip, tab-link strip" },
+    "md":   { "value": 6,  "usage": "DOMINANT (573 uses): inputs, selects, textareas, table wrapper, dropdown/popover/tooltip, containers, sm-size buttons" },
+    "lg":   { "value": 8,  "usage": "Button (default), Card, Dialog, sidebar nav row, search panel" },
+    "xl":   { "value": 12, "usage": "rare" },
+    "2xl":  { "value": 16, "usage": "rare" },
+    "drawerTop": { "value": 10, "usage": "vaul bottom sheet top corners" },
+    "full": { "value": 9999, "usage": "badges, avatars, switch, radio, progress, active-nav bar (right side only)" },
+    "hierarchyRule": "controls (8) > containers (6) > items inside containers (4). Never flatten to a single value."
+  },
+
+  "borders": {
+    "width": { "hairline": 1, "checkbox": 1.5, "switchTrack": 2, "kbdChip": 0.5, "dashedStroke": 2 },
+    "color": { "default": "#EBE9F1", "dark": "#333333", "note": "applied globally via `* { @apply border-border }`" },
+    "variants": {
+      "buttonDefault": { "color": "#B91C1C", "alpha": 0.70, "note": "tailwind red-700 @70%" },
+      "buttonSuccess": { "color": "#16A34A", "alpha": 0.70, "note": "tailwind green-600 @70%" },
+      "ghostTransparent": { "color": "transparent", "note": "ghost buttons keep a 1px transparent border to avoid layout shift" },
+      "kbdOnPrimary": { "color": "#FFFFFF", "alpha": 0.30 }
+    },
+    "dashed": { "pattern": "6 on / 6 off", "strokeWidth": 2, "radius": 6, "idle": "#ebe9f1", "active": "#d90819", "note": "implemented as an SVG background image, not a CSS border" }
+  },
+
+  "shadows": {
+    "sm": { "css": "0 1px 2px 0 rgb(0 0 0 / 0.05)", "layers": [{ "x": 0, "y": 1, "blur": 2, "spread": 0, "color": "#000000", "alpha": 0.05 }], "usage": "every Button, Card, sticky table header" },
+    "md": { "css": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)", "layers": [{ "x": 0, "y": 4, "blur": 6, "spread": -1, "color": "#000000", "alpha": 0.1 }, { "x": 0, "y": 2, "blur": 4, "spread": -2, "color": "#000000", "alpha": 0.1 }], "usage": "dropdown, popover, tooltip, select content" },
+    "lg": { "css": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)", "layers": [{ "x": 0, "y": 10, "blur": 15, "spread": -3, "color": "#000000", "alpha": 0.1 }, { "x": 0, "y": 4, "blur": 6, "spread": -4, "color": "#000000", "alpha": 0.1 }], "usage": "dialog, sheet, toast, dropdown submenu, switch thumb" },
+    "none": { "usage": "link / ghost / table-header buttons" },
+    "flutterNote": "Do not substitute Material `elevation:` - it is materially darker than these."
+  },
+
+  "iconography": {
+    "library": "lucide-react@0.395",
+    "sizes": {
+      "xs":    { "px": 12, "usage": "dense chevrons, sidebar bullets" },
+      "button":{ "px": 14, "usage": "DEFAULT inside Button (svg:not([size]) => size-3.5)" },
+      "base":  { "px": 16, "usage": "DEFAULT everywhere else - menu items, select chevron, sort chevrons, dialog close" },
+      "lg":    { "px": 20, "usage": "sidebar icons at >=1600px, page-header chevrons, collapse toggle, mobile bottom nav" },
+      "xl":    { "px": 24 },
+      "sheetClose": { "px": 40, "wide": 28 }
+    },
+    "responsivePairs": ["size-3 3xl:size-4", "size-4 3xl:size-5"],
+    "strokeWidth": { "default": 2, "checkboxTick": 4, "sidebarBullet": 5 }
+  },
+
+  "breakpoints": {
+    "xs": 375, "sm": 640, "md": 768, "lg": 1024, "xl": 1280, "2xl": 1536, "3xl": 1600,
+    "usageCounts": { "3xl": 1495, "sm": 58, "md": 25, "xs": 9, "lg": 9, "xl": 4, "2xl": 3 },
+    "primaryAxis": "3xl",
+    "primaryAxisMeaning": "density tier, not layout tier - one step up in type, control height, icon size and gap",
+    "container": { "centered": true, "padding": 32, "max2xl": 1400 }
+  },
+
+  "motion": {
+    "durations": { "fast": 150, "base": 200, "normal": 300, "sheetOpen": 500, "sheetClose": 300, "ripple": 600, "skeletonPulse": 2000, "spinnerRotate": 2000, "spinnerDash": 1500, "caretBlink": 1250 },
+    "easings": {
+      "default": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "easeInOut": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "easeOut": "cubic-bezier(0, 0, 0.2, 1)",
+      "pulse": "cubic-bezier(0.4, 0, 0.6, 1)"
+    },
+    "springs": { "radioIndicator": { "stiffness": 200, "damping": 16 } },
+    "gestures": { "buttonTapScale": 0.95, "radioHoverScale": 1.05, "radioTapScale": 0.95 },
+    "ripple": { "size": 20, "fromScale": 0, "toScale": 10, "fromOpacity": 0.5, "toOpacity": 0, "duration": 600, "easing": "easeOut" },
+    "overlayEnter": { "opacity": [0, 1], "scale": [0.95, 1], "slide": 8, "slideFrom": "trigger side" },
+    "dialogEnter": { "duration": 200, "opacity": [0, 1], "scale": [0.95, 1], "translateY": "48% -> 50%" },
+    "accordion": { "duration": 200, "easing": "ease-out", "property": "height" },
+    "inputFocus": { "property": "padding-left", "delta": 2, "duration": 300, "easing": "ease-in-out", "note": "signature interaction - there is no focus ring on inputs" }
+  },
+
+  "components": {
+    "button": {
+      "radius": 8,
+      "radiusSmall": 6,
+      "fontSize": 14,
+      "fontWeight": 500,
+      "iconSize": 14,
+      "iconGap": 8,
+      "iconGapSmall": 6,
+      "shadow": "sm",
+      "disabledOpacity": 0.5,
+      "focusRing": { "width": 3, "colorAlpha": 0.5, "offset": 0 },
+      "defaultSize": "sm",
+      "sizes": {
+        "sm":       { "height": 36, "paddingX": 12, "paddingXWithIcon": 10, "radius": 6, "gap": 6 },
+        "default":  { "height": 40, "paddingX": 16, "paddingXWithIcon": 12, "paddingY": 8 },
+        "lg":       { "height": 44, "paddingX": 32, "paddingXWithIcon": 24 },
+        "icon":     { "width": 40, "height": 40 },
+        "xs":       { "width": 32, "height": 32 },
+        "icon-xs":  { "width": 32, "height": 32 },
+        "icon-sm":  { "width": 36, "height": 36 },
+        "icon-lg":  { "width": 44, "height": 44 },
+        "link":     { "height": "auto", "paddingX": 0, "paddingY": 0 },
+        "table-header": { "height": "auto", "paddingX": 0, "paddingY": 0 }
+      },
+      "variants": {
+        "default":     { "bg": "#D90819", "fg": "#FFFFFF", "border": { "color": "#B91C1C", "alpha": 0.7 }, "hoverBgAlpha": 0.9, "rippleColor": "#F2F4F7" },
+        "destructive": { "bg": "transparent", "fg": "#D90819", "border": "#D90819", "hoverBg": { "color": "#D90819", "alpha": 0.10 }, "rippleColor": { "color": "#D90819", "alpha": 0.20 } },
+        "outline":     { "bg": "#FFFFFF", "fg": "#707070", "border": "#EBE9F1", "rippleColor": { "color": "#D1D5DB", "alpha": 0.80 } },
+        "secondary":   { "bg": "#F2F4F7", "fg": "#121212", "border": "transparent", "hoverBgAlpha": 0.8, "rippleColor": { "color": "#D1D5DB", "alpha": 0.80 } },
+        "ghost":       { "bg": "transparent", "fg": "inherit", "border": "transparent", "hoverBg": "#F2F4F7", "shadow": "none", "rippleColor": { "color": "#D1D5DB", "alpha": 0.70 } },
+        "success":     { "bg": "#22C55E", "fg": "#FFFFFF", "border": { "color": "#16A34A", "alpha": 0.7 } },
+        "link":        { "bg": "none", "fg": "#1D4ED8", "hoverDecoration": "underline", "shadow": "none" },
+        "table-header":{ "bg": "none", "fg": "#121212", "fontWeight": 600, "shadow": "none" }
+      },
+      "loading": { "spinnerSize": 19, "replacesChildren": true, "colorOnFilled": "#FFFFFF", "colorOnLight": "#000000" },
+      "shortcutChip": { "height": 17, "radius": 4, "borderWidth": 0.5, "fontSize": 10, "fontWeight": 500, "paddingX": 4, "bgAlphaOnPrimary": 0.2 }
+    },
+
+    "input": {
+      "height": { "base": 40, "wide": 44 },
+      "radius": 6,
+      "borderWidth": 1,
+      "borderColor": "#EBE9F1",
+      "background": "#FFFFFF",
+      "paddingX": 12,
+      "paddingY": 8,
+      "fontSize": { "base": 12, "wide": 14 },
+      "placeholderColor": "#999999",
+      "disabledOpacity": 0.5,
+      "focus": { "ring": "none", "paddingLeftDelta": 2, "duration": 300 },
+      "withIcon": { "iconLeft": 16, "iconSizeSearch": 18, "iconSizePlus": 22, "iconColor": "#9E9E9E", "paddingLeft": 48, "paddingLeftFocused": 51 },
+      "textarea": { "minRows": 5, "maxRows": 10, "resizable": false },
+      "label": { "fontSize": { "base": 12, "wide": 14 }, "fontWeight": 500, "color": "#292929", "lineHeight": 1.0, "errorColor": "#D90819", "requiredMarkerColor": "#D90819" },
+      "errorText": { "fontSize": { "base": 10, "wide": 12 }, "fontWeight": 500, "color": "#D90819" },
+      "helperText": { "fontSize": 14, "color": "#999999" },
+      "counter": { "fontSize": 12, "color": "#707070" }
+    },
+
+    "select": {
+      "triggerHeight": 40,
+      "radius": 6,
+      "paddingX": 12,
+      "fontSize": { "base": 12, "wide": 14 },
+      "chevronSize": 16,
+      "chevronOpacity": 0.5,
+      "focusRing": "none",
+      "content": { "radius": 6, "maxHeight": 384, "minWidth": 128, "shadow": "md", "padding": { "base": 6, "wide": 10 }, "matchesTriggerWidth": true, "offset": 4 },
+      "item": { "radius": 4, "paddingY": 6, "paddingX": 8, "heightInAppWrapper": { "base": 40, "wide": 44 }, "focusBg": { "color": "#F2F4F7", "alpha": 0.5 }, "selectedFg": "#D90819", "selectedBg": { "color": "#FCA592", "alpha": 0.2 } },
+      "filterChipStyle": { "border": "dashed", "idleStroke": "#ebe9f1", "activeStroke": "#d90819", "activeBg": { "color": "#D90819", "alpha": 0.05 }, "activeFg": "#D90819" }
+    },
+
+    "checkbox": { "size": 16, "radius": 4, "borderWidth": 1.5, "borderColor": "#CED4DA", "checkedBorderColor": "#D90819", "checkedFill": "transparent", "tickColor": "#D90819", "tickSize": 10, "tickStrokeWidth": 4, "greenVariant": "#22C55E", "focusRing": { "width": 1, "offset": 2 } },
+
+    "radio": { "size": 16, "radius": 9999, "borderWidth": 1, "borderColor": "#EBE9F1", "indicatorSize": 10, "indicatorColor": "#D90819", "groupGap": 10, "focusRing": { "width": 2, "offset": 2 } },
+
+    "switch": {
+      "default": { "trackWidth": { "base": 32, "wide": 36 }, "trackHeight": { "base": 16, "wide": 20 }, "thumbSize": { "base": 12, "wide": 16 }, "thumbTravel": 16 },
+      "small":   { "trackWidth": { "base": 28, "wide": 32 }, "trackHeight": { "base": 12, "wide": 16 }, "thumbSize": { "base": 8,  "wide": 12 }, "thumbTravel": 16 },
+      "trackOff": { "color": "#9E9E9E", "alpha": 0.5 },
+      "trackOnPrimary": { "color": "#FCA592", "alpha": 0.10 },
+      "trackOnSuccess": { "color": "#11B650", "alpha": 0.10 },
+      "trackOnBlue":    { "color": "#3B82F6", "alpha": 0.10 },
+      "thumbOff": "#FFFFFF",
+      "thumbOnPrimary": "#D90819",
+      "thumbOnSuccess": "#11B650",
+      "thumbOnBlue": "#3B82F6",
+      "thumbShadow": "lg",
+      "trackBorderWidth": 2,
+      "trackBorderColor": "transparent"
+    },
+
+    "table": {
+      "wrapper": { "radius": 6, "borderWidth": 1, "clip": true },
+      "header": { "height": { "base": 40, "wide": 48 }, "paddingX": 16, "bg": { "color": "#707070", "alpha": 0.05 }, "bgPrimitiveDefault": { "color": "#FCA592", "alpha": 0.03 }, "fontSize": { "base": 12, "wide": 14 }, "fontWeight": 600, "align": "left" },
+      "row": { "heightApprox": { "base": 37, "wide": 44 }, "cellPaddingX": 16, "cellPaddingY": { "base": 6, "wide": 10 }, "zebra": { "color": "#CED4DA", "alpha": 0.10, "on": "even" }, "hover": { "color": "#DEDEDE", "alpha": 0.50 }, "selected": { "color": "#FCA592", "alpha": 0.10 }, "highlighted": { "color": "#D90819", "alpha": 0.10 }, "transition": "colors 150ms" },
+      "cellContent": { "maxWidth": 384, "clamp": 1, "wrap": false, "ellipsis": true },
+      "footer": { "bg": { "color": "#707070", "alpha": 0.10 }, "borderTop": 1, "fontWeight": 500 },
+      "selectorColumn": { "width": 10, "paddingX": 8, "visibility": "invisible until row hover or selected" },
+      "sortChevron": { "size": 16, "idleOpacity": 0, "hoverOpacity": 1, "transition": 150 },
+      "stickyHeader": { "shadow": "sm", "zIndex": 40, "bg": "#FFFFFF" },
+      "emptySpacerRowHeight": 410,
+      "sectionGap": 12
+    },
+
+    "card": {
+      "productPattern": { "borderWidth": 1, "borderColor": "#EBE9F1", "radius": 6, "padding": 16, "background": "transparent", "shadow": "none", "innerStackGap": 12 },
+      "primitive": { "radius": 8, "borderWidth": 1, "background": "#F5F5F5", "shadow": "sm", "headerPadding": 24, "headerStackGap": 6, "titleSize": 24, "titleWeight": 600, "descriptionSize": 14, "descriptionColor": "#999999", "contentPadding": 24, "contentPaddingTop": 0 }
+    },
+
+    "badge": {
+      "radius": 9999,
+      "paddingX": 10,
+      "paddingY": 2,
+      "fontSize": { "base": 10, "wide": 12 },
+      "fontWeight": 600,
+      "borderWidth": 1,
+      "sizes": { "md": { "paddingX": 16, "paddingY": 8 }, "sm": { "paddingX": 10, "paddingY": 4 } },
+      "shapes": { "pill-md": 6, "pill-sm": 4 },
+      "statusPattern": { "bgAlpha": 0.08, "fgAlpha": 1.0, "borderAlpha": 0.08, "note": "all three derived from one hue" }
+    },
+
+    "tabs": {
+      "segmented": { "trackBg": "#F2F4F7", "trackRadius": 6, "trackPadding": 4, "trackBorderWidth": 1, "itemRadius": 4, "itemPaddingX": 12, "itemPaddingY": 6, "fontSize": 14, "fontWeight": 500, "activeBg": "#D90819", "activeFg": "#FFFFFF", "activeShadow": "sm" },
+      "routeLinks": { "trackBg": { "color": "#CED4DA", "alpha": 0.10 }, "trackRadius": 4, "trackPadding": 4, "itemGap": 8, "itemPaddingX": 16, "itemPaddingY": 6, "itemRadius": 4, "activeBg": "#D90819", "activeFg": "#FFFFFF" },
+      "underline": { "indicatorHeight": 2, "indicatorColor": "#D90819", "indicatorRadius": 4, "activeFg": "#D90819" },
+      "transparentPill": { "bg": { "color": "#D90819", "alpha": 0.10 }, "activeFg": "#D90819" },
+      "contentMarginTop": 8
+    },
+
+    "dropdown": {
+      "content": { "radius": 6, "minWidth": 128, "padding": 4, "shadow": "md", "subShadow": "lg", "offset": 4, "background": "#FFFFFF", "borderWidth": 1 },
+      "item": { "radius": 4, "paddingX": 8, "paddingY": 10, "heightApprox": 38, "fontSize": { "base": 12, "wide": 14 }, "focusBg": { "color": "#F2F4F7", "alpha": 0.5 }, "disabledOpacity": 0.5, "iconSize": 16, "iconGap": 10, "indicatorInset": 32 },
+      "label": { "paddingX": 8, "paddingY": 10, "fontSize": 14, "fontWeight": 600 },
+      "separator": { "height": 1, "color": "#DEDEDE", "marginY": 4, "marginX": -4 },
+      "shortcut": { "fontSize": 12, "opacity": 0.6, "letterSpacing": 1.6 },
+      "rowActionMenu": { "width": 192, "fontWeight": 500, "align": "end", "destructiveItemColor": "#D90819" }
+    },
+
+    "popover": { "width": 288, "radius": 6, "padding": 16, "shadow": "md", "offset": 4, "align": "center", "background": "#FFFFFF", "borderWidth": 1 },
+
+    "tooltip": { "radius": 6, "paddingX": 12, "paddingY": 6, "fontSize": 14, "shadow": "md", "offset": 4, "background": "#FFFFFF", "foreground": "#121212", "borderWidth": 1, "note": "light tooltip, not dark" },
+
+    "dialog": {
+      "scrim": { "color": "#000000", "alpha": 0.40 },
+      "radius": 8,
+      "shadow": "lg",
+      "borderWidth": 1,
+      "primitivePadding": 24,
+      "wrapperPadding": 0,
+      "formVariantPadding": 32,
+      "childGap": 16,
+      "maxHeight": "90vh",
+      "scrollsInternally": true,
+      "widths": { "sm": 384, "md": 448, "lg": 512, "xl": 576, "2xl": 672, "3xl": 768, "4xl": 896, "5xl": 1024, "6xl": 1152, "7xl": 1280, "fullBleed": "95vw x 90vh" },
+      "widthUsage": { "xl": 60, "lg": 31, "3xl": 29, "md": 25, "2xl": 25, "sm": 10, "4xl": 8, "6xl": 7, "5xl": 6, "7xl": 3 },
+      "canonicalWidth": 576,
+      "variantUsage": { "form": 98, "default": 33, "no-exit": 7, "warning": 3 },
+      "title": { "fontSize": { "base": 20, "wide": 24 }, "fontWeight": 500, "color": "#292929", "align": "center" },
+      "description": { "fontSize": { "base": 12, "wide": 14 }, "color": "#6B7280", "align": "center", "paddingY": 8 },
+      "header": { "stackGap": { "base": 4, "wide": 6 }, "alignSmall": "center", "alignLarge": "left" },
+      "footer": { "layoutSmall": "column-reverse", "layoutLarge": "row, right-aligned", "gap": 8 },
+      "closeButton": { "position": "outside top-right", "offsetRight": -10, "offsetTop": -8, "offsetRightWide": -12, "offsetTopWide": -12, "hoverOffsetRight": -8, "hoverOffsetTop": -4, "padding": { "base": 4, "wide": 6 }, "radius": 4, "background": "#FFFFFF", "borderWidth": 1, "shadow": "lg", "iconSize": { "base": 16, "wide": 20 }, "hoverIconRotate": 90, "transition": 300 }
+    },
+
+    "sheet": {
+      "scrim": { "color": "#000000", "alpha": 0.40 },
+      "padding": 24,
+      "formVariantPadding": { "base": 16, "wide": 32 },
+      "shadow": "lg",
+      "widthFraction": 0.75,
+      "maxWidthDefault": 384,
+      "commonWidths": ["max-w-md 3xl:max-w-xl", "max-w-lg sm:max-w-lg 3xl:max-w-xl", "max-w-sm 3xl:max-w-md", "md:max-w-5xl"],
+      "openDuration": 500,
+      "closeDuration": 300,
+      "easing": "ease-in-out",
+      "defaultSide": "right",
+      "title": { "fontSize": 30, "fontWeight": 500, "color": "#4B5563", "align": "center" },
+      "closeButtonOutside": { "size": 45, "offsetLeft": -64, "offsetTop": 16, "padding": 10, "radius": 6, "borderWidth": 1, "background": "#FFFFFF", "iconColor": "#D90819" },
+      "closeButtonBottomSide": { "offsetTop": -48, "centered": true }
+    },
+
+    "bottomSheet": {
+      "$comment": "vaul Drawer - the correct analogue for a Flutter modal bottom sheet",
+      "scrim": { "color": "#000000", "alpha": 0.80 },
+      "topRadius": 10,
+      "borderWidth": 1,
+      "background": "#FFFFFF",
+      "topInset": 96,
+      "handle": { "width": 100, "height": 8, "radius": 9999, "color": "#DEDEDE", "marginTop": 16 },
+      "headerPadding": 16,
+      "headerGap": 6,
+      "scalesBackground": true
+    },
+
+    "pagination": {
+      "itemHeight": 38,
+      "itemGap": 4,
+      "activeVariant": "outline",
+      "inactiveVariant": "ghost",
+      "prevNextPaddingX": { "base": 12, "wide": 24 },
+      "prevNextIconSize": 16,
+      "endBehaviour": "hidden",
+      "ellipsisBox": 36,
+      "ellipsisIconSize": 16,
+      "windowRule": "<=6 pages: show all; else 1 2 ... current ... n-1 n",
+      "pageSizeOptions": [25, 50, 100, 150],
+      "pageSizeSelect": { "height": { "base": 32, "wide": 38 }, "width": 80, "borderColor": "#DEDEDE" },
+      "labelFontSize": { "base": 12, "wide": 14 },
+      "labelFontWeight": 500,
+      "hiddenWhenCountAtMost": 25,
+      "selectionCount": { "fontSize": { "base": 12, "wide": 14 }, "color": "#999999" }
+    },
+
+    "sidebar": {
+      "widthExpanded": 240,
+      "widthCollapsed": 64,
+      "expandsOnHover": true,
+      "overlaysWhenCollapsed": true,
+      "transition": { "duration": 300, "easing": "ease-in-out" },
+      "borderRight": 1,
+      "background": "#FFFFFF",
+      "headerHeight": 56,
+      "headerPaddingX": 8,
+      "logo": { "widthExpanded": 128, "widthCollapsed": 36, "height": 40 },
+      "listPaddingX": 8,
+      "groupGap": 6,
+      "item": { "height": { "base": 38, "wide": 42 }, "radius": 8, "paddingY": 10, "paddingX": 12, "iconGap": 16, "iconSize": { "base": 16, "wide": 20 }, "fontSize": { "base": 14, "wide": 16 }, "fontWeight": 400, "restColor": "#575757", "hoverBg": { "color": "#FCA592", "alpha": 0.20 }, "activeBg": { "color": "#FCA592", "alpha": 0.20 }, "activeFg": "#D90819", "transition": 150 },
+      "activeIndicator": { "width": 4, "heightFraction": 0.5, "side": "left", "radius": "right-full", "color": "#D90819", "transition": 300 },
+      "subItem": { "paddingX": 20, "paddingY": 10, "gap": 8, "radius": 6, "fontSize": { "base": 12, "wide": 14 }, "restColor": "#404040", "activeFg": "#D90819", "bulletSize": 12, "bulletStrokeWidth": 5, "bulletRestFill": "#8C8C8C", "bulletActiveFill": "#D90819", "connectorWidth": 1, "connectorHeight": 16, "connectorColor": "#CED4DA" },
+      "footer": { "padding": 8, "gap": 8, "profileBoxPadding": 8, "profileBoxRadius": 6, "profileBoxBorder": 1 }
+    },
+
+    "mobileBottomNav": {
+      "$comment": "apps/connect - the phone pattern",
+      "widthFraction": 0.95,
+      "maxWidth": 896,
+      "bottomInset": 8,
+      "background": "#FFFFFF",
+      "borderWidth": 1,
+      "radius": 6,
+      "paddingY": 12,
+      "paddingX": 48,
+      "itemGap": 4,
+      "iconSize": 20,
+      "labelFontSize": { "base": 12, "wide": 14 },
+      "labelFontWeight": 500,
+      "restColor": "#575757",
+      "activeColor": "#D90819",
+      "floating": true
+    },
+
+    "emptyState": {
+      "paddingY": { "default": 96, "small": 36 },
+      "stackGap": 24,
+      "innerStackGap": 8,
+      "illustrationSize": { "base": 120, "wide": 175 },
+      "titleFontSize": { "base": 18, "wide": 20 },
+      "titleFontWeight": 700,
+      "descriptionFontSize": { "base": 12, "wide": 16 },
+      "align": "center",
+      "ctaVariant": "default",
+      "ctaLeadingIcon": "plus"
+    },
+
+    "skeleton": {
+      "background": "#F1F5F9",
+      "backgroundDark": { "color": "#FFFFFF", "alpha": 0.10 },
+      "radius": 6,
+      "animation": "pulse",
+      "duration": 2000,
+      "easing": "cubic-bezier(0.4, 0, 0.6, 1)",
+      "opacityRange": [1, 0.5],
+      "shimmer": false,
+      "presets": {
+        "pageTitle": { "height": 40, "width": 224 },
+        "filterBar": { "height": 44 },
+        "filterChip": { "height": 40, "width": 100 },
+        "pagination": { "height": 44 },
+        "tableBody": { "flex": 1 },
+        "tableRows": 25,
+        "rowIndex": { "height": 20, "width": 32 },
+        "rowAvatar": { "size": 32, "radius": 9999 },
+        "rowLabel": { "height": 16, "width": 128 },
+        "cardTile": { "aspectRatio": 1, "background": "#F2F4F7", "count": 20 }
+      },
+      "sectionSpinner": { "icon": "Loader2", "size": 32, "containerPaddingY": 64 }
+    },
+
+    "toast": {
+      "library": "sonner",
+      "background": "#FFFFFF",
+      "foreground": "#121212",
+      "borderColor": "#EBE9F1",
+      "shadow": "lg",
+      "descriptionColor": "#999999",
+      "actionButton": { "bg": "#D90819", "fg": "#FFFFFF" },
+      "cancelButton": { "bg": "#DEDEDE", "fg": "#999999" }
+    },
+
+    "avatar": { "defaultSize": 40, "radius": 9999, "radiusMdVariant": 6, "fallbackBg": "#E1E6FF", "fallbackFg": "#000000", "fallbackFontSizeRatio": 0.4, "fallbackTransform": "uppercase", "fallbackInitials": 2 },
+
+    "progress": { "height": 8, "radius": 9999, "trackColor": { "color": "#D90819", "alpha": 0.20 }, "indicatorColor": "#D90819" },
+
+    "separator": { "thickness": 1, "color": "#EBE9F1" },
+
+    "accordion": { "itemBorderBottom": 1, "triggerPaddingY": 16, "triggerFontWeight": 500, "chevronSize": 16, "chevronRotate": 180, "chevronDuration": 200, "contentPaddingBottom": 16, "animationDuration": 200, "animationEasing": "ease-out" },
+
+    "commandPalette": { "inputHeight": 38, "inputPaddingY": 12, "inputFontSize": { "base": 12, "wide": 14 }, "searchIconSize": 16, "searchIconOpacity": 0.5, "listMaxHeight": 300, "itemMinHeight": { "base": 40, "wide": 44 }, "itemRadius": 4, "itemPaddingX": 8, "itemPaddingY": 6, "selectedBg": { "color": "#F2F4F7", "alpha": 0.5 }, "groupHeadingFontSize": 12, "groupHeadingWeight": 500, "groupHeadingColor": "#999999" },
+
+    "appShell": {
+      "rootLayout": "flex, h-screen, w-screen, overflow-hidden",
+      "bodyScroll": false,
+      "contentColumn": { "paddingX": 24, "paddingY": 20, "scrolls": true, "scrollbar": "thin" },
+      "navHeight": 56,
+      "contentLayoutUtility": { "maxWidth": 1024, "stackGap": 48, "paddingY": 48, "centered": true }
+    }
+  }
+}

@@ -25,7 +25,7 @@ class ShellNotificationsButton extends StatelessWidget {
         elevation: const WidgetStatePropertyAll(0),
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(context.appRadius.card),
+            borderRadius: BorderRadius.circular(context.appRadius.container),
             side: BorderSide(color: context.appColors.hairline),
           ),
         ),
@@ -125,7 +125,9 @@ class _NoticeRow extends StatelessWidget {
               DecoratedBox(
                 decoration: BoxDecoration(
                   color: tone.background(context),
-                  borderRadius: BorderRadius.circular(context.appRadius.tile),
+                  borderRadius: BorderRadius.circular(
+                    context.appRadius.container,
+                  ),
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(spacing.xs),
@@ -151,7 +153,6 @@ class _NoticeRow extends StatelessWidget {
                 label: count,
                 tone: tone,
                 dense: true,
-                showDot: false,
               ),
             ],
           ),

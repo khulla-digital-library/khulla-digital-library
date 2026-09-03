@@ -33,12 +33,12 @@ extension AppStatusToneColors on AppStatusTone {
   Color foreground(BuildContext context) {
     final colors = context.appColors;
     return switch (this) {
-      AppStatusTone.neutral => colors.textMuted,
+      AppStatusTone.neutral => colors.ink500,
       AppStatusTone.success => colors.success,
       AppStatusTone.warning => colors.warning,
       AppStatusTone.info => colors.info,
       AppStatusTone.danger => colors.danger,
-      AppStatusTone.brand => context.colorScheme.primary,
+      AppStatusTone.brand => colors.brand,
     };
   }
 
@@ -58,10 +58,11 @@ extension AppStatusToneColors on AppStatusTone {
     };
   }
 
-  /// The hairline around a badge, at the strength that survives on both a
-  /// white card and a dark one.
+  /// The hairline around a badge. Derived from [foreground] rather than
+  /// hand-picked, so a new tone cannot arrive with a border that does not
+  /// belong to its hue.
   Color border(BuildContext context) =>
-      foreground(context).withValues(alpha: 0.22);
+      foreground(context).withValues(alpha: 0.2);
 
   /// Content that sits on a *solid* [foreground] fill.
   Color onSolid(BuildContext context) {

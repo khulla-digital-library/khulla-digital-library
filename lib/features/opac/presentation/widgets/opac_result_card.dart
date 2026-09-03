@@ -48,7 +48,9 @@ class OpacResultCard extends StatelessWidget {
                 height: 64,
                 decoration: BoxDecoration(
                   color: colors.brandSoft,
-                  borderRadius: BorderRadius.circular(context.appRadius.tile),
+                  borderRadius: BorderRadius.circular(
+                    context.appRadius.container,
+                  ),
                   border: Border.all(color: colors.hairline),
                 ),
                 alignment: Alignment.center,
@@ -115,7 +117,6 @@ class OpacResultCard extends StatelessWidget {
                 ),
               ),
               AppButton(
-                size: AppButtonSize.small,
                 variant: AppButtonVariant.outline,
                 onPressed: onShelf ? onDetails : onHold,
                 child: Text(

@@ -62,10 +62,8 @@ class RecordHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: context.textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.6,
-            color: colors.textHigh,
+          style: context.appTextStyles.pageHeader.copyWith(
+            color: colors.ink100,
           ),
         ),
         if (caption != null) ...[SizedBox(height: spacing.xxs), caption],
@@ -73,8 +71,8 @@ class RecordHeader extends StatelessWidget {
           SizedBox(height: spacing.xs),
           Text(
             facts.join('  ·  '),
-            style: context.textTheme.bodySmall?.copyWith(
-              color: colors.textMuted,
+            style: context.appTextStyles.body.copyWith(
+              color: colors.mutedForeground,
             ),
           ),
         ],

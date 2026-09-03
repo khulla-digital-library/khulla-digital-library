@@ -2,9 +2,12 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// The header row of an [AppTable] or [AppSliverTable].
 ///
-/// Every sortable column shows its arrows at rest, muted, and lights the
-/// active one: a header that only reveals sorting on hover is a control
-/// nobody finds, and one that reveals it on click is a control nobody trusts.
+/// A tinted band rather than a filled bar: the header is 5% of the meta ink
+/// over the page, which separates it from the rows without introducing a
+/// second surface color.
+///
+/// A sorted column keeps its glyph visible; an unsorted sortable column
+/// reveals it on hover, so a twelve-column table is not a wall of arrows.
 ///
 /// Sorting is *reported*, never performed — see [AppTableSort].
 class AppTableHeader<T> extends StatelessWidget {
@@ -12,7 +15,7 @@ class AppTableHeader<T> extends StatelessWidget {
     required this.columns,
     this.sort,
     this.onSort,
-    this.height = 44,
+    this.height,
     super.key,
   });
 
@@ -25,13 +28,12 @@ class AppTableHeader<T> extends StatelessWidget {
   /// Called with the sort the user asked for. Null makes the header inert.
   final ValueChanged<AppTableSort>? onSort;
 
-  /// The header's height.
-  final double height;
+  /// The header's height. Null resolves to the density's header height.
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
     final colors = context.appColors;
     final visible = AppTableColumn.visible(columns, context.formFactor);
     final current = sort;
@@ -39,11 +41,11 @@ class AppTableHeader<T> extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerLow,
+        color: colors.tints.tableHeader,
         border: Border(bottom: BorderSide(color: colors.hairline)),
       ),
       child: SizedBox(
-        height: height,
+        height: height ?? context.appMetrics.tableHeaderHeight,
         child: Row(
           children: [
             for (final column in visible)
@@ -52,7 +54,7 @@ class AppTableHeader<T> extends StatelessWidget {
                   column: column,
                   sort: current,
                   onSort: column.sortable ? handler : null,
-                  padding: EdgeInsets.symmetric(horizontal: spacing.sm),
+                  padding: EdgeInsets.symmetric(horizontal: spacing.md),
                 ),
               ),
           ],
@@ -62,7 +64,7 @@ class AppTableHeader<T> extends StatelessWidget {
   }
 }
 
-class _HeaderCell<T> extends StatelessWidget {
+class _HeaderCell<T> extends StatefulWidget {
   const _HeaderCell({
     required this.column,
     required this.sort,
@@ -76,12 +78,21 @@ class _HeaderCell<T> extends StatelessWidget {
   final EdgeInsets padding;
 
   @override
+  State<_HeaderCell<T>> createState() => _HeaderCellState<T>();
+}
+
+class _HeaderCellState<T> extends State<_HeaderCell<T>> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
+    final column = widget.column;
+    final padding = widget.padding;
     final colors = context.appColors;
     final scheme = context.colorScheme;
-    final current = sort;
+    final current = widget.sort;
     final isSorted = current != null && current.columnId == column.id;
-    final handler = onSort;
+    final handler = widget.onSort;
 
     final content = Align(
       alignment: column.alignment,
@@ -93,19 +104,20 @@ class _HeaderCell<T> extends StatelessWidget {
               column.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: context.textTheme.labelSmall?.copyWith(
-                fontSize: 12,
-                color: isSorted ? colors.textHigh : colors.textMuted,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0,
+              style: context.appTextStyles.columnHeader.copyWith(
+                color: isSorted ? colors.ink100 : colors.ink500,
               ),
             ),
           ),
           if (handler != null)
-            _SortGlyphs(
-              ascending: isSorted ? current.ascending : null,
-              active: scheme.primary,
-              rest: colors.hairlineStrong,
+            AnimatedOpacity(
+              duration: context.appMotion.color,
+              opacity: isSorted || _hovered ? 1 : 0,
+              child: _SortGlyphs(
+                ascending: isSorted ? current.ascending : null,
+                active: scheme.primary,
+                rest: colors.hairlineStrong,
+              ),
             ),
         ],
       ),
@@ -115,13 +127,19 @@ class _HeaderCell<T> extends StatelessWidget {
       return Padding(padding: padding, child: content);
     }
 
-    return InkWell(
-      onTap: () => handler(
-        current == null
-            ? AppTableSort(columnId: column.id)
-            : current.toggled(column.id),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => handler(
+          current == null
+              ? AppTableSort(columnId: column.id)
+              : current.toggled(column.id),
+        ),
+        child: Padding(padding: padding, child: content),
       ),
-      child: Padding(padding: padding, child: content),
     );
   }
 }

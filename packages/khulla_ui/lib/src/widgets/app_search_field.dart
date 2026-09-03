@@ -6,9 +6,10 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// knows whether the query costs a `LIKE` over ten thousand rows or a filter
 /// over a list already in memory.
 ///
-/// The field is filled rather than outlined: on a page made of white cards, a
-/// filled control is the one that reads as "type here" without adding another
-/// hairline to a screen that already has forty.
+/// It carries the same hairline box as every other field — no fill, no focus
+/// ring, and the same 2px focus nudge — so a search bar above a table and a
+/// text field inside a form read as the same control. A leading glyph in the
+/// muted icon ink is the only thing that marks it as search.
 class AppSearchField extends StatefulWidget {
   const AppSearchField({
     required this.hintText,
@@ -95,14 +96,8 @@ class _AppSearchFieldState extends State<AppSearchField> {
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
     final colors = context.appColors;
+    final metrics = context.appMetrics;
     final clearLabel = widget.clearTooltip;
-    final radius = BorderRadius.circular(context.appRadius.field);
-
-    OutlineInputBorder border(Color color, [double width = 1]) =>
-        OutlineInputBorder(
-          borderRadius: radius,
-          borderSide: BorderSide(color: color, width: width),
-        );
 
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: _controller,
@@ -114,33 +109,30 @@ class _AppSearchFieldState extends State<AppSearchField> {
         onChanged: widget.onChanged,
         onSubmitted: widget.onSubmitted,
         textInputAction: TextInputAction.search,
-        style: context.textTheme.bodyMedium?.copyWith(color: scheme.onSurface),
+        style: context.appTextStyles.body.copyWith(color: scheme.onSurface),
         decoration: InputDecoration(
-          isDense: widget.dense,
+          isDense: true,
           hintText: widget.hintText,
-          filled: true,
-          fillColor: scheme.surfaceContainerLow,
           prefixIcon: Icon(
             Icons.search_rounded,
-            size: spacing.md + 2,
-            color: colors.textMuted,
+            size: metrics.icon,
+            color: colors.mutedForeground,
           ),
           prefixIconConstraints: BoxConstraints(
-            minWidth: spacing.xlg + spacing.xxs,
-            minHeight: spacing.xlg,
+            minWidth: metrics.fieldHeight,
+            minHeight: metrics.fieldHeight,
           ),
           suffixIcon: value.text.isNotEmpty && clearLabel != null
               ? AppIconButton(
                   icon: Icons.close_rounded,
                   tooltip: clearLabel,
+                  size: AppIconButtonSize.small,
                   onPressed: _clear,
                 )
               : widget.trailing,
-          border: border(colors.hairline),
-          enabledBorder: border(colors.hairline),
-          focusedBorder: border(scheme.primary, 1.5),
           contentPadding: EdgeInsets.symmetric(
-            vertical: widget.dense ? spacing.xs + 2 : spacing.sm,
+            horizontal: spacing.sm,
+            vertical: widget.dense ? spacing.xs : spacing.sm,
           ),
         ),
       ),

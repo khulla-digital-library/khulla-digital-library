@@ -8,10 +8,11 @@ import 'package:khulla_ui/src/theme/app_palette.dart';
 /// once surface tint is involved. These are plain [BoxShadow] lists instead,
 /// so a card, a menu and a sheet can be given the same depth by name.
 ///
-/// The scale is deliberately shallow. Depth in this UI comes from the
-/// hairline; the shadow only stops a white card from cutting out of the
-/// canvas. A heavy drop shadow is what makes a dashboard look like a mockup
-/// rather than a tool.
+/// The scale is deliberately shallow — the largest is a 15px blur at 10%
+/// black. Depth here comes from the hairline; the shadow only stops a white
+/// surface from cutting out of the canvas. Material's default elevation
+/// shadows are several times darker and will make this UI look like a
+/// different product, so do not substitute them.
 class AppShadows extends ThemeExtension<AppShadows> {
   const AppShadows({
     required this.card,
@@ -21,73 +22,65 @@ class AppShadows extends ThemeExtension<AppShadows> {
 
   /// The light scale.
   factory AppShadows.light() => AppShadows(
-    card: [
-      BoxShadow(
-        color: AppPalette.shadowLight.withValues(alpha: 0.04),
-        blurRadius: 2,
-        offset: const Offset(0, 1),
-      ),
-    ],
-    raised: [
-      BoxShadow(
-        color: AppPalette.shadowLight.withValues(alpha: 0.06),
-        blurRadius: 8,
-        offset: const Offset(0, 2),
-      ),
-      BoxShadow(
-        color: AppPalette.shadowLight.withValues(alpha: 0.04),
-        blurRadius: 2,
-        offset: const Offset(0, 1),
-      ),
-    ],
-    overlay: [
-      BoxShadow(
-        color: AppPalette.shadowLight.withValues(alpha: 0.12),
-        blurRadius: 28,
-        offset: const Offset(0, 12),
-      ),
-      BoxShadow(
-        color: AppPalette.shadowLight.withValues(alpha: 0.06),
-        blurRadius: 6,
-        offset: const Offset(0, 2),
-      ),
-    ],
+    card: _card(0.05),
+    raised: _raised(0.1),
+    overlay: _overlay(0.1),
   );
 
   /// The dark scale. A shadow is nearly invisible on a dark canvas, so the
-  /// same three roles are carried by a heavier, tighter black.
+  /// same three roles are carried by the same geometry at a heavier alpha.
   factory AppShadows.dark() => AppShadows(
-    card: [
-      BoxShadow(
-        color: AppPalette.shadowDark.withValues(alpha: 0.28),
-        blurRadius: 2,
-        offset: const Offset(0, 1),
-      ),
-    ],
-    raised: [
-      BoxShadow(
-        color: AppPalette.shadowDark.withValues(alpha: 0.36),
-        blurRadius: 10,
-        offset: const Offset(0, 3),
-      ),
-    ],
-    overlay: [
-      BoxShadow(
-        color: AppPalette.shadowDark.withValues(alpha: 0.55),
-        blurRadius: 30,
-        offset: const Offset(0, 14),
-      ),
-    ],
+    card: _card(0.3),
+    raised: _raised(0.45),
+    overlay: _overlay(0.55),
   );
 
-  /// A card, a table, a stat tile — anything resting on the canvas.
+  /// Anything resting on the canvas: a card, a button, a pinned table header.
   final List<BoxShadow> card;
 
-  /// A hovered card, a pinned table header that has content scrolled under it.
+  /// Anything floating just above the page: a menu, a popover, a tooltip.
   final List<BoxShadow> raised;
 
-  /// A menu, a dialog, a side sheet — anything floating above the page.
+  /// Anything the page is behind: a dialog, a sheet, a toast.
   final List<BoxShadow> overlay;
+
+  static List<BoxShadow> _card(double alpha) => [
+    BoxShadow(
+      color: AppPalette.shadow.withValues(alpha: alpha),
+      blurRadius: 2,
+      offset: const Offset(0, 1),
+    ),
+  ];
+
+  static List<BoxShadow> _raised(double alpha) => [
+    BoxShadow(
+      color: AppPalette.shadow.withValues(alpha: alpha),
+      blurRadius: 6,
+      spreadRadius: -1,
+      offset: const Offset(0, 4),
+    ),
+    BoxShadow(
+      color: AppPalette.shadow.withValues(alpha: alpha),
+      blurRadius: 4,
+      spreadRadius: -2,
+      offset: const Offset(0, 2),
+    ),
+  ];
+
+  static List<BoxShadow> _overlay(double alpha) => [
+    BoxShadow(
+      color: AppPalette.shadow.withValues(alpha: alpha),
+      blurRadius: 15,
+      spreadRadius: -3,
+      offset: const Offset(0, 10),
+    ),
+    BoxShadow(
+      color: AppPalette.shadow.withValues(alpha: alpha),
+      blurRadius: 6,
+      spreadRadius: -4,
+      offset: const Offset(0, 4),
+    ),
+  ];
 
   @override
   AppShadows copyWith({

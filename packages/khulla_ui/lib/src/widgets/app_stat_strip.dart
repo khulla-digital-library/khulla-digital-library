@@ -65,12 +65,12 @@ class AppStatStrip extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: scheme.surface,
-        borderRadius: BorderRadius.circular(context.appRadius.card),
+        borderRadius: BorderRadius.circular(context.appRadius.container),
         border: Border.all(color: colors.hairlineStrong),
         boxShadow: context.appShadows.card,
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(context.appRadius.card),
+        borderRadius: BorderRadius.circular(context.appRadius.container),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

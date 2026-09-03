@@ -362,7 +362,6 @@ class _SavedReportTile extends StatelessWidget {
 
     final exports = [
       AppButton(
-        size: AppButtonSize.small,
         variant: AppButtonVariant.outline,
         icon: Icons.picture_as_pdf_outlined,
         onPressed: () => showNotWiredToast(context),
@@ -370,7 +369,6 @@ class _SavedReportTile extends StatelessWidget {
       ),
       SizedBox(width: spacing.xs),
       AppButton(
-        size: AppButtonSize.small,
         variant: AppButtonVariant.outline,
         icon: Icons.table_view_outlined,
         onPressed: () => showNotWiredToast(context),

@@ -1,7 +1,9 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// {@template app_icon_button}
-/// A square icon-only control with the 44px target the rest of the app uses.
+/// A square icon-only control, in the three sizes that pair with
+/// [AppButton]'s: 32 for a table row, 36 beside a 36px button, 40 for a
+/// toolbar.
 ///
 /// [tooltip] is required, not optional: an icon-only control with no label is
 /// unreachable by a screen reader and unguessable by everyone else, and on a
@@ -18,6 +20,7 @@ class AppIconButton extends StatelessWidget {
     this.selected = false,
     this.badge = false,
     this.badgeTone = AppStatusTone.danger,
+    this.size = AppIconButtonSize.medium,
     super.key,
   });
 
@@ -48,44 +51,41 @@ class AppIconButton extends StatelessWidget {
   /// The dot's tone.
   final AppStatusTone badgeTone;
 
+  /// How much room the control takes.
+  final AppIconButtonSize size;
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
+    final colors = context.appColors;
+    final metrics = context.appMetrics;
     final resolvedTone = tone;
     final foreground = selected
         ? scheme.primary
-        : resolvedTone?.foreground(context) ?? scheme.onSurfaceVariant;
+        : resolvedTone?.foreground(context) ?? colors.ink500;
 
-    final button = IconButton(
-      onPressed: onPressed,
-      icon: Icon(icon, size: spacing.md + 4),
-      color: foreground,
-      visualDensity: VisualDensity.standard,
-      constraints: BoxConstraints.tightFor(
-        width: spacing.xlg + spacing.sm,
-        height: spacing.xlg + spacing.sm,
-      ),
-      style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(
-          filled || selected
+    final side = switch (size) {
+      AppIconButtonSize.small => metrics.iconButtonSmall,
+      AppIconButtonSize.medium => metrics.iconButtonMedium,
+      AppIconButtonSize.large => metrics.iconButtonLarge,
+    };
+    final radius = BorderRadius.circular(context.appRadius.container);
+
+    final button = AppRipple(
+      onTap: onPressed,
+      borderRadius: radius,
+      child: Container(
+        width: side,
+        height: side,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: filled || selected
               ? (resolvedTone ?? AppStatusTone.brand).background(context)
               : Colors.transparent,
+          borderRadius: radius,
         ),
-        shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(context.appRadius.control),
-          ),
-        ),
-        overlayColor: WidgetStatePropertyAll(
-          foreground.withValues(alpha: 0.08),
-        ),
-        mouseCursor: const WidgetStateProperty<MouseCursor?>.fromMap(
-          <WidgetStatesConstraint, MouseCursor?>{
-            WidgetState.disabled: SystemMouseCursors.basic,
-            WidgetState.any: SystemMouseCursors.click,
-          },
-        ),
+        child: Icon(icon, size: metrics.icon, color: foreground),
       ),
     );
 
@@ -115,4 +115,16 @@ class AppIconButton extends StatelessWidget {
           : button,
     );
   }
+}
+
+/// The three icon-button sizes, paired with [AppButton]'s heights.
+enum AppIconButtonSize {
+  /// 32px — inside a table row, where the row is only ~37px tall.
+  small,
+
+  /// 36px — the default, matching a small button.
+  medium,
+
+  /// 40px — a toolbar or a page header.
+  large,
 }

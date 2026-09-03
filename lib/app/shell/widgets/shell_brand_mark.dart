@@ -5,8 +5,12 @@ import 'package:khulla_ui/khulla_ui.dart';
 ///
 /// Collapses to the monogram alone when the rail is not [extended], so it
 /// keeps the rail's width rather than forcing it wider. The mark is drawn
-/// rather than shipped as an asset: three ascending strokes on the brand
-/// square read as books on a shelf at 32px, which a raster logo does not.
+/// rather than shipped as an asset: a glyph on the flat brand square reads at
+/// 32px, which a raster logo does not.
+///
+/// Flat, not gradient. The brand is one colour in this design, and a gradient
+/// on the one square that represents the product is exactly the kind of
+/// decoration the rest of the chrome refuses.
 class ShellBrandMark extends StatelessWidget {
   const ShellBrandMark({required this.extended, super.key});
 
@@ -23,17 +27,13 @@ class ShellBrandMark extends StatelessWidget {
       width: spacing.xlg,
       height: spacing.xlg,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [scheme.primary, context.appColors.brandDeep],
-        ),
-        borderRadius: BorderRadius.circular(context.appRadius.tile),
+        color: scheme.primary,
+        borderRadius: BorderRadius.circular(context.appRadius.container),
       ),
       alignment: Alignment.center,
       child: Icon(
         Icons.auto_stories_rounded,
-        size: spacing.md + 2,
+        size: context.appMetrics.iconLarge,
         color: scheme.onPrimary,
       ),
     );
@@ -55,18 +55,16 @@ class ShellBrandMark extends StatelessWidget {
                 l10n.appName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: context.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.4,
-                  color: context.appColors.textHigh,
+                style: context.appTextStyles.sectionTitle.copyWith(
+                  color: context.appColors.ink100,
                 ),
               ),
               Text(
                 l10n.appTagline,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: context.textTheme.labelSmall?.copyWith(
-                  color: context.appColors.textMuted,
+                style: context.appTextStyles.micro.copyWith(
+                  color: context.appColors.ink500,
                 ),
               ),
             ],

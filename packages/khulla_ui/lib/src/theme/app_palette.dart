@@ -6,190 +6,189 @@ import 'package:flutter/material.dart';
 /// from outside `packages/khulla_ui`. Widgets read color through
 /// [ThemeData.colorScheme] or `context.appColors`.
 ///
-/// Rebranding the product is a matter of editing this one file: every token,
-/// component theme, and widget downstream resolves from these values.
+/// Every value here is traced to `docs/design-tokens.json`, which is itself
+/// reverse-engineered from the SaaS the product shares a design language
+/// with. Three ramps carry the whole system:
 ///
-/// The scale is deliberately two-part. A **brand** ramp carries a single warm
-/// accent — the only saturated color in the chrome — and a **neutral** ramp
-/// carries everything else. A dense catalogue screen is mostly text, rules and
-/// hairlines; keeping the neutrals cool and the accent alone lets a status
-/// badge or a primary button read as the one thing that is different.
+/// * **brand** — one saturated red. It is the *only* saturated hue in the
+///   chrome, and it doubles as the destructive color.
+/// * **ink** — a text ramp that inverts in dark mode. `ink100` is the
+///   darkest ink in light mode and the lightest in dark. The one exception is
+///   [ink700], which is a *line* color and does not invert.
+/// * **neutral** — a fixed grey ramp that never inverts, for surfaces that
+///   are deliberately light whatever the theme.
+///
+/// The warm tints that carry every hover, active and selected surface come
+/// from [accent] at low alpha, not from the brand red — compositing a light
+/// salmon over white reads warmer than tinting the red does.
 abstract final class AppPalette {
   // ── Brand ─────────────────────────────────────────────────────────────────
 
-  /// Khulla's accent, used to seed [ColorScheme] and to paint the one
-  /// primary action a screen is allowed.
-  static const Color brandSeed = Color(0xFFF26322);
+  /// The brand. Primary fill, active nav ink, focus ring, destructive text,
+  /// required-field marker.
+  static const Color brand = Color(0xFFD90819);
 
-  /// Pressed / hovered brand on light surfaces.
-  static const Color brandStrongLight = Color(0xFFD24E15);
+  /// The hairline drawn on a filled brand button, at 70% alpha.
+  static const Color brandButtonBorder = Color(0xFFB91C1C);
 
-  /// Deeper brand for emphasis text and ink ripples on light surfaces.
-  static const Color brandDeepLight = Color(0xFFB03F10);
+  /// The source of every warm tint. Never painted at full strength.
+  static const Color accent = Color(0xFFFCA592);
 
-  /// Brand wash behind an active rail item, a brand badge, an icon chip.
-  static const Color brandSoftLight = Color(0xFFFFF1E9);
+  /// The palest brand wash, for a surface that must be opaque.
+  static const Color brandTint = Color(0xFFFEE8E7);
 
-  /// Lifted brand for the same roles on dark surfaces.
-  static const Color brandDeepDark = Color(0xFFFF9A63);
+  /// The faintest brand wash.
+  static const Color brandTintFaint = Color(0xFFFFFAFA);
 
-  /// Brand wash on dark surfaces.
-  static const Color brandSoftDark = Color(0xFF35211A);
+  /// Content on a solid [brand] fill.
+  static const Color onBrand = Color(0xFFFFFFFF);
 
-  // ── Neutrals, light ───────────────────────────────────────────────────────
+  /// The brand darkened, for emphasis ink and the deep end of a gradient.
+  static const Color brandDeep = Color(0xFFA00612);
 
-  /// High-emphasis text that sits above [ColorScheme.onSurface].
-  static const Color textHighLight = Color(0xFF0F1319);
+  // ── Ink ramp, light ───────────────────────────────────────────────────────
 
-  /// Body text on light surfaces.
-  static const Color textBodyLight = Color(0xFF262C36);
+  /// Primary text.
+  static const Color ink100Light = Color(0xFF121212);
 
-  /// Secondary and supporting text on light surfaces.
-  static const Color textMutedLight = Color(0xFF6A7382);
+  /// Form labels, dialog titles.
+  static const Color ink200Light = Color(0xFF292929);
 
-  /// Neutral white surface for cards, sheets, tables, and the chrome.
-  static const Color surfaceLight = Color(0xFFFFFFFF);
+  /// Sub-navigation text.
+  static const Color ink300Light = Color(0xFF404040);
 
-  /// A half-step off white: table headers, hovered rows, field fills.
-  static const Color surfaceSubtleLight = Color(0xFFF7F8FA);
+  /// Navigation link at rest, filter labels.
+  static const Color ink400Light = Color(0xFF575757);
 
-  /// The page canvas the cards sit on.
-  static const Color surfaceMutedLight = Color(0xFFF0F2F5);
+  /// Secondary and meta text, outline-button ink.
+  static const Color ink500Light = Color(0xFF707070);
 
-  /// Neutral hairline between rows, cards and sections.
-  static const Color outlineLight = Color(0xFFE6E9EF);
+  /// Tertiary text.
+  static const Color ink600Light = Color(0xFF8C8C8C);
 
-  /// The hairline one step stronger, for a field border or a divider that
-  /// has to survive next to a filled surface.
-  static const Color outlineStrongLight = Color(0xFFD5DAE3);
+  // ── Ink ramp, dark ────────────────────────────────────────────────────────
 
-  /// Ambient shadow on light surfaces. Cards are lifted by a whisper, not a
-  /// drop shadow — depth comes from the hairline, the shadow only softens it.
-  static const Color shadowLight = Color(0xFF101828);
+  /// Primary text on dark.
+  static const Color ink100Dark = Color(0xFFFFFFFF);
 
-  // ── Neutrals, dark ────────────────────────────────────────────────────────
+  /// Labels and dialog titles on dark.
+  static const Color ink200Dark = Color(0xFFF5F5F5);
 
-  /// High-emphasis text on dark surfaces.
-  static const Color textHighDark = Color(0xFFF6F8FA);
+  /// Sub-navigation text on dark.
+  static const Color ink300Dark = Color(0xFFDEDEDE);
 
-  /// Body text on dark surfaces.
-  static const Color textBodyDark = Color(0xFFE3E7ED);
+  /// Navigation link at rest on dark.
+  static const Color ink400Dark = Color(0xFFC9C9C9);
 
-  /// Secondary text on dark surfaces.
-  static const Color textMutedDark = Color(0xFF97A1B0);
+  /// Secondary and meta text on dark.
+  static const Color ink500Dark = Color(0xFFB5B5B5);
+
+  /// Tertiary text on dark.
+  static const Color ink600Dark = Color(0xFF9E9E9E);
+
+  /// The line color: checkbox border, zebra base, sub-item connectors.
+  ///
+  /// The one rung of the ink ramp that does **not** invert — it is a rule,
+  /// not an ink, and a rule reads the same weight in either theme.
+  static const Color ink700 = Color(0xFFCED4DA);
+
+  // ── Fixed neutrals ────────────────────────────────────────────────────────
+
+  /// Pure white.
+  static const Color white100 = Color(0xFFFFFFFF);
+
+  /// The card fill in the primitive card variant — greyer than the page.
+  static const Color white200 = Color(0xFFF5F5F5);
+
+  /// Separators and muted fills.
+  static const Color white300 = Color(0xFFDEDEDE);
+
+  /// A step down from [white300].
+  static const Color white400 = Color(0xFFC9C9C9);
+
+  /// A step down again.
+  static const Color white500 = Color(0xFFB5B5B5);
+
+  /// Leading-icon color inside a field; the unchecked switch track at 50%.
+  static const Color white600 = Color(0xFF9E9E9E);
+
+  /// The secondary surface: secondary button, ghost hover, tab track.
+  static const Color secondaryLight = Color(0xFFF2F4F7);
+
+  /// Placeholders, captions, table-head ink, selection counts.
+  static const Color mutedForegroundLight = Color(0xFF999999);
+
+  /// The single hairline. Every border in the light theme is this color.
+  static const Color borderLight = Color(0xFFEBE9F1);
+
+  // ── Dark surfaces ─────────────────────────────────────────────────────────
 
   /// The dark page canvas.
-  static const Color canvasDark = Color(0xFF0D0F13);
+  static const Color backgroundDark = Color(0xFF121212);
 
-  /// Card, sheet and chrome surface on dark. Lighter than the canvas, so a
-  /// card reads as raised in dark exactly as it does in light.
-  static const Color surfaceDark = Color(0xFF171A20);
+  /// Card, popover and chrome surface on dark.
+  static const Color surfaceDark = Color(0xFF292929);
 
-  /// A half-step above [surfaceDark]: table headers, hovered rows.
-  static const Color surfaceSubtleDark = Color(0xFF1D212A);
+  /// Muted fill on dark.
+  static const Color mutedDark = Color(0xFF404040);
 
-  /// Raised dark container for chips and tints inside a card.
-  static const Color surfaceMutedDark = Color(0xFF232833);
+  /// The dark hairline.
+  static const Color borderDark = Color(0xFF333333);
 
-  /// Neutral hairline on dark surfaces.
-  static const Color outlineDark = Color(0xFF2A2F3A);
+  /// Ambient shadow. Both themes cast black; the alphas differ.
+  static const Color shadow = Color(0xFF000000);
 
-  /// The dark hairline one step stronger.
-  static const Color outlineStrongDark = Color(0xFF39404D);
+  // ── Status ────────────────────────────────────────────────────────────────
 
-  /// Ambient shadow on dark surfaces.
-  static const Color shadowDark = Color(0xFF000000);
+  /// Success ink — returned, available, active.
+  static const Color success = Color(0xFF11B650);
+
+  /// Success, one step deeper, for a border or a pressed fill.
+  static const Color successStrong = Color(0xFF0F993D);
+
+  /// Warning ink — due soon, expiring.
+  static const Color warning = Color(0xFFE08A00);
+
+  /// Warning, one step lighter.
+  static const Color warningSoftInk = Color(0xFFE68F3D);
+
+  /// Info ink — reserved, on hold, queued.
+  static const Color info = Color(0xFF00C4FF);
+
+  /// Premium / highlight accent.
+  static const Color premium = Color(0xFFFDB021);
+
+  // ── Literals the source design system itself hard-codes ───────────────────
+  //
+  // These bypass the token ramps in the SaaS deliberately. They are carried
+  // over verbatim rather than approximated from the ramps above.
+
+  /// Skeleton fill. Flat, no shimmer.
+  static const Color skeleton = Color(0xFFF1F5F9);
+
+  /// Avatar fallback wash behind initials.
+  static const Color avatarFallback = Color(0xFFE1E6FF);
+
+  /// The success *button* fill, which is not the [success] token.
+  static const Color buttonSuccess = Color(0xFF22C55E);
+
+  /// The hairline on a filled success button, at 70% alpha.
+  static const Color buttonSuccessBorder = Color(0xFF16A34A);
+
+  /// Link-button ink.
+  static const Color link = Color(0xFF1D4ED8);
+
+  /// The grey a ripple spawns in on light-surfaced buttons.
+  static const Color rippleNeutral = Color(0xFFD1D5DB);
 
   // ── Reading surfaces ──────────────────────────────────────────────────────
 
-  /// Warm parchment used for long-form reading surfaces.
+  /// Warm parchment for long-form reading surfaces. Theme-invariant.
   static const Color paper = Color(0xFFF7F1E6);
 
-  /// Raised warm parchment, the light end of a [paper] gradient.
+  /// The raised end of a [paper] gradient.
   static const Color paperElevated = Color(0xFFEFE8DA);
 
-  /// Content on [paper] and [paperElevated].
+  /// Content on [paper].
   static const Color onPaper = Color(0xFF2B2620);
-
-  // ── Status, light ─────────────────────────────────────────────────────────
-
-  /// Light success.
-  static const Color successLight = Color(0xFF067647);
-
-  /// Content on [successLight].
-  static const Color onSuccessLight = Color(0xFFFFFFFF);
-
-  /// Success wash behind a badge or a tile glyph.
-  static const Color successSoftLight = Color(0xFFE7F7EF);
-
-  /// Light warning.
-  static const Color warningLight = Color(0xFFB54708);
-
-  /// Content on [warningLight].
-  static const Color onWarningLight = Color(0xFFFFFFFF);
-
-  /// Warning wash.
-  static const Color warningSoftLight = Color(0xFFFDF3E6);
-
-  /// Light info.
-  static const Color infoLight = Color(0xFF175CD3);
-
-  /// Content on [infoLight].
-  static const Color onInfoLight = Color(0xFFFFFFFF);
-
-  /// Info wash.
-  static const Color infoSoftLight = Color(0xFFEAF2FE);
-
-  /// Light danger — overdue, destructive, lost.
-  static const Color dangerLight = Color(0xFFC0332B);
-
-  /// Content on [dangerLight].
-  static const Color onDangerLight = Color(0xFFFFFFFF);
-
-  /// Danger wash.
-  static const Color dangerSoftLight = Color(0xFFFDECEA);
-
-  /// Neutral wash for an inert badge or a muted tile glyph.
-  static const Color neutralSoftLight = Color(0xFFF0F2F5);
-
-  // ── Status, dark ──────────────────────────────────────────────────────────
-
-  /// Dark success.
-  static const Color successDark = Color(0xFF5FD09A);
-
-  /// Content on [successDark].
-  static const Color onSuccessDark = Color(0xFF0D0F13);
-
-  /// Success wash on dark.
-  static const Color successSoftDark = Color(0xFF12291F);
-
-  /// Dark warning.
-  static const Color warningDark = Color(0xFFF3B75B);
-
-  /// Content on [warningDark].
-  static const Color onWarningDark = Color(0xFF0D0F13);
-
-  /// Warning wash on dark.
-  static const Color warningSoftDark = Color(0xFF2E2317);
-
-  /// Dark info.
-  static const Color infoDark = Color(0xFF7FB0F7);
-
-  /// Content on [infoDark].
-  static const Color onInfoDark = Color(0xFF0D0F13);
-
-  /// Info wash on dark.
-  static const Color infoSoftDark = Color(0xFF17222F);
-
-  /// Dark danger.
-  static const Color dangerDark = Color(0xFFF08279);
-
-  /// Content on [dangerDark].
-  static const Color onDangerDark = Color(0xFF0D0F13);
-
-  /// Danger wash on dark.
-  static const Color dangerSoftDark = Color(0xFF2E1B19);
-
-  /// Neutral wash on dark.
-  static const Color neutralSoftDark = Color(0xFF232833);
 }

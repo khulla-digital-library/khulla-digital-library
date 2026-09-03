@@ -75,7 +75,7 @@ class AppPickerField extends StatelessWidget {
         ],
         InkWell(
           onTap: enabled ? onTap : null,
-          borderRadius: BorderRadius.circular(context.appRadius.field),
+          borderRadius: BorderRadius.circular(context.appRadius.container),
           child: InputDecorator(
             isEmpty: !hasValue,
             decoration: InputDecoration(

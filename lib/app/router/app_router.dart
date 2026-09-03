@@ -219,7 +219,8 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: Routes.settings,
-                  builder: (context, _) => const SettingsPage(),
+                  builder: (context, _) =>
+                      SettingsPage(showDesignSystem: !_config.isProduction),
                   routes: [
                     GoRoute(
                       path: Routes.librarySegment,
@@ -241,6 +242,14 @@ class AppRouter {
                       path: Routes.syncSegment,
                       builder: (context, _) => const SyncPage(),
                     ),
+                    // The component gallery is a development surface: the
+                    // release build never declares the route, so there is no
+                    // way to reach it by typing the URL either.
+                    if (!_config.isProduction)
+                      GoRoute(
+                        path: Routes.designSystemSegment,
+                        builder: (context, _) => const AppDesignGallery(),
+                      ),
                   ],
                 ),
               ],

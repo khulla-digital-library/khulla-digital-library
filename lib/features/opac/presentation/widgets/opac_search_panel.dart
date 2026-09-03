@@ -49,8 +49,7 @@ class OpacSearchPanel extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: colors.brandSoft,
-        borderRadius: BorderRadius.circular(context.appRadius.banner),
+        borderRadius: BorderRadius.circular(context.appRadius.control),
         border: Border.all(color: colors.hairline),
       ),
       child: Padding(
@@ -61,17 +60,15 @@ class OpacSearchPanel extends StatelessWidget {
           children: [
             Text(
               l10n.opacHeading,
-              style: context.textTheme.titleMedium?.copyWith(
-                color: colors.textHigh,
-                fontWeight: FontWeight.w600,
+              style: context.appTextStyles.title.copyWith(
+                color: colors.ink100,
               ),
             ),
             SizedBox(height: spacing.xxs),
             Text(
               l10n.opacSubtitle,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: colors.textMuted,
-                height: 1.4,
+              style: context.appTextStyles.body.copyWith(
+                color: colors.mutedForeground,
               ),
             ),
             SizedBox(height: spacing.md),

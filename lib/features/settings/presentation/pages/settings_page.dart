@@ -18,7 +18,12 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// prose with links in it; stretched across a maximised window every row
 /// becomes a label at one edge and a chevron a foot away at the other.
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({this.showDesignSystem = false, super.key});
+
+  /// Whether to offer the design-system gallery. The router passes the
+  /// flavor's answer, so the door and the route it opens are gated on the
+  /// same fact.
+  final bool showDesignSystem;
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +74,13 @@ class SettingsPage extends StatelessWidget {
                       icon: Icons.cloud_sync_outlined,
                       route: Routes.settingsSync,
                     ),
+                    if (showDesignSystem)
+                      NavigationTile(
+                        label: l10n.settingsDesignSystemTitle,
+                        description: l10n.settingsDesignSystemBody,
+                        icon: Icons.design_services_outlined,
+                        route: Routes.settingsDesignSystem,
+                      ),
                   ],
                 ),
                 SizedBox(height: spacing.lg),

@@ -1,6 +1,11 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Back control and page title on one row for nested screens.
+/// The title row every page opens with: an optional back control, the title,
+/// and a slot for the page's actions.
+///
+/// The title is the largest type on a page and the only place the page-header
+/// rung is used. A page must not draw its own heading with a bare [Text] —
+/// that is how eight screens end up with eight title sizes.
 ///
 /// Use in scrollable page bodies; pair with [AppBackButton.leading] when the
 /// header lives in an [AppBar] instead.
@@ -19,7 +24,6 @@ class AppPageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
 
     return Row(
       children: [
@@ -30,10 +34,8 @@ class AppPageHeader extends StatelessWidget {
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: context.textTheme.titleMedium?.copyWith(
-              color: scheme.onSurface,
-              fontWeight: FontWeight.w500,
-              letterSpacing: -0.25,
+            style: context.appTextStyles.pageHeader.copyWith(
+              color: context.appColors.ink100,
             ),
           ),
         ),

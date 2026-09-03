@@ -2,18 +2,24 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// The standing pill — *Available*, *Overdue*, *Reserved*, *Active*.
 ///
-/// A wash, a hairline and a leading dot, never a solid fill: a table of forty
-/// rows with forty saturated pills is unreadable, and the dot carries the
-/// state for anyone who cannot separate the hues. The tone decides all three
-/// colors, so the same standing looks identical in a table, a card and a
-/// detail header.
+/// One hue, three ways: an 8% wash, the hue at full strength for the text,
+/// and a hairline in between. A table of forty rows with forty saturated
+/// pills is unreadable, and a wash keeps the row's text the thing being read.
+///
+/// It is small on purpose — 10px semibold in a 10/2px pill — because in this
+/// product a status sits *inside* a table cell, next to a title, and a badge
+/// that matches the body size competes with it.
+///
+/// The label always names the standing, so hue is never the only channel
+/// carrying it. [showDot] adds a second one where a badge appears without its
+/// column header nearby.
 class AppStatusBadge extends StatelessWidget {
   const AppStatusBadge({
     required this.label,
     this.tone = AppStatusTone.neutral,
     this.icon,
     this.dense = false,
-    this.showDot = true,
+    this.showDot = false,
     super.key,
   });
 
@@ -29,8 +35,8 @@ class AppStatusBadge extends StatelessWidget {
   /// Tightens the pill for use inside a table row.
   final bool dense;
 
-  /// Whether to draw the leading dot. Turn it off only when the label is
-  /// already unambiguous without color — a count, a plan name.
+  /// Draws a leading dot in the status hue. Off by default; turn it on for a
+  /// badge that stands alone, away from the column that names what it is.
   final bool showDot;
 
   @override
@@ -48,18 +54,22 @@ class AppStatusBadge extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: dense ? spacing.xs : spacing.sm - 2,
-          vertical: dense ? spacing.xxs / 2 : spacing.xxs,
+          vertical: dense ? 1 : spacing.xxs / 2,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (glyph != null) ...[
-              Icon(glyph, size: spacing.sm, color: foreground),
+              Icon(
+                glyph,
+                size: context.appMetrics.iconDense,
+                color: foreground,
+              ),
               SizedBox(width: spacing.xxs),
             ] else if (showDot) ...[
               Container(
-                width: spacing.xxs + 2,
-                height: spacing.xxs + 2,
+                width: spacing.xxs + 1,
+                height: spacing.xxs + 1,
                 decoration: BoxDecoration(
                   color: foreground,
                   shape: BoxShape.circle,
@@ -67,14 +77,18 @@ class AppStatusBadge extends StatelessWidget {
               ),
               SizedBox(width: spacing.xxs + 2),
             ],
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.labelSmall?.copyWith(
-                color: foreground,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0,
+            // Flexible, not bare: a badge is routinely dropped into a fixed
+            // -width table column, and a min-size Row would overflow rather
+            // than let the label ellipsise.
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.appTextStyles.micro.copyWith(
+                  color: foreground,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],

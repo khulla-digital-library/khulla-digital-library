@@ -1,57 +1,54 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Squircle back control used across nested and auth screens.
+/// The back control used by nested pages and custom toolbars.
 ///
-/// Use [AppBackButton] in page bodies; use [AppBackButton.leading] as
-/// [AppBar.leading] so the control sits correctly in the Material slot.
+/// A bordered square with a brand chevron rather than Material's bare arrow:
+/// it sits on the page-header line beside a title, where an unboxed glyph
+/// would float without an anchor.
+///
+/// Use [AppBackButton] in a page body and [AppBackButton.leading] in
+/// [AppBar.leading], which needs the extra edge inset and alignment.
 class AppBackButton extends StatelessWidget {
-  /// Standalone back control (auth headers, custom toolbars).
+  /// A standalone back control.
   const AppBackButton({this.onPressed, super.key}) : _forAppBar = false;
 
-  /// AppBar-ready leading slot with edge inset and alignment.
+  /// An [AppBar]-ready back control.
   const AppBackButton.leading({this.onPressed, super.key}) : _forAppBar = true;
 
+  /// Called on press. Defaults to popping the nearest route.
   final VoidCallback? onPressed;
+
   final bool _forAppBar;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
-    final foreground = scheme.onSurface;
+    final colors = context.appColors;
+    final metrics = context.appMetrics;
     final canPop = onPressed != null || Navigator.of(context).canPop();
 
     if (!canPop) return const SizedBox.shrink();
 
-    final size = spacing.xlg + 2; // 34
-    final radius = BorderRadius.circular(context.appRadius.field); // 8
+    final radius = BorderRadius.circular(context.appRadius.container);
 
     final button = Tooltip(
       message: MaterialLocalizations.of(context).backButtonTooltip,
-      child: AppPressable(
-        child: Material(
-          color: scheme.surface,
-          shape: RoundedRectangleBorder(
+      child: AppRipple(
+        onTap: onPressed ?? () => Navigator.of(context).maybePop(),
+        borderRadius: radius,
+        child: Container(
+          width: metrics.iconButtonMedium,
+          height: metrics.iconButtonMedium,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: context.colorScheme.surface,
             borderRadius: radius,
-            side: BorderSide(
-              color: scheme.outlineVariant.withValues(alpha: 0.95),
-            ),
+            border: Border.all(color: colors.hairline),
           ),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            borderRadius: radius,
-            onTap: onPressed ?? () => Navigator.of(context).maybePop(),
-            splashColor: foreground.withValues(alpha: 0.08),
-            highlightColor: foreground.withValues(alpha: 0.04),
-            child: SizedBox(
-              width: size,
-              height: size,
-              child: Icon(
-                Icons.chevron_left_rounded,
-                size: spacing.md + 2, // 18
-                color: foreground,
-              ),
-            ),
+          child: Icon(
+            Icons.chevron_left_rounded,
+            size: metrics.icon,
+            color: context.colorScheme.primary,
           ),
         ),
       ),

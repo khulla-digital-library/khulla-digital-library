@@ -75,7 +75,6 @@ class AppDonutChart extends StatelessWidget {
                   style: context.textTheme.titleMedium?.copyWith(
                     color: colors.textHigh,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: -0.5,
                   ),
                 ),
               if (label != null)

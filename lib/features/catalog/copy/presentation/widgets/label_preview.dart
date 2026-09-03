@@ -78,7 +78,7 @@ class LabelPreview extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: scheme.surface,
-        borderRadius: BorderRadius.circular(context.appRadius.badge),
+        borderRadius: BorderRadius.circular(context.appRadius.item),
         border: Border.all(color: colors.hairlineStrong),
       ),
       padding: EdgeInsets.all(spacing.xs),

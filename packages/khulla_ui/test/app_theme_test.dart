@@ -4,11 +4,11 @@ import 'package:khulla_ui/khulla_ui.dart';
 void main() {
   group('AppTheme', () {
     for (final brightness in Brightness.values) {
-      for (final formFactor in FormFactor.values) {
-        test('carries every token extension in $brightness/$formFactor', () {
+      for (final density in AppDensity.values) {
+        test('carries every token extension in $brightness/$density', () {
           final theme = brightness == Brightness.light
-              ? AppTheme.light(formFactor)
-              : AppTheme.dark(formFactor);
+              ? AppTheme.light(density)
+              : AppTheme.dark(density);
 
           // context.appColors and friends assert these are present. A theme
           // built without one throws deep inside an unrelated widget's build,
@@ -16,24 +16,55 @@ void main() {
           expect(theme.extension<AppColors>(), isNotNull);
           expect(theme.extension<AppSpacing>(), isNotNull);
           expect(theme.extension<AppRadius>(), isNotNull);
+          expect(theme.extension<AppBorders>(), isNotNull);
           expect(theme.extension<AppBreakpoints>(), isNotNull);
+          expect(theme.extension<AppShadows>(), isNotNull);
+          expect(theme.extension<AppMetrics>(), isNotNull);
+          expect(theme.extension<AppMotion>(), isNotNull);
           expect(theme.extension<AppTextStyles>(), isNotNull);
         });
       }
     }
 
-    test('uses the mobile type ramp only for compact', () {
-      final compact = AppTheme.light().textTheme.bodyMedium?.fontSize;
-      final expanded = AppTheme.light(
-        FormFactor.expanded,
-      ).textTheme.bodyMedium?.fontSize;
+    test('steps type and control height up exactly once at comfortable', () {
+      // The density rung is the only thing the window changes. Both halves
+      // have to move together: a 14px body in a 40px field is the failure
+      // this catches.
+      final compact = AppTheme.light();
+      final comfortable = AppTheme.light(AppDensity.comfortable);
 
-      expect(compact, isNotNull);
-      expect(expanded, isNotNull);
+      expect(compact.textTheme.bodyMedium?.fontSize, 12);
+      expect(comfortable.textTheme.bodyMedium?.fontSize, 14);
+      expect(compact.extension<AppMetrics>()!.fieldHeight, 40);
+      expect(comfortable.extension<AppMetrics>()!.fieldHeight, 44);
+    });
+
+    test('keeps the radius hierarchy: control > container > item', () {
+      // Flattening these to one value is the most common single error in
+      // reproducing this design, so it is pinned rather than trusted.
+      final radius = AppTheme.light().extension<AppRadius>()!;
+
+      expect(radius.control, greaterThan(radius.container));
+      expect(radius.container, greaterThan(radius.item));
+    });
+
+    test("replaces Material ink with the design system's own feedback", () {
+      // AppRipple draws press feedback itself. If the splash factory comes
+      // back, every control gets two overlapping ripples.
+      final theme = AppTheme.light();
+
+      expect(theme.splashFactory, NoSplash.splashFactory);
+      expect(theme.highlightColor, Colors.transparent);
+    });
+
+    test('leaves a field border unchanged between resting and focused', () {
+      // Focus is signalled by a padding nudge, not a ring or a recolour.
+      final theme = AppTheme.light();
+      final decoration = theme.inputDecorationTheme;
+
       expect(
-        AppTheme.light(FormFactor.medium).textTheme.bodyMedium?.fontSize,
-        expanded,
-        reason: 'medium and expanded share the desktop ramp',
+        (decoration.focusedBorder! as OutlineInputBorder).borderSide.color,
+        (decoration.enabledBorder! as OutlineInputBorder).borderSide.color,
       );
     });
 
@@ -45,7 +76,7 @@ void main() {
         // hairline on near-black is too weak to carry an edge on its own, so
         // the canvas drops below the card instead. Both are deliberate; the
         // thing neither may do is leave the two indistinguishable.
-        final light = AppTheme.light(FormFactor.expanded);
+        final light = AppTheme.light();
         expect(light.scaffoldBackgroundColor, light.colorScheme.surface);
         expect(
           light.extension<AppColors>()!.hairline,
@@ -53,8 +84,11 @@ void main() {
           reason: 'the hairline has to be visible against the canvas',
         );
 
-        final dark = AppTheme.dark(FormFactor.expanded);
-        expect(dark.scaffoldBackgroundColor, isNot(dark.colorScheme.surface));
+        final dark = AppTheme.dark();
+        expect(
+          dark.extension<AppColors>()!.secondary,
+          isNot(dark.colorScheme.surface),
+        );
       },
     );
   });
@@ -78,6 +112,13 @@ void main() {
       expect(FormFactor.medium.usesNavigationRail, isTrue);
       expect(FormFactor.expanded.usesNavigationRail, isTrue);
       expect(FormFactor.large.usesNavigationRail, isTrue);
+    });
+
+    test('reads the density step off its own threshold', () {
+      const breakpoints = AppBreakpoints();
+
+      expect(breakpoints.densityFor(1599), AppDensity.compact);
+      expect(breakpoints.densityFor(1600), AppDensity.comfortable);
     });
 
     test('extends the rail only at the largest class', () {

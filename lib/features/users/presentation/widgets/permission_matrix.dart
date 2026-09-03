@@ -56,10 +56,8 @@ class PermissionMatrix extends StatelessWidget {
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: context.textTheme.labelSmall?.copyWith(
-                            fontSize: 12,
+                          style: context.appTextStyles.columnHeader.copyWith(
                             color: colors.textMuted,
-                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),

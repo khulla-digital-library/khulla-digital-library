@@ -3,9 +3,15 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// {@template app_nav_bar}
 /// Bottom navigation for narrow windows, the counterpart to [AppNavRail].
 ///
-/// Built on Material's [NavigationBar] so keyboard traversal, semantics, and
-/// the app's [NavigationBarThemeData] all apply for free — the same
-/// arrangement [AppNavRail] has with [NavigationRail].
+/// A **floating bordered bar inset from the edges**, not an edge-to-edge
+/// Material bottom bar with a pill indicator. It reads as a control sitting
+/// on the page rather than as a slab bolted to the bottom of the screen,
+/// which is what keeps a phone window looking like the same product as the
+/// 1600px one.
+///
+/// Selection is carried by color alone — brand glyph and brand label against
+/// the resting ink. At four destinations there is no room for an indicator
+/// that does not crowd the labels.
 /// {@endtemplate}
 class AppNavBar extends StatelessWidget {
   /// {@macro app_nav_bar}
@@ -27,26 +33,83 @@ class AppNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = context.colorScheme;
+    final spacing = context.appSpacing;
+    final colors = context.appColors;
 
-    return DecoratedBox(
-      // Mirrors the rail's trailing edge, so the chrome reads the same either
-      // side of the breakpoint.
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.5)),
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          spacing.sm,
+          spacing.xs,
+          spacing.sm,
+          spacing.xs,
+        ),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: context.colorScheme.surface,
+            borderRadius: BorderRadius.circular(context.appRadius.container),
+            border: Border.all(color: colors.hairline),
+            boxShadow: context.appShadows.card,
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: spacing.sm),
+            child: Row(
+              children: [
+                for (final (index, destination) in destinations.indexed)
+                  Expanded(
+                    child: _NavBarItem(
+                      destination: destination,
+                      selected: index == selectedIndex,
+                      onTap: () => onDestinationSelected(index),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
-      child: NavigationBar(
-        selectedIndex: selectedIndex,
-        onDestinationSelected: onDestinationSelected,
-        destinations: [
-          for (final destination in destinations)
-            NavigationDestination(
-              icon: destination.icon,
-              selectedIcon: destination.selectedIcon,
-              label: destination.label,
+    );
+  }
+}
+
+class _NavBarItem extends StatelessWidget {
+  const _NavBarItem({
+    required this.destination,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final AppNavDestination destination;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final foreground = selected ? colors.brand : colors.ink400;
+
+    return AppRipple(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(context.appRadius.container),
+      pressScale: 1,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconTheme.merge(
+            data: IconThemeData(
+              color: foreground,
+              size: context.appMetrics.iconLarge,
             ),
+            child: selected ? destination.selectedIcon : destination.icon,
+          ),
+          SizedBox(height: context.appSpacing.xxs),
+          Text(
+            destination.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.appTextStyles.label.copyWith(color: foreground),
+          ),
         ],
       ),
     );

@@ -194,7 +194,6 @@ class _OpacPageState extends State<OpacPage> with DisposeBag {
                     ),
                     SizedBox(width: spacing.sm),
                     AppButton(
-                      size: AppButtonSize.small,
                       variant: AppButtonVariant.outline,
                       onPressed: () => showNotWiredToast(context),
                       child: Text(l10n.opacKioskAction),

@@ -158,9 +158,9 @@ class _AppToastCard extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: _backgroundColor(scheme),
-        borderRadius: BorderRadius.circular(context.appRadius.card),
+        borderRadius: BorderRadius.circular(context.appRadius.container),
         border: _border(scheme),
-        boxShadow: _boxShadow(scheme),
+        boxShadow: _boxShadow(context),
       ),
       child: Padding(
         padding: EdgeInsets.fromLTRB(
@@ -219,17 +219,13 @@ class _AppToastCard extends StatelessWidget {
     );
   }
 
-  List<BoxShadow>? _boxShadow(ColorScheme scheme) {
+  List<BoxShadow>? _boxShadow(BuildContext context) {
     if (style == ToastificationStyle.simple || _isMutedInfo) {
       return null;
     }
-    return [
-      BoxShadow(
-        color: scheme.shadow.withValues(alpha: 0.08),
-        blurRadius: 16,
-        offset: const Offset(0, 4),
-      ),
-    ];
+    // A toast floats over the page, so it takes the overlay depth — the same
+    // one a dialog and a side sheet use.
+    return context.appShadows.overlay;
   }
 
   Color _titleColor(ColorScheme scheme) {
@@ -237,7 +233,7 @@ class _AppToastCard extends StatelessWidget {
       return scheme.onInverseSurface;
     }
     if (style == ToastificationStyle.fillColored) {
-      return Colors.white;
+      return scheme.onPrimary;
     }
     return scheme.onSurface;
   }
@@ -247,7 +243,7 @@ class _AppToastCard extends StatelessWidget {
       return scheme.onInverseSurface.withValues(alpha: 0.75);
     }
     if (style == ToastificationStyle.fillColored) {
-      return Colors.white.withValues(alpha: 0.85);
+      return scheme.onPrimary.withValues(alpha: 0.85);
     }
     return scheme.onSurfaceVariant;
   }

@@ -1,11 +1,11 @@
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The heading row at the top of a collection card.
+/// The heading row above a collection's table.
 ///
-/// The page's *name* is in the shell's top bar; this says what the card
-/// below it holds and offers the one action that adds to it. Secondary
-/// actions go in the overflow menu rather than becoming a row of equal
-/// buttons — a header with four buttons has no primary action at all.
+/// The page's *name* is in the shell's top bar; this says what the table
+/// below holds and offers the one action that adds to it. Secondary actions
+/// go in the overflow menu rather than becoming a row of equal buttons — a
+/// header with four buttons has no primary action at all.
 class CollectionHeader extends StatelessWidget {
   const CollectionHeader({
     required this.title,
@@ -60,16 +60,14 @@ class CollectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: context.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.4,
-            color: colors.textHigh,
-          ),
+          style: context.appTextStyles.title.copyWith(color: colors.ink100),
         ),
         const SizedBox(height: 2),
         Text(
           subtitle,
-          style: context.textTheme.bodySmall?.copyWith(color: colors.textMuted),
+          style: context.appTextStyles.body.copyWith(
+            color: colors.mutedForeground,
+          ),
         ),
       ],
     );
@@ -80,7 +78,6 @@ class CollectionHeader extends StatelessWidget {
         AppMenuButton(actions: menuActions, tooltip: tooltip),
       if (label != null)
         AppButton(
-          size: AppButtonSize.medium,
           icon: actionIcon,
           onPressed: onAction,
           child: Text(label),

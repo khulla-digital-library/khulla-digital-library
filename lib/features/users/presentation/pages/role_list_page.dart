@@ -51,7 +51,6 @@ class RoleListPage extends StatelessWidget {
                   title: l10n.rolesMatrixTitle,
                   subtitle: l10n.rolesMatrixSubtitle,
                   trailing: AppButton(
-                    size: AppButtonSize.small,
                     variant: AppButtonVariant.outline,
                     icon: Icons.add_rounded,
                     onPressed: () => showNotWiredToast(context),
@@ -122,7 +121,6 @@ class _RoleCard extends StatelessWidget {
             children: [
               AppStatusBadge(
                 dense: true,
-                showDot: false,
                 label: l10n.rolesPeopleCount('$people'),
               ),
               SizedBox(width: spacing.xs),

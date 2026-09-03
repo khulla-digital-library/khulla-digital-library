@@ -46,14 +46,18 @@ class AppSectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final textTheme = context.textTheme;
+    final type = context.appTextStyles;
     final glyph = icon;
     final caption = subtitle;
 
     return Row(
       children: [
         if (glyph != null) ...[
-          Icon(glyph, size: spacing.md + 2, color: tone.foreground(context)),
+          Icon(
+            glyph,
+            size: context.appMetrics.icon,
+            color: tone.foreground(context),
+          ),
           SizedBox(width: spacing.xs),
         ],
         Expanded(
@@ -65,12 +69,9 @@ class AppSectionHeader extends StatelessWidget {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: (dense ? textTheme.titleSmall : textTheme.titleMedium)
-                    ?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.3,
-                      color: context.appColors.textHigh,
-                    ),
+                style: (dense ? type.sectionTitle : type.title).copyWith(
+                  color: context.appColors.ink100,
+                ),
               ),
               if (caption != null) ...[
                 SizedBox(height: spacing.xxs),
@@ -78,8 +79,8 @@ class AppSectionHeader extends StatelessWidget {
                   caption,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: context.appColors.textMuted,
+                  style: type.body.copyWith(
+                    color: context.appColors.mutedForeground,
                   ),
                 ),
               ],

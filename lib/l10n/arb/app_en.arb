@@ -1099,5 +1099,7 @@
     "settingsAppearanceDensity": "Row density",
     "settingsAppearanceDensityDescription": "How much room a table row takes. Comfortable suits a mouse; compact fits more on a laptop screen.",
     "settingsDensityComfortable": "Comfortable",
-    "settingsDensityCompact": "Compact"
+    "settingsDensityCompact": "Compact",
+    "settingsDesignSystemTitle": "Design system",
+    "settingsDesignSystemBody": "Every component and state on one page, for checking the visual language."
 }
