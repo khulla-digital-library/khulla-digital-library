@@ -9,7 +9,7 @@
         "description": "Core - one-line product description shown under the app name"
     },
     "navDashboard": "Dashboard",
-    "navCatalog": "Catalog",
+    "navCatalog": "Catalogue",
     "navCirculation": "Circulation",
     "navMembers": "Members",
     "navSettings": "Settings",
@@ -42,7 +42,7 @@
         "placeholders": {
             "section": {
                 "type": "String",
-                "example": "Catalog"
+                "example": "Catalogue"
             }
         }
     },
@@ -397,6 +397,10 @@
         }
     },
     "checkOutConfirm": "Confirm checkout",
+    "checkOutSuccess": "Checkout complete",
+    "@checkOutSuccess": {
+        "description": "Circulation - checkout desk"
+    },
     "checkOutRemoveCopy": "Remove copy",
     "@checkOutRemoveCopy": {
         "description": "Circulation - the checkout desk"
@@ -419,6 +423,10 @@
     "returnsConditionSection": "Condition",
     "returnsConditionDescription": "Recorded against every copy in this return.",
     "returnsConfirm": "Confirm return",
+    "returnsSuccess": "Return recorded",
+    "@returnsSuccess": {
+        "description": "Circulation - returns desk"
+    },
     "returnsRemoveCopy": "Remove from this return",
     "@returnsRemoveCopy": {
         "description": "Circulation - the returns desk"
@@ -434,7 +442,9 @@
     "reservationsColumnExpires": "Expires",
     "reservationsStatusWaiting": "Waiting",
     "reservationsStatusReady": "Ready for pickup",
+    "reservationsStatusFulfilled": "Collected",
     "reservationsStatusExpired": "Expired",
+    "reservationsStatusCancelled": "Cancelled",
     "reservationsQueuePosition": "#{position}",
     "@reservationsQueuePosition": {
         "description": "Circulation - a member's place in the hold queue",

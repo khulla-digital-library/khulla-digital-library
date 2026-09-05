@@ -12,7 +12,17 @@ import 'dart:io';
 /// Tables missing here fall back to a generic pointer at AppDatabase.
 const Map<String, String> _tableSources = <String, String>{
   'library_settings': 'lib/features/settings/data/tables/library_settings.dart',
+  'loan_rules': 'lib/features/settings/data/tables/loan_rules.dart',
   'staff': 'lib/features/users/data/tables/staff.dart',
+  'title_formats': 'lib/features/catalog/title/data/tables/title_formats.dart',
+  'member_types': 'lib/features/members/data/tables/member_types.dart',
+  'titles': 'lib/features/catalog/title/data/tables/titles.dart',
+  'copies': 'lib/features/catalog/copy/data/tables/copies.dart',
+  'members': 'lib/features/members/data/tables/members.dart',
+  'loans': 'lib/features/circulation/loan/data/tables/loans.dart',
+  'fines': 'lib/features/circulation/fine/data/tables/fines.dart',
+  'reservations':
+      'lib/features/circulation/reservation/data/tables/reservations.dart',
 };
 
 /// Drift column types to the display types used in the diagram.
