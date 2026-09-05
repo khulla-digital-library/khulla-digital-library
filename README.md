@@ -23,18 +23,22 @@ The same codebase compiles to a Windows executable and to a web app, so a librar
 
 ## Getting started
 
-**Prerequisites** — [Flutter](https://docs.flutter.dev/get-started/install) 3.47 or newer (Dart 3.13+). For Windows builds you also need Visual Studio with the *Desktop development with C++* workload; for Linux, `clang`, `cmake`, `ninja-build`, `libgtk-3-dev`.
+**Prerequisites** — [FVM](https://fvm.app) to pin the Flutter SDK, plus platform toolchains: Visual Studio with the *Desktop development with C++* workload for Windows; `clang`, `cmake`, `ninja-build`, `libgtk-3-dev` for Linux.
 
 ```sh
 git clone https://github.com/khulla-digital-library/khulla-digital-library.git
 cd khulla-digital-library
 
-dart run melos bootstrap   # resolve dependencies, link local packages
-make build                 # generate code (freezed, injectable, assets)
-make localize              # generate localizations
+dart pub global activate fvm   # once, if you do not have FVM yet
+fvm install                    # downloads the SDK pinned in .fvmrc
+make bootstrap                 # resolve deps and link local packages
+make build                     # generate code (freezed, injectable, assets)
+make localize                  # generate localizations
 
-make run-windows           # or: make run-web, make run-linux
+make run-windows               # or: make run-web, make run-linux
 ```
+
+The Flutter version is pinned in `.fvmrc` (currently 3.47.0). After pulling a change that bumps it, run `fvm install`.
 
 Generated sources are not committed, so `make build` and `make localize` are required on a fresh clone before anything will analyze or run.
 

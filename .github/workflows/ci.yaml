@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  # push:
+  #   branches: [dev, prod]
+  # pull_request:
+    # branches: [dev]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install FVM
+        run: dart pub global activate fvm
+
+      - name: Add pub-cache bin to PATH
+        run: echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+
+      - name: Bootstrap workspace
+        run: |
+          fvm install
+          make bootstrap
+
+      - name: Generate code
+        run: make build
+
+      - name: Generate localizations
+        run: make localize
+
+      - name: Check formatting, analysis, and tests
+        run: make check

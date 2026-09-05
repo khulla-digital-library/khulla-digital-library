@@ -24,6 +24,7 @@ class AppTopBar extends StatelessWidget {
     this.breadcrumbs,
     this.actions = const [],
     this.leading,
+    this.wrapSafeArea = true,
     super.key,
   });
 
@@ -40,6 +41,10 @@ class AppTopBar extends StatelessWidget {
 
   /// A control before the title — the drawer button on a narrow window.
   final Widget? leading;
+
+  /// Whether to wrap the bar in [SafeArea]. The shell turns this off when the
+  /// bar shares a top row with the brand header and the row is wrapped once.
+  final bool wrapSafeArea;
 
   @override
   Widget build(BuildContext context) {
@@ -70,67 +75,61 @@ class AppTopBar extends StatelessWidget {
       ],
     );
 
+    final bar = LayoutBuilder(
+      builder: (context, constraints) {
+        final stacked = constraints.maxWidth < 640 && actions.length > 1;
+
+        final actionRow = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final (index, action) in actions.indexed) ...[
+              if (index > 0) SizedBox(width: spacing.xs),
+              action,
+            ],
+          ],
+        );
+
+        return Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: spacing.page,
+            vertical: spacing.sm,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  if (lead != null) ...[
+                    lead,
+                    SizedBox(width: spacing.xs),
+                  ],
+                  Expanded(child: titleBlock),
+                  if (actions.isNotEmpty && !stacked) ...[
+                    SizedBox(width: spacing.md),
+                    actionRow,
+                  ],
+                ],
+              ),
+              if (actions.isNotEmpty && stacked) ...[
+                SizedBox(height: spacing.xs),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: actionRow,
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: scheme.surface,
         border: Border(bottom: BorderSide(color: colors.hairline)),
         boxShadow: context.appShadows.card,
       ),
-      child: SafeArea(
-        bottom: false,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final stacked = constraints.maxWidth < 640 && actions.length > 1;
-
-            final actionRow = Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (final (index, action) in actions.indexed) ...[
-                  if (index > 0) SizedBox(width: spacing.xs),
-                  action,
-                ],
-              ],
-            );
-
-            return Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: spacing.page,
-                vertical: spacing.xs,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: context.appMetrics.topBarHeight,
-                    ),
-                    child: Row(
-                      children: [
-                        if (lead != null) ...[
-                          lead,
-                          SizedBox(width: spacing.xs),
-                        ],
-                        Expanded(child: titleBlock),
-                        if (actions.isNotEmpty && !stacked) ...[
-                          SizedBox(width: spacing.md),
-                          actionRow,
-                        ],
-                      ],
-                    ),
-                  ),
-                  if (actions.isNotEmpty && stacked) ...[
-                    SizedBox(height: spacing.xs),
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: actionRow,
-                    ),
-                  ],
-                ],
-              ),
-            );
-          },
-        ),
-      ),
+      child: wrapSafeArea ? SafeArea(bottom: false, child: bar) : bar,
     );
   }
 }

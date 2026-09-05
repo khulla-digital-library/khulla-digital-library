@@ -247,6 +247,12 @@ abstract final class AppIcons {
   /// End the session.
   static const AppIconSpec signOut = AppIconSpec(SolarIcons.logout2);
 
+  /// Reveal what a password field is masking.
+  static const AppIconSpec revealPassword = AppIconSpec(SolarIcons.eye);
+
+  /// Mask a revealed password field again.
+  static const AppIconSpec hidePassword = AppIconSpec(SolarIcons.eyeClosed);
+
   /// Send a staff member a new password.
   static const AppIconSpec resetPassword = AppIconSpec(SolarIcons.lockPassword);
 

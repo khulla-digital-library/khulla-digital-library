@@ -4,13 +4,17 @@ Thanks for helping build Khulla.
 
 ## Setup
 
-You need [Flutter](https://docs.flutter.dev/get-started/install) 3.47+ (Dart 3.13+). Platform toolchains: Visual Studio with *Desktop development with C++* for Windows; `clang`, `cmake`, `ninja-build`, `libgtk-3-dev` for Linux; Xcode for macOS and iOS.
+You need [FVM](https://fvm.app) and the platform toolchains: Visual Studio with *Desktop development with C++* for Windows; `clang`, `cmake`, `ninja-build`, `libgtk-3-dev` for Linux; Xcode for macOS and iOS.
 
 ```sh
-dart run melos bootstrap
-make build      # generated sources are not committed — required on a fresh clone
+dart pub global activate fvm   # once, if you do not have FVM yet
+fvm install
+make bootstrap
+make build                     # generated sources are not committed — required on a fresh clone
 make localize
 ```
+
+If a pull request bumps `.fvmrc`, run `fvm install` before `make bootstrap`.
 
 Verify your setup with `make check`.
 
@@ -55,4 +59,4 @@ Open pull requests against `dev`. `make pr` pushes and opens one for you.
 
 ## Reporting bugs
 
-Open an issue with the platform you hit it on (Windows, web, …), the Flutter version from `flutter --version`, and the steps to reproduce. If it involves the database, say whether it happened on a fresh install or an existing catalogue — migration bugs and query bugs look identical from the outside.
+Open an issue with the platform you hit it on (Windows, web, …), the Flutter version from `fvm flutter --version`, and the steps to reproduce. If it involves the database, say whether it happened on a fresh install or an existing catalogue — migration bugs and query bugs look identical from the outside.

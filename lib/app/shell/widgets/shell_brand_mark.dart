@@ -1,16 +1,57 @@
 import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/widgets/app_logo.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Product mark pinned to the top of the navigation rail.
+/// The product mark in the shell's top chrome row.
 ///
-/// Collapses to the monogram alone when the rail is not [extended], so it
-/// keeps the rail's width rather than forcing it wider. The mark is drawn
-/// rather than shipped as an asset: a glyph on the flat brand square reads at
-/// 32px, which a raster logo does not.
+/// Sits above the navigation rail in the shell's left column, beside
+/// [AppTopBar] on the right. The icon column matches [AppNavRail]
+/// destination rows exactly — same slot width, same gap, same left inset.
+class ShellBrandHeader extends StatelessWidget {
+  const ShellBrandHeader({required this.extended, super.key});
+
+  /// Whether the rail beside this header is showing labels.
+  final bool extended;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.appSpacing;
+    final colors = context.appColors;
+    final scheme = context.colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        border: Border(
+          right: BorderSide(color: colors.hairline),
+          bottom: BorderSide(color: colors.hairline),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          spacing.sm,
+          spacing.sm,
+          spacing.sm,
+          spacing.sm,
+        ),
+        child: Align(
+          alignment: extended
+              ? AlignmentDirectional.centerStart
+              : Alignment.center,
+          child: ShellBrandMark(extended: extended),
+        ),
+      ),
+    );
+  }
+}
+
+/// Product mark drawn for the shell header and the collapsed rail.
 ///
-/// Flat, not gradient. The brand is one colour in this design, and a gradient
-/// on the one square that represents the product is exactly the kind of
-/// decoration the rest of the chrome refuses.
+/// Extended: the horizontal wordmark plus the product tagline — the wordmark
+/// already carries the name, so no duplicate title line.
+///
+/// Collapsed: the submark centred in the rail width, because at 64px there is
+/// no room for the wordmark.
 class ShellBrandMark extends StatelessWidget {
   const ShellBrandMark({required this.extended, super.key});
 
@@ -20,58 +61,28 @@ class ShellBrandMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
+    final colors = context.appColors;
+    final metrics = context.appMetrics;
     final l10n = context.l10n;
 
-    final monogram = Container(
-      width: spacing.xlg,
-      height: spacing.xlg,
-      decoration: BoxDecoration(
-        color: scheme.primary,
-        borderRadius: BorderRadius.circular(context.appRadius.container),
-        boxShadow: context.appShadows.raised,
-      ),
-      alignment: Alignment.center,
-      child: AppIcon(
-        AppIcons.openBook,
-        size: context.appMetrics.iconLarge,
-        color: scheme.onPrimary,
-      ),
-    );
-
     if (!extended) {
-      return Tooltip(message: l10n.appName, child: monogram);
+      return Tooltip(
+        message: l10n.appName,
+        child: AppLogo.submark(size: spacing.xlg),
+      );
     }
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        monogram,
-        SizedBox(width: spacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                l10n.appName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.appTextStyles.sectionTitle.copyWith(
-                  color: context.appColors.ink100,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.2,
-                ),
-              ),
-              Text(
-                l10n.appTagline,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.appTextStyles.micro.copyWith(
-                  color: context.appColors.ink500,
-                ),
-              ),
-            ],
-          ),
+        AppLogo.primary(height: spacing.xlg),
+        SizedBox(height: spacing.xxs),
+        Text(
+          l10n.appTagline,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.appTextStyles.micro.copyWith(color: colors.ink500),
         ),
       ],
     );

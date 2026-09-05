@@ -9,8 +9,9 @@ This is the **how-to** companion to [DATABASE.md](../DATABASE.md), which covers 
 
 | Task | Command |
 |---|---|
-| Added/changed a table | `make migrate` then `make build` |
+| Added/changed a table | `make migrate` then `make build` then `make db-diagram` |
 | Just changed non-DB code | `make build` |
+| Refresh the visual schema | `make db-diagram` |
 | Run tests | `make test` |
 | Generate code only | `dart run build_runner build --delete-conflicting-outputs` |
 
@@ -232,7 +233,8 @@ If the test is red → your migration step has a bug. Fix the step before mergin
 4. make migrate                writes schema JSON + steps + tests
 5. Fill the migration step     _upgradeSchema → from1To2 callback
 6. make build                  regenerates .g.dart
-7. make test                   migration tests must be green
+7. make db-diagram              refreshes docs/database/schema.md
+8. make test                   migration tests must be green
 ```
 
 ---
@@ -824,6 +826,7 @@ Every schema change must complete all of these before it's considered done:
 - [ ] `make migrate` run — `drift_schemas/` and `test/drift/` updated
 - [ ] Migration step filled in (never using `this`)
 - [ ] `make build` run — `.g.dart` files regenerated
+- [ ] `make db-diagram` run — `docs/database/schema.md` refreshed
 - [ ] `make test` is green — migration tests pass
 - [ ] Data source reads/writes wrapped in `guardDatabase`
 - [ ] Domain mapper created (`toDomain()`, `toCompanion()`)

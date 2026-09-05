@@ -23,6 +23,7 @@ class AppNavRail extends StatefulWidget {
     this.leading,
     this.trailing,
     this.footer,
+    this.wrapSafeArea = true,
     super.key,
   }) : assert(destinations.length >= 2, 'Need at least 2 destinations');
 
@@ -48,6 +49,10 @@ class AppNavRail extends StatefulWidget {
   /// The bottom-most slot, drawn full-bleed inside the rail's padding — a
   /// promo card, a storage meter.
   final Widget? footer;
+
+  /// Whether to wrap the rail in [SafeArea]. The shell turns this off when it
+  /// already wrapped the chrome row once.
+  final bool wrapSafeArea;
 
   /// The rail's width when it is showing labels.
   static const double extendedWidth = 240;
@@ -96,6 +101,75 @@ class _AppNavRailState extends State<AppNavRail> {
     final head = widget.leading;
     final tail = widget.trailing;
     final bottom = widget.footer;
+    final applySafeArea = widget.wrapSafeArea;
+
+    final rail = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Optional slot above the destinations — product mark, search, or
+        // a workspace switcher. The shell draws its brand header above the
+        // rail instead, so this stays null in production.
+        if (head != null)
+          SizedBox(
+            height: context.appMetrics.topBarHeight,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: spacing.sm),
+              child: Center(child: head),
+            ),
+          ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              spacing.sm,
+              spacing.xs,
+              spacing.sm,
+              spacing.xs,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final (index, destination) in widget.destinations.indexed)
+                  _RailItem(
+                    destination: destination,
+                    extended: extended,
+                    selected: index == widget.selectedIndex,
+                    expanded: _expanded.contains(index),
+                    onTap: () {
+                      widget.onDestinationSelected(index);
+                      if (extended && destination.children.isNotEmpty) {
+                        _toggle(index);
+                      }
+                    },
+                    onToggle: destination.children.isEmpty || !extended
+                        ? null
+                        : () => _toggle(index),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        if (tail != null)
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              spacing.sm,
+              spacing.xs,
+              spacing.sm,
+              spacing.xs,
+            ),
+            child: tail,
+          ),
+        if (bottom != null)
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              spacing.sm,
+              spacing.xs,
+              spacing.sm,
+              spacing.sm,
+            ),
+            child: bottom,
+          ),
+      ],
+    );
 
     return Container(
       width: extended ? AppNavRail.extendedWidth : AppNavRail.collapsedWidth,
@@ -103,76 +177,7 @@ class _AppNavRailState extends State<AppNavRail> {
         color: scheme.surface,
         border: Border(right: BorderSide(color: colors.hairline)),
       ),
-      child: SafeArea(
-        right: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // The header matches the top bar's height so the product mark
-            // and the page title sit on the same line across the seam.
-            if (head != null)
-              SizedBox(
-                height: context.appMetrics.topBarHeight,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: spacing.sm),
-                  child: Center(child: head),
-                ),
-              ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                  spacing.sm,
-                  spacing.xs,
-                  spacing.sm,
-                  spacing.xs,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (final (index, destination)
-                        in widget.destinations.indexed)
-                      _RailItem(
-                        destination: destination,
-                        extended: extended,
-                        selected: index == widget.selectedIndex,
-                        expanded: _expanded.contains(index),
-                        onTap: () {
-                          widget.onDestinationSelected(index);
-                          if (extended && destination.children.isNotEmpty) {
-                            _toggle(index);
-                          }
-                        },
-                        onToggle: destination.children.isEmpty || !extended
-                            ? null
-                            : () => _toggle(index),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-            if (tail != null)
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  spacing.sm,
-                  spacing.xs,
-                  spacing.sm,
-                  spacing.xs,
-                ),
-                child: tail,
-              ),
-            if (bottom != null)
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  spacing.sm,
-                  spacing.xs,
-                  spacing.sm,
-                  spacing.sm,
-                ),
-                child: bottom,
-              ),
-          ],
-        ),
-      ),
+      child: applySafeArea ? SafeArea(right: false, child: rail) : rail,
     );
   }
 }

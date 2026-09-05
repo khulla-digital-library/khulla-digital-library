@@ -24,11 +24,9 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// the section's actions have to stay put while a catalogue of ten thousand
 /// titles scrolls, and no arrangement inside a page achieves that as simply.
 ///
-/// The chrome is split by *scope*, not by convenience. The top bar carries
-/// only what changes with the page — its name, its trail, what you can do to
-/// it. Search, notifications, the theme switch and the account control are
-/// the same everywhere, so they sit at the foot of the rail with the rest of
-/// the app-wide furniture.
+/// The chrome is split by *scope*, not by convenience. The brand header sits
+/// above the rail in the left column; the top bar tops the page column beside
+/// it. Theme lives under Settings → Appearance.
 class AppShell extends StatelessWidget {
   const AppShell({required this.navigationShell, super.key});
 
@@ -69,6 +67,7 @@ class AppShell extends StatelessWidget {
           ? null
           : AppBreadcrumbs(crumbs: page.crumbs),
       actions: shellPageActions(context, location, l10n),
+      wrapSafeArea: !formFactor.usesNavigationRail,
       leading: formFactor.usesNavigationRail
           ? null
           : AppIconButton(
@@ -126,41 +125,64 @@ class AppShell extends StatelessWidget {
     }
 
     final extended = formFactor.usesExtendedRail;
+    final railWidth = extended
+        ? AppNavRail.extendedWidth
+        : AppNavRail.collapsedWidth;
 
     return Scaffold(
-      body: Row(
-        children: [
-          AppNavRail(
-            selectedIndex: navigationShell.currentIndex,
-            onDestinationSelected: _goBranch,
-            extended: extended,
-            leading: ShellBrandMark(extended: extended),
-            footer: ShellRailFooter(extended: extended),
-            destinations: [
-              for (final destination in destinations)
-                AppNavDestination(
-                  icon: AppIcon(destination.icon),
-                  label: destination.label,
-                  children: [
-                    for (final child in destination.children)
-                      AppNavChild(
-                        label: child.label,
-                        selected: Routes.isUnder(location, child.route),
-                        onSelected: () => _goRoute(context, child.route),
-                      ),
-                  ],
-                ),
-            ],
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                topBar,
-                Expanded(child: navigationShell),
-              ],
+      body: SafeArea(
+        bottom: false,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              width: railWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ShellBrandHeader(extended: extended),
+                  Expanded(
+                    child: AppNavRail(
+                      selectedIndex: navigationShell.currentIndex,
+                      onDestinationSelected: _goBranch,
+                      extended: extended,
+                      wrapSafeArea: false,
+                      footer: ShellRailFooter(extended: extended),
+                      destinations: [
+                        for (final destination in destinations)
+                          AppNavDestination(
+                            icon: AppIcon(destination.icon),
+                            label: destination.label,
+                            children: [
+                              for (final child in destination.children)
+                                AppNavChild(
+                                  label: child.label,
+                                  selected: Routes.isUnder(
+                                    location,
+                                    child.route,
+                                  ),
+                                  onSelected: () =>
+                                      _goRoute(context, child.route),
+                                ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  topBar,
+                  Expanded(child: navigationShell),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

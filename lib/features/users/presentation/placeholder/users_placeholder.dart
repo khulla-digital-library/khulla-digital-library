@@ -57,6 +57,3 @@ const List<StaffRecord> placeholderStaff = [
     lastActive: 'Last month',
   ),
 ];
-
-/// The account the app is signed in as, until sessions exist.
-StaffRecord get signedInStaff => placeholderStaff.first;

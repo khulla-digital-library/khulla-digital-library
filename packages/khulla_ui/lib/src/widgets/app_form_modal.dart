@@ -73,22 +73,9 @@ class AppFormModal extends StatelessWidget {
     final scheme = context.colorScheme;
     final typography = context.appTextStyles;
 
-    final heading = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          title,
-          style: typography.formTitle.copyWith(color: colors.ink100),
-        ),
-        if (description case final line?) ...[
-          SizedBox(height: spacing.xxs),
-          Text(
-            line,
-            style: typography.body.copyWith(color: colors.mutedForeground),
-          ),
-        ],
-      ],
+    final heading = Text(
+      title,
+      style: typography.sectionTitle.copyWith(color: colors.ink100),
     );
 
     final body = Column(
@@ -108,7 +95,7 @@ class AppFormModal extends StatelessWidget {
         border: Border(top: BorderSide(color: colors.hairline)),
       ),
       padding: EdgeInsets.symmetric(
-        horizontal: spacing.dialog,
+        horizontal: spacing.lg,
         vertical: spacing.sm,
       ),
       child: AppDialogActions(children: actions),
@@ -178,18 +165,17 @@ class AppFormModal extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.fromLTRB(
-                spacing.dialog,
-                spacing.dialog,
+                spacing.lg,
                 spacing.sm,
-                spacing.sm,
+                spacing.xs,
+                0,
               ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(child: heading),
-                  SizedBox(width: spacing.sm),
                   AppIconButton(
                     icon: AppIcons.close,
+                    size: AppIconButtonSize.small,
                     tooltip: MaterialLocalizations.of(
                       context,
                     ).closeButtonTooltip,
@@ -201,8 +187,28 @@ class AppFormModal extends StatelessWidget {
             Divider(height: 1, color: colors.hairline),
             Flexible(
               child: SingleChildScrollView(
-                padding: EdgeInsets.all(spacing.dialog),
-                child: body,
+                padding: EdgeInsets.fromLTRB(
+                  spacing.lg,
+                  spacing.sm,
+                  spacing.lg,
+                  spacing.lg,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (description case final line?) ...[
+                      Text(
+                        line,
+                        style: typography.body.copyWith(
+                          color: colors.mutedForeground,
+                        ),
+                      ),
+                      SizedBox(height: spacing.sm),
+                    ],
+                    body,
+                  ],
+                ),
               ),
             ),
             footer,

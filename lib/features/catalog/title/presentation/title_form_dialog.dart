@@ -136,19 +136,30 @@ class _TitleFormDialogState extends State<TitleFormDialog> with DisposeBag {
                   keyboardType: TextInputType.text,
                   onChanged: (_) {},
                 ),
-              ],
-            ),
-            AppFormRow(
-              children: [
                 AppTextField(
                   label: l10n.fieldPublisher,
                   controller: _publisher,
                   textCapitalization: TextCapitalization.words,
                   onChanged: (_) {},
                 ),
+              ],
+            ),
+            AppFormRow(
+              children: [
                 AppTextField(
                   label: l10n.fieldPublishedYear,
                   controller: _year,
+                  keyboardType: TextInputType.number,
+                  onChanged: (_) {},
+                ),
+                AppTextField(
+                  label: l10n.fieldEdition,
+                  controller: _edition,
+                  onChanged: (_) {},
+                ),
+                AppTextField(
+                  label: l10n.fieldPages,
+                  controller: _pages,
                   keyboardType: TextInputType.number,
                   onChanged: (_) {},
                 ),
@@ -170,21 +181,6 @@ class _TitleFormDialogState extends State<TitleFormDialog> with DisposeBag {
                   label: l10n.fieldLanguage,
                   controller: _language,
                   textCapitalization: TextCapitalization.words,
-                  onChanged: (_) {},
-                ),
-              ],
-            ),
-            AppFormRow(
-              children: [
-                AppTextField(
-                  label: l10n.fieldEdition,
-                  controller: _edition,
-                  onChanged: (_) {},
-                ),
-                AppTextField(
-                  label: l10n.fieldPages,
-                  controller: _pages,
-                  keyboardType: TextInputType.number,
                   onChanged: (_) {},
                 ),
               ],
