@@ -11,7 +11,7 @@ Widget _host(Widget child, {Size size = const Size(1400, 900)}) => MediaQuery(
 
 void main() {
   group('AppButton', () {
-    testWidgets('defaults to the 36px size', (tester) async {
+    testWidgets('defaults to the 40px size', (tester) async {
       await tester.pumpWidget(
         _host(AppButton(onPressed: () {}, child: const Text('Add title'))),
       );
@@ -24,7 +24,7 @@ void main() {
             )
             .first,
       );
-      expect(box.height, 36);
+      expect(box.height, 40);
     });
 
     testWidgets('swaps the label for a spinner while loading', (tester) async {
@@ -160,6 +160,7 @@ void main() {
                     value: 'Book',
                     items: const ['Book', 'Journal'],
                     itemLabel: (value) => value,
+                    itemIcon: (_) => AppIcons.book,
                     onChanged: (_) {},
                   ),
                 ),
@@ -176,14 +177,15 @@ void main() {
         ),
       );
 
-      final dropdownHeight = tester
-          .getSize(find.byType(InputDecorator).first)
-          .height;
-      final textFieldHeight = tester
-          .getSize(find.byType(TextFormField).first)
-          .height;
+      final borders = find.byWidgetPredicate(
+        (widget) => widget.runtimeType.toString() == '_BorderContainer',
+      );
 
-      expect(dropdownHeight, textFieldHeight);
+      expect(borders, findsNWidgets(2));
+      expect(
+        tester.getSize(borders.at(0)).height,
+        tester.getSize(borders.at(1)).height,
+      );
     });
 
     testWidgets('opens a menu as wide as the field', (tester) async {
@@ -352,6 +354,31 @@ void main() {
       final body = tester.getRect(find.byType(Scaffold));
       final title = tester.getRect(find.text('No titles yet'));
       expect(title.center.dy, closeTo(body.center.dy, 48));
+    });
+  });
+
+  group('AppDialogCloseChip', () {
+    testWidgets('fills with the opaque surface, not a washed container', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_host(AppDialogCloseChip(onPressed: () {})));
+
+      final container = tester.widget<AnimatedContainer>(
+        find.byType(AnimatedContainer),
+      );
+      final decoration = container.decoration! as BoxDecoration;
+      expect(decoration.color, AppTheme.light().colorScheme.surface);
+      expect(decoration.color!.a, 1.0);
+    });
+
+    testWidgets('invokes onPressed when tapped', (tester) async {
+      var pressed = 0;
+      await tester.pumpWidget(
+        _host(AppDialogCloseChip(onPressed: () => pressed++)),
+      );
+
+      await tester.tap(find.byType(AppDialogCloseChip));
+      expect(pressed, 1);
     });
   });
 

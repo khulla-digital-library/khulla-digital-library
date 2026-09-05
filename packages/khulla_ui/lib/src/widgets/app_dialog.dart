@@ -195,9 +195,7 @@ class AppDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
     final colors = context.appColors;
-    final scheme = context.colorScheme;
     final typography = context.appTextStyles;
-    final maxHeight = MediaQuery.sizeOf(context).height * 0.9;
 
     final badgeGlyph =
         iconWidget ??
@@ -247,36 +245,12 @@ class AppDialog extends StatelessWidget {
       ],
     );
 
-    return Dialog(
-      backgroundColor: scheme.surface,
-      insetPadding: EdgeInsets.all(spacing.lg),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(context.appRadius.control),
-        side: BorderSide(color: colors.hairline),
-      ),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: width.value,
-          maxHeight: maxHeight,
-        ),
-        // The chip hangs outside the panel, so nothing here may clip.
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            SingleChildScrollView(
-              padding: EdgeInsets.all(spacing.dialog),
-              child: body,
-            ),
-            if (showClose)
-              Positioned(
-                top: -spacing.xs,
-                right: -spacing.xs - 2,
-                child: AppDialogCloseChip(
-                  onPressed: () => Navigator.of(context).maybePop(),
-                ),
-              ),
-          ],
-        ),
+    return AppDialogShell(
+      maxWidth: width.value,
+      showClose: showClose,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.dialog),
+        child: body,
       ),
     );
   }

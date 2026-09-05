@@ -32,26 +32,32 @@ class _AppDialogCloseChipState extends State<AppDialogCloseChip> {
           duration: motion.layout,
           curve: motion.standard,
           offset: _hovered ? const Offset(0.15, -0.15) : Offset.zero,
-          child: AnimatedContainer(
-            duration: motion.layout,
-            curve: motion.standard,
-            padding: EdgeInsets.all(spacing.xs),
-            decoration: BoxDecoration(
-              color: _hovered
-                  ? colors.secondary
-                  : scheme.surfaceContainerHighest,
+          child: Material(
+            color: scheme.surface,
+            shadowColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(context.appRadius.item),
-              border: Border.all(color: colors.hairline),
-              boxShadow: context.appShadows.raised,
             ),
-            child: AnimatedRotation(
+            child: AnimatedContainer(
               duration: motion.layout,
               curve: motion.standard,
-              turns: _hovered ? 0.25 : 0,
-              child: AppIcon(
-                AppIcons.close,
-                size: metrics.iconLarge,
-                color: colors.ink500,
+              padding: EdgeInsets.all(spacing.xs),
+              decoration: BoxDecoration(
+                color: _hovered ? colors.secondary : scheme.surface,
+                borderRadius: BorderRadius.circular(context.appRadius.item),
+                border: Border.all(color: colors.hairline),
+                boxShadow: context.appShadows.raised,
+              ),
+              child: AnimatedRotation(
+                duration: motion.layout,
+                curve: motion.standard,
+                turns: _hovered ? 0.25 : 0,
+                child: AppIcon(
+                  AppIcons.close,
+                  size: metrics.iconLarge,
+                  color: colors.ink500,
+                ),
               ),
             ),
           ),

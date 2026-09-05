@@ -345,54 +345,52 @@ class _DropdownFieldControlState<T> extends State<_DropdownFieldControl<T>> {
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: enabled ? _toggleMenu : null,
-                child: SizedBox(
-                  height: metrics.fieldHeight,
-                  width: _fieldWidth,
-                  child: InputDecorator(
-                    expands: true,
-                    isEmpty: !hasValue,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      hintText: widget.hintText,
-                      enabled: enabled,
-                      contentPadding: EdgeInsetsDirectional.only(
-                        start: spacing.sm,
-                        end: spacing.sm,
-                        top: spacing.xs,
-                        bottom: spacing.xs,
-                      ),
+                // Content-sized, same as [AppTextField]: forcing [fieldHeight]
+                // with `expands` stretches the outline past a neighbouring
+                // text field.
+                child: InputDecorator(
+                  isEmpty: !hasValue,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    hintText: widget.hintText,
+                    enabled: enabled,
+                    contentPadding: EdgeInsetsDirectional.only(
+                      start: spacing.sm,
+                      end: spacing.sm,
+                      top: spacing.xs,
+                      bottom: spacing.xs,
                     ),
-                    child: Row(
-                      children: [
-                        if (selectedIcon != null) ...[
-                          AppIcon(
-                            selectedIcon,
-                            size: metrics.icon,
-                            color: colors.ink500,
-                          ),
-                          SizedBox(width: spacing.menuIconGap),
-                        ],
-                        Expanded(
-                          child: hasValue
-                              ? Text(
-                                  widget.itemLabel(selected),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: typography.body.copyWith(
-                                    color: enabled
-                                        ? colors.ink100
-                                        : colors.ink500,
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                        ),
+                  ),
+                  child: Row(
+                    children: [
+                      if (selectedIcon != null) ...[
                         AppIcon(
-                          AppIcons.chevronDown,
+                          selectedIcon,
                           size: metrics.icon,
                           color: colors.ink500,
                         ),
+                        SizedBox(width: spacing.menuIconGap),
                       ],
-                    ),
+                      Expanded(
+                        child: hasValue
+                            ? Text(
+                                widget.itemLabel(selected),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: typography.body.copyWith(
+                                  color: enabled
+                                      ? colors.ink100
+                                      : colors.ink500,
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                      AppIcon(
+                        AppIcons.chevronDown,
+                        size: metrics.icon,
+                        color: colors.ink500,
+                      ),
+                    ],
                   ),
                 ),
               ),

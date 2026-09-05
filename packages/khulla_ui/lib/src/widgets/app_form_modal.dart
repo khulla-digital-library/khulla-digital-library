@@ -61,7 +61,6 @@ class AppFormModal extends StatelessWidget {
     }
     return showDialog<T>(
       context: context,
-      barrierDismissible: true,
       builder: builder,
     );
   }
@@ -145,72 +144,49 @@ class AppFormModal extends StatelessWidget {
       );
     }
 
-    return Dialog(
-      backgroundColor: scheme.surface,
-      insetPadding: EdgeInsets.all(spacing.lg),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(context.appRadius.control),
-        side: BorderSide(color: colors.hairline),
-      ),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: width.value,
-          maxHeight: MediaQuery.sizeOf(context).height * 0.9,
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    spacing.lg,
-                    spacing.lg,
-                    spacing.lg,
-                    spacing.sm,
-                  ),
-                  child: heading,
-                ),
-                Flexible(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                      spacing.lg,
-                      0,
-                      spacing.lg,
-                      spacing.lg,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (description case final line?) ...[
-                          Text(
-                            line,
-                            style: typography.body.copyWith(
-                              color: colors.mutedForeground,
-                            ),
-                          ),
-                          SizedBox(height: spacing.sm),
-                        ],
-                        body,
-                      ],
-                    ),
-                  ),
-                ),
-                footer,
-              ],
+    return AppDialogShell(
+      maxWidth: width.value,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              spacing.lg,
+              spacing.lg,
+              spacing.lg,
+              spacing.sm,
             ),
-            Positioned(
-              top: -spacing.xs,
-              right: -spacing.xs - 2,
-              child: AppDialogCloseChip(
-                onPressed: () => Navigator.of(context).maybePop(),
+            child: heading,
+          ),
+          Flexible(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                spacing.lg,
+                0,
+                spacing.lg,
+                spacing.lg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (description case final line?) ...[
+                    Text(
+                      line,
+                      style: typography.body.copyWith(
+                        color: colors.mutedForeground,
+                      ),
+                    ),
+                    SizedBox(height: spacing.sm),
+                  ],
+                  body,
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          footer,
+        ],
       ),
     );
   }

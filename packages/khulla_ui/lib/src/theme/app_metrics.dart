@@ -8,7 +8,7 @@ import 'package:khulla_ui/khulla_ui.dart';
 ///
 /// These numbers are what make the product feel like itself — get the colors
 /// perfect and the heights wrong and it still reads as a different app. A
-/// 36px button next to a 44px field next to a 60px table row is the rhythm;
+/// 40px button next to a 44px field next to a 60px table row is the rhythm;
 /// Material's defaults (48px everything) are roughly a third looser and turn
 /// a dense catalogue screen into a scrolling one.
 ///
@@ -27,20 +27,20 @@ class AppMetrics extends ThemeExtension<AppMetrics> {
     required this.iconNav,
     required this.labelToControlGap,
     required this.formRowGap,
-    this.buttonHeightSmall = 36,
-    this.buttonHeightMedium = 40,
-    this.buttonHeightLarge = 44,
-    this.iconButtonSmall = 32,
-    this.iconButtonMedium = 36,
-    this.iconButtonLarge = 40,
+    this.buttonHeightSmall = 40,
+    this.buttonHeightMedium = 44,
+    this.buttonHeightLarge = 48,
+    this.iconButtonSmall = 35,
+    this.iconButtonMedium = 40,
+    this.iconButtonLarge = 44,
     this.iconDense = 12,
-    this.iconInButton = 14,
+    this.iconInButton = 15,
     this.icon = 16,
     this.iconLarge = 20,
     this.checkbox = 16,
     this.switchTrackWidth = 32,
     this.switchTrackHeight = 16,
-    this.paginationItem = 38,
+    this.paginationItem = 42,
     this.railExpanded = 240,
     this.railCollapsed = 64,
     this.topBarHeight = 56,

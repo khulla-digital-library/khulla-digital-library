@@ -299,6 +299,7 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
         ),
         AppFormSection(
           title: l10n.titleFormShelving,
+          description: l10n.titleFormShelvingDescription,
           children: [
             AppFormRow(
               children: [
@@ -319,6 +320,7 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
             ),
             if (!_isEditing)
               AppFormRow(
+                flexes: const [1, 1],
                 children: [
                   AppTextField(
                     label: l10n.titleFormInitialCopies,
@@ -329,6 +331,8 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
                   AppSwitchField(
                     value: _lendable,
                     label: l10n.titleFormLendable,
+                    description: l10n.titleFormLendableDescription,
+                    stacked: true,
                     onChanged: (value) => setState(() => _lendable = value),
                   ),
                 ],
@@ -337,6 +341,8 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
               AppSwitchField(
                 value: _lendable,
                 label: l10n.titleFormLendable,
+                description: l10n.titleFormLendableDescription,
+                stacked: true,
                 onChanged: (value) => setState(() => _lendable = value),
               ),
           ],

@@ -2,7 +2,7 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// {@template app_icon_button}
 /// A square icon-only control, in the three sizes that pair with
-/// [AppButton]'s: 32 for a table row, 36 beside a 36px button, 40 for a
+/// [AppButton]'s: 35 for a table row, 40 beside a 40px button, 44 for a
 /// toolbar.
 ///
 /// [tooltip] is required, not optional: an icon-only control with no label is
@@ -119,12 +119,12 @@ class AppIconButton extends StatelessWidget {
 
 /// The three icon-button sizes, paired with [AppButton]'s heights.
 enum AppIconButtonSize {
-  /// 32px — inside a table row, where the row is only ~60px tall.
+  /// 35px — inside a table row, where the row is only ~60px tall.
   small,
 
-  /// 36px — the default, matching a small button.
+  /// 40px — the default, matching a small button.
   medium,
 
-  /// 40px — a toolbar or a page header.
+  /// 44px — a toolbar or a page header.
   large,
 }
