@@ -79,7 +79,6 @@ class FineListPage extends StatelessWidget {
       message: l10n.finesWaiveBody,
       confirmLabel: l10n.finesWaive,
       cancelLabel: l10n.commonCancel,
-      icon: AppIcons.waiveFine,
     );
     if (!context.mounted || !confirmed) return;
     try {

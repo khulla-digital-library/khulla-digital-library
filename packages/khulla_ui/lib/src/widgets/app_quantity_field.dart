@@ -99,7 +99,7 @@ class AppQuantityField extends StatefulWidget {
   /// Whether the field accepts input.
   final bool enabled;
 
-  /// [regular] matches a text field; [small] fits a short dialog.
+  /// [AppQuantityFieldSize.regular] matches a text field; [AppQuantityFieldSize.small] fits a short dialog.
   final AppQuantityFieldSize size;
 
   @override

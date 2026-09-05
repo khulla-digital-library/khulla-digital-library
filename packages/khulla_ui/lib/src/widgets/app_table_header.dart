@@ -94,33 +94,40 @@ class _HeaderCellState<T> extends State<_HeaderCell<T>> {
     final isSorted = current != null && current.columnId == column.id;
     final handler = widget.onSort;
 
-    final content = Align(
-      alignment: column.alignment,
-      child: Row(
+    final labelStyle = context.appTextStyles.columnHeader.copyWith(
+      color: isSorted ? colors.ink100 : colors.ink500,
+    );
+    final label = Text(
+      column.label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: labelStyle,
+    );
+
+    final Widget alignedLabel;
+    if (handler == null) {
+      alignedLabel = label;
+    } else {
+      alignedLabel = Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Flexible(
-            child: Text(
-              column.label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: context.appTextStyles.columnHeader.copyWith(
-                color: isSorted ? colors.ink100 : colors.ink500,
-              ),
+          Flexible(child: label),
+          AnimatedOpacity(
+            duration: context.appMotion.color,
+            opacity: isSorted || _hovered ? 1 : 0,
+            child: _SortGlyph(
+              ascending: isSorted ? current.ascending : null,
+              active: scheme.primary,
+              rest: colors.hairlineStrong,
             ),
           ),
-          if (handler != null)
-            AnimatedOpacity(
-              duration: context.appMotion.color,
-              opacity: isSorted || _hovered ? 1 : 0,
-              child: _SortGlyph(
-                ascending: isSorted ? current.ascending : null,
-                active: scheme.primary,
-                rest: colors.hairlineStrong,
-              ),
-            ),
         ],
-      ),
+      );
+    }
+
+    final content = Align(
+      alignment: column.alignment,
+      child: alignedLabel,
     );
 
     if (handler == null) {

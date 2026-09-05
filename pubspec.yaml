@@ -72,6 +72,8 @@ dependencies:
   country_phone_kit:
     git:
       url: https://github.com/sawongam/country_phone_kit
+  printing: ^5.15.0
+  pdf: ^3.13.0
 
 dev_dependencies:
   # Code generation

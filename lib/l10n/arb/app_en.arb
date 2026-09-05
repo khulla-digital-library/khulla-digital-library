@@ -1153,6 +1153,16 @@
     "labelsPreviewTitle": "Preview",
     "labelsPreviewSubtitle": "One sticker, at the chosen size",
     "labelsPrint": "Print sheet",
+    "labelsPrintSuccess": "{count} labels sent to the printer",
+    "@labelsPrintSuccess": {
+        "description": "Labels - toast after the sheet reaches the print dialog",
+        "placeholders": {
+            "count": {
+                "type": "String",
+                "example": "12"
+            }
+        }
+    },
     "labelsClearQueue": "Clear the queue",
     "labelsRemove": "Remove from the queue",
     "settingsAppearanceLanguage": "Language",

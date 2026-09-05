@@ -214,7 +214,6 @@ class TitleDetailPage extends StatelessWidget {
                   children: [
                     TitleDetailHeader(
                       title: title,
-                      onBack: () => context.go(Routes.catalogTitles),
                       onEdit: () => unawaited(_edit(context)),
                       onDelete: () => unawaited(_confirmDelete(context)),
                     ),
@@ -301,7 +300,6 @@ class _AddCopyCountDialogState extends State<_AddCopyCountDialog>
 
     return AppFormModal(
       title: l10n.titleDetailAddCopyDialogTitle,
-      description: l10n.titleDetailAddCopyDialogBody,
       width: AppDialogWidth.sm,
       actions: [
         AppDialog.secondaryAction(
@@ -316,19 +314,37 @@ class _AddCopyCountDialogState extends State<_AddCopyCountDialog>
         ),
       ],
       children: [
-        AppQuantityField(
-          label: l10n.titleDetailAddCopyCount,
-          required: true,
-          size: AppQuantityFieldSize.small,
-          controller: _controller,
-          errorText: _errorText,
-          decreaseTooltip: l10n.commonDecrease,
-          increaseTooltip: l10n.commonIncrease,
-          onChanged: (_) {
-            if (_errorText != null) {
-              setState(() => _errorText = null);
-            }
-          },
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AppFieldLabel(
+              label: l10n.titleDetailAddCopyCount,
+              required: true,
+              hasError: _errorText != null,
+            ),
+            SizedBox(height: context.appMetrics.labelToControlGap),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: FractionallySizedBox(
+                widthFactor: 0.3,
+                child: AppQuantityField(
+                  size: AppQuantityFieldSize.small,
+                  controller: _controller,
+                  decreaseTooltip: l10n.commonDecrease,
+                  increaseTooltip: l10n.commonIncrease,
+                  onChanged: (_) {
+                    if (_errorText != null) {
+                      setState(() => _errorText = null);
+                    }
+                  },
+                ),
+              ),
+            ),
+            if (_errorText case final error?) ...[
+              SizedBox(height: context.appSpacing.xxs + 2),
+              AppFieldError(message: error),
+            ],
+          ],
         ),
       ],
     );

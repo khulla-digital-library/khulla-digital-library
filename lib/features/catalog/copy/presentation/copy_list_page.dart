@@ -84,27 +84,14 @@ class _CopyListPageState extends State<CopyListPage> {
 
   Future<void> _markDamaged(Copy copy) async {
     final l10n = context.l10n;
-    final confirmed = await AppDialog.show<bool>(
+    final confirmed = await AppDialog.confirmDestructive(
       context: context,
       title: l10n.copiesMarkDamaged,
       message: l10n.copiesMarkDamagedBody,
-      actionsBuilder: (dialogContext) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AppDialog.primaryAction(
-            context: dialogContext,
-            label: l10n.copiesMarkDamaged,
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-          ),
-          AppDialog.secondaryAction(
-            context: dialogContext,
-            label: l10n.commonCancel,
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-          ),
-        ],
-      ),
+      confirmLabel: l10n.copiesMarkDamaged,
+      cancelLabel: l10n.commonCancel,
     );
-    if (!mounted || confirmed != true) return;
+    if (!mounted || !confirmed) return;
     try {
       await context.read<CopyCubit>().markCopyDamaged(copy.id);
       if (!mounted) return;

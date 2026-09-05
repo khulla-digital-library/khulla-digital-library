@@ -46,7 +46,9 @@ enum AppDialogWidth {
 ///   thumb on a phone.
 ///
 /// Use [AppDialog.show] for arbitrary content and [AppDialog.confirmDestructive]
-/// for the "delete this?" prompt.
+/// for the "delete this?" prompt — same chrome as [AppFormModal]: left-aligned
+/// [AppTextStyles.displaySmall] title, body copy, [AppDialogWidth.sm], and a
+/// filled destructive confirm.
 /// {@endtemplate}
 class AppDialog extends StatelessWidget {
   /// {@macro app_dialog}
@@ -121,43 +123,52 @@ class AppDialog extends StatelessWidget {
   );
 
   /// Confirms a destructive action. Resolves true only on confirm.
+  ///
+  /// Uses [AppFormModal] so the prompt matches create/edit chrome: heading
+  /// size, description, small width, and a filled danger confirm.
   static Future<bool> confirmDestructive({
     required BuildContext context,
     required String title,
     required String message,
     required String confirmLabel,
     required String cancelLabel,
-    AppIconSpec? icon = AppIcons.delete,
-    Widget? iconWidget,
   }) async {
-    final confirmed = await show<bool>(
+    final confirmed = await AppFormModal.show<bool>(
       context: context,
-      title: title,
-      message: message,
-      icon: iconWidget == null ? icon : null,
-      iconWidget: iconWidget,
-      actionsBuilder: (dialogContext) => AppDialogActions(
-        children: [
+      builder: (dialogContext) => AppFormModal(
+        title: title,
+        description: message,
+        width: AppDialogWidth.sm,
+        actions: [
           secondaryAction(
             context: dialogContext,
             label: cancelLabel,
             onPressed: () => Navigator.of(dialogContext).pop(false),
           ),
-          destructiveAction(
+          destructiveFilledAction(
             context: dialogContext,
             label: confirmLabel,
             onPressed: () => Navigator.of(dialogContext).pop(true),
           ),
         ],
+        children: const [],
       ),
     );
     return confirmed ?? false;
   }
 
-  /// The confirming action of a destructive prompt.
-  ///
-  /// Outlined rather than filled: a solid red slab reads as the recommended
-  /// choice, and in a "delete this?" prompt it is not.
+  /// The confirming action of a destructive prompt in a dialog footer.
+  static Widget destructiveFilledAction({
+    required BuildContext context,
+    required String label,
+    required VoidCallback onPressed,
+  }) => AppButton(
+    onPressed: onPressed,
+    variant: AppButtonVariant.destructiveFilled,
+    child: Text(label),
+  );
+
+  /// An outlined destructive control — a page action, not a dialog confirm.
   static Widget destructiveAction({
     required BuildContext context,
     required String label,

@@ -10,7 +10,8 @@ import 'package:khulla/core/router/go_router_refresh_stream.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_list_page.dart';
 import 'package:khulla/features/catalog/copy/presentation/cubit/copy_cubit.dart';
-import 'package:khulla/features/catalog/copy/presentation/label_print_page.dart';
+import 'package:khulla/features/catalog/label/presentation/cubit/label_cubit.dart';
+import 'package:khulla/features/catalog/label/presentation/label_print_page.dart';
 import 'package:khulla/features/catalog/title/presentation/cubit/title/title_cubit.dart';
 import 'package:khulla/features/catalog/title/presentation/cubit/title/title_detail_cubit.dart';
 import 'package:khulla/features/catalog/title/presentation/title_detail_page.dart';
@@ -167,7 +168,14 @@ class AppRouter {
                     ),
                     GoRoute(
                       path: Routes.labelsSegment,
-                      builder: (context, _) => const LabelPrintPage(),
+                      builder: (context, _) => BlocProvider<LabelCubit>(
+                        create: (_) {
+                          final cubit = getIt<LabelCubit>();
+                          unawaited(cubit.loadLabelDesk());
+                          return cubit;
+                        },
+                        child: const LabelPrintPage(),
+                      ),
                     ),
                   ],
                 ),

@@ -1,12 +1,19 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/lifecycle/dispose_bag.dart';
-import 'package:khulla/features/catalog/copy/presentation/label_size.dart';
-import 'package:khulla/features/catalog/copy/presentation/placeholder/label_queue_entry.dart';
-import 'package:khulla/features/catalog/copy/presentation/placeholder/labels_placeholder.dart';
-import 'package:khulla/features/catalog/copy/presentation/widgets/label_preview.dart';
-import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_placeholder.dart';
+import 'package:khulla/features/catalog/label/domain/models/label_queue_entry.dart';
+import 'package:khulla/features/catalog/label/domain/models/label_size.dart';
+import 'package:khulla/features/catalog/label/presentation/cubit/label_cubit.dart';
+import 'package:khulla/features/catalog/label/presentation/cubit/label_state.dart';
+import 'package:khulla/features/catalog/label/presentation/label_labels.dart';
+import 'package:khulla/features/catalog/label/presentation/widgets/label_preview.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
+import 'package:khulla/shared/utils/app_exception_l10n.dart';
+import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The label desk: scan a copy, queue its sticker, print the sheet.
@@ -15,6 +22,9 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// scanner is a keyboard that types a barcode and presses enter — anything
 /// that steals focus between two scans turns a tray of new books into a
 /// hunt-and-click job.
+///
+/// [LabelCubit] owns the queue and the layout; a scan that matches nothing
+/// answers as a toast, not as a screen state.
 class LabelPrintPage extends StatefulWidget {
   const LabelPrintPage({super.key});
 
@@ -26,62 +36,38 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
   late final TextEditingController _scanController = textController();
   late final FocusNode _scanFocus = focusNode();
 
-  late List<LabelQueueEntry> _queue = initialLabelQueue();
-  LabelSize _size = LabelSize.medium;
-  bool _includeTitle = true;
-  bool _includeAuthor = true;
-  bool _includeShelf = true;
-  bool _includeLibrary = false;
-
-  int get _labelCount => _queue.fold(0, (total, entry) => total + entry.count);
-
-  /// Queues the copy whose barcode was scanned, or bumps its count when it is
-  /// already in the queue — a second scan of the same book means a second
-  /// sticker, not a duplicate row.
-  void _queueBarcode(String raw) {
-    final barcode = raw.trim();
-    _scanController.clear();
-    _scanFocus.requestFocus();
-    if (barcode.isEmpty) return;
-
-    final needle = barcode.toLowerCase();
-    final match = placeholderCopies
-        .where((copy) => copy.barcode.toLowerCase() == needle)
-        .firstOrNull;
-    if (match == null) {
-      showNotWiredToast(context);
-      return;
+  Future<void> _queueBarcode(String raw) async {
+    final cubit = context.read<LabelCubit>();
+    final l10n = context.l10n;
+    try {
+      await cubit.queueBarcode(raw);
+      if (!mounted) return;
+      _scanController.clear();
+      _scanFocus.requestFocus();
+    } on AppException catch (error) {
+      if (!mounted) return;
+      _scanController.clear();
+      _scanFocus.requestFocus();
+      AppToast.error(context, message: error.localizedMessage(l10n));
     }
-
-    setState(() {
-      final index = _queue.indexWhere((entry) => entry.copy.id == match.id);
-      if (index == -1) {
-        _queue = [..._queue, LabelQueueEntry(copy: match)];
-      } else {
-        _queue = [
-          for (final (position, entry) in _queue.indexed)
-            if (position == index) entry.withCount(entry.count + 1) else entry,
-        ];
-      }
-    });
   }
 
-  void _setCount(LabelQueueEntry entry, int count) => setState(() {
-    _queue = [
-      for (final queued in _queue)
-        if (queued.copy.id == entry.copy.id)
-          queued.withCount(count)
-        else
-          queued,
-    ];
-  });
-
-  void _remove(LabelQueueEntry entry) => setState(() {
-    _queue = [
-      for (final queued in _queue)
-        if (queued.copy.id != entry.copy.id) queued,
-    ];
-  });
+  Future<void> _printSheet() async {
+    final cubit = context.read<LabelCubit>();
+    final l10n = context.l10n;
+    final count = cubit.state.labelCount;
+    try {
+      final printed = await cubit.printSheet();
+      if (!mounted || !printed) return;
+      AppToast.success(
+        context,
+        message: l10n.labelsPrintSuccess('$count'),
+      );
+    } on AppException catch (error) {
+      if (!mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
 
   Widget _scanCard(AppLocalizations l10n) => SectionCard(
     title: l10n.labelsScanTitle,
@@ -94,11 +80,12 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
       prefixIcon: const AppIcon(AppIcons.barcode),
       textInputAction: TextInputAction.done,
       onChanged: (_) {},
-      onSubmitted: _queueBarcode,
+      onSubmitted: (value) => unawaited(_queueBarcode(value)),
     ),
   );
 
-  Widget _queueCard(AppLocalizations l10n) {
+  Widget _queueCard(AppLocalizations l10n, LabelState state) {
+    final cubit = context.read<LabelCubit>();
     final colors = context.appColors;
     final muted = context.textTheme.bodyMedium?.copyWith(
       color: colors.textMuted,
@@ -106,14 +93,14 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
 
     return SectionCard(
       title: l10n.labelsQueueTitle,
-      subtitle: l10n.labelsQueueSubtitle('$_labelCount'),
-      trailing: _queue.isEmpty
+      subtitle: l10n.labelsQueueSubtitle('${state.labelCount}'),
+      trailing: state.queue.isEmpty
           ? null
           : AppTextButton(
-              onPressed: () => setState(() => _queue = const []),
+              onPressed: cubit.clearQueue,
               child: Text(l10n.labelsClearQueue),
             ),
-      child: _queue.isEmpty
+      child: state.queue.isEmpty
           ? AppEmptyView(
               icon: AppIcons.qrCode,
               title: l10n.labelsQueueEmptyTitle,
@@ -121,7 +108,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
               variant: AppFeedbackVariant.inline,
             )
           : AppTable<LabelQueueEntry>(
-              items: _queue,
+              items: state.queue,
               columns: [
                 AppTableColumn<LabelQueueEntry>(
                   id: 'barcode',
@@ -155,7 +142,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, entry) => _CountStepper(
                     count: entry.count,
-                    onChanged: (next) => _setCount(entry, next),
+                    onChanged: (next) => cubit.setEntryCount(entry, next),
                   ),
                 ),
                 AppTableColumn<LabelQueueEntry>(
@@ -166,7 +153,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
                   cellBuilder: (context, entry) => AppIconButton(
                     icon: AppIcons.close,
                     tooltip: l10n.labelsRemove,
-                    onPressed: () => _remove(entry),
+                    onPressed: () => cubit.removeEntry(entry),
                   ),
                 ),
               ],
@@ -174,7 +161,8 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
     );
   }
 
-  Widget _layoutCard(AppLocalizations l10n) {
+  Widget _layoutCard(AppLocalizations l10n, LabelState state) {
+    final cubit = context.read<LabelCubit>();
     final spacing = context.appSpacing;
 
     return SectionCard(
@@ -186,45 +174,41 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
         children: [
           AppDropdownField<LabelSize>(
             label: l10n.labelsSizeTitle,
-            value: _size,
+            value: state.size,
             items: LabelSize.values,
             itemLabel: (size) => size.label(l10n),
-            onChanged: (size) => setState(() => _size = size ?? _size),
+            onChanged: (size) {
+              if (size != null) cubit.sizeChanged(size);
+            },
           ),
           SizedBox(height: spacing.md),
           AppCheckboxField(
             label: l10n.labelsIncludeTitle,
-            value: _includeTitle,
-            onChanged: (value) =>
-                setState(() => _includeTitle = value ?? false),
+            value: state.includeTitle,
+            onChanged: (value) => cubit.includeTitleChanged(value ?? false),
           ),
           AppCheckboxField(
             label: l10n.labelsIncludeAuthor,
-            value: _includeAuthor,
-            onChanged: (value) =>
-                setState(() => _includeAuthor = value ?? false),
+            value: state.includeAuthor,
+            onChanged: (value) => cubit.includeAuthorChanged(value ?? false),
           ),
           AppCheckboxField(
             label: l10n.labelsIncludeShelf,
-            value: _includeShelf,
-            onChanged: (value) =>
-                setState(() => _includeShelf = value ?? false),
+            value: state.includeShelf,
+            onChanged: (value) => cubit.includeShelfChanged(value ?? false),
           ),
           AppCheckboxField(
             label: l10n.labelsIncludeLibrary,
-            value: _includeLibrary,
-            onChanged: (value) =>
-                setState(() => _includeLibrary = value ?? false),
+            value: state.includeLibrary,
+            onChanged: (value) => cubit.includeLibraryChanged(value ?? false),
           ),
         ],
       ),
     );
   }
 
-  Widget _previewCard(AppLocalizations l10n) {
+  Widget _previewCard(AppLocalizations l10n, LabelState state) {
     final spacing = context.appSpacing;
-    final sample = _queue.isEmpty ? placeholderCopies.first : _queue.first.copy;
-    final title = placeholderTitleById(sample.titleId);
 
     return SectionCard(
       title: l10n.labelsPreviewTitle,
@@ -233,21 +217,38 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Center(
-            child: LabelPreview(
-              barcode: sample.barcode,
-              width: _size.width,
-              height: _size.height,
-              title: _includeTitle ? sample.titleName : null,
-              author: _includeAuthor ? title.author : null,
-              shelf: _includeShelf ? sample.shelf : null,
-              libraryName: _includeLibrary ? placeholderLabelLibrary : null,
+          if (state.queue.isEmpty)
+            AppEmptyView(
+              icon: AppIcons.qrCode,
+              title: l10n.labelsQueueEmptyTitle,
+              message: l10n.labelsQueueEmptyBody,
+              variant: AppFeedbackVariant.inline,
+            )
+          else
+            Center(
+              child: Builder(
+                builder: (context) {
+                  final entry = state.queue.first;
+                  return LabelPreview(
+                    barcode: entry.copy.barcode,
+                    width: state.size.width,
+                    height: state.size.height,
+                    title: state.includeTitle ? entry.copy.titleName : null,
+                    author: state.includeAuthor ? entry.author : null,
+                    shelf: state.includeShelf ? entry.copy.shelf : null,
+                    libraryName: state.includeLibrary
+                        ? state.libraryName
+                        : null,
+                  );
+                },
+              ),
             ),
-          ),
           SizedBox(height: spacing.md),
           AppButton(
             icon: AppIcons.printer,
-            onPressed: _queue.isEmpty ? null : () => showNotWiredToast(context),
+            onPressed: state.queue.isEmpty || state.isPrinting
+                ? null
+                : () => unawaited(_printSheet()),
             child: Text(l10n.labelsPrint),
           ),
         ],
@@ -260,54 +261,69 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
     final colors = context.appColors;
+    final cubit = context.read<LabelCubit>();
     final sideBySide = context.formFactor.isAtLeast(FormFactor.expanded);
 
-    final main = [_scanCard(l10n), _queueCard(l10n)];
-    final side = [_layoutCard(l10n), _previewCard(l10n)];
+    return BlocBuilder<LabelCubit, LabelState>(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return const Center(child: AppSpinner());
+        }
+        if (state.hasError) {
+          return ErrorRetryView(
+            error: state.error,
+            onRetry: cubit.loadLabelDesk,
+          );
+        }
 
-    return AppPageBody(
-      wide: true,
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              spacing.page,
-              spacing.lg,
-              spacing.page,
-              spacing.xlg,
-            ),
-            sliver: SliverList.list(
-              children: [
-                Text(
-                  l10n.labelsSubtitle,
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: colors.textMuted,
-                    height: 1.4,
-                  ),
+        final main = [_scanCard(l10n), _queueCard(l10n, state)];
+        final side = [_layoutCard(l10n, state), _previewCard(l10n, state)];
+
+        return AppPageBody(
+          wide: true,
+          child: CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  spacing.page,
+                  spacing.lg,
+                  spacing.page,
+                  spacing.xlg,
                 ),
-                SizedBox(height: spacing.lg),
-                if (sideBySide)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: _Stack(gap: spacing.md, children: main),
+                sliver: SliverList.list(
+                  children: [
+                    Text(
+                      l10n.labelsSubtitle,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: colors.textMuted,
+                        height: 1.4,
                       ),
-                      SizedBox(width: spacing.md),
-                      SizedBox(
-                        width: 360,
-                        child: _Stack(gap: spacing.md, children: side),
-                      ),
-                    ],
-                  )
-                else
-                  _Stack(gap: spacing.md, children: [...main, ...side]),
-              ],
-            ),
+                    ),
+                    SizedBox(height: spacing.lg),
+                    if (sideBySide)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: _Stack(gap: spacing.md, children: main),
+                          ),
+                          SizedBox(width: spacing.md),
+                          SizedBox(
+                            width: 360,
+                            child: _Stack(gap: spacing.md, children: side),
+                          ),
+                        ],
+                      )
+                    else
+                      _Stack(gap: spacing.md, children: [...main, ...side]),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

@@ -103,8 +103,10 @@ class TitleCopiesCard extends StatelessWidget {
                   id: 'status',
                   label: l10n.commonStatus,
                   width: 130,
-                  cellBuilder: (context, copy) =>
-                      CopyStatusBadge(status: copy.status),
+                  cellBuilder: (context, copy) => CopyStatusBadge(
+                    status: copy.status,
+                    showDot: false,
+                  ),
                 ),
                 AppTableColumn<Copy>(
                   id: 'actions',

@@ -9,22 +9,20 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// librarian can do with it.
 ///
 /// Secondary actions sit in the open rather than behind an overflow menu. Delete
-/// is icon-only so it stays available without competing with edit for label
-/// space; the destructive confirm dialog still carries the full sentence. The
-/// status row is two badges at most: whether a copy can be taken off the shelf,
+/// uses the destructive button variant so it reads clearly without competing
+/// with edit for emphasis; the confirm dialog still carries the full sentence.
+/// The status row is two badges at most: whether a copy can be taken off the shelf,
 /// and whether the title is reference only. Format and copy count moved into the
 /// fact line — a librarian reads them, but nobody has to act on them.
 class TitleDetailHeader extends StatelessWidget {
   const TitleDetailHeader({
     required this.title,
-    required this.onBack,
     required this.onEdit,
     required this.onDelete,
     super.key,
   });
 
   final catalog.Title title;
-  final VoidCallback onBack;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -36,11 +34,6 @@ class TitleDetailHeader extends StatelessWidget {
     final isAvailable = title.availableCount > 0;
 
     return RecordHeader(
-      leading: AppIconButton(
-        icon: AppIcons.chevronLeft,
-        tooltip: l10n.navCatalogTitles,
-        onPressed: onBack,
-      ),
       title: title.title,
       subtitle: Text(
         title.author,
@@ -58,11 +51,13 @@ class TitleDetailHeader extends StatelessWidget {
       ],
       badges: [
         AppStatusBadge(
+          showDot: false,
           label: isAvailable ? l10n.statusAvailable : l10n.statusOnLoan,
           tone: isAvailable ? AppStatusTone.success : AppStatusTone.brand,
         ),
         if (!title.lendable)
           AppStatusBadge(
+            showDot: false,
             label: l10n.titlesReferenceOnly,
             tone: AppStatusTone.warning,
           ),
@@ -73,11 +68,12 @@ class TitleDetailHeader extends StatelessWidget {
           runSpacing: spacing.xs,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            AppIconButton(
+            AppButton(
+              variant: AppButtonVariant.destructive,
+              size: AppButtonSize.medium,
               icon: AppIcons.delete,
-              tooltip: l10n.commonDelete,
-              tone: AppStatusTone.danger,
               onPressed: onDelete,
+              child: Text(l10n.titleDetailDelete),
             ),
             AppButton(
               size: AppButtonSize.medium,

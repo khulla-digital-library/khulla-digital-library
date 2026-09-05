@@ -9,9 +9,13 @@ enum AppButtonVariant {
   /// The one action a screen is built around. Filled brand.
   primary,
 
-  /// A destructive confirmation. **Outlined, never filled** — a red slab
-  /// reads as the recommended action, which is the opposite of the intent.
+  /// An outlined destructive control on a page (e.g. a header Delete).
+  /// Dialog confirms use the filled destructive variant instead.
   destructive,
+
+  /// The confirming action on a destructive prompt and form-modal footers.
+  /// Filled like [primary] but in the danger color.
+  destructiveFilled,
 
   /// The neutral action next to a primary one: Cancel, Back, a filter.
   outline,
@@ -247,6 +251,14 @@ class _AppButtonState extends State<AppButton> {
         foreground: colors.danger,
         border: colors.danger,
         ripple: colors.danger.withValues(alpha: 0.2),
+        ring: colors.danger,
+      ),
+      AppButtonVariant.destructiveFilled => _ButtonStyle(
+        fill: colors.danger,
+        hoverFill: colors.danger.withValues(alpha: 0.9),
+        foreground: colors.onDanger,
+        border: colors.danger.withValues(alpha: 0.7),
+        ripple: colors.secondary,
         ring: colors.danger,
       ),
       AppButtonVariant.outline => _ButtonStyle(

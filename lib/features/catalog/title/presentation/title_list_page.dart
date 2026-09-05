@@ -18,6 +18,9 @@ import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
+String _displayOrDash(String? value) =>
+    value == null || value.isEmpty ? '-' : value;
+
 /// Every work the library holds.
 ///
 /// [TitleCubit] owns search, format and availability filters, sort and paging —
@@ -70,6 +73,9 @@ class _TitleListPageState extends State<TitleListPage> {
     final smallMuted = context.textTheme.bodySmall?.copyWith(
       color: scheme.onSurfaceVariant,
     );
+    final isbnStyle = context.appTextStyles.numeric.copyWith(
+      color: scheme.onSurfaceVariant,
+    );
 
     return [
       AppTableColumn<catalog.Title>(
@@ -94,13 +100,15 @@ class _TitleListPageState extends State<TitleListPage> {
         label: l10n.titlesColumnAuthor,
         flex: 2,
         sortable: true,
-        cellBuilder: (context, title) => Text(title.author, style: muted),
+        cellBuilder: (context, title) =>
+            Text(_displayOrDash(title.author), style: muted),
       ),
       AppTableColumn<catalog.Title>(
         id: 'isbn',
         label: l10n.titlesColumnIsbn,
+        width: 152,
         cellBuilder: (context, title) =>
-            Text(title.isbn ?? '', style: smallMuted),
+            Text(_displayOrDash(title.isbn), style: isbnStyle),
       ),
       AppTableColumn<catalog.Title>(
         id: 'publisher',
@@ -108,14 +116,14 @@ class _TitleListPageState extends State<TitleListPage> {
         flex: 2,
         sortable: true,
         cellBuilder: (context, title) =>
-            Text(title.publisher ?? '', style: muted),
+            Text(_displayOrDash(title.publisher), style: muted),
       ),
       AppTableColumn<catalog.Title>(
         id: 'year',
         label: l10n.titlesColumnYear,
         sortable: true,
         alignment: Alignment.centerRight,
-        cellBuilder: (context, title) => Text(title.year),
+        cellBuilder: (context, title) => Text(_displayOrDash(title.year)),
       ),
       AppTableColumn<catalog.Title>(
         id: 'available',
@@ -137,6 +145,7 @@ class _TitleListPageState extends State<TitleListPage> {
         width: 125,
         cellBuilder: (context, title) => AppStatusBadge(
           dense: true,
+          showDot: false,
           label: title.availableCount > 0
               ? l10n.statusAvailable
               : l10n.statusOnLoan,
