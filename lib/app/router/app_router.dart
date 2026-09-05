@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
@@ -9,20 +11,33 @@ import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/author/presentation/author_detail_page.dart';
 import 'package:khulla/features/catalog/author/presentation/author_list_page.dart';
 import 'package:khulla/features/catalog/catalog/presentation/catalog_page.dart';
+import 'package:khulla/features/catalog/catalog/presentation/cubit/catalog_overview_cubit.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_list_page.dart';
+import 'package:khulla/features/catalog/copy/presentation/cubit/copy_cubit.dart';
 import 'package:khulla/features/catalog/copy/presentation/label_print_page.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title_cubit.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title_detail_cubit.dart';
 import 'package:khulla/features/catalog/title/presentation/title_detail_page.dart';
 import 'package:khulla/features/catalog/title/presentation/title_list_page.dart';
 import 'package:khulla/features/circulation/check_out/presentation/check_out_page.dart';
+import 'package:khulla/features/circulation/check_out/presentation/cubit/check_out_cubit.dart';
 import 'package:khulla/features/circulation/circulation/presentation/circulation_page.dart';
+import 'package:khulla/features/circulation/circulation/presentation/cubit/loan_list_cubit.dart';
+import 'package:khulla/features/circulation/fine/presentation/cubit/fine_list_cubit.dart';
 import 'package:khulla/features/circulation/fine/presentation/fine_list_page.dart';
+import 'package:khulla/features/circulation/reservation/presentation/cubit/reservation_list_cubit.dart';
 import 'package:khulla/features/circulation/reservation/presentation/reservation_list_page.dart';
+import 'package:khulla/features/circulation/return_copy/presentation/cubit/return_cubit.dart';
 import 'package:khulla/features/circulation/return_copy/presentation/return_page.dart';
 import 'package:khulla/features/dashboard/presentation/dashboard_page.dart';
+import 'package:khulla/features/members/presentation/cubit/member_cubit.dart';
+import 'package:khulla/features/members/presentation/cubit/member_detail_cubit.dart';
 import 'package:khulla/features/members/presentation/pages/member_detail_page.dart';
 import 'package:khulla/features/members/presentation/pages/member_list_page.dart';
 import 'package:khulla/features/opac/presentation/opac_page.dart';
 import 'package:khulla/features/reports/presentation/reports_page.dart';
+import 'package:khulla/features/settings/presentation/cubit/library_profile_cubit.dart';
+import 'package:khulla/features/settings/presentation/cubit/loan_rules_cubit.dart';
 import 'package:khulla/features/settings/presentation/pages/appearance_page.dart';
 import 'package:khulla/features/settings/presentation/pages/backup_page.dart';
 import 'package:khulla/features/settings/presentation/pages/library_profile_page.dart';
@@ -105,23 +120,52 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: Routes.catalog,
-                  builder: (context, _) => const CatalogPage(),
+                  builder: (context, _) => BlocProvider<CatalogOverviewCubit>(
+                    create: (_) {
+                      final cubit = getIt<CatalogOverviewCubit>();
+                      unawaited(cubit.loadOverview());
+                      return cubit;
+                    },
+                    child: const CatalogPage(),
+                  ),
                   routes: [
                     GoRoute(
                       path: Routes.titlesSegment,
-                      builder: (context, _) => const TitleListPage(),
+                      builder: (context, _) => BlocProvider<TitleCubit>(
+                        create: (_) {
+                          final cubit = getIt<TitleCubit>();
+                          unawaited(cubit.loadTitles());
+                          return cubit;
+                        },
+                        child: const TitleListPage(),
+                      ),
                       routes: [
                         GoRoute(
                           path: Routes.idSegment,
-                          builder: (context, state) => TitleDetailPage(
-                            titleId: state.pathParameters['id'] ?? '',
-                          ),
+                          builder: (context, state) {
+                            final id = state.pathParameters['id'] ?? '';
+                            return BlocProvider<TitleDetailCubit>(
+                              create: (_) {
+                                final cubit = getIt<TitleDetailCubit>();
+                                unawaited(cubit.loadTitle(id));
+                                return cubit;
+                              },
+                              child: TitleDetailPage(titleId: id),
+                            );
+                          },
                         ),
                       ],
                     ),
                     GoRoute(
                       path: Routes.copiesSegment,
-                      builder: (context, _) => const CopyListPage(),
+                      builder: (context, _) => BlocProvider<CopyCubit>(
+                        create: (_) {
+                          final cubit = getIt<CopyCubit>();
+                          unawaited(cubit.loadCopies());
+                          return cubit;
+                        },
+                        child: const CopyListPage(),
+                      ),
                     ),
                     GoRoute(
                       path: Routes.labelsSegment,
@@ -147,23 +191,51 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: Routes.circulation,
-                  builder: (context, _) => const CirculationPage(),
+                  builder: (context, _) => BlocProvider<LoanListCubit>(
+                    create: (_) {
+                      final cubit = getIt<LoanListCubit>();
+                      unawaited(cubit.loadOpenLoans());
+                      return cubit;
+                    },
+                    child: const CirculationPage(),
+                  ),
                   routes: [
                     GoRoute(
                       path: Routes.checkOutSegment,
-                      builder: (context, _) => const CheckOutPage(),
+                      builder: (context, _) => BlocProvider<CheckOutCubit>(
+                        create: (_) => getIt<CheckOutCubit>(),
+                        child: const CheckOutPage(),
+                      ),
                     ),
                     GoRoute(
                       path: Routes.returnsSegment,
-                      builder: (context, _) => const ReturnPage(),
+                      builder: (context, _) => BlocProvider<ReturnCubit>(
+                        create: (_) => getIt<ReturnCubit>(),
+                        child: const ReturnPage(),
+                      ),
                     ),
                     GoRoute(
                       path: Routes.reservationsSegment,
-                      builder: (context, _) => const ReservationListPage(),
+                      builder: (context, _) =>
+                          BlocProvider<ReservationListCubit>(
+                            create: (_) {
+                              final cubit = getIt<ReservationListCubit>();
+                              unawaited(cubit.loadReservations());
+                              return cubit;
+                            },
+                            child: const ReservationListPage(),
+                          ),
                     ),
                     GoRoute(
                       path: Routes.finesSegment,
-                      builder: (context, _) => const FineListPage(),
+                      builder: (context, _) => BlocProvider<FineListCubit>(
+                        create: (_) {
+                          final cubit = getIt<FineListCubit>();
+                          unawaited(cubit.loadFines());
+                          return cubit;
+                        },
+                        child: const FineListPage(),
+                      ),
                     ),
                   ],
                 ),
@@ -173,13 +245,28 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: Routes.members,
-                  builder: (context, _) => const MemberListPage(),
+                  builder: (context, _) => BlocProvider<MemberCubit>(
+                    create: (_) {
+                      final cubit = getIt<MemberCubit>();
+                      unawaited(cubit.loadMembers());
+                      return cubit;
+                    },
+                    child: const MemberListPage(),
+                  ),
                   routes: [
                     GoRoute(
                       path: Routes.idSegment,
-                      builder: (context, state) => MemberDetailPage(
-                        memberId: state.pathParameters['id'] ?? '',
-                      ),
+                      builder: (context, state) {
+                        final id = state.pathParameters['id'] ?? '';
+                        return BlocProvider<MemberDetailCubit>(
+                          create: (_) {
+                            final cubit = getIt<MemberDetailCubit>();
+                            unawaited(cubit.loadMember(id));
+                            return cubit;
+                          },
+                          child: MemberDetailPage(memberId: id),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -224,11 +311,26 @@ class AppRouter {
                   routes: [
                     GoRoute(
                       path: Routes.librarySegment,
-                      builder: (context, _) => const LibraryProfilePage(),
+                      builder: (context, _) =>
+                          BlocProvider<LibraryProfileCubit>(
+                            create: (_) {
+                              final cubit = getIt<LibraryProfileCubit>();
+                              unawaited(cubit.loadProfile());
+                              return cubit;
+                            },
+                            child: const LibraryProfilePage(),
+                          ),
                     ),
                     GoRoute(
                       path: Routes.loanRulesSegment,
-                      builder: (context, _) => const LoanRulesPage(),
+                      builder: (context, _) => BlocProvider<LoanRulesCubit>(
+                        create: (_) {
+                          final cubit = getIt<LoanRulesCubit>();
+                          unawaited(cubit.loadRules());
+                          return cubit;
+                        },
+                        child: const LoanRulesPage(),
+                      ),
                     ),
                     GoRoute(
                       path: Routes.appearanceSegment,

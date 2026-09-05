@@ -62,7 +62,6 @@ class ShellBrandMark extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
     final colors = context.appColors;
-    final metrics = context.appMetrics;
     final l10n = context.l10n;
 
     if (!extended) {
