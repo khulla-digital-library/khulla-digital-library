@@ -66,7 +66,6 @@ class AppRouter {
     router = GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: Routes.dashboard,
-      debugLogDiagnostics: !_config.isProduction,
       refreshListenable: GoRouterRefreshStream(_auth.stream),
       redirect: _redirect,
       routes: [

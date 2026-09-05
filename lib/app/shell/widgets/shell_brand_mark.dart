@@ -76,7 +76,7 @@ class ShellBrandMark extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        AppLogo.primary(height: metrics.iconLarge),
+        AppLogo.primary(height: spacing.xlg),
         SizedBox(height: spacing.xxs),
         Text(
           l10n.appTagline,
