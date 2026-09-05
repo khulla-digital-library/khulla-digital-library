@@ -1,0 +1,60 @@
+import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
+import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
+import 'package:khulla/features/circulation/fine/domain/models/fine_query.dart';
+import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
+import 'package:khulla/features/circulation/loan/domain/models/loan_query.dart';
+import 'package:khulla/features/circulation/reservation/domain/models/reservation.dart';
+import 'package:khulla/features/circulation/reservation/domain/models/reservation_query.dart';
+
+/// One copy scanned at the returns desk.
+typedef ReturnCopyInput = ({
+  String barcode,
+  CopyCondition condition,
+});
+
+abstract interface class CirculationRepository {
+  Future<Loan> checkOutCopy({
+    required String memberId,
+    required String barcode,
+    String? staffId,
+  });
+
+  Future<Loan> returnCopy({
+    required String barcode,
+    required CopyCondition condition,
+    bool waiveFine = false,
+    String? staffId,
+  });
+
+  /// Processes every item in one transaction so the desk stays consistent.
+  Future<List<Loan>> returnCopies({
+    required List<ReturnCopyInput> copies,
+    bool waiveFine = false,
+    String? staffId,
+  });
+
+  Future<Loan> renewLoan(String loanId, {String? staffId});
+
+  Future<Reservation> placeHold({
+    required String memberId,
+    required String titleId,
+  });
+
+  Future<void> cancelHold(String reservationId);
+
+  Future<void> expireStaleHolds();
+
+  Future<LoanListResult> findOpenLoans(LoanQuery query);
+
+  Future<LoanListResult> findLoans(LoanQuery query);
+
+  Future<Loan?> findLoan(String id);
+
+  Future<FineListResult> findFines(FineQuery query);
+
+  Future<Fine?> findFine(String id);
+
+  Future<ReservationListResult> findReservations(ReservationQuery query);
+
+  Future<Reservation?> findReservation(String id);
+}

@@ -1,13 +1,13 @@
-import 'package:khulla/features/catalog/title/presentation/placeholder/title_history_entry.dart';
+import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Who has borrowed this work, most recent first.
 class TitleHistoryCard extends StatelessWidget {
-  const TitleHistoryCard({required this.entries, super.key});
+  const TitleHistoryCard({required this.loans, super.key});
 
-  final List<TitleHistoryEntry> entries;
+  final List<Loan> loans;
 
   @override
   Widget build(BuildContext context) {
@@ -17,53 +17,54 @@ class TitleHistoryCard extends StatelessWidget {
     return SectionCard(
       title: l10n.titleDetailHistoryTitle,
       subtitle: l10n.titleDetailHistorySubtitle,
-      child: entries.isEmpty
+      child: loans.isEmpty
           ? AppEmptyView(
               variant: AppFeedbackVariant.inline,
               title: l10n.titleDetailHistoryEmptyTitle,
               message: l10n.titleDetailHistoryEmptyBody,
             )
-          : AppTable<TitleHistoryEntry>(
-              items: entries,
+          : AppTable<Loan>(
+              items: loans,
               columns: [
-                AppTableColumn<TitleHistoryEntry>(
+                AppTableColumn<Loan>(
                   id: 'member',
                   label: l10n.loansColumnMember,
                   flex: 3,
-                  cellBuilder: (context, entry) => Text(entry.member),
+                  cellBuilder: (context, loan) =>
+                      Text(loan.memberName ?? l10n.commonNotSet),
                 ),
-                AppTableColumn<TitleHistoryEntry>(
+                AppTableColumn<Loan>(
                   id: 'barcode',
                   label: l10n.loansColumnBarcode,
                   flex: 2,
                   showFrom: FormFactor.expanded,
-                  cellBuilder: (context, entry) => Text(
-                    entry.barcode,
+                  cellBuilder: (context, loan) => Text(
+                    loan.barcode ?? l10n.commonNotSet,
                     style: context.textTheme.bodySmall?.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
                   ),
                 ),
-                AppTableColumn<TitleHistoryEntry>(
+                AppTableColumn<Loan>(
                   id: 'borrowed',
                   label: l10n.loansColumnIssued,
                   flex: 2,
                   showFrom: FormFactor.medium,
-                  cellBuilder: (context, entry) => Text(entry.borrowed),
+                  cellBuilder: (context, loan) => Text(loan.issuedOn),
                 ),
-                AppTableColumn<TitleHistoryEntry>(
+                AppTableColumn<Loan>(
                   id: 'status',
                   label: l10n.commonStatus,
                   width: 130,
                   alignment: Alignment.centerRight,
-                  cellBuilder: (context, entry) => AppStatusBadge(
+                  cellBuilder: (context, loan) => AppStatusBadge(
                     dense: true,
-                    label: entry.returned == null
+                    label: loan.isOpen
                         ? l10n.statusOnLoan
                         : l10n.statusReturned,
-                    tone: entry.returned == null
+                    tone: loan.isOpen
                         ? AppStatusTone.brand
-                        : (entry.wasLate
+                        : (loan.daysLate > 0
                               ? AppStatusTone.warning
                               : AppStatusTone.success),
                   ),

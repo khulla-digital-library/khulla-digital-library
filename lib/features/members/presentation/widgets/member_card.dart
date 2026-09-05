@@ -1,5 +1,5 @@
+import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
-import 'package:khulla/features/members/presentation/placeholder/member_record.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -7,7 +7,7 @@ import 'package:khulla_ui/khulla_ui.dart';
 class MemberCard extends StatelessWidget {
   const MemberCard({required this.member, required this.onTap, super.key});
 
-  final MemberRecord member;
+  final Member member;
   final VoidCallback onTap;
 
   @override
@@ -52,7 +52,7 @@ class MemberCard extends StatelessWidget {
                   ),
                   SizedBox(height: spacing.xxs),
                   Text(
-                    '${member.cardNumber} · ${member.category.label(l10n)}',
+                    '${member.cardNumber} · ${member.memberTypeName}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: context.textTheme.bodySmall?.copyWith(

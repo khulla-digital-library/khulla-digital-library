@@ -1,11 +1,9 @@
 import 'package:khulla/core/money/money.dart';
-import 'package:khulla/features/catalog/shared/domain/catalog_format.dart';
 
-/// One work in the catalogue, as the screens need it.
+/// One work in the catalogue, as OPAC and author screens need it until wired.
 ///
-/// A stand-in until the `titles` table exists: the fields are the ones the
-/// list, the detail pane and the editor actually render, so when the query
-/// lands it replaces this class rather than the widgets around it.
+/// Kept for screens that still read mock data. Wired catalogue screens use
+/// the domain title model instead.
 class CatalogTitle {
   const CatalogTitle({
     required this.id,
@@ -14,7 +12,7 @@ class CatalogTitle {
     required this.isbn,
     required this.publisher,
     required this.year,
-    required this.format,
+    required this.formatCode,
     required this.shelf,
     required this.copies,
     required this.available,
@@ -38,28 +36,17 @@ class CatalogTitle {
   final String year;
   final String? edition;
   final String language;
-  final CatalogFormat format;
+  final String formatCode;
   final int? pages;
   final List<String> subjects;
   final String shelf;
   final String? description;
-
-  /// How many physical items exist under this title.
   final int copies;
-
-  /// How many of them are on the shelf right now.
   final int available;
-
   final String addedOn;
-
-  /// What one copy costs to replace, charged when a copy is lost.
   final Money replacementCost;
-
-  /// False for reference works that never leave the building.
   final bool lendable;
 
-  /// The one letter shown in the title's badge, taken here rather than in the
-  /// design system, which takes ready-made text and does not do locale.
   String get initial =>
       title.isEmpty ? '?' : title.substring(0, 1).toUpperCase();
 }

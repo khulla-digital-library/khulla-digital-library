@@ -1,14 +1,10 @@
+import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
-import 'package:khulla/features/members/presentation/placeholder/member_record.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/record_header.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// A borrower's identity block: who they are, how their card stands, and the
-/// action the desk came here for.
-///
-/// Checking out to this member is the primary action rather than *Edit*: the
-/// register is opened at a counter far more often than it is corrected.
+/// A borrower's identity block at the top of their detail screen.
 class MemberDetailHeader extends StatelessWidget {
   const MemberDetailHeader({
     required this.member,
@@ -17,7 +13,7 @@ class MemberDetailHeader extends StatelessWidget {
     super.key,
   });
 
-  final MemberRecord member;
+  final Member member;
   final VoidCallback onCheckOut;
   final List<AppMenuAction> menuActions;
 
@@ -29,7 +25,7 @@ class MemberDetailHeader extends StatelessWidget {
     return RecordHeader(
       title: member.name,
       initials: member.initials,
-      facts: [member.cardNumber, member.category.label(l10n)],
+      facts: [member.cardNumber, member.memberTypeName],
       badges: [
         AppStatusBadge(
           label: member.status.label(l10n),

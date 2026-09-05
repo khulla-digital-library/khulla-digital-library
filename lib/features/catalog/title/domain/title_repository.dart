@@ -1,0 +1,32 @@
+import 'package:khulla/core/money/money.dart';
+import 'package:khulla/features/catalog/title/domain/models/title.dart';
+import 'package:khulla/features/catalog/title/domain/models/title_query.dart';
+
+abstract interface class TitleRepository {
+  Future<TitleListResult> findTitles(TitleQuery query);
+
+  Future<Title?> findTitle(String id);
+
+  Future<Title> saveTitle({
+    required String title,
+    required String author,
+    required String formatId,
+    required bool lendable,
+    required Money replacementCost,
+    String? id,
+    String? subtitle,
+    String? isbn,
+    String? publisher,
+    int? publishedYear,
+    String? edition,
+    String language,
+    int? pages,
+    List<String> subjects,
+    String? description,
+    String? shelf,
+  });
+
+  Future<void> archiveTitle(String id);
+
+  Future<void> removeTitle(String id);
+}

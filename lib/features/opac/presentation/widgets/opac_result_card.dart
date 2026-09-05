@@ -55,7 +55,7 @@ class OpacResultCard extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: AppIcon(
-                  title.format.icon,
+                  title.formatCode.formatIcon,
                   size: spacing.lg,
                   color: context.colorScheme.primary,
                 ),
@@ -108,7 +108,7 @@ class OpacResultCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '${title.format.label(l10n)} · ${title.year} · ${title.shelf}',
+                  '${title.formatCode.formatLabel(l10n)} · ${title.year} · ${title.shelf}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: context.textTheme.bodySmall?.copyWith(

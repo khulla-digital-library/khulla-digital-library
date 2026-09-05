@@ -1,4 +1,5 @@
-import 'package:khulla/features/members/presentation/placeholder/member_fine_entry.dart';
+import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
+import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -11,8 +12,8 @@ class MemberFinesCard extends StatelessWidget {
     super.key,
   });
 
-  final List<MemberFineEntry> fines;
-  final void Function(MemberFineEntry fine) onCollect;
+  final List<Fine> fines;
+  final void Function(Fine fine) onCollect;
 
   @override
   Widget build(BuildContext context) {
@@ -28,64 +29,59 @@ class MemberFinesCard extends StatelessWidget {
               title: l10n.memberDetailFinesEmptyTitle,
               message: l10n.memberDetailFinesEmptyBody,
             )
-          : AppTable<MemberFineEntry>(
+          : AppTable<Fine>(
               items: fines,
               columns: [
-                AppTableColumn<MemberFineEntry>(
+                AppTableColumn<Fine>(
                   id: 'title',
                   label: l10n.finesColumnTitle,
                   flex: 4,
                   cellBuilder: (context, fine) =>
                       Text(fine.titleName ?? l10n.commonNotSet),
                 ),
-                AppTableColumn<MemberFineEntry>(
+                AppTableColumn<Fine>(
                   id: 'raised',
                   label: l10n.finesColumnRaised,
                   flex: 2,
                   showFrom: FormFactor.medium,
                   cellBuilder: (context, fine) => Text(
-                    fine.raised,
+                    fine.raisedOn,
                     style: context.textTheme.bodyMedium?.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
                   ),
                 ),
-                AppTableColumn<MemberFineEntry>(
+                AppTableColumn<Fine>(
                   id: 'amount',
                   label: l10n.finesColumnAmount,
                   width: 110,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, fine) => Text(
-                    fine.amount.display(),
+                    fine.outstanding.display(),
                     style: context.textTheme.bodyMedium?.copyWith(
+                      color: scheme.error,
                       fontWeight: FontWeight.w500,
-                      color: fine.isPaid ? scheme.onSurface : scheme.error,
                     ),
                   ),
                 ),
-                AppTableColumn<MemberFineEntry>(
+                AppTableColumn<Fine>(
                   id: 'status',
                   label: l10n.commonStatus,
-                  width: 110,
+                  width: 120,
                   cellBuilder: (context, fine) => AppStatusBadge(
                     dense: true,
-                    label: fine.isPaid
-                        ? l10n.finesStatusPaid
-                        : l10n.finesStatusUnpaid,
-                    tone: fine.isPaid
-                        ? AppStatusTone.success
-                        : AppStatusTone.danger,
+                    label: fine.status.label(l10n),
+                    tone: fine.status.tone,
                   ),
                 ),
-                AppTableColumn<MemberFineEntry>(
-                  id: 'collect',
+                AppTableColumn<Fine>(
+                  id: 'actions',
                   label: l10n.commonActions,
-                  width: 56,
+                  width: 100,
                   alignment: Alignment.centerRight,
-                  cellBuilder: (context, fine) => AppIconButton(
-                    icon: AppIcons.payment,
-                    tooltip: l10n.finesCollect,
-                    onPressed: fine.isPaid ? null : () => onCollect(fine),
+                  cellBuilder: (context, fine) => AppTextButton(
+                    onPressed: () => onCollect(fine),
+                    child: Text(l10n.finesCollect),
                   ),
                 ),
               ],

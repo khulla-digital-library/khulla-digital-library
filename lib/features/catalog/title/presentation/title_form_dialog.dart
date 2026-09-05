@@ -1,87 +1,203 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:khulla/core/di/injection.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/lifecycle/dispose_bag.dart';
-import 'package:khulla/features/catalog/shared/domain/catalog_format.dart';
+import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
-import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_placeholder.dart';
-import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_title.dart';
+import 'package:khulla/features/catalog/title/domain/models/title.dart'
+    as catalog;
+import 'package:khulla/features/catalog/title/domain/models/title_format.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title_form_cubit.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title_form_state.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
+import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The title editor, used for both a new work and an existing one.
-///
-/// A modal rather than a route — see [AppFormModal] for why editing does not
-/// get a path of its own. Fields that are genuinely independent pair up
-/// through [AppFormRow], which stacks them again inside the narrower panel.
-///
-/// Nothing is validated yet: validation is `formz` input state on a cubit,
-/// and this build has no cubit behind it. The error slots the fields already
-/// carry are where those messages will land.
-class TitleFormDialog extends StatefulWidget {
+class TitleFormDialog extends StatelessWidget {
   const TitleFormDialog({this.titleId, super.key});
 
-  /// The record being edited, or null for a new work.
   final String? titleId;
 
-  /// Opens the editor. Resolves true once saving is wired and the operator
-  /// saved, so a list can refresh itself.
   static Future<bool?> show(BuildContext context, {String? titleId}) =>
       AppFormModal.show<bool>(
         context: context,
-        builder: (_) => TitleFormDialog(titleId: titleId),
+        builder: (_) => BlocProvider(
+          create: (_) {
+            final cubit = getIt<TitleFormCubit>();
+            unawaited(cubit.load(titleId: titleId));
+            return cubit;
+          },
+          child: TitleFormDialog(titleId: titleId),
+        ),
       );
 
   @override
-  State<TitleFormDialog> createState() => _TitleFormDialogState();
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final isEditing = titleId != null;
+
+    return BlocBuilder<TitleFormCubit, TitleFormState>(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return AppFormModal(
+            title: isEditing
+                ? l10n.titleFormEditHeading
+                : l10n.titleFormNewHeading,
+            width: AppDialogWidth.xxxl,
+            actions: const [],
+            children: const [Center(child: AppSpinner())],
+          );
+        }
+
+        return _TitleFormBody(
+          key: ValueKey(titleId ?? 'new'),
+          titleId: titleId,
+          existing: state.existing,
+          formats: state.formats,
+          isSaving: state.isSaving,
+        );
+      },
+    );
+  }
 }
 
-class _TitleFormDialogState extends State<TitleFormDialog> with DisposeBag {
-  late final TextEditingController _title = textController(_existing?.title);
+class _TitleFormBody extends StatefulWidget {
+  const _TitleFormBody({
+    required this.titleId,
+    required this.existing,
+    required this.formats,
+    required this.isSaving,
+    super.key,
+  });
+
+  final String? titleId;
+  final catalog.Title? existing;
+  final List<TitleFormat> formats;
+  final bool isSaving;
+
+  @override
+  State<_TitleFormBody> createState() => _TitleFormBodyState();
+}
+
+class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
+  late final TextEditingController _title = textController(
+    widget.existing?.title,
+  );
   late final TextEditingController _subtitle = textController(
-    _existing?.subtitle,
+    widget.existing?.subtitle,
   );
-  late final TextEditingController _author = textController(_existing?.author);
-  late final TextEditingController _isbn = textController(_existing?.isbn);
+  late final TextEditingController _author = textController(
+    widget.existing?.author,
+  );
+  late final TextEditingController _isbn = textController(
+    widget.existing?.isbn,
+  );
   late final TextEditingController _publisher = textController(
-    _existing?.publisher,
+    widget.existing?.publisher,
   );
-  late final TextEditingController _year = textController(_existing?.year);
+  late final TextEditingController _year = textController(
+    widget.existing?.year,
+  );
   late final TextEditingController _edition = textController(
-    _existing?.edition,
+    widget.existing?.edition,
   );
   late final TextEditingController _language = textController(
-    _existing?.language,
+    widget.existing?.language ?? 'English',
   );
   late final TextEditingController _pages = textController(
-    _existing?.pages?.toString(),
+    widget.existing?.pages?.toString(),
   );
   late final TextEditingController _subjects = textController(
-    _existing?.subjects.join(', '),
+    widget.existing?.subjects.join(', '),
   );
-  late final TextEditingController _shelf = textController(_existing?.shelf);
+  late final TextEditingController _shelf = textController(
+    widget.existing?.shelf,
+  );
   late final TextEditingController _description = textController(
-    _existing?.description,
+    widget.existing?.description,
   );
   late final TextEditingController _replacementCost = textController(
-    _existing?.replacementCost.editable,
+    widget.existing?.replacementCost.editable,
   );
   late final TextEditingController _initialCopies = textController(
     _isEditing ? null : '1',
   );
 
-  late CatalogFormat _format = _existing?.format ?? CatalogFormat.book;
-  late bool _lendable = _existing?.lendable ?? true;
+  late String _formatId =
+      widget.existing?.formatId ??
+      (widget.formats.isNotEmpty ? widget.formats.first.id : '');
+  late bool _lendable = widget.existing?.lendable ?? true;
 
   bool get _isEditing => widget.titleId != null;
 
-  /// The record being edited, or null while creating one.
-  ///
-  /// Read once through the placeholder lookup; a cubit reads it once in
-  /// `loadTitle(id)` and hands the same shape to these controllers.
-  late final CatalogTitle? _existing = _isEditing
-      ? placeholderTitleById(widget.titleId!)
-      : null;
+  TitleFormat? get _selectedFormat {
+    for (final format in widget.formats) {
+      if (format.id == _formatId) return format;
+    }
+    return widget.formats.isEmpty ? null : widget.formats.first;
+  }
 
   void _close() => Navigator.of(context).pop();
+
+  Future<void> _save() async {
+    final l10n = context.l10n;
+    final title = _title.text.trim();
+    final author = _author.text.trim();
+    if (title.isEmpty || author.isEmpty || _formatId.isEmpty) {
+      AppToast.error(context, message: l10n.validationFieldRequired);
+      return;
+    }
+    if (!_replacementCost.text.isValidMoney) {
+      AppToast.error(context, message: l10n.validationFieldRequired);
+      return;
+    }
+    final initialCopies = _isEditing
+        ? 0
+        : int.tryParse(_initialCopies.text) ?? 0;
+    final publishedYear = int.tryParse(_year.text.trim());
+    final pages = int.tryParse(_pages.text.trim());
+    final subjects = _subjects.text
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    try {
+      await context.read<TitleFormCubit>().saveTitle(
+        title: title,
+        author: author,
+        formatId: _formatId,
+        subtitle: _subtitle.text.trim().isEmpty ? null : _subtitle.text.trim(),
+        isbn: _isbn.text.trim().isEmpty ? null : _isbn.text.trim(),
+        publisher: _publisher.text.trim().isEmpty
+            ? null
+            : _publisher.text.trim(),
+        publishedYear: publishedYear,
+        edition: _edition.text.trim().isEmpty ? null : _edition.text.trim(),
+        language: _language.text.trim().isEmpty
+            ? 'English'
+            : _language.text.trim(),
+        pages: pages,
+        subjects: subjects,
+        description: _description.text.trim().isEmpty
+            ? null
+            : _description.text.trim(),
+        shelf: _shelf.text.trim().isEmpty ? null : _shelf.text.trim(),
+        lendable: _lendable,
+        replacementCostText: _replacementCost.text,
+        initialCopies: initialCopies,
+      );
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } on AppException catch (error) {
+      if (!mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +215,8 @@ class _TitleFormDialogState extends State<TitleFormDialog> with DisposeBag {
         AppDialog.primaryAction(
           context: context,
           label: l10n.titleFormSave,
-          onPressed: () => showNotWiredToast(context),
+          isLoading: widget.isSaving,
+          onPressed: () => unawaited(_save()),
         ),
       ],
       children: [
@@ -111,7 +228,6 @@ class _TitleFormDialogState extends State<TitleFormDialog> with DisposeBag {
               label: l10n.fieldTitle,
               required: true,
               controller: _title,
-              hintText: l10n.fieldTitle,
               textCapitalization: TextCapitalization.words,
               onChanged: (_) {},
             ),
@@ -133,7 +249,6 @@ class _TitleFormDialogState extends State<TitleFormDialog> with DisposeBag {
                 AppTextField(
                   label: l10n.fieldIsbn,
                   controller: _isbn,
-                  keyboardType: TextInputType.text,
                   onChanged: (_) {},
                 ),
                 AppTextField(
@@ -167,14 +282,14 @@ class _TitleFormDialogState extends State<TitleFormDialog> with DisposeBag {
             ),
             AppFormRow(
               children: [
-                AppDropdownField<CatalogFormat>(
+                AppDropdownField<TitleFormat>(
                   label: l10n.fieldFormat,
-                  value: _format,
-                  items: CatalogFormat.values,
+                  value: _selectedFormat,
+                  items: widget.formats,
                   itemLabel: (format) => format.label(l10n),
                   itemIcon: (format) => format.icon,
                   onChanged: (format) => setState(
-                    () => _format = format ?? _format,
+                    () => _formatId = format?.id ?? _formatId,
                   ),
                 ),
                 AppTextField(

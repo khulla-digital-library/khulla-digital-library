@@ -37,13 +37,17 @@ extension ReservationStatusX on ReservationStatus {
   String label(AppLocalizations l10n) => switch (this) {
     ReservationStatus.waiting => l10n.reservationsStatusWaiting,
     ReservationStatus.ready => l10n.reservationsStatusReady,
+    ReservationStatus.fulfilled => l10n.reservationsStatusFulfilled,
     ReservationStatus.expired => l10n.reservationsStatusExpired,
+    ReservationStatus.cancelled => l10n.reservationsStatusCancelled,
   };
 
   AppStatusTone get tone => switch (this) {
     ReservationStatus.waiting => AppStatusTone.info,
     ReservationStatus.ready => AppStatusTone.success,
+    ReservationStatus.fulfilled => AppStatusTone.neutral,
     ReservationStatus.expired => AppStatusTone.neutral,
+    ReservationStatus.cancelled => AppStatusTone.neutral,
   };
 }
 

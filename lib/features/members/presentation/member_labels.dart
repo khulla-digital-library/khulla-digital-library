@@ -1,4 +1,3 @@
-import 'package:khulla/features/members/domain/member_category.dart';
 import 'package:khulla/features/members/domain/member_status.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -20,18 +19,11 @@ extension MemberStatusX on MemberStatus {
   };
 }
 
-extension MemberCategoryX on MemberCategory {
-  String label(AppLocalizations l10n) => switch (this) {
-    MemberCategory.student => l10n.membersCategoryStudent,
-    MemberCategory.teacher => l10n.membersCategoryTeacher,
-    MemberCategory.public => l10n.membersCategoryPublic,
-    MemberCategory.child => l10n.membersCategoryChild,
-  };
-
-  AppIconSpec get icon => switch (this) {
-    MemberCategory.student => AppIcons.education,
-    MemberCategory.teacher => AppIcons.teacher,
-    MemberCategory.public => AppIcons.person,
-    MemberCategory.child => AppIcons.child,
+extension MemberTypeCodeX on String? {
+  AppIconSpec get memberTypeIcon => switch (this) {
+    'student' => AppIcons.education,
+    'teacher' => AppIcons.teacher,
+    'child' => AppIcons.child,
+    _ => AppIcons.person,
   };
 }

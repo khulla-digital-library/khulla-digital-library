@@ -24,7 +24,27 @@ class LibrarySettings extends Table {
   /// does.
   TextColumn get currency => textEnum<AppCurrency>()();
 
+  /// Which branch this installation serves, when the library has more than one name.
+  TextColumn get branch => text().nullable().withLength(max: 120)();
+
+  TextColumn get email => text().nullable().withLength(max: 254)();
+
+  TextColumn get phone => text().nullable().withLength(max: 40)();
+
+  TextColumn get address => text().nullable().withLength(max: 400)();
+
+  /// Free text — not a structured weekly schedule.
+  TextColumn get openingHours => text().nullable().withLength(max: 200)();
+
+  /// Prefix for auto-generated copy barcodes — the counter follows.
+  TextColumn get barcodePrefix => text().withDefault(const Constant('KH-'))();
+
+  /// Next integer appended after [barcodePrefix] when a copy gets no barcode.
+  IntColumn get barcodeNextValue => integer().withDefault(const Constant(1))();
+
   DateTimeColumn get createdAt => dateTime()();
+
+  DateTimeColumn get updatedAt => dateTime().nullable()();
 
   /// The only id this table's row may take.
   static const int singletonId = 1;

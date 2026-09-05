@@ -9,6 +9,7 @@ import 'package:khulla/core/form/inputs/password.dart';
 import 'package:khulla/core/form/inputs/required_text.dart';
 import 'package:khulla/core/money/currency.dart';
 import 'package:khulla/features/settings/domain/library_settings_repository.dart';
+import 'package:khulla/features/settings/domain/models/library_profile.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/onboarding/cubit/onboarding_state.dart';
 import 'package:khulla/features/users/domain/staff_repository.dart';
@@ -122,8 +123,11 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
     try {
       await _library.saveProfile(
-        name: state.libraryName.value,
-        currency: state.currency,
+        LibraryProfile(
+          name: state.libraryName.value,
+          currency: state.currency,
+          createdAt: DateTime.now(),
+        ),
       );
       final administrator = await _staff.createStaff(
         name: adminName.value,

@@ -1,0 +1,59 @@
+import 'dart:async';
+
+import 'package:bloc/bloc.dart';
+import 'package:injectable/injectable.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/features/circulation/reservation/domain/models/reservation_query.dart';
+import 'package:khulla/features/circulation/reservation/presentation/cubit/reservation_list_state.dart';
+import 'package:khulla/features/circulation/shared/domain/circulation_repository.dart';
+import 'package:khulla/features/circulation/shared/domain/reservation_status.dart';
+import 'package:khulla/shared/models/load_status.dart';
+
+@injectable
+class ReservationListCubit extends Cubit<ReservationListState> {
+  ReservationListCubit(this._repository) : super(const ReservationListState());
+
+  final CirculationRepository _repository;
+
+  Future<void> loadReservations() async {
+    emit(state.copyWith(status: LoadStatus.loading, error: null));
+    try {
+      final result = await _repository.findReservations(state.query);
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          status: LoadStatus.loaded,
+          reservations: result.items,
+          totalCount: result.totalCount,
+          error: null,
+        ),
+      );
+    } on AppException catch (error) {
+      if (isClosed) return;
+      emit(state.copyWith(status: LoadStatus.failure, error: error));
+    }
+  }
+
+  void searchChanged(String value) {
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(search: value, offset: 0),
+      ),
+    );
+    unawaited(loadReservations());
+  }
+
+  void statusFilterChanged(ReservationStatus? status) {
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(status: status, offset: 0),
+      ),
+    );
+    unawaited(loadReservations());
+  }
+
+  void clearFilters() {
+    emit(state.copyWith(query: const ReservationQuery()));
+    unawaited(loadReservations());
+  }
+}

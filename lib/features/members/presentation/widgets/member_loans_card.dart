@@ -1,13 +1,11 @@
-import 'package:khulla/features/members/presentation/placeholder/member_activity.dart';
+import 'package:khulla/core/format/app_date_format.dart';
+import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
+import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The copies a member is holding, or everything they have brought back.
-///
-/// One widget for both because the two tables differ only in which date
-/// matters — the due date while a copy is out, the return date once it is
-/// back — and duplicating the column list to say that would be worse.
 class MemberLoansCard extends StatelessWidget {
   const MemberLoansCard({
     required this.title,
@@ -21,11 +19,9 @@ class MemberLoansCard extends StatelessWidget {
 
   final String title;
   final String subtitle;
-  final List<MemberLoanEntry> loans;
+  final List<Loan> loans;
   final String emptyTitle;
   final String emptyBody;
-
-  /// Whether these are past loans, which show a return date and no action.
   final bool isHistory;
 
   @override
@@ -45,74 +41,77 @@ class MemberLoansCard extends StatelessWidget {
               title: emptyTitle,
               message: emptyBody,
             )
-          : AppTable<MemberLoanEntry>(
+          : AppTable<Loan>(
               items: loans,
               columns: [
-                AppTableColumn<MemberLoanEntry>(
+                AppTableColumn<Loan>(
                   id: 'title',
                   label: l10n.loansColumnTitle,
                   flex: 4,
-                  cellBuilder: (context, loan) => Text(loan.titleName),
+                  cellBuilder: (context, loan) =>
+                      Text(loan.titleName ?? l10n.commonNotSet),
                 ),
-                AppTableColumn<MemberLoanEntry>(
+                AppTableColumn<Loan>(
                   id: 'barcode',
                   label: l10n.loansColumnBarcode,
                   flex: 2,
                   showFrom: FormFactor.large,
                   cellBuilder: (context, loan) =>
-                      Text(loan.barcode, style: muted),
+                      Text(loan.barcode ?? l10n.commonNotSet, style: muted),
                 ),
-                AppTableColumn<MemberLoanEntry>(
+                AppTableColumn<Loan>(
                   id: 'issued',
                   label: l10n.loansColumnIssued,
                   flex: 2,
                   showFrom: FormFactor.expanded,
                   cellBuilder: (context, loan) =>
-                      Text(loan.issued, style: muted),
+                      Text(loan.issuedOn, style: muted),
                 ),
-                AppTableColumn<MemberLoanEntry>(
+                AppTableColumn<Loan>(
                   id: 'due',
                   label: l10n.loansColumnDue,
                   flex: 2,
                   showFrom: FormFactor.medium,
                   cellBuilder: (context, loan) => Text(
-                    isHistory ? (loan.returned ?? loan.due) : loan.due,
+                    isHistory
+                        ? (loan.returnedAt == null
+                              ? loan.dueOn
+                              : AppDateFormat.format(loan.returnedAt!))
+                        : loan.dueOn,
                   ),
                 ),
-                AppTableColumn<MemberLoanEntry>(
+                AppTableColumn<Loan>(
                   id: 'fine',
                   label: l10n.loansColumnFine,
                   width: 100,
                   alignment: Alignment.centerRight,
                   showFrom: FormFactor.expanded,
-                  cellBuilder: (context, loan) => Text(
-                    loan.fine.isZero ? l10n.commonNotSet : loan.fine.display(),
-                    style: loan.fine.isZero
-                        ? muted
-                        : context.textTheme.bodyMedium?.copyWith(
-                            color: scheme.error,
-                          ),
-                  ),
+                  cellBuilder: (context, loan) {
+                    final fine = isHistory
+                        ? loan.accruedFine
+                        : loan.accruedFine;
+                    return Text(
+                      fine.isZero ? l10n.commonNotSet : fine.display(),
+                      style: fine.isZero
+                          ? muted
+                          : context.textTheme.bodyMedium?.copyWith(
+                              color: scheme.error,
+                            ),
+                    );
+                  },
                 ),
-                AppTableColumn<MemberLoanEntry>(
+                AppTableColumn<Loan>(
                   id: 'status',
                   label: l10n.commonStatus,
                   width: 120,
-                  cellBuilder: (context, loan) => AppStatusBadge(
-                    dense: true,
-                    label: isHistory
-                        ? l10n.statusReturned
-                        : (loan.isOverdue
-                              ? l10n.statusOverdue
-                              : l10n.statusOnLoan),
-                    tone: isHistory
-                        ? (loan.isOverdue
-                              ? AppStatusTone.warning
-                              : AppStatusTone.success)
-                        : (loan.isOverdue
-                              ? AppStatusTone.danger
-                              : AppStatusTone.brand),
-                  ),
+                  cellBuilder: (context, loan) {
+                    final status = isHistory ? loan.status : loan.status;
+                    return AppStatusBadge(
+                      dense: true,
+                      label: status.label(l10n),
+                      tone: status.tone,
+                    );
+                  },
                 ),
               ],
             ),

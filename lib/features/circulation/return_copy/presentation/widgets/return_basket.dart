@@ -1,5 +1,5 @@
+import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
-import 'package:khulla/features/circulation/shared/presentation/placeholder/loan_record.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -18,10 +18,10 @@ class ReturnBasket extends StatelessWidget {
     super.key,
   });
 
-  final List<LoanRecord> loans;
+  final List<Loan> loans;
   final TextEditingController scanController;
   final ValueChanged<String> onScanSubmitted;
-  final void Function(LoanRecord loan) onRemove;
+  final void Function(Loan loan) onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -55,28 +55,29 @@ class ReturnBasket extends StatelessWidget {
               message: l10n.returnsEmptyBody,
             )
           else
-            AppTable<LoanRecord>(
+            AppTable<Loan>(
               items: loans,
               columns: [
-                AppTableColumn<LoanRecord>(
+                AppTableColumn<Loan>(
                   id: 'title',
                   label: l10n.loansColumnTitle,
                   flex: 4,
-                  cellBuilder: (context, loan) => Text(loan.titleName),
+                  cellBuilder: (context, loan) =>
+                      Text(loan.titleName ?? l10n.commonNotSet),
                 ),
-                AppTableColumn<LoanRecord>(
+                AppTableColumn<Loan>(
                   id: 'member',
                   label: l10n.loansColumnMember,
                   flex: 3,
                   showFrom: FormFactor.expanded,
                   cellBuilder: (context, loan) => Text(
-                    loan.memberName,
+                    loan.memberName ?? l10n.commonNotSet,
                     style: context.textTheme.bodyMedium?.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
                   ),
                 ),
-                AppTableColumn<LoanRecord>(
+                AppTableColumn<Loan>(
                   id: 'daysLate',
                   label: l10n.returnsColumnDaysLate,
                   width: 100,
@@ -91,7 +92,7 @@ class ReturnBasket extends StatelessWidget {
                     ),
                   ),
                 ),
-                AppTableColumn<LoanRecord>(
+                AppTableColumn<Loan>(
                   id: 'fine',
                   label: l10n.returnsColumnFine,
                   width: 110,
@@ -110,7 +111,7 @@ class ReturnBasket extends StatelessWidget {
                     ),
                   ),
                 ),
-                AppTableColumn<LoanRecord>(
+                AppTableColumn<Loan>(
                   id: 'status',
                   label: l10n.commonStatus,
                   width: 120,
@@ -121,7 +122,7 @@ class ReturnBasket extends StatelessWidget {
                     tone: loan.status.tone,
                   ),
                 ),
-                AppTableColumn<LoanRecord>(
+                AppTableColumn<Loan>(
                   id: 'remove',
                   label: l10n.commonActions,
                   width: 56,

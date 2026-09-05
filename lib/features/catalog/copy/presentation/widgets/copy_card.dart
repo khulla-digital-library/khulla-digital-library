@@ -1,15 +1,12 @@
+import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
 import 'package:khulla/features/catalog/copy/presentation/widgets/copy_status_badge.dart';
-import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_copy.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// One copy as a card, for the window classes too narrow for the table.
-///
-/// The barcode leads: it is what the desk scans, and what someone looking at
-/// a physical item in their hand can match against the screen.
 class CopyCard extends StatelessWidget {
   const CopyCard({required this.copy, required this.onTap, super.key});
 
-  final CatalogCopy copy;
+  final Copy copy;
   final VoidCallback onTap;
 
   @override

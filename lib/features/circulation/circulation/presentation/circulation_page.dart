@@ -1,113 +1,78 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/circulation/circulation/presentation/cubit/loan_list_cubit.dart';
+import 'package:khulla/features/circulation/circulation/presentation/cubit/loan_list_state.dart';
+import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/features/circulation/shared/domain/loan_status.dart';
 import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
-import 'package:khulla/features/circulation/shared/presentation/placeholder/circulation_placeholder.dart';
-import 'package:khulla/features/circulation/shared/presentation/placeholder/loan_record.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/navigation_group.dart';
 import 'package:khulla/shared/components/navigation_tile.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
+import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The desk: what is out, what is due back, and what is late.
-///
-/// One page rather than a landing screen plus a list, because the loans table
-/// *is* what a librarian came here to look at. The counts above it are the
-/// filters written out — tapping *Overdue* selects the same rows the chip
-/// does, which is the behaviour a stat tile earns by being tappable.
-class CirculationPage extends StatefulWidget {
+class CirculationPage extends StatelessWidget {
   const CirculationPage({super.key});
 
-  @override
-  State<CirculationPage> createState() => _CirculationPageState();
-}
+  bool _isFiltered(LoanListState state) =>
+      state.query.search.isNotEmpty || state.query.status != null;
 
-class _CirculationPageState extends State<CirculationPage> {
-  String _query = '';
-  LoanStatus? _status;
-  AppTableSort _sort = const AppTableSort(columnId: 'due');
-
-  bool get _isFiltered => _query.isNotEmpty || _status != null;
-
-  void _clearFilters() => setState(() {
-    _query = '';
-    _status = null;
-  });
-
-  void _selectStatus(LoanStatus? status) => setState(() => _status = status);
-
-  List<LoanRecord> get _matches {
-    final needle = _query.trim().toLowerCase();
-    final matches = [
-      for (final loan in placeholderLoans)
-        if ((needle.isEmpty ||
-                loan.memberName.toLowerCase().contains(needle) ||
-                loan.titleName.toLowerCase().contains(needle) ||
-                loan.barcode.toLowerCase().contains(needle)) &&
-            (_status == null || loan.status == _status))
-          loan,
-    ];
-
-    return matches..sort((a, b) {
-      final order = switch (_sort.columnId) {
-        'member' => a.memberName.compareTo(b.memberName),
-        'title' => a.titleName.compareTo(b.titleName),
-        'issued' => a.issued.compareTo(b.issued),
-        'fine' => a.accruedFine.compareTo(b.accruedFine),
-        _ => a.due.compareTo(b.due),
-      };
-      return _sort.ascending ? order : -order;
-    });
-  }
-
-  List<AppTableColumn<LoanRecord>> _columns(AppLocalizations l10n) {
+  List<AppTableColumn<Loan>> _columns(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     final scheme = context.colorScheme;
     final muted = context.textTheme.bodyMedium?.copyWith(
       color: scheme.onSurfaceVariant,
     );
 
     return [
-      AppTableColumn<LoanRecord>(
+      AppTableColumn<Loan>(
         id: 'title',
         label: l10n.loansColumnTitle,
         flex: 4,
         sortable: true,
-        cellBuilder: (context, loan) => Text(loan.titleName),
+        cellBuilder: (context, loan) =>
+            Text(loan.titleName ?? l10n.commonNotSet),
       ),
-      AppTableColumn<LoanRecord>(
+      AppTableColumn<Loan>(
         id: 'member',
         label: l10n.loansColumnMember,
         flex: 3,
         sortable: true,
         showFrom: FormFactor.medium,
-        cellBuilder: (context, loan) => Text(loan.memberName),
+        cellBuilder: (context, loan) =>
+            Text(loan.memberName ?? l10n.commonNotSet),
       ),
-      AppTableColumn<LoanRecord>(
+      AppTableColumn<Loan>(
         id: 'barcode',
         label: l10n.loansColumnBarcode,
         flex: 2,
         showFrom: FormFactor.large,
-        cellBuilder: (context, loan) => Text(loan.barcode, style: muted),
+        cellBuilder: (context, loan) =>
+            Text(loan.barcode ?? l10n.commonNotSet, style: muted),
       ),
-      AppTableColumn<LoanRecord>(
+      AppTableColumn<Loan>(
         id: 'issued',
         label: l10n.loansColumnIssued,
         flex: 2,
         sortable: true,
         showFrom: FormFactor.large,
-        cellBuilder: (context, loan) => Text(loan.issued, style: muted),
+        cellBuilder: (context, loan) => Text(loan.issuedOn, style: muted),
       ),
-      AppTableColumn<LoanRecord>(
+      AppTableColumn<Loan>(
         id: 'due',
         label: l10n.loansColumnDue,
         flex: 2,
         sortable: true,
         showFrom: FormFactor.expanded,
-        cellBuilder: (context, loan) => Text(loan.due),
+        cellBuilder: (context, loan) => Text(loan.dueOn),
       ),
-      AppTableColumn<LoanRecord>(
+      AppTableColumn<Loan>(
         id: 'fine',
         label: l10n.loansColumnFine,
         width: 100,
@@ -126,7 +91,7 @@ class _CirculationPageState extends State<CirculationPage> {
                 ),
         ),
       ),
-      AppTableColumn<LoanRecord>(
+      AppTableColumn<Loan>(
         id: 'status',
         label: l10n.commonStatus,
         width: 120,
@@ -136,7 +101,7 @@ class _CirculationPageState extends State<CirculationPage> {
           tone: loan.status.tone,
         ),
       ),
-      AppTableColumn<LoanRecord>(
+      AppTableColumn<Loan>(
         id: 'actions',
         label: l10n.commonActions,
         width: 56,
@@ -175,163 +140,192 @@ class _CirculationPageState extends State<CirculationPage> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
-    final matches = _matches;
+    final cubit = context.read<LoanListCubit>();
 
-    return CollectionPageView<LoanRecord>(
-      intro: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AppStatStrip(
-            tiles: [
-              AppStatTile(
-                label: l10n.circulationStatOnLoan,
-                value: '${placeholderLoans.length}',
-                icon: AppIcons.transfer,
-                tone: AppStatusTone.brand,
-                onTap: () => _selectStatus(null),
+    return BlocBuilder<LoanListCubit, LoanListState>(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return const Center(child: AppSpinner());
+        }
+        if (state.hasError) {
+          return ErrorRetryView(
+            error: state.error,
+            onRetry: cubit.loadOpenLoans,
+          );
+        }
+
+        final isFiltered = _isFiltered(state);
+        final sort = AppTableSort(
+          columnId: _displaySortColumn(state.query.sortColumn),
+          ascending: state.query.sortAscending,
+        );
+
+        return CollectionPageView<Loan>(
+          intro: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AppStatStrip(
+                tiles: [
+                  AppStatTile(
+                    label: l10n.circulationStatOnLoan,
+                    value: '${state.onLoanCount}',
+                    icon: AppIcons.transfer,
+                    tone: AppStatusTone.brand,
+                    onTap: () => cubit.statusFilterChanged(null),
+                  ),
+                  AppStatTile(
+                    label: l10n.circulationStatDueToday,
+                    value: '${state.dueTodayCount}',
+                    icon: AppIcons.event,
+                    tone: AppStatusTone.warning,
+                    onTap: () => cubit.statusFilterChanged(LoanStatus.dueToday),
+                  ),
+                  AppStatTile(
+                    label: l10n.circulationStatOverdue,
+                    value: '${state.overdueCount}',
+                    icon: AppIcons.error,
+                    tone: AppStatusTone.danger,
+                    onTap: () => cubit.statusFilterChanged(LoanStatus.overdue),
+                  ),
+                  AppStatTile(
+                    label: l10n.circulationStatHolds,
+                    value: '${state.holdsCount}',
+                    icon: AppIcons.bookmark,
+                    tone: AppStatusTone.info,
+                    onTap: () => context.go(Routes.circulationReservations),
+                  ),
+                ],
               ),
-              AppStatTile(
-                label: l10n.circulationStatDueToday,
-                value: '${placeholderLoansWith(LoanStatus.dueToday).length}',
+              SizedBox(height: spacing.lg),
+              AppSectionHeader(
+                title: l10n.circulationDeskTitle,
+                subtitle: l10n.circulationDeskSubtitle,
+              ),
+              SizedBox(height: spacing.md),
+              NavigationGroup(
+                children: [
+                  NavigationTile(
+                    label: l10n.circulationCheckOut,
+                    description: l10n.checkOutSubtitle,
+                    icon: AppIcons.scan,
+                    route: Routes.circulationCheckOut,
+                  ),
+                  NavigationTile(
+                    label: l10n.circulationReturn,
+                    description: l10n.returnsSubtitle,
+                    icon: AppIcons.checkIn,
+                    route: Routes.circulationReturn,
+                  ),
+                  NavigationTile(
+                    label: l10n.circulationReservations,
+                    description: l10n.reservationsSubtitle,
+                    count: '${state.holdsCount}',
+                    icon: AppIcons.bookmark,
+                    route: Routes.circulationReservations,
+                  ),
+                  NavigationTile(
+                    label: l10n.circulationFines,
+                    description: l10n.finesSubtitle,
+                    icon: AppIcons.wallet,
+                    route: Routes.circulationFines,
+                  ),
+                ],
+              ),
+              SizedBox(height: spacing.lg),
+              AppSectionHeader(
+                title: l10n.circulationLoansTitle,
+                subtitle: l10n.circulationLoansSubtitle,
+              ),
+            ],
+          ),
+          toolbar: AppToolbar(
+            search: AppSearchField(
+              hintText: l10n.circulationSearchHint,
+              clearTooltip: l10n.commonClearSearch,
+              onChanged: cubit.searchChanged,
+            ),
+            filters: [
+              AppFilterChip(
+                label: l10n.circulationFilterOnLoan,
+                icon: AppIcons.transfer,
+                selected: state.query.status == LoanStatus.onLoan,
+                onSelected: (selected) => cubit.statusFilterChanged(
+                  selected ? LoanStatus.onLoan : null,
+                ),
+              ),
+              AppFilterChip(
+                label: l10n.circulationFilterDueToday,
                 icon: AppIcons.event,
                 tone: AppStatusTone.warning,
-                onTap: () => _selectStatus(LoanStatus.dueToday),
+                selected: state.query.status == LoanStatus.dueToday,
+                onSelected: (selected) => cubit.statusFilterChanged(
+                  selected ? LoanStatus.dueToday : null,
+                ),
               ),
-              AppStatTile(
-                label: l10n.circulationStatOverdue,
-                value: '${placeholderLoansWith(LoanStatus.overdue).length}',
+              AppFilterChip(
+                label: l10n.circulationFilterOverdue,
                 icon: AppIcons.error,
                 tone: AppStatusTone.danger,
-                onTap: () => _selectStatus(LoanStatus.overdue),
+                selected: state.query.status == LoanStatus.overdue,
+                onSelected: (selected) => cubit.statusFilterChanged(
+                  selected ? LoanStatus.overdue : null,
+                ),
               ),
-              AppStatTile(
-                label: l10n.circulationStatHolds,
-                value: '${placeholderReservations.length}',
-                icon: AppIcons.bookmark,
-                tone: AppStatusTone.info,
-                onTap: () => context.go(Routes.circulationReservations),
+            ],
+            actions: [
+              if (isFiltered)
+                AppTextButton(
+                  onPressed: cubit.clearFilters,
+                  child: Text(l10n.commonClearFilters),
+                ),
+              AppButton(
+                size: AppButtonSize.medium,
+                variant: AppButtonVariant.outline,
+                onPressed: () => context.go(Routes.circulationReturn),
+                child: Text(l10n.circulationReturn),
               ),
             ],
           ),
-          SizedBox(height: spacing.lg),
-          AppSectionHeader(
-            title: l10n.circulationDeskTitle,
-            subtitle: l10n.circulationDeskSubtitle,
-          ),
-          SizedBox(height: spacing.md),
-          NavigationGroup(
-            children: [
-              NavigationTile(
-                label: l10n.circulationCheckOut,
-                description: l10n.checkOutSubtitle,
-                icon: AppIcons.scan,
-                route: Routes.circulationCheckOut,
-              ),
-              NavigationTile(
-                label: l10n.circulationReturn,
-                description: l10n.returnsSubtitle,
-                icon: AppIcons.checkIn,
-                route: Routes.circulationReturn,
-              ),
-              NavigationTile(
-                label: l10n.circulationReservations,
-                description: l10n.reservationsSubtitle,
-                count: '${placeholderReservations.length}',
-                icon: AppIcons.bookmark,
-                route: Routes.circulationReservations,
-              ),
-              NavigationTile(
-                label: l10n.circulationFines,
-                description: l10n.finesSubtitle,
-                count: placeholderOutstandingFines.display(),
-                icon: AppIcons.wallet,
-                route: Routes.circulationFines,
-              ),
-            ],
-          ),
-          SizedBox(height: spacing.lg),
-          AppSectionHeader(
-            title: l10n.circulationLoansTitle,
-            subtitle: l10n.circulationLoansSubtitle,
-          ),
-        ],
-      ),
-      toolbar: AppToolbar(
-        search: AppSearchField(
-          hintText: l10n.circulationSearchHint,
-          clearTooltip: l10n.commonClearSearch,
-          onChanged: (value) => setState(() => _query = value),
-        ),
-        filters: [
-          AppFilterChip(
-            label: l10n.circulationFilterOnLoan,
-            icon: AppIcons.transfer,
-            selected: _status == LoanStatus.onLoan,
-            onSelected: (selected) =>
-                _selectStatus(selected ? LoanStatus.onLoan : null),
-          ),
-          AppFilterChip(
-            label: l10n.circulationFilterDueToday,
-            icon: AppIcons.event,
-            tone: AppStatusTone.warning,
-            selected: _status == LoanStatus.dueToday,
-            onSelected: (selected) =>
-                _selectStatus(selected ? LoanStatus.dueToday : null),
-          ),
-          AppFilterChip(
-            label: l10n.circulationFilterOverdue,
-            icon: AppIcons.error,
-            tone: AppStatusTone.danger,
-            selected: _status == LoanStatus.overdue,
-            onSelected: (selected) =>
-                _selectStatus(selected ? LoanStatus.overdue : null),
-          ),
-        ],
-        actions: [
-          if (_isFiltered)
-            AppTextButton(
-              onPressed: _clearFilters,
-              child: Text(l10n.commonClearFilters),
-            ),
-          AppButton(
-            size: AppButtonSize.medium,
-            variant: AppButtonVariant.outline,
-            onPressed: () => context.go(Routes.circulationReturn),
-            child: Text(l10n.circulationReturn),
-          ),
-        ],
-      ),
-      items: matches,
-      columns: _columns(l10n),
-      sort: _sort,
-      onSort: (next) => setState(() => _sort = next),
-      onRowTap: (loan) => context.go(Routes.member(loan.memberId)),
-      compactBuilder: (context, loan) => _LoanCard(loan: loan),
-      emptyState: _isFiltered
-          ? AppEmptyView(
-              icon: AppIcons.noResults,
-              title: l10n.commonNoMatchesTitle,
-              message: l10n.commonNoMatchesBody,
-              actionLabel: l10n.commonClearFilters,
-              onAction: _clearFilters,
-            )
-          : AppEmptyView(
-              icon: AppIcons.transfer,
-              title: l10n.circulationLoansEmptyTitle,
-              message: l10n.circulationLoansEmptyBody,
-              actionLabel: l10n.circulationCheckOut,
-              onAction: () => context.go(Routes.circulationCheckOut),
-            ),
+          items: state.loans,
+          columns: _columns(context, l10n),
+          sort: sort,
+          onSort: (next) => cubit.sortChanged(next.columnId, next.ascending),
+          onRowTap: (loan) => context.go(Routes.member(loan.memberId)),
+          compactBuilder: (context, loan) => _LoanCard(loan: loan),
+          emptyState: isFiltered
+              ? AppEmptyView(
+                  icon: AppIcons.noResults,
+                  title: l10n.commonNoMatchesTitle,
+                  message: l10n.commonNoMatchesBody,
+                  actionLabel: l10n.commonClearFilters,
+                  onAction: cubit.clearFilters,
+                )
+              : AppEmptyView(
+                  icon: AppIcons.transfer,
+                  title: l10n.circulationLoansEmptyTitle,
+                  message: l10n.circulationLoansEmptyBody,
+                  actionLabel: l10n.circulationCheckOut,
+                  onAction: () => context.go(Routes.circulationCheckOut),
+                ),
+        );
+      },
     );
   }
+
+  String _displaySortColumn(String columnId) => switch (columnId) {
+    'memberName' => 'member',
+    'titleName' => 'title',
+    'checkedOutAt' => 'issued',
+    'barcode' => 'barcode',
+    _ => 'due',
+  };
 }
 
-/// One loan as a card, for the window classes too narrow for eight columns.
 class _LoanCard extends StatelessWidget {
   const _LoanCard({required this.loan});
 
-  final LoanRecord loan;
+  final Loan loan;
 
   @override
   Widget build(BuildContext context) {
@@ -351,7 +345,7 @@ class _LoanCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    loan.titleName,
+                    loan.titleName ?? l10n.commonNotSet,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: context.textTheme.bodyMedium?.copyWith(
@@ -369,7 +363,7 @@ class _LoanCard extends StatelessWidget {
             ),
             SizedBox(height: spacing.xxs),
             Text(
-              loan.memberName,
+              loan.memberName ?? l10n.commonNotSet,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: context.textTheme.bodySmall?.copyWith(
@@ -379,8 +373,8 @@ class _LoanCard extends StatelessWidget {
             SizedBox(height: spacing.xs),
             Text(
               loan.accruedFine.isZero
-                  ? '${l10n.loansColumnDue} ${loan.due}'
-                  : '${l10n.loansColumnDue} ${loan.due} · ${loan.accruedFine.display()}',
+                  ? '${l10n.loansColumnDue} ${loan.dueOn}'
+                  : '${l10n.loansColumnDue} ${loan.dueOn} · ${loan.accruedFine.display()}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: context.textTheme.bodySmall?.copyWith(

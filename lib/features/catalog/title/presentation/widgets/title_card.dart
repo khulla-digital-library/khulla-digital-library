@@ -1,18 +1,13 @@
 import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
-import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_title.dart';
+import 'package:khulla/features/catalog/title/domain/models/title.dart'
+    as catalog;
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// One title as a card, for the window classes where a five-column table
-/// would be five columns of ellipses.
-///
-/// It is handed to `AppSliverTable.compactBuilder`, which gives every card the
-/// same extent, so the card is laid out to a fixed height and must not grow
-/// past it — two lines of title, one line of author, one row of standing.
 class TitleCard extends StatelessWidget {
   const TitleCard({required this.title, required this.onTap, super.key});
 
-  final CatalogTitle title;
+  final catalog.Title title;
   final VoidCallback onTap;
 
   @override
@@ -20,7 +15,7 @@ class TitleCard extends StatelessWidget {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
-    final isAvailable = title.available > 0;
+    final isAvailable = title.availableCount > 0;
 
     return Padding(
       padding: EdgeInsets.only(bottom: spacing.sm),
@@ -30,7 +25,7 @@ class TitleCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AppIcon(
-              title.format.icon,
+              title.formatCode.formatIcon,
               size: spacing.md + 4,
               color: scheme.onSurfaceVariant,
             ),
@@ -74,8 +69,8 @@ class TitleCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           l10n.titlesCopiesOf(
-                            '${title.available}',
-                            '${title.copies}',
+                            '${title.availableCount}',
+                            '${title.copyCount}',
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

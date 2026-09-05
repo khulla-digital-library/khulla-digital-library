@@ -1,0 +1,95 @@
+import 'dart:async';
+
+import 'package:bloc/bloc.dart';
+import 'package:injectable/injectable.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/features/catalog/copy/domain/copy_repository.dart';
+import 'package:khulla/features/catalog/copy/domain/models/copy_query.dart';
+import 'package:khulla/features/catalog/copy/presentation/cubit/copy_state.dart';
+import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
+import 'package:khulla/shared/models/load_status.dart';
+
+@injectable
+class CopyCubit extends Cubit<CopyState> {
+  CopyCubit(this._repository) : super(const CopyState());
+
+  final CopyRepository _repository;
+
+  Future<void> loadCopies() async {
+    emit(state.copyWith(status: LoadStatus.loading, error: null));
+    try {
+      final result = await _repository.findCopies(state.query);
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          status: LoadStatus.loaded,
+          copies: result.items,
+          totalCount: result.totalCount,
+          error: null,
+        ),
+      );
+    } on AppException catch (error) {
+      if (isClosed) return;
+      emit(state.copyWith(status: LoadStatus.failure, error: error));
+    }
+  }
+
+  void searchChanged(String value) {
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(search: value, offset: 0),
+      ),
+    );
+    unawaited(loadCopies());
+  }
+
+  void statusFilterChanged(CopyStatus status, bool selected) {
+    final next = Set<CopyStatus>.from(state.query.statuses);
+    if (selected) {
+      next.add(status);
+    } else {
+      next.remove(status);
+    }
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(statuses: next, offset: 0),
+      ),
+    );
+    unawaited(loadCopies());
+  }
+
+  void sortChanged(String columnId, bool ascending) {
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(
+          sortColumn: columnId,
+          sortAscending: ascending,
+          offset: 0,
+        ),
+      ),
+    );
+    unawaited(loadCopies());
+  }
+
+  void clearFilters() {
+    emit(state.copyWith(query: const CopyQuery()));
+    unawaited(loadCopies());
+  }
+
+  void pageChanged(int page) {
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(
+          offset: page * state.query.limit,
+        ),
+      ),
+    );
+    unawaited(loadCopies());
+  }
+
+  Future<void> archiveCopy(String id) async {
+    await _repository.archiveCopy(id);
+    if (isClosed) return;
+    await loadCopies();
+  }
+}

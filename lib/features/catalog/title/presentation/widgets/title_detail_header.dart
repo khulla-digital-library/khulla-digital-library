@@ -1,21 +1,11 @@
 import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
-import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_title.dart';
+import 'package:khulla/features/catalog/title/domain/models/title.dart'
+    as catalog;
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/record_header.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// A title's identity block: what the work is, how it stands, and the one
-/// thing the page is for.
-///
-/// Secondary actions sit behind [AppMenuButton] rather than becoming a row of
-/// equal buttons, and the destructive one is inside that menu — never beside
-/// the primary action.
-/// A title's identity at the top of its detail screen.
-///
-/// The status row is two badges at most: whether a copy can be taken off the
-/// shelf, and whether the title is reference only. The format and the copy
-/// count moved into the fact line — a librarian reads them, but nobody has to
-/// act on them, and pills spend attention that the availability badge needs.
+/// A title's identity block at the top of its detail screen.
 class TitleDetailHeader extends StatelessWidget {
   const TitleDetailHeader({
     required this.title,
@@ -24,7 +14,7 @@ class TitleDetailHeader extends StatelessWidget {
     super.key,
   });
 
-  final CatalogTitle title;
+  final catalog.Title title;
   final VoidCallback onEdit;
   final List<AppMenuAction> menuActions;
 
@@ -33,7 +23,7 @@ class TitleDetailHeader extends StatelessWidget {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
-    final isAvailable = title.available > 0;
+    final isAvailable = title.availableCount > 0;
     final subtitle = title.subtitle;
 
     return RecordHeader(
@@ -61,8 +51,11 @@ class TitleDetailHeader extends StatelessWidget {
         ],
       ),
       facts: [
-        title.format.label(l10n),
-        l10n.titlesCopiesOf('${title.available}', '${title.copies}'),
+        title.formatCode.formatLabel(l10n),
+        l10n.titlesCopiesOf(
+          '${title.availableCount}',
+          '${title.copyCount}',
+        ),
       ],
       badges: [
         AppStatusBadge(
@@ -81,7 +74,7 @@ class TitleDetailHeader extends StatelessWidget {
         AppButton(
           size: AppButtonSize.medium,
           onPressed: onEdit,
-          child: Text(l10n.titleDetailEdit),
+          child: Text(l10n.commonEdit),
         ),
       ],
     );
