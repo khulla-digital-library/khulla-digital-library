@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Khulla Digital Library
-Comment=Khulla Digital Library - an open-source library management system.
-Exec=khulla
-Icon=${SNAP}/meta/gui/khulla.png
-Terminal=false
-Type=Application
-Categories=Education;Office;Utility;

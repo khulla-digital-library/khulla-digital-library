@@ -1095,5 +1095,103 @@
     "settingsDensityComfortable": "Comfortable",
     "settingsDensityCompact": "Compact",
     "settingsDesignSystemTitle": "Design system",
-    "settingsDesignSystemBody": "Every component and state on one page, for checking the visual language."
+    "settingsDesignSystemBody": "Every component and state on one page, for checking the visual language.",
+    "fieldPassword": "Password",
+    "fieldConfirmPassword": "Confirm password",
+    "@fieldConfirmPassword": {
+        "description": "Forms — field labels for the credentials a staff member signs in with"
+    },
+    "validationEmailRequired": "Enter an email address.",
+    "validationEmailInvalid": "That does not look like an email address.",
+    "validationPasswordRequired": "Enter a password.",
+    "validationPasswordTooShort": "Use at least {minLength} characters.",
+    "@validationPasswordTooShort": {
+        "description": "Validation — the password is shorter than the minimum",
+        "placeholders": {
+            "minLength": {
+                "type": "int",
+                "example": "8"
+            }
+        }
+    },
+    "validationConfirmPasswordRequired": "Type the password again.",
+    "validationPasswordsDoNotMatch": "The two passwords do not match.",
+    "validationNameRequired": "Enter a name.",
+    "validationNameTooShort": "That name looks too short.",
+    "validationFieldRequired": "This field is required.",
+    "@validationFieldRequired": {
+        "description": "Validation — messages shown under a form field that has been edited and is not yet valid"
+    },
+    "authBrandTagline": "A library catalogue that lives on your own machine.",
+    "authBrandLocalTitle": "Your records stay here",
+    "authBrandLocalBody": "The catalogue is a file on this computer. Nothing is uploaded, and there is no account to lose.",
+    "authBrandDeskTitle": "Built for the desk",
+    "authBrandDeskBody": "Issue, return and renew without waiting on a connection. It works the same offline.",
+    "authBrandOpenTitle": "Open source",
+    "authBrandOpenBody": "Free to run, free to read, free to fork. No licence to renew.",
+    "@authBrandOpenBody": {
+        "description": "Auth — the brand panel beside the sign-in and onboarding forms"
+    },
+    "authRevealPassword": "Show password",
+    "authHidePassword": "Hide password",
+    "@authHidePassword": {
+        "description": "Auth — tooltip on the button that unmasks a password field"
+    },
+    "signInHeading": "Sign in",
+    "signInSubtitle": "Use the staff account this library was set up with.",
+    "signInRejected": "That email and password do not match an active staff account.",
+    "signInAction": "Sign in",
+    "signInForgotPassword": "Forgotten the password? An administrator can reset it under Staff.",
+    "@signInForgotPassword": {
+        "description": "Auth — the sign-in screen"
+    },
+    "currencyNpr": "Nepalese rupee (NPR)",
+    "currencyInr": "Indian rupee (INR)",
+    "currencyUsd": "US dollar (USD)",
+    "currencyEur": "Euro (EUR)",
+    "currencyGbp": "Pound sterling (GBP)",
+    "@currencyGbp": {
+        "description": "Settings — the currencies a library can be set up in"
+    },
+    "onboardingStepCounter": "Step {step} of {total}",
+    "@onboardingStepCounter": {
+        "description": "Onboarding — the progress line above the wizard",
+        "placeholders": {
+            "step": {
+                "type": "int",
+                "example": "1"
+            },
+            "total": {
+                "type": "int",
+                "example": "2"
+            }
+        }
+    },
+    "onboardingLibraryHeading": "Set up your library",
+    "onboardingLibrarySubtitle": "Two steps, then the catalogue is yours. Everything else can be changed later under Settings.",
+    "onboardingLibraryNameLabel": "Library name",
+    "onboardingLibraryNameHint": "Kathmandu Community Library",
+    "onboardingCurrencyLabel": "Currency",
+    "onboardingCurrencyHelp": "Used for every fine, fee and deposit this library records.",
+    "onboardingAccountHeading": "Your administrator account",
+    "onboardingAccountSubtitle": "The first account runs the library. Other staff are added later under Staff.",
+    "onboardingEmailHint": "you@library.org",
+    "onboardingEmailTaken": "A staff account already uses that email address.",
+    "onboardingPasswordHelp": "At least {minLength} characters. It is stored hashed on this machine and cannot be recovered.",
+    "@onboardingPasswordHelp": {
+        "description": "Onboarding — the note under the password fields",
+        "placeholders": {
+            "minLength": {
+                "type": "int",
+                "example": "8"
+            }
+        }
+    },
+    "onboardingContinue": "Continue",
+    "onboardingBack": "Back",
+    "onboardingFinish": "Create library",
+    "onboardingSetupFailed": "The library could not be set up.",
+    "@onboardingSetupFailed": {
+        "description": "Onboarding — the first-run setup wizard"
+    }
 }

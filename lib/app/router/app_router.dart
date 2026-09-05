@@ -1,7 +1,10 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/app/shell/app_shell.dart';
 import 'package:khulla/core/config/app_config.dart';
+import 'package:khulla/core/di/injection.dart';
+import 'package:khulla/core/router/go_router_refresh_stream.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/author/presentation/author_detail_page.dart';
 import 'package:khulla/features/catalog/author/presentation/author_list_page.dart';
@@ -26,6 +29,12 @@ import 'package:khulla/features/settings/presentation/pages/library_profile_page
 import 'package:khulla/features/settings/presentation/pages/loan_rules_page.dart';
 import 'package:khulla/features/settings/presentation/pages/settings_page.dart';
 import 'package:khulla/features/settings/presentation/pages/sync_page.dart';
+import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
+import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_state.dart';
+import 'package:khulla/features/staff_auth/presentation/onboarding/cubit/onboarding_cubit.dart';
+import 'package:khulla/features/staff_auth/presentation/onboarding/onboarding_page.dart';
+import 'package:khulla/features/staff_auth/presentation/sign_in/cubit/sign_in_cubit.dart';
+import 'package:khulla/features/staff_auth/presentation/sign_in/sign_in_page.dart';
 import 'package:khulla/features/users/presentation/pages/role_list_page.dart';
 import 'package:khulla/features/users/presentation/pages/user_list_page.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -46,17 +55,37 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// Route paths are never written here as strings — [Routes] owns the
 /// segments, so a rename is one edit and every caller moves with it.
 ///
-/// There is no redirect guard yet because there is no session to guard on.
-/// When staff sign-in lands, add a `refreshListenable` over the auth cubit's
-/// stream (see `GoRouterRefreshStream`) and a `redirect` beside it.
+/// Two routes sit outside the shell — onboarding and sign-in — and
+/// [_redirect] is what decides when the operator is on one of them. It reads
+/// [AuthCubit], and `refreshListenable` re-runs it whenever that cubit emits,
+/// so signing in or out moves the app on its own with no `context.go` at the
+/// call site.
 @lazySingleton
 class AppRouter {
-  AppRouter(this._config) {
+  AppRouter(this._config, this._auth) {
     router = GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: Routes.dashboard,
       debugLogDiagnostics: !_config.isProduction,
+      refreshListenable: GoRouterRefreshStream(_auth.stream),
+      redirect: _redirect,
       routes: [
+        GoRoute(
+          path: Routes.onboarding,
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (context, _) => BlocProvider<OnboardingCubit>(
+            create: (_) => getIt<OnboardingCubit>(),
+            child: const OnboardingPage(),
+          ),
+        ),
+        GoRoute(
+          path: Routes.signIn,
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (context, _) => BlocProvider<SignInCubit>(
+            create: (_) => getIt<SignInCubit>(),
+            child: const SignInPage(),
+          ),
+        ),
         GoRoute(
           path: Routes.root,
           redirect: (_, _) => Routes.dashboard,
@@ -233,10 +262,31 @@ class AppRouter {
   }
 
   final AppConfig _config;
+  final AuthCubit _auth;
   final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
     debugLabel: 'root',
   );
 
   /// The configured router, handed to `MaterialApp.router`.
   late final GoRouter router;
+
+  /// Sends the operator to the one screen their session allows.
+  ///
+  /// `bootstrap` resolves the session before the first frame, so
+  /// [AuthStatus.unknown] here means the catalogue could not be read at all.
+  /// It redirects nowhere in that case: guessing "needs setup" would offer to
+  /// create a second administrator over the top of a real library, and the
+  /// startup failure screen is already what the operator is looking at.
+  String? _redirect(BuildContext context, GoRouterState state) {
+    final location = state.matchedLocation;
+
+    return switch (_auth.state.status) {
+      AuthStatus.unknown => null,
+      AuthStatus.needsSetup =>
+        location == Routes.onboarding ? null : Routes.onboarding,
+      AuthStatus.signedOut => location == Routes.signIn ? null : Routes.signIn,
+      AuthStatus.signedIn =>
+        Routes.isAuthLocation(location) ? Routes.dashboard : null,
+    };
+  }
 }

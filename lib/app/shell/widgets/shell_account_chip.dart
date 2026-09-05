@@ -1,6 +1,9 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
-import 'package:khulla/features/users/presentation/placeholder/users_placeholder.dart';
+import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
@@ -15,6 +18,10 @@ import 'package:khulla_ui/khulla_ui.dart';
 ///
 /// The menu opens above the full footer row, not from the avatar alone — the
 /// whole row is the tap target and the panel anchors to its width.
+///
+/// It renders nothing when nobody is signed in. That is unreachable in
+/// practice — the shell is behind the router's redirect — but a signed-out
+/// frame can still be built for one pass while the redirect settles.
 class ShellAccountChip extends StatelessWidget {
   const ShellAccountChip({this.compact = false, super.key});
 
@@ -26,7 +33,9 @@ class ShellAccountChip extends StatelessWidget {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
     final colors = context.appColors;
-    final staff = signedInStaff;
+    final staff = context.watch<AuthCubit>().state.staff;
+
+    if (staff == null) return const SizedBox.shrink();
 
     return PopupMenuButton<int>(
       tooltip: l10n.shellAccountMenu,
@@ -56,7 +65,9 @@ class ShellAccountChip extends StatelessWidget {
         ),
         const PopupMenuDivider(),
         PopupMenuItem<int>(
-          onTap: () => showNotWiredToast(context),
+          // No confirmation: signing out costs nothing to undo, and the
+          // catalogue is untouched — the next screen is sign-in.
+          onTap: () => unawaited(context.read<AuthCubit>().signOut()),
           child: _MenuRow(
             icon: AppIcons.signOut,
             label: l10n.shellSignOut,
