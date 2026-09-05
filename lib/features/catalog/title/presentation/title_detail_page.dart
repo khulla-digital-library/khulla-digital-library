@@ -6,8 +6,8 @@ import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
-import 'package:khulla/features/catalog/title/presentation/cubit/title_detail_cubit.dart';
-import 'package:khulla/features/catalog/title/presentation/cubit/title_detail_state.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_detail_cubit.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_detail_state.dart';
 import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_copies_card.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_detail_header.dart';
@@ -17,7 +17,6 @@ import 'package:khulla/features/circulation/reservation/presentation/place_hold_
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -222,11 +221,6 @@ class TitleDetailPage extends StatelessWidget {
                           label: l10n.titleDetailPlaceHold,
                           icon: AppIcons.addBookmark,
                           onSelected: () => unawaited(_placeHold(context)),
-                        ),
-                        AppMenuAction(
-                          label: l10n.titlesPrintLabels,
-                          icon: AppIcons.printer,
-                          onSelected: () => showNotWiredToast(context),
                         ),
                         AppMenuAction(
                           label: l10n.titleDetailDelete,

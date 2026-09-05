@@ -30,6 +30,8 @@ class AppTextField extends StatefulWidget {
     this.prefixIcon,
     this.prefixIconConstraints,
     this.suffixIcon,
+    this.suffixIconConstraints,
+    this.textAlign = TextAlign.start,
     this.textInputAction,
     this.initialValue,
     this.controller,
@@ -82,6 +84,12 @@ class AppTextField extends StatefulWidget {
 
   /// Trailing adornment.
   final Widget? suffixIcon;
+
+  /// Size constraints for [suffixIcon]. Tighten when the suffix is a control.
+  final BoxConstraints? suffixIconConstraints;
+
+  /// Alignment of the value inside the field.
+  final TextAlign textAlign;
 
   /// Keyboard action button.
   final TextInputAction? textInputAction;
@@ -194,6 +202,7 @@ class _AppTextFieldState extends State<AppTextField> {
         ConstrainedBox(
           constraints: BoxConstraints(
             minHeight: multiline ? 0 : metrics.fieldHeight,
+            maxHeight: multiline ? double.infinity : metrics.fieldHeight,
           ),
           child: TextFormField(
             initialValue: widget.initialValue,
@@ -218,6 +227,7 @@ class _AppTextFieldState extends State<AppTextField> {
             maxLines: widget.maxLines,
             minLines: widget.minLines,
             inputFormatters: widget.inputFormatters,
+            textAlign: widget.textAlign,
             style: typography.body.copyWith(color: colors.ink100),
             decoration: InputDecoration(
               hintText: hint,
@@ -230,6 +240,7 @@ class _AppTextFieldState extends State<AppTextField> {
                 final suffix? => AppFieldAffix(child: suffix),
                 _ => null,
               },
+              suffixIconConstraints: widget.suffixIconConstraints,
               counterText: '',
               // The signature interaction: focus moves the text 2px right
               // rather than lighting up a ring.

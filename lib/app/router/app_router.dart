@@ -13,8 +13,8 @@ import 'package:khulla/features/catalog/author/presentation/author_list_page.dar
 import 'package:khulla/features/catalog/copy/presentation/copy_list_page.dart';
 import 'package:khulla/features/catalog/copy/presentation/cubit/copy_cubit.dart';
 import 'package:khulla/features/catalog/copy/presentation/label_print_page.dart';
-import 'package:khulla/features/catalog/title/presentation/cubit/title_cubit.dart';
-import 'package:khulla/features/catalog/title/presentation/cubit/title_detail_cubit.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_cubit.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_detail_cubit.dart';
 import 'package:khulla/features/catalog/title/presentation/title_detail_page.dart';
 import 'package:khulla/features/catalog/title/presentation/title_list_page.dart';
 import 'package:khulla/features/circulation/check_out/presentation/check_out_page.dart';
@@ -73,7 +73,7 @@ class AppRouter {
   AppRouter(this._config, this._auth) {
     router = GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: Routes.dashboard,
+      initialLocation: Routes.catalogTitles,
       refreshListenable: GoRouterRefreshStream(_auth.stream),
       redirect: _redirect,
       routes: [

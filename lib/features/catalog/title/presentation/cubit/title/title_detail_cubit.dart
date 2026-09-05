@@ -8,7 +8,7 @@ import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/catalog/title/domain/title_repository.dart';
-import 'package:khulla/features/catalog/title/presentation/cubit/title_detail_state.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_detail_state.dart';
 import 'package:khulla/features/circulation/loan/domain/models/loan_query.dart';
 import 'package:khulla/features/circulation/shared/domain/circulation_repository.dart';
 import 'package:khulla/shared/models/load_status.dart';

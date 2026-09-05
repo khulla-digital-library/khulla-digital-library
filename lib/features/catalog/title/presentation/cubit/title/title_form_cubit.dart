@@ -4,8 +4,9 @@ import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/catalog/copy/domain/copy_repository.dart';
 import 'package:khulla/features/catalog/title/domain/models/title.dart';
+import 'package:khulla/features/catalog/title/domain/models/title_format.dart';
 import 'package:khulla/features/catalog/title/domain/title_repository.dart';
-import 'package:khulla/features/catalog/title/presentation/cubit/title_form_state.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_form_state.dart';
 import 'package:khulla/shared/domain/reference_data_repository.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
@@ -46,6 +47,22 @@ class TitleFormCubit extends Cubit<TitleFormState> {
     } on AppException catch (error) {
       if (isClosed) return;
       emit(state.copyWith(status: LoadStatus.failure, error: error));
+    }
+  }
+
+  /// Inserts a format, refreshes the picker list, and rethrows on failure.
+  Future<TitleFormat> addFormat(String name) async {
+    try {
+      final format = await _referenceData.addFormat(name);
+      if (isClosed) return format;
+      final formats = await _referenceData.findActiveFormats();
+      if (isClosed) return format;
+      emit(state.copyWith(formats: formats, error: null));
+      return format;
+    } on AppException catch (error) {
+      if (isClosed) rethrow;
+      emit(state.copyWith(error: error));
+      rethrow;
     }
   }
 

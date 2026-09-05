@@ -160,6 +160,7 @@
     "formatAudio": "Audiobook",
     "formatVideo": "Video",
     "formatDigital": "E-book",
+    "formatOther": "Other",
     "formatAllFormats": "All formats",
     "@formatAllFormats": {
         "description": "Catalogue - the media a title can be held in"
@@ -196,11 +197,23 @@
     "titlesImport": "Import from a file",
     "titlesExport": "Export the catalogue",
     "titlesPrintLabels": "Print spine labels",
+    "titlesManageFormats": "Manage title formats",
+    "titlesManageFormatsBody": "Formats appear on the title form and as filters on this list.",
+    "titlesFormatEditHeading": "Edit format",
+    "titlesFormatDeleteTitle": "Delete this format?",
+    "titlesFormatDeleteBody": "It leaves the picker. Titles that already use it keep it.",
+    "titlesFormatLastBody": "Keep at least one format so new titles can pick one.",
+    "titlesFormatsEmptyTitle": "No formats yet",
+    "titlesFormatsEmptyBody": "Add a format before cataloguing titles.",
+    "@titlesManageFormats": {
+        "description": "Catalogue - overflow action to edit title formats"
+    },
     "titlesColumnTitle": "Title",
     "titlesColumnAuthor": "Author",
     "titlesColumnIsbn": "ISBN",
     "titlesColumnFormat": "Format",
     "titlesColumnShelf": "Shelf",
+    "titlesColumnPublisher": "Publisher",
     "titlesColumnYear": "Year",
     "titlesColumnCopies": "Copies",
     "titlesColumnAvailable": "Available",
@@ -283,6 +296,8 @@
     "@titleFormSave": {
         "description": "Catalogue - the title editor"
     },
+    "titleFormAddFormat": "Add format",
+    "titleFormCreateFormatHeading": "Create format",
     "copiesHeading": "Copies",
     "copiesSubtitle": "{count} items on the shelves",
     "@copiesSubtitle": {
@@ -1151,6 +1166,8 @@
     "@validationFieldRequired": {
         "description": "Validation - messages shown under a form field that has been edited and is not yet valid"
     },
+    "validationAmountInvalid": "Enter a valid amount.",
+    "validationCopiesMin": "Create at least one copy.",
     "authBrandTagline": "A library catalogue that lives on your own machine.",
     "authBrandLocalTitle": "Your records stay here",
     "authBrandLocalBody": "The catalogue is a file on this computer. There is no cloud account to set up or lose.",

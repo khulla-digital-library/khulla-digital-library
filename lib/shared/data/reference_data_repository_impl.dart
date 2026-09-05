@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/features/catalog/title/data/title_format_local_data_source.dart';
 import 'package:khulla/features/catalog/title/domain/models/title_format.dart';
 import 'package:khulla/features/members/data/member_type_local_data_source.dart';
@@ -94,6 +95,74 @@ class ReferenceDataRepositoryImpl implements ReferenceDataRepository {
 
   @override
   Future<List<TitleFormat>> findActiveFormats() => _formats.findActiveFormats();
+
+  @override
+  Future<TitleFormat> addFormat(String name) async {
+    final trimmed = name.trim();
+    final formats = await findActiveFormats();
+    _ensureUniqueName(formats, trimmed);
+    var maxOrder = -1;
+    for (final format in formats) {
+      if (format.sortOrder > maxOrder) maxOrder = format.sortOrder;
+    }
+    return await _formats.insertFormat(
+      TitleFormat(
+        id: _uuid.v4(),
+        name: trimmed,
+        sortOrder: maxOrder + 1,
+        isSystem: false,
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
+  @override
+  Future<TitleFormat> saveFormat({
+    required String id,
+    required String name,
+  }) async {
+    final trimmed = name.trim();
+    final formats = await findActiveFormats();
+    TitleFormat? current;
+    for (final format in formats) {
+      if (format.id == id) current = format;
+    }
+    if (current == null) {
+      throw const NotFoundException();
+    }
+    _ensureUniqueName(formats, trimmed, exceptId: id);
+    return await _formats.updateFormat(current.copyWith(name: trimmed));
+  }
+
+  @override
+  Future<void> removeFormat(String id) async {
+    final formats = await findActiveFormats();
+    if (formats.length <= 1) {
+      throw const ConflictException();
+    }
+    final exists = formats.any((format) => format.id == id);
+    if (!exists) {
+      throw const NotFoundException();
+    }
+    await _formats.archiveFormat(id, DateTime.now());
+  }
+
+  void _ensureUniqueName(
+    List<TitleFormat> formats,
+    String name, {
+    String? exceptId,
+  }) {
+    if (name.isEmpty) {
+      throw const InvalidInputException();
+    }
+    final needle = name.toLowerCase();
+    for (final format in formats) {
+      if (format.id == exceptId) continue;
+      if (format.name.toLowerCase() == needle) {
+        throw const DuplicateRecordException();
+      }
+    }
+  }
 
   @override
   Future<List<MemberType>> findActiveMemberTypes() =>

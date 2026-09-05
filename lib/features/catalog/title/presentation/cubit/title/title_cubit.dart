@@ -5,7 +5,7 @@ import 'package:injectable/injectable.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/features/catalog/title/domain/models/title_query.dart';
 import 'package:khulla/features/catalog/title/domain/title_repository.dart';
-import 'package:khulla/features/catalog/title/presentation/cubit/title_state.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_state.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
 /// The titles list: search, filters, sort and pagination.

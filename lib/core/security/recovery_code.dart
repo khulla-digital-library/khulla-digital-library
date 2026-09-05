@@ -53,7 +53,6 @@ abstract final class RecoveryCode {
   /// Plain-text kit written to the downloadable file. Keep it ASCII.
   static String fileContents({
     required String libraryName,
-    required String email,
     required List<String> codes,
   }) {
     final body = codes.map((code) => '- $code').join('\n');
@@ -61,7 +60,6 @@ abstract final class RecoveryCode {
 Khulla Digital Library recovery codes
 
 Library: $libraryName
-Administrator: $email
 
 Each code can be used once to set a new administrator password if you forget yours.
 Keep this file offline. Anyone who has an unused code can reset that password.

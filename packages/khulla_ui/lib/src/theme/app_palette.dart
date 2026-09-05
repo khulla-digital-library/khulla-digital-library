@@ -152,11 +152,11 @@ abstract final class AppPalette {
   /// The palest danger wash, for a surface that must be opaque.
   static const Color dangerTint = Color(0xFFFEE4E2);
 
-  /// Success ink — returned, available, active.
-  static const Color success = Color(0xFF11B650);
+  /// Success ink — returned, available, active. Forest, not a lime pill.
+  static const Color success = Color(0xFF2F6B4A);
 
   /// Success, one step deeper, for a border or a pressed fill.
-  static const Color successStrong = Color(0xFF0F993D);
+  static const Color successStrong = Color(0xFF24573C);
 
   /// Warning ink — due soon, expiring.
   static const Color warning = Color(0xFFE08A00);
@@ -164,8 +164,8 @@ abstract final class AppPalette {
   /// Warning, one step lighter.
   static const Color warningSoftInk = Color(0xFFE68F3D);
 
-  /// Info ink — reserved, on hold, queued.
-  static const Color info = Color(0xFF00C4FF);
+  /// Info ink — reserved, on hold, queued. Slate, not electric cyan.
+  static const Color info = Color(0xFF4A7388);
 
   /// Premium / highlight accent.
   static const Color premium = Color(0xFFFDB021);

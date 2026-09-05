@@ -28,6 +28,7 @@ class AppDesignGallery extends StatefulWidget {
 class _AppDesignGalleryState extends State<AppDesignGallery> {
   final _searchController = TextEditingController();
   final _textController = TextEditingController(text: 'Ursula K. Le Guin');
+  final _quantityController = TextEditingController(text: '1');
 
   _GallerySection _section = _GallerySection.foundations;
   bool _checkbox = true;
@@ -42,6 +43,7 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
   void dispose() {
     _searchController.dispose();
     _textController.dispose();
+    _quantityController.dispose();
     super.dispose();
   }
 
@@ -403,14 +405,32 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
                 AppDropdownField<String>(
                   label: 'Collection',
                   value: _dropdown,
-                  items: const ['Fiction', 'Reference', 'Periodicals'],
+                  items: const [
+                    'Fiction',
+                    'Reference',
+                    'Periodicals',
+                    'Local history',
+                    'Children',
+                    'Young adult',
+                    'Reserve',
+                  ],
                   itemLabel: (value) => value,
+                  footerActionLabel: 'Add collection',
+                  onFooterAction: () {},
                   onChanged: (value) => setState(() => _dropdown = value),
                 ),
                 AppSearchField(
                   hintText: 'Search titles, authors, ISBNs',
                   controller: _searchController,
                   clearTooltip: 'Clear',
+                  onChanged: (_) {},
+                ),
+                AppQuantityField(
+                  label: 'Copies',
+                  required: true,
+                  controller: _quantityController,
+                  decreaseTooltip: 'One fewer',
+                  increaseTooltip: 'One more',
                   onChanged: (_) {},
                 ),
               ],
@@ -455,7 +475,7 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
               ],
             ),
             AppGalleryRow(
-              label: 'filters — dashed at rest, tinted when set',
+              label: 'filters — hairline at rest, brand wash when set',
               children: [
                 AppFilterChip(
                   label: 'Overdue',
@@ -532,8 +552,8 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
         AppGallerySection(
           title: 'Badges',
           note:
-              'One hue, three ways: an 8% wash, the hue for the text, a '
-              'hairline between. 10px semibold, deliberately small.',
+              'Ink on a secondary wash; hue sits on a leading dot. Danger '
+              'keeps a red wash. 10px semibold, deliberately small.',
           children: [
             AppGalleryRow(
               label: 'tones',
@@ -550,7 +570,7 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
               ],
             ),
             const AppGalleryRow(
-              label: 'dense, and with a dot',
+              label: 'dense, alarm wash, and with an icon',
               children: [
                 AppStatusBadge(
                   label: 'On loan',
@@ -560,7 +580,6 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
                 AppStatusBadge(
                   label: 'Lost',
                   tone: AppStatusTone.danger,
-                  showDot: true,
                 ),
                 AppStatusBadge(
                   label: 'Returned',

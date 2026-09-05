@@ -18,6 +18,15 @@ abstract interface class ReferenceDataRepository {
   /// Active title formats in display order.
   Future<List<TitleFormat>> findActiveFormats();
 
+  /// Inserts an operator-created format and returns it.
+  Future<TitleFormat> addFormat(String name);
+
+  /// Renames an active format.
+  Future<TitleFormat> saveFormat({required String id, required String name});
+
+  /// Hides a format from pickers. Titles that already use it keep the link.
+  Future<void> removeFormat(String id);
+
   /// Active member types in display order.
   Future<List<MemberType>> findActiveMemberTypes();
 }

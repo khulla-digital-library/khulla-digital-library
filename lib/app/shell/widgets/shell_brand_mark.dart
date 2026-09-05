@@ -66,7 +66,7 @@ class ShellBrandMark extends StatelessWidget {
     if (!extended) {
       return Tooltip(
         message: l10n.appName,
-        child: AppLogo.submark(size: spacing.xlg),
+        child: AppLogo.submark(size: spacing.lg),
       );
     }
 

@@ -1,4 +1,4 @@
-import 'package:khulla/features/catalog/title/presentation/cubit/title_detail_cubit.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_detail_cubit.dart';
 import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';

@@ -13,7 +13,8 @@ extension TitleFormatCodeX on String? {
     'audiobook' => AppIcons.audio,
     'video' => AppIcons.video,
     'ebook' => AppIcons.devices,
-    _ => AppIcons.book,
+    'other' => AppIcons.inventory,
+    _ => AppIcons.article,
   };
 
   String formatLabel(AppLocalizations l10n) => switch (this) {
@@ -23,17 +24,19 @@ extension TitleFormatCodeX on String? {
     'audiobook' => l10n.formatAudio,
     'video' => l10n.formatVideo,
     'ebook' => l10n.formatDigital,
-    _ => l10n.formatBook,
+    'other' => l10n.formatOther,
+    _ => l10n.formatOther,
   };
 }
 
 extension TitleFormatX on TitleFormat {
-  AppIconSpec get icon => code.formatIcon;
-
-  String label(AppLocalizations l10n) => switch (code) {
-    null => name,
-    final value => value.formatLabel(l10n),
+  AppIconSpec get icon => switch (code) {
+    null => AppIcons.article,
+    final value => value.formatIcon,
   };
+
+  String label(AppLocalizations l10n) =>
+      code == null ? name : code!.formatLabel(l10n);
 }
 
 extension CopyStatusX on CopyStatus {

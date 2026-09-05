@@ -21,16 +21,20 @@ class AppMenuButton extends StatelessWidget {
   /// The trigger glyph.
   final AppIconSpec icon;
 
-  @override
-  Widget build(BuildContext context) {
-    final metrics = context.appMetrics;
-
-    return PopupMenuButton<AppMenuAction>(
-      tooltip: tooltip,
-      icon: AppIcon(icon, size: metrics.icon, color: context.appColors.ink500),
-      position: PopupMenuPosition.under,
-      onSelected: (action) => action.onSelected(),
-      itemBuilder: (menuContext) => [
+  Future<void> _openMenu(BuildContext context) async {
+    final box = context.findRenderObject()! as RenderBox;
+    final overlay =
+        Overlay.of(context).context.findRenderObject()! as RenderBox;
+    final origin = box.localToGlobal(Offset.zero, ancestor: overlay);
+    final selected = await showMenu<AppMenuAction>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        origin.dx,
+        origin.dy + box.size.height,
+        overlay.size.width - origin.dx - box.size.width,
+        overlay.size.height - origin.dy - box.size.height,
+      ),
+      items: [
         for (final action in actions)
           PopupMenuItem<AppMenuAction>(
             value: action,
@@ -40,9 +44,22 @@ class AppMenuButton extends StatelessWidget {
               horizontal: context.appSpacing.xs,
               vertical: context.appSpacing.xs + 2,
             ),
+            mouseCursor: action.enabled
+                ? SystemMouseCursors.click
+                : SystemMouseCursors.basic,
             child: _MenuActionRow(action: action),
           ),
       ],
+    );
+    selected?.onSelected();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AppIconButton(
+      icon: icon,
+      tooltip: tooltip,
+      onPressed: () => _openMenu(context),
     );
   }
 }

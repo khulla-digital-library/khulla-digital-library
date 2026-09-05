@@ -91,8 +91,8 @@ LIMIT ? OFFSET ?''';
     final dir = query.sortAscending ? 'ASC' : 'DESC';
     return switch (query.sortColumn) {
       'author' => 't.author $dir',
+      'publisher' => 't.publisher $dir',
       'year' => 't.published_year $dir',
-      'shelf' => 't.shelf $dir',
       'copies' => 'copy_count $dir',
       'available' => 'available_count $dir',
       _ => 't.title $dir',

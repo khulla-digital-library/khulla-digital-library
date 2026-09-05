@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:khulla/core/di/injection.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_form_dialog.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_list_refresh.dart';
 import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
+import 'package:khulla/features/catalog/title/presentation/title_format_list_dialog.dart';
 import 'package:khulla/features/catalog/title/presentation/title_list_refresh.dart';
 import 'package:khulla/features/circulation/reservation/presentation/place_hold_dialog.dart';
 import 'package:khulla/features/circulation/reservation/presentation/reservation_list_refresh.dart';
@@ -37,26 +40,14 @@ List<Widget> shellPageActions(
     Future<void> Function() open,
   ) => primary(label, icon, open);
 
-  AppButton soon(String label, AppIconSpec icon) =>
-      primary(label, icon, () => showNotWiredToast(context));
-
-  AppMenuButton menu(List<AppMenuAction> actions) =>
-      AppMenuButton(actions: actions, tooltip: l10n.commonMoreActions);
-
-  AppMenuAction item(String label, AppIconSpec icon) => AppMenuAction(
-    label: label,
-    icon: icon,
-    onSelected: () => showNotWiredToast(context),
-  );
-
   // Longest path first: `/catalog/titles` must not be answered by `/catalog`.
   return switch (location) {
     _ when Routes.isUnder(location, Routes.catalogTitles) => [
-      menu([
-        item(l10n.titlesImport, AppIcons.upload),
-        item(l10n.titlesExport, AppIcons.download),
-        item(l10n.titlesPrintLabels, AppIcons.printer),
-      ]),
+      AppIconButton(
+        icon: AppIcons.bookBookmark,
+        tooltip: l10n.titlesManageFormats,
+        onPressed: () => unawaited(TitleFormatListDialog.show(context)),
+      ),
       modal(
         l10n.titlesAdd,
         AppIcons.add,
@@ -81,15 +72,8 @@ List<Widget> shellPageActions(
       ),
     ],
     _ when Routes.isUnder(location, Routes.catalogAuthors) => [
-      soon(l10n.authorsAdd, AppIcons.add),
+      primary(l10n.authorsAdd, AppIcons.add, () => showNotWiredToast(context)),
     ],
-    // _ when Routes.isUnder(location, Routes.catalog) => [
-    //   modal(
-    //     l10n.titlesAdd,
-    //     AppIcons.add,
-    //     () => TitleFormDialog.show(context),
-    //   ),
-    // ],
     _ when Routes.isUnder(location, Routes.circulationReservations) => [
       modal(
         l10n.reservationsPlace,
@@ -104,35 +88,13 @@ List<Widget> shellPageActions(
     ],
     _ when Routes.isUnder(location, Routes.circulationCheckOut) => const [],
     _ when Routes.isUnder(location, Routes.circulationReturn) => const [],
-    // _ when Routes.isUnder(location, Routes.circulation) => [
-    //   go(
-    //     l10n.circulationCheckOut,
-    //     AppIcons.checkOut,
-    //     Routes.circulationCheckOut,
-    //   ),
-    // ],
     _ when Routes.isUnder(location, Routes.members) => [
-      menu([
-        item(l10n.membersImport, AppIcons.upload),
-        item(l10n.membersExport, AppIcons.download),
-      ]),
       modal(
         l10n.membersAdd,
         AppIcons.addPerson,
         () => MemberFormDialog.show(context),
       ),
     ],
-    // _ when Routes.isUnder(location, Routes.usersRoles) => const [],
-    // _ when Routes.isUnder(location, Routes.users) => [
-    //   soon(l10n.usersAdd, AppIcons.addPerson),
-    // ],
-    // _ when Routes.isUnder(location, Routes.reports) => [
-    //   menu([
-    //     item(l10n.commonExportCsv, AppIcons.download),
-    //     item(l10n.commonPrint, AppIcons.printer),
-    //   ]),
-    //   soon(l10n.commonExportPdf, AppIcons.pdf),
-    // ],
     _ => const [],
   };
 }

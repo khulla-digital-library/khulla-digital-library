@@ -2,24 +2,23 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// The standing pill — *Available*, *Overdue*, *Reserved*, *Active*.
 ///
-/// One hue, three ways: an 8% wash, the hue at full strength for the text,
-/// and a hairline in between. A table of forty rows with forty saturated
-/// pills is unreadable, and a wash keeps the row's text the thing being read.
+/// A quiet tag: secondary wash, hairline, ink for the label. Hue lives on a
+/// leading dot (or [icon]), not on the whole pill — a table of saturated
+/// greens and cyans reads as decoration, not as data.
 ///
-/// It is small on purpose — 10px semibold in a 10/2px pill — because in this
-/// product a status sits *inside* a table cell, next to a title, and a badge
-/// that matches the body size competes with it.
+/// [AppStatusTone.danger] is the exception: overdue and lost keep a red wash
+/// so an alarm still interrupts the row.
 ///
-/// The label always names the standing, so hue is never the only channel
-/// carrying it. [showDot] adds a second one where a badge appears without its
-/// column header nearby.
+/// It is small on purpose — 10px semibold — because a status sits *inside* a
+/// table cell, next to a title, and a badge that matches the body size
+/// competes with it.
 class AppStatusBadge extends StatelessWidget {
   const AppStatusBadge({
     required this.label,
     this.tone = AppStatusTone.neutral,
     this.icon,
     this.dense = false,
-    this.showDot = false,
+    this.showDot = true,
     super.key,
   });
 
@@ -35,21 +34,26 @@ class AppStatusBadge extends StatelessWidget {
   /// Tightens the pill for use inside a table row.
   final bool dense;
 
-  /// Draws a leading dot in the status hue. Off by default; turn it on for a
-  /// badge that stands alone, away from the column that names what it is.
+  /// Draws a leading dot in the status hue. On by default so meaning still
+  /// has a color channel once the pill itself is ink.
   final bool showDot;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final foreground = tone.foreground(context);
+    final colors = context.appColors;
+    final alarm = tone == AppStatusTone.danger;
+    final mark = tone.foreground(context);
+    final labelColor = alarm ? mark : colors.ink200;
     final glyph = icon;
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: tone.background(context),
+        color: alarm ? tone.background(context) : colors.secondary,
         borderRadius: BorderRadius.circular(context.appRadius.pill),
-        border: Border.all(color: tone.border(context)),
+        border: Border.all(
+          color: alarm ? tone.border(context) : colors.hairline,
+        ),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
@@ -63,7 +67,7 @@ class AppStatusBadge extends StatelessWidget {
               AppIcon(
                 glyph,
                 size: context.appMetrics.iconDense,
-                color: foreground,
+                color: mark,
               ),
               SizedBox(width: spacing.xxs),
             ] else if (showDot) ...[
@@ -71,7 +75,7 @@ class AppStatusBadge extends StatelessWidget {
                 width: spacing.xxs + 1,
                 height: spacing.xxs + 1,
                 decoration: BoxDecoration(
-                  color: foreground,
+                  color: mark,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -86,7 +90,7 @@ class AppStatusBadge extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: context.appTextStyles.micro.copyWith(
-                  color: foreground,
+                  color: labelColor,
                   fontWeight: FontWeight.w600,
                 ),
               ),

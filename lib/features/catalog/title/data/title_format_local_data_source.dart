@@ -7,4 +7,8 @@ abstract interface class TitleFormatLocalDataSource {
   Future<List<TitleFormat>> findActiveFormats();
 
   Future<TitleFormat> insertFormat(TitleFormat format);
+
+  Future<TitleFormat> updateFormat(TitleFormat format);
+
+  Future<void> archiveFormat(String id, DateTime archivedAt);
 }

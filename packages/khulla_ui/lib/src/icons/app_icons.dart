@@ -220,6 +220,10 @@ abstract final class AppIcons {
   /// A group of members.
   static const AppIconSpec people = AppIconSpec(SolarIcons.usersGroupRounded);
 
+  static const AppIconSpec bookBookmark = AppIconSpec(
+    SolarIcons.bookmarkSquare,
+  );
+
   /// Enrol someone new.
   static const AppIconSpec addPerson = AppIconSpec(SolarIcons.userPlusRounded);
 
@@ -269,6 +273,8 @@ abstract final class AppIcons {
 
   /// The settings section.
   static const AppIconSpec settings = AppIconSpec(SolarIcons.settings);
+
+  static const AppIconSpec options = AppIconSpec(SolarIcons.menuDotsSquare);
 
   /// Notifications, none waiting.
   static const AppIconSpec notifications = AppIconSpec(SolarIcons.bell);

@@ -18,7 +18,12 @@ const int kAppDropdownVisibleRows = 5;
 /// Long lists open in a capped panel: a fixed search header when
 /// [searchable] is true or once [items] exceeds [searchThreshold], then a
 /// scrollable list underneath. Short lists skip search and still cap height
-/// when they would overflow [menuMaxHeight].
+/// when they would overflow [menuMaxHeight]. Overflowing lists keep a
+/// scrollbar thumb visible so the extra rows are obvious without dragging.
+///
+/// [footerActionLabel] pins a create action under the list — the caller
+/// supplies the copy and what happens; this widget only closes the menu and
+/// fires [onFooterAction].
 /// {@endtemplate}
 class AppDropdownField<T> extends StatelessWidget {
   /// {@macro app_dropdown_field}
@@ -40,10 +45,17 @@ class AppDropdownField<T> extends StatelessWidget {
     this.searchThreshold = kAppDropdownSearchThreshold,
     this.itemMatchesSearch,
     this.menuMaxHeight,
+    this.footerActionLabel,
+    this.onFooterAction,
+    this.footerActionIcon,
     super.key,
   }) : assert(
          searchable != true || searchHint != null,
          'searchHint is required when searchable is true',
+       ),
+       assert(
+         (footerActionLabel == null) == (onFooterAction == null),
+         'footerActionLabel and onFooterAction must be set together',
        );
 
   /// The current selection. Null shows [hintText].
@@ -102,6 +114,15 @@ class AppDropdownField<T> extends StatelessWidget {
   /// Cap on the scrollable list height inside the menu.
   final double? menuMaxHeight;
 
+  /// Label on the pinned action under the list, e.g. "Add format".
+  final String? footerActionLabel;
+
+  /// Called after the menu closes when the footer action is pressed.
+  final VoidCallback? onFooterAction;
+
+  /// Glyph on the footer action. Defaults to [AppIcons.add].
+  final AppIconSpec? footerActionIcon;
+
   @override
   Widget build(BuildContext context) {
     final metrics = context.appMetrics;
@@ -135,6 +156,9 @@ class AppDropdownField<T> extends StatelessWidget {
           searchThreshold: searchThreshold,
           itemMatchesSearch: itemMatchesSearch,
           menuMaxHeight: menuMaxHeight,
+          footerActionLabel: footerActionLabel,
+          onFooterAction: onFooterAction,
+          footerActionIcon: footerActionIcon,
         ),
         if (error != null) ...[
           SizedBox(height: context.appSpacing.xxs + 2),
@@ -161,6 +185,9 @@ class _DropdownFieldControl<T> extends StatefulWidget {
     this.searchThreshold = kAppDropdownSearchThreshold,
     this.itemMatchesSearch,
     this.menuMaxHeight,
+    this.footerActionLabel,
+    this.onFooterAction,
+    this.footerActionIcon,
   });
 
   final T? value;
@@ -177,6 +204,9 @@ class _DropdownFieldControl<T> extends StatefulWidget {
   final int searchThreshold;
   final bool Function(T item, String query)? itemMatchesSearch;
   final double? menuMaxHeight;
+  final String? footerActionLabel;
+  final VoidCallback? onFooterAction;
+  final AppIconSpec? footerActionIcon;
 
   @override
   State<_DropdownFieldControl<T>> createState() =>
@@ -261,6 +291,9 @@ class _DropdownFieldControlState<T> extends State<_DropdownFieldControl<T>> {
         itemExtent: _itemExtent(overlayContext),
         menuMaxHeight: _menuMaxHeight(overlayContext),
         enabled: widget.enabled,
+        footerActionLabel: widget.footerActionLabel,
+        onFooterAction: widget.onFooterAction,
+        footerActionIcon: widget.footerActionIcon,
         onQueryChanged: (query) {
           _query = query;
           _scrollController?.jumpTo(0);
@@ -423,6 +456,9 @@ class _DropdownMenuOverlay<T> extends StatelessWidget {
     this.emptySearchMessage,
     this.selected,
     this.itemIcon,
+    this.footerActionLabel,
+    this.onFooterAction,
+    this.footerActionIcon,
   });
 
   final LayerLink layerLink;
@@ -444,6 +480,9 @@ class _DropdownMenuOverlay<T> extends StatelessWidget {
   final ValueChanged<String> onQueryChanged;
   final ValueChanged<T> onSelected;
   final VoidCallback onClose;
+  final String? footerActionLabel;
+  final VoidCallback? onFooterAction;
+  final AppIconSpec? footerActionIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -520,32 +559,59 @@ class _DropdownMenuOverlay<T> extends StatelessWidget {
                                     message: emptySearchMessage,
                                     itemExtent: itemExtent,
                                   ))
-                          : ListView.builder(
+                          : Scrollbar(
                               controller: scrollController,
-                              padding: EdgeInsets.fromLTRB(
-                                menuInset,
-                                0,
-                                menuInset,
-                                menuInset,
+                              thumbVisibility: true,
+                              child: ListView.builder(
+                                controller: scrollController,
+                                padding: EdgeInsets.fromLTRB(
+                                  menuInset,
+                                  0,
+                                  menuInset,
+                                  footerActionLabel == null
+                                      ? menuInset
+                                      : spacing.xxs,
+                                ),
+                                itemExtent: itemExtent,
+                                itemCount: items.length,
+                                itemBuilder: (context, index) {
+                                  final item = items[index];
+                                  final isSelected = item == selected;
+                                  return _DropdownMenuItem(
+                                    label: itemLabel(item),
+                                    icon: iconFor?.call(item),
+                                    selected: isSelected,
+                                    enabled: enabled,
+                                    itemRadius: itemRadius,
+                                    onTap: enabled
+                                        ? () => onSelected(item)
+                                        : null,
+                                  );
+                                },
                               ),
-                              itemExtent: itemExtent,
-                              itemCount: items.length,
-                              itemBuilder: (context, index) {
-                                final item = items[index];
-                                final isSelected = item == selected;
-                                return _DropdownMenuItem(
-                                  label: itemLabel(item),
-                                  icon: iconFor?.call(item),
-                                  selected: isSelected,
-                                  enabled: enabled,
-                                  itemRadius: itemRadius,
-                                  onTap: enabled
-                                      ? () => onSelected(item)
-                                      : null,
-                                );
-                              },
                             ),
                     ),
+                    if (footerActionLabel != null &&
+                        onFooterAction != null) ...[
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          menuInset,
+                          spacing.xxs,
+                          menuInset,
+                          menuInset,
+                        ),
+                        child: AppButton(
+                          expand: true,
+                          variant: AppButtonVariant.secondary,
+                          icon: footerActionIcon ?? AppIcons.add,
+                          onPressed: () {
+                            onClose();
+                            onFooterAction?.call();
+                          },
+                          child: Text(footerActionLabel ?? ''),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

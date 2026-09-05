@@ -145,6 +145,127 @@ void main() {
     });
   });
 
+  group('AppQuantityField', () {
+    testWidgets('steps up from the current value', (tester) async {
+      final controller = TextEditingController(text: '1');
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 280,
+            child: AppQuantityField(
+              label: 'Copies',
+              controller: controller,
+              decreaseTooltip: 'One fewer',
+              increaseTooltip: 'One more',
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byTooltip('One more'));
+      await tester.pump();
+      expect(controller.text, '2');
+    });
+
+    testWidgets('does not expand past a compact control width', (tester) async {
+      final controller = TextEditingController(text: '1');
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _host(
+          Row(
+            children: [
+              AppQuantityField(
+                label: 'Copies',
+                controller: controller,
+                decreaseTooltip: 'One fewer',
+                increaseTooltip: 'One more',
+                onChanged: (_) {},
+              ),
+              const Expanded(child: SizedBox()),
+            ],
+          ),
+        ),
+      );
+
+      final box = tester.getSize(find.byType(AppQuantityField));
+      expect(box.width, lessThan(160));
+    });
+
+    testWidgets('matches AppTextField control height', (tester) async {
+      final controller = TextEditingController(text: '1');
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _host(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: AppTextField(label: 'Cost', onChanged: (_) {}),
+              ),
+              AppQuantityField(
+                label: 'Copies',
+                controller: controller,
+                decreaseTooltip: 'One fewer',
+                increaseTooltip: 'One more',
+                onChanged: (_) {},
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final fields = tester.widgetList<TextField>(find.byType(TextField));
+      expect(fields, hasLength(2));
+      final cost = tester.getSize(find.byType(TextField).first);
+      final copies = tester.getSize(find.byType(TextField).last);
+      expect(copies.height, cost.height);
+    });
+
+    testWidgets('does not step below min', (tester) async {
+      final controller = TextEditingController(text: '1');
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 280,
+            child: AppQuantityField(
+              label: 'Copies',
+              controller: controller,
+              decreaseTooltip: 'One fewer',
+              increaseTooltip: 'One more',
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byTooltip('One fewer'));
+      await tester.pump();
+      expect(controller.text, '1');
+    });
+  });
+
+  group('AppPositiveIntFormatter', () {
+    test('keeps digits and strips leading zeros', () {
+      const formatter = AppPositiveIntFormatter();
+      TextEditingValue apply(String text) => formatter.formatEditUpdate(
+        TextEditingValue.empty,
+        TextEditingValue(text: text),
+      );
+
+      expect(apply('12').text, '12');
+      expect(apply('012').text, '12');
+      expect(apply('abc').text, '');
+      expect(apply('1000').text, '');
+    });
+  });
+
   group('AppDropdownField', () {
     testWidgets('matches AppTextField control height', (tester) async {
       await tester.pumpWidget(
@@ -288,6 +409,72 @@ void main() {
         find.descendant(of: list, matching: find.text('NPR')),
         findsNothing,
       );
+    });
+
+    testWidgets('keeps a scrollbar thumb visible on a long menu', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 280,
+            child: AppDropdownField<String>(
+              label: 'Format',
+              value: 'Book',
+              items: const [
+                'Book',
+                'Journal',
+                'Magazine',
+                'Audiobook',
+                'Video',
+                'E-book',
+                'Other',
+              ],
+              itemLabel: (value) => value,
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(InputDecorator));
+      await tester.pumpAndSettle();
+
+      final bar = tester.widget<Scrollbar>(find.byType(Scrollbar));
+      expect(bar.thumbVisibility, isTrue);
+    });
+
+    testWidgets('invokes the footer action and closes the menu', (
+      tester,
+    ) async {
+      var adds = 0;
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 280,
+            child: AppDropdownField<String>(
+              label: 'Format',
+              value: 'Book',
+              items: const ['Book', 'Journal'],
+              itemLabel: (value) => value,
+              footerActionLabel: 'Add format',
+              onFooterAction: () => adds++,
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(InputDecorator));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Add format'), findsOneWidget);
+
+      await tester.tap(find.text('Add format'));
+      await tester.pumpAndSettle();
+
+      expect(adds, 1);
+      expect(find.text('Journal'), findsNothing);
     });
   });
 

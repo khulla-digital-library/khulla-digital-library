@@ -63,6 +63,7 @@ export 'src/widgets/app_page_body.dart';
 export 'src/widgets/app_pagination.dart';
 export 'src/widgets/app_picker_field.dart';
 export 'src/widgets/app_progress_bar.dart';
+export 'src/widgets/app_quantity_field.dart';
 export 'src/widgets/app_radio_field.dart';
 export 'src/widgets/app_responsive_grid.dart';
 export 'src/widgets/app_ripple.dart';

@@ -99,4 +99,4 @@ build-apk:
 # ── Git ─────────────────────────────────────────────────────────────────────
 
 pr:
-	git push && gh pr create --fill --base dev
+	git push && gh pr create --base dev

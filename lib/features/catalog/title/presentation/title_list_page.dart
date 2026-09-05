@@ -7,8 +7,8 @@ import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
 import 'package:khulla/features/catalog/title/domain/models/title.dart'
     as catalog;
-import 'package:khulla/features/catalog/title/presentation/cubit/title_cubit.dart';
-import 'package:khulla/features/catalog/title/presentation/cubit/title_state.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_cubit.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_state.dart';
 import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
 import 'package:khulla/features/catalog/title/presentation/title_list_refresh.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_card.dart';
@@ -64,88 +64,77 @@ class _TitleListPageState extends State<TitleListPage> {
 
   List<AppTableColumn<catalog.Title>> _columns(AppLocalizations l10n) {
     final scheme = context.colorScheme;
+    final muted = context.textTheme.bodyMedium?.copyWith(
+      color: scheme.onSurfaceVariant,
+    );
+    final smallMuted = context.textTheme.bodySmall?.copyWith(
+      color: scheme.onSurfaceVariant,
+    );
 
     return [
       AppTableColumn<catalog.Title>(
         id: 'title',
         label: l10n.titlesColumnTitle,
-        flex: 4,
+        flex: 3,
         sortable: true,
         cellBuilder: (context, title) => Row(
           children: [
-            AppIcon(
-              title.formatCode.formatIcon,
-              size: context.appSpacing.md,
-              color: scheme.onSurfaceVariant,
+            Expanded(
+              child: Text(
+                title.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            SizedBox(width: context.appSpacing.xs),
-            Flexible(child: Text(title.title)),
           ],
         ),
       ),
       AppTableColumn<catalog.Title>(
         id: 'author',
         label: l10n.titlesColumnAuthor,
-        flex: 3,
+        flex: 2,
         sortable: true,
-        showFrom: FormFactor.medium,
-        cellBuilder: (context, title) => Text(
-          title.author,
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: scheme.onSurfaceVariant,
-          ),
-        ),
+        cellBuilder: (context, title) => Text(title.author, style: muted),
       ),
       AppTableColumn<catalog.Title>(
         id: 'isbn',
         label: l10n.titlesColumnIsbn,
-        flex: 2,
-        showFrom: FormFactor.large,
-        cellBuilder: (context, title) => Text(
-          title.isbn ?? '',
-          style: context.textTheme.bodySmall?.copyWith(
-            color: scheme.onSurfaceVariant,
-          ),
-        ),
+        cellBuilder: (context, title) =>
+            Text(title.isbn ?? '', style: smallMuted),
       ),
       AppTableColumn<catalog.Title>(
-        id: 'shelf',
-        label: l10n.titlesColumnShelf,
+        id: 'publisher',
+        label: l10n.titlesColumnPublisher,
         flex: 2,
         sortable: true,
-        showFrom: FormFactor.expanded,
-        cellBuilder: (context, title) => Text(title.shelf ?? ''),
+        cellBuilder: (context, title) =>
+            Text(title.publisher ?? '', style: muted),
       ),
       AppTableColumn<catalog.Title>(
         id: 'year',
         label: l10n.titlesColumnYear,
-        width: 80,
         sortable: true,
         alignment: Alignment.centerRight,
-        showFrom: FormFactor.large,
         cellBuilder: (context, title) => Text(title.year),
       ),
       AppTableColumn<catalog.Title>(
         id: 'available',
+        flex: 2,
         label: l10n.titlesColumnAvailable,
-        width: 110,
         sortable: true,
         alignment: Alignment.centerRight,
-        showFrom: FormFactor.medium,
         cellBuilder: (context, title) => Text(
           l10n.titlesCopiesOf(
             '${title.availableCount}',
             '${title.copyCount}',
           ),
-          style: context.textTheme.bodySmall?.copyWith(
-            color: scheme.onSurfaceVariant,
-          ),
+          style: smallMuted,
         ),
       ),
       AppTableColumn<catalog.Title>(
         id: 'status',
         label: l10n.commonStatus,
-        width: 120,
+        width: 125,
         cellBuilder: (context, title) => AppStatusBadge(
           dense: true,
           label: title.availableCount > 0
@@ -202,10 +191,18 @@ class _TitleListPageState extends State<TitleListPage> {
               AppFilterChip(
                 label: l10n.statusAvailable,
                 icon: AppIcons.success,
-                tone: AppStatusTone.success,
                 selected: state.query.availableOnly,
                 onSelected: cubit.availableOnlyChanged,
               ),
+              if (formats.isNotEmpty)
+                SizedBox(
+                  height: context.appSpacing.lg,
+                  child: VerticalDivider(
+                    width: context.appSpacing.md,
+                    thickness: context.appBorders.hairline,
+                    color: context.appColors.hairline,
+                  ),
+                ),
               for (final format in formats)
                 AppFilterChip(
                   label: format.label(l10n),

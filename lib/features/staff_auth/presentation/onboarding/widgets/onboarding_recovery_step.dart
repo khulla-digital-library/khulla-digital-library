@@ -35,7 +35,6 @@ class OnboardingRecoveryStep extends StatelessWidget {
         filename: 'khulla-recovery-codes.txt',
         contents: RecoveryCode.fileContents(
           libraryName: state.libraryName.value,
-          email: state.email.value,
           codes: state.recoveryCodes,
         ),
       );
