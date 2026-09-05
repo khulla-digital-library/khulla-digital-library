@@ -1,4 +1,4 @@
-.PHONY: bootstrap install-sdk build migrate localize analyze format fix test check clean \
+.PHONY: bootstrap install-sdk build migrate db-diagram localize analyze format fix test check clean \
         db-web run-web run-windows run-linux build-web build-windows build-apk pr
 
 FLUTTER := fvm flutter
@@ -36,6 +36,11 @@ build:
 ## tests. Run after changing a table and bumping schemaVersion, before `build`.
 migrate:
 	$(DART) run drift_dev make-migrations
+
+## Regenerate the Mermaid ER diagram in docs/database/schema.md from the
+## latest drift schema snapshot. Run after `make migrate` / `make build`.
+db-diagram:
+	$(DART) tools/db_diagram.dart
 
 ## Regenerate AppLocalizations from lib/l10n/arb/.
 localize:

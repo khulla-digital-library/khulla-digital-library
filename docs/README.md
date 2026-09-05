@@ -57,6 +57,7 @@ See [`architecture/README.md`](architecture/README.md) for the full index and in
 
 - [`overview.md`](database/overview.md) — a walkthrough of every database file: what it does, why it's there, how it connects
 - [`guide.md`](database/guide.md) — how to add tables, write queries, run migrations, and remove things safely
+- [`schema.md`](database/schema.md) — the visual schema: generated Mermaid ER diagram (`make db-diagram`)
 
 ### `contributing/`
 

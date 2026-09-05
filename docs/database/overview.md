@@ -624,13 +624,12 @@ Feature Data Sources
 
 ---
 
-## ⚠️ Current State of the Schema
+## 🗺️ Current Schema
 
-The schema is currently **empty** — `allSchemaEntities => []`.
+The visual schema lives in [`schema.md`](schema.md) — a Mermaid ER diagram
+generated from the latest drift snapshot. Regenerate it with
+`make db-diagram` after `make migrate` / `make build`.
 
-No tables exist yet. The whole infrastructure is set up and ready. You just need to:
-1. Add table classes
-2. Register them in `@DriftDatabase(tables: [...])`
-3. Run `make migrate` / `build_runner build`
-
-The first real tables will likely be things like `Books`, `Members`, `Loans`, `Fines` as catalog sub-features land.
+It currently covers `library_settings` (single-row) and `staff` at
+`schemaVersion` 2. The next tables will likely be things like `Books`,
+`Members`, `Loans`, `Fines` as catalog sub-features land.

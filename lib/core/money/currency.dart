@@ -32,5 +32,4 @@ enum AppCurrency {
   };
 }
 
-
 //TODO(sawongam): Add a custom currency package later (will do later)
