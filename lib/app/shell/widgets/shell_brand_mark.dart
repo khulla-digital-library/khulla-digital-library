@@ -71,19 +71,6 @@ class ShellBrandMark extends StatelessWidget {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AppLogo.primary(height: spacing.xlg),
-        SizedBox(height: spacing.xxs),
-        Text(
-          l10n.appTagline,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: context.appTextStyles.micro.copyWith(color: colors.ink500),
-        ),
-      ],
-    );
+    return AppLogo.primaryFull(height: spacing.xlg + spacing.lg);
   }
 }

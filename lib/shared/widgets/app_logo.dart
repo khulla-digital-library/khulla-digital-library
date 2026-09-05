@@ -7,7 +7,14 @@ enum AppLogoVariant {
   /// Horizontal wordmark — `primary_logo.png`.
   primary,
 
+  /// Horizontal wordmark with a light background — `primary_light_logo.png`.
   primaryLight,
+
+  /// Horizontal full wordmark — `primary_full_logo.png`.
+  primaryFull,
+
+  /// Horizontal full wordmark with a light background — `primary_full_light_logo.png`.
+  primaryFullLight,
 
   /// Icon-only K mark — `submark_logo.png`.
   submark,
@@ -37,6 +44,14 @@ class AppLogo extends StatelessWidget {
   const AppLogo.primaryLight({this.height, this.width, super.key})
     : variant = AppLogoVariant.primaryLight;
 
+
+  const AppLogo.primaryFull({this.height, this.width, super.key})
+    : variant = AppLogoVariant.primaryFull;
+
+  /// Horizontal full wordmark with a light background at [height], width unconstrained.
+  const AppLogo.primaryFullLight({this.height, this.width, super.key})
+    : variant = AppLogoVariant.primaryFullLight;
+
   /// Square icon mark; [size] sets both [height] and [width].
   const AppLogo.submark({double? size, super.key})
     : variant = AppLogoVariant.submark,
@@ -50,6 +65,8 @@ class AppLogo extends StatelessWidget {
   AssetGenImage get _asset => switch (variant) {
     AppLogoVariant.primary => Assets.images.logos.primaryLogo,
     AppLogoVariant.primaryLight => Assets.images.logos.primaryLightLogo,
+    AppLogoVariant.primaryFull => Assets.images.logos.primaryFullLogo,
+    AppLogoVariant.primaryFullLight => Assets.images.logos.primaryFullLightLogo,
     AppLogoVariant.submark => Assets.images.logos.submarkLogo,
   };
 

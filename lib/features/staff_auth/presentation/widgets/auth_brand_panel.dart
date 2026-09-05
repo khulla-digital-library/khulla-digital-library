@@ -33,7 +33,7 @@ class AuthBrandPanel extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppLogo.primaryLight(height: spacing.xxlg),
+                AppLogo.primaryFullLight(height: spacing.xxlg + spacing.xxlg),
                 SizedBox(height: spacing.md),
                 Text(
                   l10n.authBrandTagline,

@@ -294,6 +294,32 @@ void main() {
     });
   });
 
+  group('AppEmptyView', () {
+    testWidgets('centers in the space its parent gives it', (tester) async {
+      const height = 400.0;
+
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(800, height)),
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: Scaffold(
+              body: const AppEmptyView(
+                icon: AppIcons.book,
+                title: 'No titles yet',
+                message: 'Catalogue the first work.',
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final body = tester.getRect(find.byType(Scaffold));
+      final title = tester.getRect(find.text('No titles yet'));
+      expect(title.center.dy, closeTo(body.center.dy, 48));
+    });
+  });
+
   testWidgets('AppDesignGallery builds every section without throwing', (
     tester,
   ) async {

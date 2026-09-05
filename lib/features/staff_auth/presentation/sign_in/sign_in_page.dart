@@ -104,7 +104,7 @@ class _SignInPageState extends State<SignInPage> with DisposeBag {
                 child: Text(l10n.signInAction),
               ),
               if (state.recoveryAvailabilityLoaded) ...[
-                SizedBox(height: spacing.xlg),
+                SizedBox(height: spacing.lg),
                 if (state.canRecoverPassword)
                   AuthSecondaryAction(
                     label: l10n.signInForgotPasswordAction,

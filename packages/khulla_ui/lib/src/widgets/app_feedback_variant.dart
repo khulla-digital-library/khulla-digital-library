@@ -17,3 +17,17 @@ enum AppFeedbackVariant {
   /// Whether this layout centers its content and shows an icon.
   bool get isCentered => this == AppFeedbackVariant.centered;
 }
+
+/// Fills the parent and centers [child] for [AppFeedbackVariant.centered].
+///
+/// Inline variants pass through unchanged — they sit inside a card that sizes
+/// to its content and has no spare vertical room to centre into.
+Widget wrapFeedbackVariant({
+  required AppFeedbackVariant variant,
+  required Widget child,
+}) {
+  if (variant.isCentered) {
+    return Align(child: child);
+  }
+  return child;
+}

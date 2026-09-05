@@ -4,7 +4,7 @@
     "@appName": {
         "description": "Core - application display name"
     },
-    "appTagline": "Open Digital Library",
+    "appTagline": "Digital Library",
     "@appTagline": {
         "description": "Core - one-line product description shown under the app name"
     },

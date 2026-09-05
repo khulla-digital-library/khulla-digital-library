@@ -140,7 +140,10 @@ class CollectionPageView<T> extends StatelessWidget {
                 slivers: [
                   for (final widget in head) SliverToBoxAdapter(child: widget),
                   if (items.isEmpty)
-                    SliverToBoxAdapter(child: table)
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: table,
+                    )
                   else
                     table,
                   if (end != null)

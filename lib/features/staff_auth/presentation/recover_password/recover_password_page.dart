@@ -135,7 +135,7 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage>
                 onPressed: _submit,
                 child: Text(l10n.recoverPasswordAction),
               ),
-              SizedBox(height: spacing.xlg),
+              SizedBox(height: spacing.lg),
               AuthSecondaryAction(
                 label: l10n.recoverPasswordBackToSignIn,
                 onTap: () => context.go(Routes.signIn),
