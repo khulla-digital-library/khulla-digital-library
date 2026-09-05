@@ -1,4 +1,5 @@
 import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/widgets/app_logo.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The brand half of the sign-in and onboarding screens.
@@ -32,15 +33,8 @@ class AuthBrandPanel extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const AuthBrandMark(onBrandSurface: true),
-                SizedBox(height: spacing.lg),
-                Text(
-                  l10n.appName,
-                  style: typography.displaySmall.copyWith(
-                    color: scheme.onPrimary,
-                  ),
-                ),
-                SizedBox(height: spacing.xs),
+                AppLogo.primary(height: spacing.lg),
+                SizedBox(height: spacing.md),
                 Text(
                   l10n.authBrandTagline,
                   style: typography.bodyLarge.copyWith(
@@ -75,42 +69,6 @@ class AuthBrandPanel extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// The app's mark: its icon in a rounded chip.
-///
-/// Takes [onBrandSurface] rather than reading the theme, because it sits on
-/// the brand panel in one place and on the page surface in another, and those
-/// two need opposite ink.
-class AuthBrandMark extends StatelessWidget {
-  const AuthBrandMark({this.onBrandSurface = false, super.key});
-
-  /// Whether the mark is drawn on the brand-colored panel.
-  final bool onBrandSurface;
-
-  @override
-  Widget build(BuildContext context) {
-    final spacing = context.appSpacing;
-    final colors = context.appColors;
-    final scheme = context.colorScheme;
-    final radius = context.appRadius;
-    final metrics = context.appMetrics;
-
-    return Container(
-      padding: EdgeInsets.all(spacing.sm),
-      decoration: BoxDecoration(
-        color: onBrandSurface
-            ? scheme.onPrimary.withValues(alpha: 0.12)
-            : colors.brandSoft,
-        borderRadius: BorderRadius.circular(radius.container),
-      ),
-      child: AppIcon(
-        AppIcons.library,
-        size: metrics.iconLarge,
-        color: onBrandSurface ? scheme.onPrimary : colors.brand,
       ),
     );
   }

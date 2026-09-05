@@ -85,7 +85,6 @@ dev_dependencies:
 
   # Monorepo tooling (config in melos.yaml — not pub workspaces)
   melos: ^6.3.2
-  icons_launcher: ^3.1.0
 
 # FlutterGen code generation for assets, fonts and colors.
 # Generated output lives in lib/gen/ and is regenerated via:
@@ -103,5 +102,5 @@ flutter:
 
   # Assets
   assets:
-    - assets/icons/
     - assets/images/
+    - assets/images/logos/

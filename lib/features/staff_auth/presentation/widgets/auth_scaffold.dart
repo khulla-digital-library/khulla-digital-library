@@ -1,4 +1,5 @@
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_brand_panel.dart';
+import 'package:khulla/shared/widgets/app_logo.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The page chrome sign-in and onboarding share.
@@ -72,9 +73,9 @@ class _AuthContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (showMark) ...[
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
-                    child: AuthBrandMark(),
+                    child: AppLogo.primary(height: spacing.lg),
                   ),
                   SizedBox(height: spacing.lg),
                 ],
