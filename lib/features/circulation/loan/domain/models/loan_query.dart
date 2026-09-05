@@ -16,8 +16,8 @@ abstract class LoanQuery with _$LoanQuery {
     String? titleId,
     LoanStatus? status,
     @Default(false) bool openOnly,
-    @Default('dueAt') String sortColumn,
-    @Default(true) bool sortAscending,
+    @Default('checkedOutAt') String sortColumn,
+    @Default(false) bool sortAscending,
     @Default(0) int offset,
     @Default(50) int limit,
   }) = _LoanQuery;

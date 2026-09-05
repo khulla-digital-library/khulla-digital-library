@@ -1,7 +1,6 @@
 import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
-import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_author.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_copy.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_title.dart';
 
@@ -329,66 +328,6 @@ const List<CatalogCopy> placeholderCopies = [
   ),
 ];
 
-/// The authors credited across [placeholderTitles].
-const List<CatalogAuthor> placeholderAuthors = [
-  CatalogAuthor(
-    id: 'a-1',
-    name: 'Narayan Wagle',
-    titleCount: 3,
-    lifespan: 'b. 1968',
-    nationality: 'Nepali',
-    biography:
-        'Journalist and novelist, long-time editor of a Kathmandu daily, whose '
-        'first novel became one of the best-selling Nepali books of its decade.',
-  ),
-  CatalogAuthor(
-    id: 'a-2',
-    name: 'Chinua Achebe',
-    titleCount: 5,
-    lifespan: '1930 – 2013',
-    nationality: 'Nigerian',
-    biography:
-        'Novelist, poet and critic, whose first novel is among the most widely '
-        'read works of African literature.',
-  ),
-  CatalogAuthor(
-    id: 'a-3',
-    name: 'Laxmi Prasad Devkota',
-    titleCount: 12,
-    lifespan: '1909 – 1959',
-    nationality: 'Nepali',
-    biography:
-        'Poet, essayist and playwright, known in Nepal as Mahakavi — the great '
-        'poet — for a body of work written largely in the last decade of his life.',
-  ),
-  CatalogAuthor(
-    id: 'a-4',
-    name: 'Thomas H. Cormen',
-    titleCount: 2,
-    lifespan: 'b. 1956',
-    nationality: 'American',
-    biography:
-        'Computer scientist and co-author of a standard algorithms text.',
-  ),
-  CatalogAuthor(
-    id: 'a-5',
-    name: 'Yuval Noah Harari',
-    titleCount: 4,
-    lifespan: 'b. 1976',
-    nationality: 'Israeli',
-  ),
-  CatalogAuthor(
-    id: 'a-6',
-    name: 'Stephen Hawking',
-    titleCount: 6,
-    lifespan: '1942 – 2018',
-    nationality: 'British',
-    biography:
-        'Theoretical physicist and cosmologist whose popular science writing '
-        'reached an audience far beyond the field.',
-  ),
-];
-
 /// Copies belonging to [titleId], as the title's detail pane needs them.
 List<CatalogCopy> placeholderCopiesOf(String titleId) => [
   for (final copy in placeholderCopies)
@@ -401,10 +340,4 @@ List<CatalogCopy> placeholderCopiesOf(String titleId) => [
 CatalogTitle placeholderTitleById(String id) => placeholderTitles.firstWhere(
   (title) => title.id == id,
   orElse: () => placeholderTitles.first,
-);
-
-/// The author behind an id, with the same fallback as [placeholderTitleById].
-CatalogAuthor placeholderAuthorById(String id) => placeholderAuthors.firstWhere(
-  (author) => author.id == id,
-  orElse: () => placeholderAuthors.first,
 );

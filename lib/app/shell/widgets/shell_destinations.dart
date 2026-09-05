@@ -68,7 +68,6 @@ List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
     children: [
       ShellChild(label: l10n.navCatalogTitles, route: Routes.catalogTitles),
       ShellChild(label: l10n.navCatalogCopies, route: Routes.catalogCopies),
-      ShellChild(label: l10n.navCatalogAuthors, route: Routes.catalogAuthors),
       ShellChild(label: l10n.navCatalogLabels, route: Routes.catalogLabels),
     ],
   ),

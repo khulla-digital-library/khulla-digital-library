@@ -34,6 +34,15 @@ class AppPositiveIntFormatter extends TextInputFormatter {
   }
 }
 
+/// How tall the minus/plus control is relative to a text field.
+enum AppQuantityFieldSize {
+  /// Matches [AppMetrics.fieldHeight] — sits beside a text field in a form row.
+  regular,
+
+  /// A tighter control for short prompts and dialogs.
+  small,
+}
+
 /// {@template app_quantity_field}
 /// A whole-number field with minus and plus at the ends.
 ///
@@ -56,6 +65,7 @@ class AppQuantityField extends StatefulWidget {
     this.min = 1,
     this.max = 999,
     this.enabled = true,
+    this.size = AppQuantityFieldSize.regular,
   });
 
   /// External label shown above the field.
@@ -89,6 +99,9 @@ class AppQuantityField extends StatefulWidget {
   /// Whether the field accepts input.
   final bool enabled;
 
+  /// [regular] matches a text field; [small] fits a short dialog.
+  final AppQuantityFieldSize size;
+
   @override
   State<AppQuantityField> createState() => _AppQuantityFieldState();
 }
@@ -116,8 +129,8 @@ class _AppQuantityFieldState extends State<AppQuantityField> {
 
   void _step(int delta) {
     final current = _parsed(widget.controller.text);
-    final next = (current ?? (delta > 0 ? widget.min - 1 : widget.min + 1)) +
-        delta;
+    final next =
+        (current ?? (delta > 0 ? widget.min - 1 : widget.min + 1)) + delta;
     final clamped = next.clamp(widget.min, widget.max);
     final text = clamped.toString();
     _focus.unfocus();
@@ -134,10 +147,19 @@ class _AppQuantityFieldState extends State<AppQuantityField> {
     final spacing = context.appSpacing;
     final colors = context.appColors;
     final metrics = context.appMetrics;
-    final numeric = context.appTextStyles.numeric.copyWith(color: colors.ink100);
+    final numeric = context.appTextStyles.numeric.copyWith(
+      color: colors.ink100,
+    );
     final error = widget.errorText;
     final fieldLabel = widget.label;
-    final width = metrics.fieldHeight * 3;
+    final controlHeight = switch (widget.size) {
+      AppQuantityFieldSize.small => metrics.iconButtonSmall,
+      AppQuantityFieldSize.regular => metrics.fieldHeight,
+    };
+    final width = switch (widget.size) {
+      AppQuantityFieldSize.small => metrics.iconButtonSmall * 2.75,
+      AppQuantityFieldSize.regular => metrics.fieldHeight * 3,
+    };
     final focused = _focus.hasFocus;
 
     return SizedBox(
@@ -155,10 +177,12 @@ class _AppQuantityFieldState extends State<AppQuantityField> {
           ],
           ConstrainedBox(
             key: const ValueKey('app_quantity_control'),
-            constraints: BoxConstraints.tightFor(height: metrics.fieldHeight),
+            constraints: BoxConstraints.tightFor(height: controlHeight),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(context.appRadius.container),
+                borderRadius: BorderRadius.circular(
+                  context.appRadius.container,
+                ),
                 border: Border.all(
                   color: colors.hairline,
                   width: context.appBorders.hairline,

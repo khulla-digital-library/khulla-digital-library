@@ -35,7 +35,9 @@ class TitleCopiesCard extends StatelessWidget {
     return SectionCard(
       title: l10n.titleDetailCopiesTitle,
       subtitle: l10n.titleDetailCopiesSubtitle,
-      trailing: AppTextButton(
+      trailing: AppButton(
+        variant: AppButtonVariant.outline,
+        icon: AppIcons.add,
         onPressed: onAddCopy,
         child: Text(l10n.titleDetailAddCopy),
       ),
@@ -44,8 +46,6 @@ class TitleCopiesCard extends StatelessWidget {
               variant: AppFeedbackVariant.inline,
               title: l10n.titleDetailCopiesEmptyTitle,
               message: l10n.titleDetailCopiesEmptyBody,
-              actionLabel: l10n.titleDetailAddCopy,
-              onAction: onAddCopy,
             )
           : AppTable<Copy>(
               items: copies,

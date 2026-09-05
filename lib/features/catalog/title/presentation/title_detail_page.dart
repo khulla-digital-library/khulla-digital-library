@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/feedback/app_toast.dart';
+import 'package:khulla/core/lifecycle/dispose_bag.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
 import 'package:khulla/features/catalog/title/presentation/cubit/title/title_detail_cubit.dart';
@@ -13,7 +14,6 @@ import 'package:khulla/features/catalog/title/presentation/widgets/title_copies_
 import 'package:khulla/features/catalog/title/presentation/widgets/title_detail_header.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_details_card.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_history_card.dart';
-import 'package:khulla/features/circulation/reservation/presentation/place_hold_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
@@ -29,8 +29,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// is still inside the catalogue.
 ///
 /// [TitleDetailCubit] loads the title, its copies and closed loans for
-/// [TitleHistoryCard]. Edit, delete, add-copy, place hold and copy maintenance
-/// are wired; print labels still toast as not wired.
+/// [TitleHistoryCard]. Edit, delete, add-copy and copy maintenance are wired;
+/// print labels still toast as not wired.
 class TitleDetailPage extends StatelessWidget {
   const TitleDetailPage({required this.titleId, super.key});
 
@@ -56,18 +56,31 @@ class TitleDetailPage extends StatelessWidget {
     }
   }
 
+  Future<int?> _promptAddCopyCount(BuildContext context) {
+    return AppFormModal.show<int>(
+      context: context,
+      builder: (_) => const _AddCopyCountDialog(),
+    );
+  }
+
   Future<void> _addCopy(BuildContext context, TitleDetailState state) async {
     final title = state.title;
     if (title == null) return;
     final l10n = context.l10n;
+    final count = await _promptAddCopyCount(context);
+    if (!context.mounted || count == null) return;
     try {
-      await context.read<TitleDetailCubit>().addCopy(
+      await context.read<TitleDetailCubit>().addCopies(
         titleId,
         title.title,
+        count: count,
         shelf: title.shelf,
       );
       if (!context.mounted) return;
-      AppToast.success(context, message: l10n.titleDetailAddCopy);
+      AppToast.success(
+        context,
+        message: l10n.titleDetailAddCopySuccess(count),
+      );
     } on AppException catch (error) {
       if (!context.mounted) return;
       AppToast.error(context, message: error.localizedMessage(l10n));
@@ -78,15 +91,6 @@ class TitleDetailPage extends StatelessWidget {
     final saved = await TitleFormDialog.show(context, titleId: titleId);
     if (saved == true && context.mounted) {
       unawaited(context.read<TitleDetailCubit>().loadTitle(titleId));
-    }
-  }
-
-  Future<void> _placeHold(BuildContext context) async {
-    final l10n = context.l10n;
-    final saved = await PlaceHoldDialog.show(context, titleId: titleId);
-    if (saved == true && context.mounted) {
-      unawaited(context.read<TitleDetailCubit>().loadTitle(titleId));
-      AppToast.success(context, message: l10n.placeHoldSuccess);
     }
   }
 
@@ -210,25 +214,9 @@ class TitleDetailPage extends StatelessWidget {
                   children: [
                     TitleDetailHeader(
                       title: title,
+                      onBack: () => context.go(Routes.catalogTitles),
                       onEdit: () => unawaited(_edit(context)),
-                      menuActions: [
-                        AppMenuAction(
-                          label: l10n.titleDetailAddCopy,
-                          icon: AppIcons.addCircle,
-                          onSelected: () => unawaited(_addCopy(context, state)),
-                        ),
-                        AppMenuAction(
-                          label: l10n.titleDetailPlaceHold,
-                          icon: AppIcons.addBookmark,
-                          onSelected: () => unawaited(_placeHold(context)),
-                        ),
-                        AppMenuAction(
-                          label: l10n.titleDetailDelete,
-                          icon: AppIcons.delete,
-                          isDestructive: true,
-                          onSelected: () => unawaited(_confirmDelete(context)),
-                        ),
-                      ],
+                      onDelete: () => unawaited(_confirmDelete(context)),
                     ),
                     SizedBox(height: spacing.md),
                     if (twoPane)
@@ -282,6 +270,67 @@ class TitleDetailPage extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _AddCopyCountDialog extends StatefulWidget {
+  const _AddCopyCountDialog();
+
+  @override
+  State<_AddCopyCountDialog> createState() => _AddCopyCountDialogState();
+}
+
+class _AddCopyCountDialogState extends State<_AddCopyCountDialog>
+    with DisposeBag {
+  late final TextEditingController _controller = textController('1');
+  String? _errorText;
+
+  void _submit() {
+    final count = int.tryParse(_controller.text);
+    if (count == null || count < 1) {
+      setState(() => _errorText = context.l10n.validationCopiesMin);
+      return;
+    }
+    Navigator.of(context).pop(count);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return AppFormModal(
+      title: l10n.titleDetailAddCopyDialogTitle,
+      description: l10n.titleDetailAddCopyDialogBody,
+      width: AppDialogWidth.sm,
+      actions: [
+        AppDialog.secondaryAction(
+          context: context,
+          label: l10n.commonCancel,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        AppDialog.primaryAction(
+          context: context,
+          label: l10n.commonAdd,
+          onPressed: _submit,
+        ),
+      ],
+      children: [
+        AppQuantityField(
+          label: l10n.titleDetailAddCopyCount,
+          required: true,
+          size: AppQuantityFieldSize.small,
+          controller: _controller,
+          errorText: _errorText,
+          decreaseTooltip: l10n.commonDecrease,
+          increaseTooltip: l10n.commonIncrease,
+          onChanged: (_) {
+            if (_errorText != null) {
+              setState(() => _errorText = null);
+            }
+          },
+        ),
+      ],
     );
   }
 }

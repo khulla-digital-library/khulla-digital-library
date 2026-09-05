@@ -26,6 +26,9 @@ enum AppButtonVariant {
   /// A confirming action that is not the page's primary — "Mark returned".
   success,
 
+  /// A positive secondary action drawn as an outline — "Add a copy".
+  successOutline,
+
   /// Inline navigation inside a sentence. Reads as a link, not a control.
   link,
 }
@@ -279,6 +282,14 @@ class _AppButtonState extends State<AppButton> {
         foreground: colors.onSuccess,
         border: colors.success.withValues(alpha: 0.7),
         ripple: colors.secondary,
+        ring: colors.success,
+      ),
+      AppButtonVariant.successOutline => _ButtonStyle(
+        fill: Colors.transparent,
+        hoverFill: tints.successHover,
+        foreground: colors.success,
+        border: colors.success,
+        ripple: colors.success.withValues(alpha: 0.2),
         ring: colors.success,
       ),
       AppButtonVariant.link => _ButtonStyle(

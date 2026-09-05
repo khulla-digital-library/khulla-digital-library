@@ -35,12 +35,11 @@ abstract final class Routes {
   /// Dashboard: the shift's starting point — counts, activity, quick actions.
   static const String dashboard = '/dashboard';
 
-  /// Catalogue: titles, copies, authors, subjects.
+  /// Catalogue: titles, copies, labels.
   static const String catalog = '/catalog';
 
   static const String titlesSegment = 'titles';
   static const String copiesSegment = 'copies';
-  static const String authorsSegment = 'authors';
   static const String idSegment = ':id';
 
   /// Every work the library holds.
@@ -52,17 +51,11 @@ abstract final class Routes {
   /// Every physical item, across every title.
   static const String catalogCopies = '$catalog/$copiesSegment';
 
-  /// The people and organisations credited on a title.
-  static const String catalogAuthors = '$catalog/$authorsSegment';
-
   /// The label and barcode desk.
   static const String catalogLabels = '$catalog/$labelsSegment';
 
   /// One title's record.
   static String catalogTitle(String id) => '$catalogTitles/$id';
-
-  /// One author's record.
-  static String catalogAuthor(String id) => '$catalogAuthors/$id';
 
   /// Circulation: checkouts, returns, reservations, overdues.
   static const String circulation = '/circulation';

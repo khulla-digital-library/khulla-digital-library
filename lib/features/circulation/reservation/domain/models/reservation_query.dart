@@ -16,7 +16,7 @@ abstract class ReservationQuery with _$ReservationQuery {
     ReservationStatus? status,
     @Default(true) bool activeOnly,
     @Default('placedAt') String sortColumn,
-    @Default(true) bool sortAscending,
+    @Default(false) bool sortAscending,
     @Default(0) int offset,
     @Default(50) int limit,
   }) = _ReservationQuery;

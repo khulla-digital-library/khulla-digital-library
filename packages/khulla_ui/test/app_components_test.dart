@@ -220,8 +220,51 @@ void main() {
       );
 
       final cost = tester.getSize(find.byType(TextField).first);
-      final copies = tester.getSize(find.byKey(const ValueKey('app_quantity_control')));
+      final copies = tester.getSize(
+        find.byKey(const ValueKey('app_quantity_control')),
+      );
       expect(copies.height, cost.height);
+    });
+
+    testWidgets('small size is shorter than regular', (tester) async {
+      final smallController = TextEditingController(text: '1');
+      final regularController = TextEditingController(text: '1');
+      addTearDown(smallController.dispose);
+      addTearDown(regularController.dispose);
+
+      await tester.pumpWidget(
+        _host(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppQuantityField(
+                label: 'Copies',
+                size: AppQuantityFieldSize.small,
+                controller: smallController,
+                decreaseTooltip: 'One fewer',
+                increaseTooltip: 'One more',
+                onChanged: (_) {},
+              ),
+              AppQuantityField(
+                label: 'Copies',
+                controller: regularController,
+                decreaseTooltip: 'One fewer',
+                increaseTooltip: 'One more',
+                onChanged: (_) {},
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final controls = tester.widgetList<ConstrainedBox>(
+        find.byKey(const ValueKey('app_quantity_control')),
+      );
+      expect(controls.length, 2);
+      expect(
+        controls.first.constraints.maxHeight,
+        lessThan(controls.last.constraints.maxHeight),
+      );
     });
 
     testWidgets('does not step below min', (tester) async {

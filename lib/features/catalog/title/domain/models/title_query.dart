@@ -13,8 +13,8 @@ abstract class TitleQuery with _$TitleQuery {
     @Default('') String search,
     String? formatId,
     @Default(false) bool availableOnly,
-    @Default('title') String sortColumn,
-    @Default(true) bool sortAscending,
+    @Default('createdAt') String sortColumn,
+    @Default(false) bool sortAscending,
     @Default(0) int offset,
     @Default(8) int limit,
   }) = _TitleQuery;

@@ -8,8 +8,6 @@ import 'package:khulla/core/config/app_config.dart';
 import 'package:khulla/core/di/injection.dart';
 import 'package:khulla/core/router/go_router_refresh_stream.dart';
 import 'package:khulla/core/router/routes.dart';
-import 'package:khulla/features/catalog/author/presentation/author_detail_page.dart';
-import 'package:khulla/features/catalog/author/presentation/author_list_page.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_list_page.dart';
 import 'package:khulla/features/catalog/copy/presentation/cubit/copy_cubit.dart';
 import 'package:khulla/features/catalog/copy/presentation/label_print_page.dart';
@@ -170,18 +168,6 @@ class AppRouter {
                     GoRoute(
                       path: Routes.labelsSegment,
                       builder: (context, _) => const LabelPrintPage(),
-                    ),
-                    GoRoute(
-                      path: Routes.authorsSegment,
-                      builder: (context, _) => const AuthorListPage(),
-                      routes: [
-                        GoRoute(
-                          path: Routes.idSegment,
-                          builder: (context, state) => AuthorDetailPage(
-                            authorId: state.pathParameters['id'] ?? '',
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),

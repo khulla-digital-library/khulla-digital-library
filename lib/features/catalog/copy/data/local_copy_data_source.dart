@@ -55,7 +55,8 @@ class LocalCopyDataSource implements CopyLocalDataSource {
         'title' => 't.title ${query.sortAscending ? 'ASC' : 'DESC'}',
         'shelf' => 'c.shelf ${query.sortAscending ? 'ASC' : 'DESC'}',
         'status' => 'c.status ${query.sortAscending ? 'ASC' : 'DESC'}',
-        _ => 'c.barcode ${query.sortAscending ? 'ASC' : 'DESC'}',
+        'barcode' => 'c.barcode ${query.sortAscending ? 'ASC' : 'DESC'}',
+        _ => 'c.created_at ${query.sortAscending ? 'ASC' : 'DESC'}',
       };
 
       final countSql =

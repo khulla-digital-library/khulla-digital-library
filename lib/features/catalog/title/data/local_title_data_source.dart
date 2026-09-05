@@ -95,7 +95,8 @@ LIMIT ? OFFSET ?''';
       'year' => 't.published_year $dir',
       'copies' => 'copy_count $dir',
       'available' => 'available_count $dir',
-      _ => 't.title $dir',
+      'title' => 't.title $dir',
+      _ => 't.created_at $dir',
     };
   }
 

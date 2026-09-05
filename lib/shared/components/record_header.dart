@@ -19,6 +19,7 @@ class RecordHeader extends StatelessWidget {
     required this.actions,
     this.subtitle,
     this.initials,
+    this.leading,
     this.facts = const [],
     this.badges = const [],
     this.note,
@@ -34,6 +35,10 @@ class RecordHeader extends StatelessWidget {
   /// Initials for the leading avatar. Null draws no avatar — a book has no
   /// face, and a two-letter circle beside a title is decoration.
   final String? initials;
+
+  /// A control before the identity block — typically a back chevron on a
+  /// detail screen the operator drilled into from a list.
+  final Widget? leading;
 
   /// Identifying facts, already formatted and localized, joined into one
   /// muted line.
@@ -55,6 +60,7 @@ class RecordHeader extends StatelessWidget {
     final avatar = initials;
     final caption = subtitle;
     final remark = note;
+    final back = leading;
 
     final identity = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,16 +99,17 @@ class RecordHeader extends StatelessWidget {
       ],
     );
 
-    final lead = avatar == null
-        ? identity
-        : Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AppAvatar(initials: avatar, size: 52),
-              SizedBox(width: spacing.md),
-              Expanded(child: identity),
-            ],
-          );
+    final lead = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (back != null) ...[back, SizedBox(width: spacing.sm)],
+        if (avatar != null) ...[
+          AppAvatar(initials: avatar, size: 52),
+          SizedBox(width: spacing.md),
+        ],
+        Expanded(child: identity),
+      ],
+    );
 
     final compact = context.formFactor.isCompact;
 

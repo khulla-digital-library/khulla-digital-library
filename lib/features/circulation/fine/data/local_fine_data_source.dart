@@ -119,6 +119,7 @@ LIMIT ? OFFSET ?
       'memberName' => 'm.full_name $dir',
       'assessed' => 'f.assessed $dir',
       'outstanding' => '(f.assessed - f.paid - f.waived) $dir',
+      'raisedAt' => 'f.raised_at $dir',
       _ => 'f.raised_at $dir',
     };
   }

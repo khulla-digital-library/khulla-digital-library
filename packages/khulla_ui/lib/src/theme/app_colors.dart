@@ -412,6 +412,9 @@ extension type AppTints(AppColors _c) {
   /// The hover fill under a destructive action.
   Color get destructiveHover => _c.danger.withValues(alpha: 0.1);
 
+  /// The hover fill under a positive outlined action.
+  Color get successHover => _c.success.withValues(alpha: 0.1);
+
   /// The switch track when on.
   Color get switchTrackOn => _c.accent.withValues(alpha: 0.3);
 

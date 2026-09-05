@@ -250,9 +250,30 @@
     "titleDetailHistorySubtitle": "Who has borrowed this work, most recent first",
     "titleDetailHistoryEmptyTitle": "Never borrowed",
     "titleDetailHistoryEmptyBody": "Checkouts of this title will be listed here.",
-    "titleDetailEdit": "Edit title",
+    "titleDetailEdit": "Edit {title}",
+    "@titleDetailEdit": {
+        "description": "Catalogue - primary action on a title's detail screen",
+        "placeholders": {
+            "title": {
+                "type": "String",
+                "example": "Pride and Prejudice"
+            }
+        }
+    },
     "titleDetailAddCopy": "Add a copy",
-    "titleDetailPlaceHold": "Place a hold",
+    "titleDetailAddCopyDialogTitle": "Add copies",
+    "titleDetailAddCopyDialogBody": "How many copies should be added to this title?",
+    "titleDetailAddCopyCount": "Copies to add",
+    "titleDetailAddCopySuccess": "Added {count} copies",
+    "@titleDetailAddCopySuccess": {
+        "description": "Catalogue - toast after adding one or more copies from the detail screen",
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "3"
+            }
+        }
+    },
     "titleDetailDelete": "Delete title",
     "titleDetailDeleteTitle": "Delete this title?",
     "titleDetailDeleteBody": "The title and every copy under it are removed from the catalogue. Loan history is kept.",

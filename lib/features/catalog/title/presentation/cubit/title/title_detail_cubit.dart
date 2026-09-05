@@ -18,7 +18,7 @@ import 'package:khulla/shared/models/load_status.dart';
 /// Page-scoped `@injectable` cubit for the title detail page. Pulls the title
 /// from [TitleRepository], copies from [CopyRepository], and returned loans
 /// from [CirculationRepository]. Reads emit into state; writes ([removeTitle],
-/// [addCopy]) rethrow so the gesture can toast.
+/// [addCopies]) rethrow so the gesture can toast.
 @injectable
 class TitleDetailCubit extends Cubit<TitleDetailState> {
   TitleDetailCubit(this._titles, this._copies, this._circulation)
@@ -75,18 +75,21 @@ class TitleDetailCubit extends Cubit<TitleDetailState> {
     await _titles.removeTitle(id);
   }
 
-  /// Adds a copy and reloads the detail pane. Rethrows on failure.
-  Future<void> addCopy(
+  /// Adds [count] copies and reloads the detail pane. Rethrows on failure.
+  Future<void> addCopies(
     String titleId,
     String titleName, {
+    required int count,
     String? shelf,
   }) async {
-    await _copies.addCopy(
-      titleId: titleId,
-      titleName: titleName,
-      shelf: shelf,
-    );
-    if (isClosed) return;
+    for (var index = 0; index < count; index++) {
+      await _copies.addCopy(
+        titleId: titleId,
+        titleName: titleName,
+        shelf: shelf,
+      );
+      if (isClosed) return;
+    }
     await loadTitle(titleId);
   }
 

@@ -137,11 +137,12 @@ LIMIT ? OFFSET ?
   String _orderClause(LoanQuery query) {
     final dir = query.sortAscending ? 'ASC' : 'DESC';
     return switch (query.sortColumn) {
+      'dueAt' => 'l.due_at $dir',
       'checkedOutAt' => 'l.checked_out_at $dir',
       'memberName' => 'm.full_name $dir',
       'titleName' => 't.title $dir',
       'barcode' => 'c.barcode $dir',
-      _ => 'l.due_at $dir',
+      _ => 'l.checked_out_at $dir',
     };
   }
 

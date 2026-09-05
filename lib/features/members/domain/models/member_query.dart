@@ -15,8 +15,8 @@ abstract class MemberQuery with _$MemberQuery {
     @Default(false) bool owesFines,
     @Default(false) bool suspended,
     @Default(false) bool expiring,
-    @Default('name') String sortColumn,
-    @Default(true) bool sortAscending,
+    @Default('createdAt') String sortColumn,
+    @Default(false) bool sortAscending,
     @Default(0) int offset,
     @Default(8) int limit,
   }) = _MemberQuery;

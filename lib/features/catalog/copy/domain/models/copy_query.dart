@@ -13,8 +13,8 @@ abstract class CopyQuery with _$CopyQuery {
     @Default('') String search,
     String? titleId,
     @Default(<CopyStatus>{}) Set<CopyStatus> statuses,
-    @Default('barcode') String sortColumn,
-    @Default(true) bool sortAscending,
+    @Default('createdAt') String sortColumn,
+    @Default(false) bool sortAscending,
     @Default(0) int offset,
     @Default(8) int limit,
   }) = _CopyQuery;

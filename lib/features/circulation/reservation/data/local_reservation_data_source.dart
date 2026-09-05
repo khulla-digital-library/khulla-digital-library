@@ -111,6 +111,7 @@ LIMIT ? OFFSET ?
       'memberName' => 'm.full_name $dir',
       'queuePosition' => 'queue_position $dir',
       'status' => 'r.status $dir',
+      'placedAt' => 'r.placed_at $dir',
       _ => 'r.placed_at $dir',
     };
   }

@@ -131,7 +131,8 @@ LIMIT ? OFFSET ?
       'fines' => 'fines_owed $dir',
       'joined' => 'm.joined_at $dir',
       'expires' => 'm.expires_at $dir',
-      _ => 'm.full_name $dir',
+      'name' => 'm.full_name $dir',
+      _ => 'm.created_at $dir',
     };
   }
 

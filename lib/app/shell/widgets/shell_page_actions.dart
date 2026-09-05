@@ -11,7 +11,6 @@ import 'package:khulla/features/circulation/reservation/presentation/place_hold_
 import 'package:khulla/features/circulation/reservation/presentation/reservation_list_refresh.dart';
 import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// What the top bar offers for a given location.
@@ -70,9 +69,6 @@ List<Widget> shellPageActions(
           }
         },
       ),
-    ],
-    _ when Routes.isUnder(location, Routes.catalogAuthors) => [
-      primary(l10n.authorsAdd, AppIcons.add, () => showNotWiredToast(context)),
     ],
     _ when Routes.isUnder(location, Routes.circulationReservations) => [
       modal(
