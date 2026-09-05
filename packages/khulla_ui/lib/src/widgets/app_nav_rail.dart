@@ -70,22 +70,8 @@ class _AppNavRailState extends State<AppNavRail> {
   @override
   void initState() {
     super.initState();
-    _expandAllWithChildren();
-  }
-
-  @override
-  void didUpdateWidget(covariant AppNavRail oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.destinations.length != widget.destinations.length) {
-      _expandAllWithChildren();
-    }
-  }
-
-  void _expandAllWithChildren() {
     for (final (index, destination) in widget.destinations.indexed) {
-      if (destination.expandable && destination.children.isNotEmpty) {
-        _expanded.add(index);
-      }
+      if (destination.children.isNotEmpty) _expanded.add(index);
     }
   }
 
@@ -136,24 +122,15 @@ class _AppNavRailState extends State<AppNavRail> {
                     selected:
                         index == widget.selectedIndex &&
                         !destination.children.any((child) => child.selected),
-                    expanded:
-                        _expanded.contains(index) ||
-                        (destination.expandable &&
-                            destination.children.any(
-                              (child) => child.selected,
-                            )),
+                    expanded: _expanded.contains(index),
                     onTap: () {
-                      widget.onDestinationSelected(index);
-                      if (extended &&
-                          destination.expandable &&
-                          destination.children.isNotEmpty) {
+                      if (extended && destination.children.isNotEmpty) {
                         _toggle(index);
+                        return;
                       }
+                      widget.onDestinationSelected(index);
                     },
-                    onToggle:
-                        !destination.expandable ||
-                            destination.children.isEmpty ||
-                            !extended
+                    onToggle: destination.children.isEmpty || !extended
                         ? null
                         : () => _toggle(index),
                   ),
@@ -256,7 +233,7 @@ class _RailItem extends StatelessWidget {
                       SizedBox(width: spacing.xs),
                       _RailBadge(label: count, selected: selected),
                     ],
-                    if (destination.expandable && onToggle != null) ...[
+                    if (onToggle != null) ...[
                       SizedBox(width: spacing.xxs),
                       AnimatedRotation(
                         duration: context.appMotion.overlay,
@@ -284,10 +261,7 @@ class _RailItem extends StatelessWidget {
           );
 
     final children = destination.children;
-    final showChildren =
-        extended &&
-        children.isNotEmpty &&
-        (!destination.expandable || expanded);
+    final showChildren = extended && expanded && children.isNotEmpty;
 
     return Padding(
       padding: EdgeInsets.only(bottom: spacing.xs),

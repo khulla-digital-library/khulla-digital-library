@@ -11,7 +11,6 @@ class AppNavDestination {
     required this.label,
     this.badge,
     this.children = const [],
-    this.expandable = false,
   });
 
   /// The destination's glyph.
@@ -31,10 +30,6 @@ class AppNavDestination {
   /// The sections nested under this one, revealed when the rail is extended
   /// and this destination is expanded. Empty means a leaf destination.
   final List<AppNavChild> children;
-
-  /// Whether tapping the row expands and collapses [children]. When false,
-  /// children stay visible whenever the rail is extended.
-  final bool expandable;
 }
 
 /// One row nested under an [AppNavDestination] in an extended rail.

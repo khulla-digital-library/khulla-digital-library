@@ -43,6 +43,8 @@ dependencies:
   # Password hashing for local accounts. Pure Dart (a jBCrypt port), so
   # it runs identically on desktop, mobile and web — no FFI, no native build.
   bcrypt: ^1.2.0
+  crypto: ^3.0.7
+  file_selector: ^1.0.3
 
   # Stable record identifiers, generated on the device.
   uuid: ^4.5.1

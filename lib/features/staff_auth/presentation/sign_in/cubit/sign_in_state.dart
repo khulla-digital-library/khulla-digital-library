@@ -17,6 +17,10 @@ abstract class SignInState with _$SignInState {
     /// Distinct from [error], which means the catalogue could not be read at
     /// all — one is the operator's problem, the other is the machine's.
     @Default(false) bool credentialsRejected,
+
+    /// Whether unused recovery codes exist, so the recover link is worth
+    /// showing. False until the cubit has asked, and false when none remain.
+    @Default(false) bool canRecoverPassword,
     AppException? error,
   }) = _SignInState;
 

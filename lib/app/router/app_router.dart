@@ -41,6 +41,8 @@ import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.da
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_state.dart';
 import 'package:khulla/features/staff_auth/presentation/onboarding/cubit/onboarding_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/onboarding/onboarding_page.dart';
+import 'package:khulla/features/staff_auth/presentation/recover_password/cubit/recover_password_cubit.dart';
+import 'package:khulla/features/staff_auth/presentation/recover_password/recover_password_page.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/cubit/sign_in_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/sign_in_page.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -87,8 +89,20 @@ class AppRouter {
           path: Routes.signIn,
           parentNavigatorKey: _rootNavigatorKey,
           builder: (context, _) => BlocProvider<SignInCubit>(
-            create: (_) => getIt<SignInCubit>(),
+            create: (_) {
+              final cubit = getIt<SignInCubit>();
+              unawaited(cubit.loadRecoveryAvailability());
+              return cubit;
+            },
             child: const SignInPage(),
+          ),
+        ),
+        GoRoute(
+          path: Routes.recoverPassword,
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (context, _) => BlocProvider<RecoverPasswordCubit>(
+            create: (_) => getIt<RecoverPasswordCubit>(),
+            child: const RecoverPasswordPage(),
           ),
         ),
         GoRoute(
@@ -367,7 +381,10 @@ class AppRouter {
       AuthStatus.unknown => null,
       AuthStatus.needsSetup =>
         location == Routes.onboarding ? null : Routes.onboarding,
-      AuthStatus.signedOut => location == Routes.signIn ? null : Routes.signIn,
+      AuthStatus.signedOut =>
+        location == Routes.signIn || location == Routes.recoverPassword
+            ? null
+            : Routes.signIn,
       AuthStatus.signedIn =>
         Routes.isAuthLocation(location) ? Routes.dashboard : null,
     };

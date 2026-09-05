@@ -25,6 +25,7 @@ import 'package:khulla/features/members/data/tables/members.dart';
 import 'package:khulla/features/settings/data/tables/library_settings.dart';
 import 'package:khulla/features/settings/data/tables/loan_rules.dart';
 import 'package:khulla/features/users/data/tables/staff.dart';
+import 'package:khulla/features/users/data/tables/staff_recovery_codes.dart';
 // The enums the tables store through `textEnum` are named in the generated
 // part file, which cannot carry imports of its own — they have to be visible
 // from here even though nothing in this file mentions them.
@@ -39,6 +40,7 @@ part 'app_database.g.dart';
   tables: [
     LibrarySettings,
     Staff,
+    StaffRecoveryCodes,
     LoanRules,
     TitleFormats,
     MemberTypes,
@@ -59,7 +61,7 @@ class AppDatabase extends _$AppDatabase {
   static const String _source = 'AppDatabase';
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -262,6 +264,10 @@ class AppDatabase extends _$AppDatabase {
                 'WHERE closed_at IS NULL',
           ),
         );
+      },
+      from6To7: (m, schema) async {
+        await m.createTable(schema.staffRecoveryCodes);
+        await m.createIndex(schema.staffRecoveryCodesStaff);
       },
     )(m, from, to);
   }

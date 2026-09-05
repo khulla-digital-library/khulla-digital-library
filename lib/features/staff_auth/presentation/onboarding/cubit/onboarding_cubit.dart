@@ -8,6 +8,7 @@ import 'package:khulla/core/form/inputs/full_name.dart';
 import 'package:khulla/core/form/inputs/password.dart';
 import 'package:khulla/core/form/inputs/required_text.dart';
 import 'package:khulla/core/money/currency.dart';
+import 'package:khulla/core/security/recovery_code.dart';
 import 'package:khulla/features/settings/domain/library_settings_repository.dart';
 import 'package:khulla/features/settings/domain/models/library_profile.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
@@ -16,7 +17,7 @@ import 'package:khulla/features/users/domain/staff_repository.dart';
 import 'package:khulla/features/users/domain/user_role.dart';
 
 /// First-run setup: name the library, pick its currency, create the
-/// administrator who will run it.
+/// administrator who will run it, and issue recovery codes for that account.
 @injectable
 class OnboardingCubit extends Cubit<OnboardingState> {
   OnboardingCubit(this._library, this._staff, this._auth)
@@ -62,37 +63,34 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     ),
   );
 
+  void codesSavedChanged(bool value) => emit(state.copyWith(codesSaved: value));
+
   /// Moves to the account step once the library step holds.
   ///
   /// Marks the step's fields dirty first, so pressing *Continue* on an
   /// untouched form explains itself rather than doing nothing.
   void goToNextStep() {
-    final libraryName = RequiredText.dirty(state.libraryName.value);
-    if (!libraryName.isValid) {
-      emit(state.copyWith(libraryName: libraryName));
-      return;
+    switch (state.step) {
+      case OnboardingStep.library:
+        final libraryName = RequiredText.dirty(state.libraryName.value);
+        if (!libraryName.isValid) {
+          emit(state.copyWith(libraryName: libraryName));
+          return;
+        }
+        emit(state.copyWith(step: OnboardingStep.account, error: null));
+      case OnboardingStep.account:
+        goToRecoveryStep();
+      case OnboardingStep.recovery:
+        break;
     }
-    emit(state.copyWith(step: OnboardingStep.account, error: null));
   }
 
-  void goToPreviousStep() =>
-      emit(state.copyWith(step: OnboardingStep.library, error: null));
-
-  /// Writes the library profile and the administrator, then opens the
-  /// session.
+  /// Validates the account step, issues recovery codes once, and shows them.
   ///
-  /// The two writes are not one transaction, and that is survivable by
-  /// design: the setup gate is the staff table, so a profile written without
-  /// its administrator leaves the app on this screen, and the retry overwrites
-  /// the profile row rather than adding a second. The reverse order would not
-  /// be survivable — an administrator with no library profile would let the
-  /// app into the shell with no currency set.
-  ///
-  /// Emits the failure into state *and* rethrows: a gesture asked for this,
-  /// so the page answers it with a toast as well as the inline message.
-  Future<void> completeSetup() async {
-    if (state.isSubmitting) return;
-
+  /// Codes are generated here rather than at submit so the operator can copy
+  /// or download them before anything is written. Closing the app on this
+  /// step leaves the catalogue unset, and setup starts again.
+  void goToRecoveryStep() {
     final adminName = FullName.dirty(state.adminName.value);
     final email = Email.dirty(state.email.value);
     final password = Password.dirty(state.password.value);
@@ -115,6 +113,48 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
     emit(
       state.copyWith(
+        adminName: adminName,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+        recoveryCodes: state.recoveryCodes.isEmpty
+            ? RecoveryCode.generateSet()
+            : state.recoveryCodes,
+        step: OnboardingStep.recovery,
+        error: null,
+      ),
+    );
+  }
+
+  void goToPreviousStep() => emit(
+    state.copyWith(
+      step: switch (state.step) {
+        OnboardingStep.recovery => OnboardingStep.account,
+        OnboardingStep.account ||
+        OnboardingStep.library => OnboardingStep.library,
+      },
+      error: null,
+    ),
+  );
+
+  /// Writes the library profile, the administrator, and the hashed recovery
+  /// codes, then opens the session.
+  ///
+  /// The profile and staff writes are not one transaction, and that is
+  /// survivable by design: the setup gate is the staff table, so a profile
+  /// written without its administrator leaves the app on this screen, and the
+  /// retry overwrites the profile row rather than adding a second. The reverse
+  /// order would not be survivable — an administrator with no library profile
+  /// would let the app into the shell with no currency set.
+  ///
+  /// Emits the failure into state *and* rethrows: a gesture asked for this,
+  /// so the page answers it with a toast as well as the inline message.
+  Future<void> completeSetup() async {
+    if (state.isSubmitting) return;
+    if (!state.codesSaved || state.recoveryCodes.isEmpty) return;
+
+    emit(
+      state.copyWith(
         status: FormzSubmissionStatus.inProgress,
         emailTaken: false,
         error: null,
@@ -130,10 +170,11 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         ),
       );
       final administrator = await _staff.createStaff(
-        name: adminName.value,
-        email: email.value,
-        password: password.value,
+        name: state.adminName.value,
+        email: state.email.value,
+        password: state.password.value,
         role: UserRole.administrator,
+        recoveryCodes: state.recoveryCodes,
       );
       if (isClosed) return;
 

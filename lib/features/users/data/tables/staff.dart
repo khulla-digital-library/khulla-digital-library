@@ -31,8 +31,9 @@ class Staff extends Table {
   /// what a person expects — `Ram@Lib.np` and `ram@lib.np` are one account.
   TextColumn get email => text().withLength(min: 3, max: 254).unique()();
 
-  /// A salted bcrypt digest. Never the password itself, and never reversible
-  /// — a forgotten password is reset by an administrator, not recovered.
+  /// A salted bcrypt digest. Never the password itself, and never reversible.
+  /// The first administrator can reset theirs with a one-time recovery code;
+  /// later accounts are reset by an administrator under Staff.
   TextColumn get passwordHash => text()();
 
   /// What the account is allowed to do. Stored as the enum's name so the set

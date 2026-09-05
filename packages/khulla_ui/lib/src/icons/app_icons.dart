@@ -111,6 +111,9 @@ abstract final class AppIcons {
   /// Pull data out of the app.
   static const AppIconSpec download = AppIconSpec(SolarIcons.download);
 
+  /// Copy text to the clipboard.
+  static const AppIconSpec copy = AppIconSpec(SolarIcons.copy);
+
   /// Push data into the app.
   static const AppIconSpec upload = AppIconSpec(SolarIcons.upload);
 

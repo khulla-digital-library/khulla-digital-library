@@ -1176,7 +1176,8 @@
     "signInSubtitle": "Use the staff account this library was set up with.",
     "signInRejected": "That email and password do not match an active staff account.",
     "signInAction": "Sign in",
-    "signInForgotPassword": "Forgotten the password? An administrator can reset it under Staff.",
+    "signInForgotPassword": "Forgotten the password? If unused recovery codes remain, use them below. Otherwise another administrator can reset it under Staff.",
+    "signInForgotPasswordAction": "Use a recovery code",
     "@signInForgotPassword": {
         "description": "Auth - the sign-in screen"
     },
@@ -1203,7 +1204,7 @@
         }
     },
     "onboardingLibraryHeading": "Set up your library",
-    "onboardingLibrarySubtitle": "Two steps, then the catalogue is yours. Everything else can be changed later under Settings.",
+    "onboardingLibrarySubtitle": "Name the library, create your administrator account, then save recovery codes. Everything else can be changed later under Settings.",
     "onboardingLibraryNameLabel": "Library name",
     "onboardingLibraryNameHint": "Kathmandu Community Library",
     "onboardingCurrencyLabel": "Currency",
@@ -1228,5 +1229,26 @@
     "onboardingSetupFailed": "The library could not be set up.",
     "@onboardingSetupFailed": {
         "description": "Onboarding - the first-run setup wizard"
+    },
+    "onboardingRecoveryHeading": "Save your recovery codes",
+    "onboardingRecoverySubtitle": "These codes can reset the administrator password if you forget it. This is the only time they are shown.",
+    "onboardingRecoveryWarning": "Store them offline: a printed page, a password manager, or a downloaded file on another device. Anyone with a code can set a new administrator password.",
+    "onboardingCopyCodes": "Copy codes",
+    "onboardingDownloadCodes": "Download",
+    "onboardingCodesCopied": "Codes copied.",
+    "onboardingCodesDownloaded": "Recovery codes saved.",
+    "onboardingCodesDownloadFailed": "The file could not be saved.",
+    "onboardingCodesSavedLabel": "I have saved these codes somewhere I can find them",
+    "onboardingCodesSavedDescription": "You will need one of them if you are signed out and cannot remember the password.",
+    "recoverPasswordHeading": "Reset with a recovery code",
+    "recoverPasswordSubtitle": "Use one unused code from setup, then choose a new password. That code cannot be used again.",
+    "recoverPasswordCodeLabel": "Recovery code",
+    "recoverPasswordCodeHint": "7K2M-9QWP-4XNH-B6RT",
+    "recoverPasswordNewPassword": "New password",
+    "recoverPasswordAction": "Set new password",
+    "recoverPasswordRejected": "That email and recovery code do not match an unused code for an active account.",
+    "recoverPasswordBackToSignIn": "Back to sign in",
+    "@recoverPasswordBackToSignIn": {
+        "description": "Auth - recover the first administrator password with a one-time code from setup"
     }
 }

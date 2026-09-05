@@ -1,6 +1,14 @@
 import 'package:khulla/features/users/domain/models/staff_credentials.dart';
 import 'package:khulla/features/users/domain/models/staff_member.dart';
 
+/// An unused recovery-code row: its id and the stored digest.
+class StoredRecoveryCode {
+  const StoredRecoveryCode({required this.id, required this.codeHash});
+
+  final String id;
+  final String codeHash;
+}
+
 /// Reads and writes staff accounts in the local catalogue.
 abstract interface class StaffLocalDataSource {
   /// Whether any staff account exists.
@@ -20,11 +28,26 @@ abstract interface class StaffLocalDataSource {
   /// pass exactly what the operator typed.
   Future<StaffCredentials?> findCredentialsByEmail(String email);
 
-  /// Writes [staff] with [passwordHash] and returns it.
+  /// Whether any recovery code has not yet been spent. Drives the sign-in
+  /// recover link: no unused codes means that path cannot succeed.
+  Future<bool> hasUnusedRecoveryCodes();
+
+  /// Unused recovery codes for [staffId], oldest first.
+  Future<List<StoredRecoveryCode>> findUnusedRecoveryCodes(String staffId);
+
+  /// Writes [staff] with [passwordHash] and optional recovery-code digests.
   ///
   /// Throws a `DuplicateRecordException` when the email is already held.
   Future<StaffMember> insertStaff(
     StaffMember staff, {
     required String passwordHash,
+    List<String> recoveryCodeHashes = const [],
+  });
+
+  /// Replaces the password digest and marks one recovery code as spent.
+  Future<void> resetPasswordWithRecoveryCode({
+    required String staffId,
+    required String passwordHash,
+    required String recoveryCodeId,
   });
 }

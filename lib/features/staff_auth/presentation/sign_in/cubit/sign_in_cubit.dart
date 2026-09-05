@@ -36,6 +36,17 @@ class SignInCubit extends Cubit<SignInState> {
     ),
   );
 
+  /// Offers the recover path only when an unused code still exists.
+  Future<void> loadRecoveryAvailability() async {
+    try {
+      final canRecover = await _staff.hasUnusedRecoveryCodes();
+      if (isClosed) return;
+      emit(state.copyWith(canRecoverPassword: canRecover));
+    } on AppException {
+      if (isClosed) return;
+    }
+  }
+
   /// Verifies the credentials and, when they hold, opens the session.
   ///
   /// A rejection is a state, not a thrown failure: the answer belongs under

@@ -23,9 +23,14 @@ abstract final class Routes {
   /// Staff sign-in. Outside the shell, for the same reason.
   static const String signIn = '/sign-in';
 
+  /// Reset the first administrator password with a recovery code.
+  static const String recoverPassword = '/recover-password';
+
   /// Whether [location] is one of the screens that live outside the shell.
   static bool isAuthLocation(String location) =>
-      location == onboarding || location == signIn;
+      location == onboarding ||
+      location == signIn ||
+      location == recoverPassword;
 
   /// Dashboard: the shift's starting point — counts, activity, quick actions.
   static const String dashboard = '/dashboard';

@@ -3,8 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:khulla/core/lifecycle/dispose_bag.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/staff_auth/presentation/auth_labels.dart';
-import 'package:khulla/features/staff_auth/presentation/sign_in/cubit/sign_in_cubit.dart';
-import 'package:khulla/features/staff_auth/presentation/sign_in/cubit/sign_in_state.dart';
+import 'package:khulla/features/staff_auth/presentation/recover_password/cubit/recover_password_cubit.dart';
+import 'package:khulla/features/staff_auth/presentation/recover_password/cubit/recover_password_state.dart';
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_error_notice.dart';
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_header.dart';
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_password_field.dart';
@@ -12,44 +12,41 @@ import 'package:khulla/features/staff_auth/presentation/widgets/auth_scaffold.da
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Sign-in for a library that has already been set up.
-///
-/// The router sends the operator here whenever staff accounts exist and
-/// nobody is signed in on this device; there is no way to reach it otherwise,
-/// and no link from here to onboarding — a second administrator is created
-/// from the staff section, not from this screen.
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+/// Sets a new administrator password using a one-time recovery code.
+class RecoverPasswordPage extends StatefulWidget {
+  const RecoverPasswordPage({super.key});
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<RecoverPasswordPage> createState() => _RecoverPasswordPageState();
 }
 
-class _SignInPageState extends State<SignInPage> with DisposeBag {
+class _RecoverPasswordPageState extends State<RecoverPasswordPage>
+    with DisposeBag {
   late final TextEditingController _email = textController();
+  late final TextEditingController _recoveryCode = textController();
   late final TextEditingController _password = textController();
+  late final TextEditingController _confirmPassword = textController();
 
-  void _submit() => context.read<SignInCubit>().signIn();
+  void _submit() =>
+      context.read<RecoverPasswordCubit>().resetPasswordWithRecoveryCode();
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
-    final colors = context.appColors;
-    final typography = context.appTextStyles;
 
     return AuthScaffold(
-      child: BlocBuilder<SignInCubit, SignInState>(
+      child: BlocBuilder<RecoverPasswordCubit, RecoverPasswordState>(
         builder: (context, state) {
-          final cubit = context.read<SignInCubit>();
+          final cubit = context.read<RecoverPasswordCubit>();
           final error = state.error;
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               AuthHeader(
-                title: l10n.signInHeading,
-                description: l10n.signInSubtitle,
+                title: l10n.recoverPasswordHeading,
+                description: l10n.recoverPasswordSubtitle,
               ),
               SizedBox(height: spacing.lg),
               AppTextField(
@@ -63,17 +60,36 @@ class _SignInPageState extends State<SignInPage> with DisposeBag {
                 onChanged: cubit.emailChanged,
               ),
               SizedBox(height: spacing.sm),
+              AppTextField(
+                label: l10n.recoverPasswordCodeLabel,
+                hintText: l10n.recoverPasswordCodeHint,
+                required: true,
+                controller: _recoveryCode,
+                textCapitalization: TextCapitalization.characters,
+                textInputAction: TextInputAction.next,
+                errorText: state.recoveryCode.messageFor(l10n),
+                onChanged: cubit.recoveryCodeChanged,
+              ),
+              SizedBox(height: spacing.sm),
               AuthPasswordField(
-                label: l10n.fieldPassword,
+                label: l10n.recoverPasswordNewPassword,
                 controller: _password,
-                textInputAction: TextInputAction.done,
+                textInputAction: TextInputAction.next,
                 errorText: state.password.messageFor(l10n),
                 onChanged: cubit.passwordChanged,
+              ),
+              SizedBox(height: spacing.sm),
+              AuthPasswordField(
+                label: l10n.fieldConfirmPassword,
+                controller: _confirmPassword,
+                textInputAction: TextInputAction.done,
+                errorText: state.confirmPassword.messageFor(l10n),
+                onChanged: cubit.confirmPasswordChanged,
                 onSubmitted: (_) => _submit(),
               ),
               if (state.credentialsRejected) ...[
                 SizedBox(height: spacing.md),
-                AuthErrorNotice(message: l10n.signInRejected),
+                AuthErrorNotice(message: l10n.recoverPasswordRejected),
               ],
               if (error != null) ...[
                 SizedBox(height: spacing.md),
@@ -85,21 +101,14 @@ class _SignInPageState extends State<SignInPage> with DisposeBag {
                 expand: true,
                 isLoading: state.isSubmitting,
                 onPressed: _submit,
-                child: Text(l10n.signInAction),
+                child: Text(l10n.recoverPasswordAction),
               ),
               SizedBox(height: spacing.md),
-              if (state.canRecoverPassword)
-                AppButton(
-                  variant: AppButtonVariant.link,
-                  onPressed: () => context.go(Routes.recoverPassword),
-                  child: Text(l10n.signInForgotPasswordAction),
-                )
-              else
-                Text(
-                  l10n.signInForgotPassword,
-                  textAlign: TextAlign.center,
-                  style: typography.caption.copyWith(color: colors.textMuted),
-                ),
+              AppButton(
+                variant: AppButtonVariant.link,
+                onPressed: () => context.go(Routes.signIn),
+                child: Text(l10n.recoverPasswordBackToSignIn),
+              ),
             ],
           );
         },
