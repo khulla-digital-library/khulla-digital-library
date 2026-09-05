@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
 
+/// Maps [FineRow] to [Fine] and back for drift writes.
 extension FineRowMapper on FineRow {
   Fine toDomain({
     String? memberName,

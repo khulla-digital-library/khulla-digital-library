@@ -5,6 +5,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'catalog_overview_state.freezed.dart';
 
+/// Catalogue overview headline counts and recent titles.
 @freezed
 abstract class CatalogOverviewState with _$CatalogOverviewState {
   const factory CatalogOverviewState({

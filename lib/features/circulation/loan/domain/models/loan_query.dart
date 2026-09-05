@@ -4,6 +4,9 @@ import 'package:khulla/features/circulation/shared/domain/loan_status.dart';
 
 part 'loan_query.freezed.dart';
 
+/// Filters and paging for loan lists.
+///
+/// [openOnly] hides returned rows; [status] applies the derived desk status.
 @freezed
 abstract class LoanQuery with _$LoanQuery {
   const factory LoanQuery({

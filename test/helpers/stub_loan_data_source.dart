@@ -2,7 +2,8 @@ import 'package:khulla/features/circulation/loan/data/loan_local_data_source.dar
 import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/features/circulation/loan/domain/models/loan_query.dart';
 
-/// Checkout/return tests do not use [LoanLocalDataSource]; this stub satisfies DI.
+/// Stand-in for [LoanLocalDataSource] when a test only exercises checkout,
+/// return or copy-status writes and never reads the loans table.
 class StubLoanLocalDataSource implements LoanLocalDataSource {
   @override
   Future<LoanListResult> findLoans(LoanQuery query) =>

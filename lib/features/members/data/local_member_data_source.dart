@@ -9,6 +9,10 @@ import 'package:khulla/features/members/data/member_local_data_source.dart';
 import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/domain/models/member_query.dart';
 
+/// Drift-backed [MemberLocalDataSource].
+///
+/// List and detail queries join member types and subselect open loans and
+/// outstanding fines so each [Member] row is desk-ready without N+1 reads.
 @LazySingleton(as: MemberLocalDataSource)
 class LocalMemberDataSource implements MemberLocalDataSource {
   LocalMemberDataSource(this._db);

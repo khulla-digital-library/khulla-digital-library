@@ -1,11 +1,18 @@
 import 'package:khulla/core/format/app_date_format.dart';
 import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
+import 'package:khulla/features/members/presentation/cubit/member_detail_cubit.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The copies a member is holding, or everything they have brought back.
+///
+/// One widget for both because the two tables differ only in which date
+/// matters — the due date while a copy is out, the return date once it is
+/// back — and duplicating the column list to say that would be worse.
+/// [isHistory] switches the date column; the parent passes the slice from
+/// [MemberDetailCubit].
 class MemberLoansCard extends StatelessWidget {
   const MemberLoansCard({
     required this.title,

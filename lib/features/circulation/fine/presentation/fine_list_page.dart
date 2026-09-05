@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/core/money/money.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
 import 'package:khulla/features/circulation/fine/presentation/cubit/fine_list_cubit.dart';
@@ -15,6 +16,13 @@ import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The fines ledger: what is owed, what was taken, what was written off.
+///
+/// Every amount on this screen is a [Money] rendered through `display()` —
+/// never interpolated, which would print the paisa, and never formatted by
+/// hand, which would put the currency symbol somewhere the library's settings
+/// did not ask for. [FineListCubit] drives search, status filters and the
+/// summary totals. Collect and waive confirm in a dialog, then still toast as
+/// not wired until payment recording lands.
 class FineListPage extends StatelessWidget {
   const FineListPage({super.key});
 

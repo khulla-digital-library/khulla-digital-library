@@ -9,6 +9,11 @@ import 'package:khulla/features/catalog/title/presentation/cubit/title_form_stat
 import 'package:khulla/shared/domain/reference_data_repository.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// The create/edit title modal: formats for the picker and the record being edited.
+///
+/// Page-scoped `@injectable` cubit for the title form modal. [load] failures
+/// stay in [TitleFormState.error]; [saveTitle] emits and rethrows so the
+/// modal can toast and keep the form open.
 @injectable
 class TitleFormCubit extends Cubit<TitleFormState> {
   TitleFormCubit(
@@ -21,6 +26,7 @@ class TitleFormCubit extends Cubit<TitleFormState> {
   final CopyRepository _copies;
   final ReferenceDataRepository _referenceData;
 
+  /// Loads format options and, when [titleId] is set, the existing title.
   Future<void> load({String? titleId}) async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {
@@ -43,6 +49,10 @@ class TitleFormCubit extends Cubit<TitleFormState> {
     }
   }
 
+  /// Persists the title and seeds initial copies on create.
+  ///
+  /// Emits [TitleFormState.isSaving] and rethrows on failure so the modal
+  /// can show a toast without closing.
   Future<Title> saveTitle({
     required String title,
     required String author,

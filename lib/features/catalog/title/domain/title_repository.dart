@@ -2,6 +2,10 @@ import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/catalog/title/domain/models/title.dart';
 import 'package:khulla/features/catalog/title/domain/models/title_query.dart';
 
+/// Catalogue works: list, load, save, archive and hard-delete.
+///
+/// [saveTitle] assigns ids and rebuilds search text; [removeTitle] refuses
+/// when copies still exist. Archived rows stay out of list queries.
 abstract interface class TitleRepository {
   Future<TitleListResult> findTitles(TitleQuery query);
 

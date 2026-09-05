@@ -5,6 +5,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'library_profile_state.freezed.dart';
 
+/// Library profile record and save progress.
 @freezed
 abstract class LibraryProfileState with _$LibraryProfileState {
   const factory LibraryProfileState({

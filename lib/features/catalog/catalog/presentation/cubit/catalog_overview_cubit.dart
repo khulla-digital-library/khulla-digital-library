@@ -9,6 +9,10 @@ import 'package:khulla/features/catalog/title/domain/models/title_query.dart';
 import 'package:khulla/features/catalog/title/domain/title_repository.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// Catalogue landing summary: counts and a handful of recent titles.
+///
+/// Page-scoped `@injectable` cubit for the catalog overview page. Aggregates
+/// [TitleRepository] and [CopyRepository] in one read — no writes.
 @injectable
 class CatalogOverviewCubit extends Cubit<CatalogOverviewState> {
   CatalogOverviewCubit(this._titles, this._copies)
@@ -17,6 +21,7 @@ class CatalogOverviewCubit extends Cubit<CatalogOverviewState> {
   final TitleRepository _titles;
   final CopyRepository _copies;
 
+  /// Loads headline counts and the five most recently added titles.
   Future<void> loadOverview() async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {

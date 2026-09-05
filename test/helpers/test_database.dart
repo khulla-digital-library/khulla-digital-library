@@ -1,7 +1,10 @@
 import 'package:drift/native.dart';
 import 'package:khulla/core/database/app_database.dart';
 
-/// In-memory catalogue opened for integration tests.
+/// Opens an in-memory [AppDatabase] for integration tests.
+///
+/// Runs [AppDatabase.warmUp] so migrations execute before the first assertion,
+/// matching production startup. Pair with [closeTestDatabase] in `tearDown`.
 Future<AppDatabase> openTestDatabase() async {
   final db = AppDatabase.connect(NativeDatabase.memory());
   await db.warmUp();

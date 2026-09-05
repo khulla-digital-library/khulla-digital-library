@@ -7,6 +7,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'fine_list_state.freezed.dart';
 
+/// Fines list, summary totals, and load status.
 @freezed
 abstract class FineListState with _$FineListState {
   const factory FineListState({

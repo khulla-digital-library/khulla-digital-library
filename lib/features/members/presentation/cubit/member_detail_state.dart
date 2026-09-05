@@ -7,6 +7,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'member_detail_state.freezed.dart';
 
+/// One member with loans, history and outstanding fines.
 @freezed
 abstract class MemberDetailState with _$MemberDetailState {
   const factory MemberDetailState({

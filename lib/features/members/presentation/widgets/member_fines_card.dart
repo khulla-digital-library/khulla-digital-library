@@ -1,10 +1,16 @@
 import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
+import 'package:khulla/features/circulation/fine/presentation/cubit/fine_list_cubit.dart';
 import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
+import 'package:khulla/features/members/presentation/cubit/member_detail_cubit.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// What a member owes, and the control that settles it.
+///
+/// Outstanding amounts come from [FineListCubit] on the ledger page and from
+/// [MemberDetailCubit] here. [onCollect] is passed down because payment
+/// recording is not wired yet — the page shows the dialog, then toasts.
 class MemberFinesCard extends StatelessWidget {
   const MemberFinesCard({
     required this.fines,

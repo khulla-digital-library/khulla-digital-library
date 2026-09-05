@@ -10,7 +10,14 @@ import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The catalogue's landing page: collection size, list links, and recent accessions.
+/// The catalogue's landing page: the size of the collection, the three lists
+/// behind it, and what was accessioned most recently.
+///
+/// It owns no resource of its own — titles, copies and authors each have their
+/// own sub-feature — so this page is a board, not a list, and takes the wide
+/// content cap like the dashboard does. [CatalogOverviewCubit] supplies the
+/// counts and recent titles; the authors stat tile still links ahead of that
+/// sub-feature being wired.
 class CatalogPage extends StatelessWidget {
   const CatalogPage({super.key});
 

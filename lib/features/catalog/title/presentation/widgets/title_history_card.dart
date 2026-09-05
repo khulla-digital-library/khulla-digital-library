@@ -1,9 +1,13 @@
+import 'package:khulla/features/catalog/title/presentation/cubit/title_detail_cubit.dart';
 import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Who has borrowed this work, most recent first.
+///
+/// Closed loans only — open loans show on the copies table via borrower and
+/// due date. The parent loads the list from [TitleDetailCubit].
 class TitleHistoryCard extends StatelessWidget {
   const TitleHistoryCard({required this.loans, super.key});
 

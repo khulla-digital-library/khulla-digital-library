@@ -8,6 +8,11 @@ import 'package:khulla/features/members/domain/member_repository.dart';
 import 'package:khulla/features/members/presentation/cubit/member_detail_state.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// A single member with open loans, history and outstanding fines.
+///
+/// Page-scoped `@injectable` cubit for the member detail page. Reads from
+/// [MemberRepository] and [CirculationRepository] emit into state; [removeMember]
+/// rethrows so the confirming dialog can toast.
 @injectable
 class MemberDetailCubit extends Cubit<MemberDetailState> {
   MemberDetailCubit(this._members, this._circulation)
@@ -16,6 +21,7 @@ class MemberDetailCubit extends Cubit<MemberDetailState> {
   final MemberRepository _members;
   final CirculationRepository _circulation;
 
+  /// Loads the member, open loans, returned loans and unpaid fines.
   Future<void> loadMember(String id) async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {
@@ -61,6 +67,7 @@ class MemberDetailCubit extends Cubit<MemberDetailState> {
     }
   }
 
+  /// Deletes the member. Rethrows on failure — the confirming dialog toasts.
   Future<void> removeMember(String id) async {
     await _members.removeMember(id);
   }

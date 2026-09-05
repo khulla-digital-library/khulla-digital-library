@@ -5,7 +5,15 @@ import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/record_header.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// A title's identity block at the top of its detail screen.
+/// A title's identity block: what the work is, how it stands, and the one
+/// thing the page is for.
+///
+/// Secondary actions sit behind [AppMenuButton] rather than becoming a row of
+/// equal buttons, and the destructive one is inside that menu — never beside
+/// the primary action. The status row is two badges at most: whether a copy
+/// can be taken off the shelf, and whether the title is reference only. Format
+/// and copy count moved into the fact line — a librarian reads them, but
+/// nobody has to act on them.
 class TitleDetailHeader extends StatelessWidget {
   const TitleDetailHeader({
     required this.title,

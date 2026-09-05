@@ -2,6 +2,7 @@ import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
 import 'package:khulla/features/circulation/fine/domain/models/fine_query.dart';
 
+/// Read-side fine queries and per-member outstanding totals.
 abstract interface class FineLocalDataSource {
   Future<FineListResult> findFines(FineQuery query);
 

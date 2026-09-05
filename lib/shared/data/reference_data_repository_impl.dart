@@ -8,6 +8,11 @@ import 'package:khulla/features/settings/data/loan_rules_repository_impl.dart';
 import 'package:khulla/shared/domain/reference_data_repository.dart';
 import 'package:uuid/uuid.dart';
 
+/// [ReferenceDataRepository] backed by the owning sub-feature data sources.
+///
+/// Coordinates bootstrap seeding across [TitleFormatLocalDataSource],
+/// [MemberTypeLocalDataSource] and [LoanRulesLocalDataSource] so bootstrap
+/// has one call site. Read paths delegate straight through; no mapping here.
 @LazySingleton(as: ReferenceDataRepository)
 class ReferenceDataRepositoryImpl implements ReferenceDataRepository {
   ReferenceDataRepositoryImpl(
@@ -40,6 +45,7 @@ class ReferenceDataRepositoryImpl implements ReferenceDataRepository {
     'other',
   ];
 
+  /// Seeds system formats, member types and default loan rules on a fresh catalogue.
   @override
   Future<void> ensureDefaults({
     required String Function(String code) formatName,

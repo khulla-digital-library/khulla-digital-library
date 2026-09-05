@@ -6,6 +6,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'member_form_state.freezed.dart';
 
+/// Member form: existing record, type picker options, and save progress.
 @freezed
 abstract class MemberFormState with _$MemberFormState {
   const factory MemberFormState({

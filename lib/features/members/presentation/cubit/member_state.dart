@@ -6,6 +6,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'member_state.freezed.dart';
 
+/// Members list query, page of results, and load status.
 @freezed
 abstract class MemberState with _$MemberState {
   const factory MemberState({

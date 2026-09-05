@@ -3,6 +3,7 @@ import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/features/settings/data/tables/library_settings.dart';
 import 'package:khulla/features/settings/domain/models/library_profile.dart';
 
+/// Maps [LibrarySettingsRow] to [LibraryProfile] and back for drift writes.
 extension LibrarySettingsRowX on LibrarySettingsRow {
   LibraryProfile toDomain() => LibraryProfile(
     name: name,

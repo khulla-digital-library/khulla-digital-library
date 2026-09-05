@@ -9,12 +9,17 @@ import 'package:khulla/features/circulation/shared/domain/circulation_repository
 import 'package:khulla/features/circulation/shared/domain/reservation_status.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// Holds and reservations list with search and status filters.
+///
+/// Page-scoped `@injectable` cubit backed by [CirculationRepository].
+/// [loadReservations] failures emit into [ReservationListState.error].
 @injectable
 class ReservationListCubit extends Cubit<ReservationListState> {
   ReservationListCubit(this._repository) : super(const ReservationListState());
 
   final CirculationRepository _repository;
 
+  /// Fetches the current page of reservations using [ReservationListState.query].
   Future<void> loadReservations() async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {

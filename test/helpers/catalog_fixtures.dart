@@ -28,7 +28,11 @@ typedef MemberSeed = ({
   String cardNumber,
 });
 
-/// Inserts default formats, member types, and loan rules when missing.
+/// Seeds the reference rows every catalogue test needs.
+///
+/// Formats, member types and loan rules are inserted through
+/// [ReferenceDataRepositoryImpl.ensureDefaults] when missing, so tests start
+/// from the same baseline the app does on first open.
 Future<ReferenceSeed> seedReferenceData(AppDatabase db) async {
   final formats = LocalTitleFormatDataSource(db);
   final memberTypes = LocalMemberTypeDataSource(db);
@@ -50,7 +54,7 @@ Future<ReferenceSeed> seedReferenceData(AppDatabase db) async {
   return (formatId: formatId, memberTypeId: memberTypeId);
 }
 
-/// One lendable title and an available copy on the shelf.
+/// One lendable title and an available copy — the smallest checkout scenario.
 Future<TitleWithCopySeed> seedTitleWithCopy(
   AppDatabase db, {
   required String formatId,
@@ -93,7 +97,7 @@ Future<TitleWithCopySeed> seedTitleWithCopy(
   return (titleId: titleId, copyId: copyId, barcode: barcode);
 }
 
-/// A member card on the register.
+/// A member card on the register, optionally expired or suspended.
 Future<MemberSeed> seedMember(
   AppDatabase db, {
   required String memberTypeId,
@@ -125,7 +129,7 @@ Future<MemberSeed> seedMember(
   return (memberId: memberId, cardNumber: cardNumber);
 }
 
-/// Updates the singleton loan-rules row.
+/// Tweaks the singleton loan-rules row without going through a repository.
 Future<void> updateLoanRules(
   AppDatabase db, {
   int? borrowingLimit,

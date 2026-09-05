@@ -7,6 +7,9 @@ import 'package:khulla/features/circulation/reservation/domain/models/reservatio
 import 'package:khulla/features/circulation/reservation/domain/models/reservation_query.dart';
 import 'package:khulla/features/circulation/shared/domain/reservation_status.dart';
 
+/// Drift-backed [ReservationLocalDataSource].
+///
+/// List rows include a computed [Reservation.queuePosition] per title queue.
 @LazySingleton(as: ReservationLocalDataSource)
 class LocalReservationDataSource implements ReservationLocalDataSource {
   LocalReservationDataSource(this._db);

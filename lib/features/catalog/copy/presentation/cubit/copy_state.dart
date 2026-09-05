@@ -6,6 +6,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'copy_state.freezed.dart';
 
+/// Copies list query, page of results, and load status.
 @freezed
 abstract class CopyState with _$CopyState {
   const factory CopyState({

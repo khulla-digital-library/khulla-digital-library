@@ -1,6 +1,7 @@
 import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy_query.dart';
 
+/// Drift access to `copies` and the open loan that fills borrower fields.
 abstract interface class CopyLocalDataSource {
   Future<CopyListResult> findCopies(CopyQuery query);
 

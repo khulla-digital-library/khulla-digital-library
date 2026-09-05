@@ -4,6 +4,9 @@ import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 
 part 'copy_query.freezed.dart';
 
+/// Filters and paging for the copy list.
+///
+/// [statuses] is empty for all statuses; [titleId] scopes to one work.
 @freezed
 abstract class CopyQuery with _$CopyQuery {
   const factory CopyQuery({

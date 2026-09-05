@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/features/catalog/title/domain/models/title_format.dart';
 
+/// Maps [TitleFormatRow] to [TitleFormat] and back for drift writes.
 extension TitleFormatRowX on TitleFormatRow {
   TitleFormat toDomain() => TitleFormat(
     id: id,

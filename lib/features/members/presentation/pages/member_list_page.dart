@@ -14,6 +14,12 @@ import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The register: every borrower and how they stand.
+///
+/// The filters are the questions a desk actually asks of it — who is holding
+/// something, who owes something, whose card has stopped working — rather
+/// than one chip per enum value. [MemberCubit] turns search, those filters,
+/// sort and paging into one query. Renew membership and suspend in the row
+/// menu still toast as not wired; check-out jumps to the circulation desk.
 class MemberListPage extends StatelessWidget {
   const MemberListPage({super.key});
 

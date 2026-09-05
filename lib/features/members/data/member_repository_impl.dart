@@ -12,6 +12,10 @@ import 'package:khulla/features/settings/domain/loan_rules_repository.dart';
 import 'package:khulla/shared/utils/search_text.dart';
 import 'package:uuid/uuid.dart';
 
+/// [MemberRepository] over the local catalogue.
+///
+/// Merges member-type labels and loan-rule defaults on save; circulation
+/// aggregates on list rows come from [MemberLocalDataSource].
 @LazySingleton(as: MemberRepository)
 class MemberRepositoryImpl implements MemberRepository {
   MemberRepositoryImpl(

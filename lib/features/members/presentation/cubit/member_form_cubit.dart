@@ -7,6 +7,10 @@ import 'package:khulla/features/members/presentation/cubit/member_form_state.dar
 import 'package:khulla/shared/domain/reference_data_repository.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// The create/edit member modal: member types for the picker and the record being edited.
+///
+/// Page-scoped `@injectable` cubit for the member form modal. [load] failures
+/// stay in [MemberFormState.error]; [saveMember] emits and rethrows.
 @injectable
 class MemberFormCubit extends Cubit<MemberFormState> {
   MemberFormCubit(this._members, this._referenceData)
@@ -15,6 +19,7 @@ class MemberFormCubit extends Cubit<MemberFormState> {
   final MemberRepository _members;
   final ReferenceDataRepository _referenceData;
 
+  /// Loads member-type options and, when [memberId] is set, the existing member.
   Future<void> load({String? memberId}) async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {
@@ -37,6 +42,7 @@ class MemberFormCubit extends Cubit<MemberFormState> {
     }
   }
 
+  /// Persists the member. Emits [MemberFormState.isSaving] and rethrows on failure.
   Future<Member> saveMember({
     required String fullName,
     required String cardNumber,

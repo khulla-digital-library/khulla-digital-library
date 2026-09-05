@@ -15,6 +15,12 @@ import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The desk: what is out, what is due back, and what is late.
+///
+/// One page rather than a landing screen plus a list, because the loans table
+/// *is* what a librarian came here to look at. [LoanListCubit] supplies the
+/// counts, the open-loan query and the holds figure for the stat strip — tapping
+/// *Overdue* selects the same rows the chip does. Renew and mark lost in the row
+/// menu still toast as not wired; return routes to the returns desk.
 class CirculationPage extends StatelessWidget {
   const CirculationPage({super.key});
 

@@ -3,6 +3,8 @@ import 'package:khulla/features/members/domain/models/member_type.dart';
 import 'package:khulla/features/settings/domain/models/loan_rules.dart';
 
 /// Merges global defaults with nullable member-type overrides.
+///
+/// Null on a type field means "use the library default from [LoanRules]".
 EffectiveLoanRules resolveLoanRules(
   LoanRules defaults,
   MemberType type,

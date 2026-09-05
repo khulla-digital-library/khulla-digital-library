@@ -3,6 +3,10 @@ import 'package:khulla/features/members/domain/models/member.dart';
 
 part 'member_query.freezed.dart';
 
+/// Filters and paging for the member list.
+///
+/// Quick filters ([withLoans], [owesFines], [suspended], [expiring]) map to
+/// SQL predicates on aggregates and expiry dates.
 @freezed
 abstract class MemberQuery with _$MemberQuery {
   const factory MemberQuery({

@@ -1,6 +1,11 @@
 import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/domain/models/member_query.dart';
 
+/// Borrowers on the register: search, save, archive and hard-delete.
+///
+/// [saveMember] resolves the type name, builds search text, and sets
+/// membership expiry on first insert from loan rules. [removeMember] refuses
+/// when loans or fines exist.
 abstract interface class MemberRepository {
   Future<MemberListResult> findMembers(MemberQuery query);
 

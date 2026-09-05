@@ -16,6 +16,13 @@ import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Every physical item, across every title.
+///
+/// The holdings view: a shelf-reading list, a place to find one barcode, and
+/// the screen a librarian uses to write off a copy that never came back.
+/// [CopyCubit] drives search, copy-status filters, sort and paging — filters
+/// are copy standings, not title availability, which is the distinction the
+/// whole catalogue rests on. Row tap opens the parent title; mark lost, damaged
+/// and withdraw still toast as not wired.
 class CopyListPage extends StatelessWidget {
   const CopyListPage({super.key});
 

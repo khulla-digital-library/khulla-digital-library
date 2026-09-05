@@ -7,12 +7,17 @@ import 'package:khulla/features/settings/domain/models/loan_rules.dart';
 import 'package:khulla/features/settings/presentation/cubit/loan_rules_state.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// Circulation policy settings: loan periods, limits and fine rates.
+///
+/// Page-scoped `@injectable` cubit backed by [LoanRulesRepository].
+/// [loadRules] failures emit into state; [saveRules] emits and rethrows.
 @injectable
 class LoanRulesCubit extends Cubit<LoanRulesState> {
   LoanRulesCubit(this._repository) : super(const LoanRulesState());
 
   final LoanRulesRepository _repository;
 
+  /// Loads the single loan-rules row.
   Future<void> loadRules() async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {
@@ -31,6 +36,7 @@ class LoanRulesCubit extends Cubit<LoanRulesState> {
     }
   }
 
+  /// Persists edited rules. Emits and rethrows on failure.
   Future<void> saveRules(LoanRules rules) async {
     emit(state.copyWith(isSaving: true, error: null));
     try {
@@ -44,6 +50,7 @@ class LoanRulesCubit extends Cubit<LoanRulesState> {
     }
   }
 
+  /// Builds a [LoanRules] draft from form fields, parsing money at the edge.
   LoanRules draftFromForm({
     required int loanPeriodDays,
     required int renewalLimit,

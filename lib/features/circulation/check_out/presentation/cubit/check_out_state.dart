@@ -6,6 +6,7 @@ import 'package:khulla/features/members/domain/models/member.dart';
 
 part 'check_out_state.freezed.dart';
 
+/// Check-out desk: selected member, basket, and effective loan rules.
 @freezed
 abstract class CheckOutState with _$CheckOutState {
   const factory CheckOutState({
@@ -19,14 +20,17 @@ abstract class CheckOutState with _$CheckOutState {
 
   const CheckOutState._();
 
+  /// True when a member is set, the basket is non-empty, and no submit is in flight.
   bool get canConfirm => member != null && basket.isNotEmpty && !isSubmitting;
 
   int get borrowingLimit => rules?.borrowingLimit ?? 0;
 
   int get loanPeriodDays => rules?.loanPeriodDays ?? 0;
 
+  /// Open loans plus basket size — compared against [borrowingLimit].
   int get copiesAfterCheckout => (member?.loansOut ?? 0) + basket.length;
 
+  /// Whether confirming would exceed the member's borrowing limit.
   bool get isOverBorrowingLimit =>
       rules != null && copiesAfterCheckout > rules!.borrowingLimit;
 }

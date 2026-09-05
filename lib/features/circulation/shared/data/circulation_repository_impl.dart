@@ -28,6 +28,13 @@ import 'package:khulla/features/settings/data/mappers/loan_rules_row_mappers.dar
 import 'package:khulla/features/settings/data/tables/loan_rules.dart';
 import 'package:uuid/uuid.dart';
 
+/// [CirculationRepository] over the local catalogue.
+///
+/// Checkout, return, renew and holds run in transactions here — copy status,
+/// loan rows, fine snapshots and reservation queue stay consistent. List reads
+/// delegate to [LoanLocalDataSource], [FineLocalDataSource] and
+/// [ReservationLocalDataSource]; writes touch [AppDatabase] directly until
+/// those sources grow insert/update paths.
 @LazySingleton(as: CirculationRepository)
 class CirculationRepositoryImpl implements CirculationRepository {
   CirculationRepositoryImpl(

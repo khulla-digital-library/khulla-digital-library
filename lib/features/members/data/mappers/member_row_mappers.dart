@@ -3,6 +3,10 @@ import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/members/domain/models/member.dart';
 
+/// Maps [MemberRow] to [Member] and back for drift writes.
+///
+/// Loan and fine aggregates are supplied by the list query, not stored on the
+/// member row itself.
 extension MemberRowMapper on MemberRow {
   Member toDomain({
     required String memberTypeName,

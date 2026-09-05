@@ -19,7 +19,17 @@ import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// One work's record: bibliographic details, copies, and loan history.
+/// One work's record: what it is, the copies under it, and who has had them.
+///
+/// Two panes from [FormFactor.expanded] up — copies and loan history on the
+/// left, where the tables need the width, and the bibliographic record on the
+/// right — and one column below that. The page keeps the shell's rail rather
+/// than pushing a screen over it, because a librarian moving between records
+/// is still inside the catalogue.
+///
+/// [TitleDetailCubit] loads the title, its copies and closed loans for
+/// [TitleHistoryCard]. Edit, delete and add-copy are wired; place hold, print
+/// labels and per-copy maintenance actions still toast as not wired.
 class TitleDetailPage extends StatelessWidget {
   const TitleDetailPage({required this.titleId, super.key});
 

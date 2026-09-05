@@ -6,6 +6,11 @@ import 'package:khulla/features/circulation/loan/domain/models/loan_query.dart';
 import 'package:khulla/features/circulation/reservation/domain/models/reservation.dart';
 import 'package:khulla/features/circulation/reservation/domain/models/reservation_query.dart';
 
+/// Checkout, return, renew, holds and the ledgers that hang off them.
+///
+/// Desk writes run in transactions; list screens read through the typed
+/// query objects on each sub-resource.
+
 /// One copy scanned at the returns desk.
 typedef ReturnCopyInput = ({
   String barcode,

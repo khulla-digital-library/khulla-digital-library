@@ -5,6 +5,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'loan_rules_state.freezed.dart';
 
+/// Loan rules record and save progress.
 @freezed
 abstract class LoanRulesState with _$LoanRulesState {
   const factory LoanRulesState({

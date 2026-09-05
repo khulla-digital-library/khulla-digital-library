@@ -17,6 +17,12 @@ import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The borrower editor, used for both a new card and an existing one.
+///
+/// A modal rather than a route — see [AppFormModal]. Three sections in the
+/// order the counter fills them: who the person is, how to reach them, and
+/// which rules their card runs under. [MemberFormCubit] loads member types and
+/// saves the record; the category sits last because it decides the loan period,
+/// borrowing limit and fine rate. The expiry picker still toasts as not wired.
 class MemberFormDialog extends StatelessWidget {
   const MemberFormDialog({this.memberId, super.key});
 

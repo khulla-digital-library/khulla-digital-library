@@ -7,6 +7,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'title_detail_state.freezed.dart';
 
+/// One title with its copies and returned-loan history.
 @freezed
 abstract class TitleDetailState with _$TitleDetailState {
   const factory TitleDetailState({

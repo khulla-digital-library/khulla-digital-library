@@ -4,6 +4,7 @@ import 'package:khulla/features/settings/data/tables/loan_rules.dart';
 import 'package:khulla/features/settings/domain/models/loan_rules.dart'
     as domain;
 
+/// Maps [LoanRulesRow] to [domain.LoanRules] and back for drift writes.
 extension LoanRulesRowX on LoanRulesRow {
   domain.LoanRules toDomain() => domain.LoanRules(
     loanPeriodDays: loanPeriodDays,

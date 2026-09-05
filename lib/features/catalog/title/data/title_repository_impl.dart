@@ -8,6 +8,11 @@ import 'package:khulla/features/catalog/title/domain/title_repository.dart';
 import 'package:khulla/shared/utils/search_text.dart';
 import 'package:uuid/uuid.dart';
 
+/// [TitleRepository] over the local catalogue.
+///
+/// Owns id assignment, [buildSearchText] for list filters, and the guard that
+/// blocks [removeTitle] while copies remain. Row mapping stays in
+/// [TitleLocalDataSource].
 @LazySingleton(as: TitleRepository)
 class TitleRepositoryImpl implements TitleRepository {
   TitleRepositoryImpl(this._dataSource);

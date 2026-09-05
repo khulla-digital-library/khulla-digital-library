@@ -4,6 +4,9 @@ import 'package:khulla/features/circulation/shared/domain/reservation_status.dar
 
 part 'reservation_query.freezed.dart';
 
+/// Filters and paging for the holds list.
+///
+/// [activeOnly] hides closed holds; queue order follows [sortColumn].
 @freezed
 abstract class ReservationQuery with _$ReservationQuery {
   const factory ReservationQuery({

@@ -2,6 +2,10 @@ import 'package:drift/drift.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/features/catalog/title/domain/models/title.dart';
 
+/// Maps [TitleRow] to [Title] and back for drift writes.
+///
+/// Joined columns — format name, copy counts, subjects — are passed in from
+/// the data source because they are not on the base row.
 extension TitleRowMapper on TitleRow {
   Title toDomain({
     required String formatName,

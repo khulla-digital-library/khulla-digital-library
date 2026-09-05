@@ -1,7 +1,11 @@
 import 'package:drift/drift.dart';
 import 'package:khulla/core/database/app_database.dart';
+import 'package:khulla/features/catalog/copy/data/copy_local_data_source.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
 
+/// Maps [CopyRow] to [Copy] and back for drift writes.
+///
+/// Title name, borrower and due date come from joins in [CopyLocalDataSource].
 extension CopyRowMapper on CopyRow {
   Copy toDomain({
     required String titleName,

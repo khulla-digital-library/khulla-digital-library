@@ -6,6 +6,11 @@ import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The bibliographic record, as label/value pairs.
+///
+/// [AppDetailRow] stacks its label above its value when the slot is narrow,
+/// so the same card works in a half-width column beside the copies table and
+/// full width on a phone. The parent passes a loaded title record — this
+/// widget does not fetch.
 class TitleDetailsCard extends StatelessWidget {
   const TitleDetailsCard({required this.title, super.key});
 

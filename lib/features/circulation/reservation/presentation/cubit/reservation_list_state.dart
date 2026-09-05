@@ -6,6 +6,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'reservation_list_state.freezed.dart';
 
+/// Reservations list query, page of results, and load status.
 @freezed
 abstract class ReservationListState with _$ReservationListState {
   const factory ReservationListState({

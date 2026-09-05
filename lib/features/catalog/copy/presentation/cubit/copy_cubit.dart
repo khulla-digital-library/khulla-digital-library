@@ -9,12 +9,17 @@ import 'package:khulla/features/catalog/copy/presentation/cubit/copy_state.dart'
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// The copies list: search, status filters, sort and pagination.
+///
+/// Page-scoped `@injectable` cubit. Delegates to [CopyRepository].
+/// [loadCopies] failures emit into [CopyState.error]; [archiveCopy] rethrows.
 @injectable
 class CopyCubit extends Cubit<CopyState> {
   CopyCubit(this._repository) : super(const CopyState());
 
   final CopyRepository _repository;
 
+  /// Fetches the current page of copies using [CopyState.query].
   Future<void> loadCopies() async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {
@@ -87,6 +92,7 @@ class CopyCubit extends Cubit<CopyState> {
     unawaited(loadCopies());
   }
 
+  /// Soft-deletes a copy and reloads the list. Rethrows on failure.
   Future<void> archiveCopy(String id) async {
     await _repository.archiveCopy(id);
     if (isClosed) return;

@@ -9,6 +9,10 @@ import 'package:khulla/features/circulation/shared/domain/circulation_fine.dart'
 import '../helpers/catalog_fixtures.dart';
 import '../helpers/test_database.dart';
 
+/// Drift type converters round-trip through SQL, not just in isolation.
+///
+/// Each group checks the converter directly and through a real column write,
+/// because drift code generation is where the mapping actually lands.
 void main() {
   group('MoneyConverter', () {
     const converter = MoneyConverter();

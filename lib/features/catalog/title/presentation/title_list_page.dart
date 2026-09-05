@@ -14,6 +14,13 @@ import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
+/// Every work the library holds.
+///
+/// [TitleCubit] owns search, format and availability filters, sort and paging —
+/// the same four knobs the placeholder ran in memory, now one SQLite query.
+/// Format chips read [ReferenceDataCubit] because formats are reference data,
+/// not part of the title query. The [CollectionPageView] shape is unchanged:
+/// row tap opens the detail route, the empty state opens [TitleFormDialog].
 class TitleListPage extends StatefulWidget {
   const TitleListPage({super.key});
 

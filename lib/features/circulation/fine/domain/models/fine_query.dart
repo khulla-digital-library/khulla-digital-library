@@ -4,6 +4,9 @@ import 'package:khulla/features/circulation/shared/domain/fine_status.dart';
 
 part 'fine_query.freezed.dart';
 
+/// Filters and paging for the fines ledger.
+///
+/// [outstandingOnly] keeps rows where assessed exceeds paid plus waived.
 @freezed
 abstract class FineQuery with _$FineQuery {
   const factory FineQuery({

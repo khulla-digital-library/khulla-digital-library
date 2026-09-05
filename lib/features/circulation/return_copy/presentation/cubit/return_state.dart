@@ -6,6 +6,7 @@ import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 
 part 'return_state.freezed.dart';
 
+/// Returns desk basket, check-in options and submit progress.
 @freezed
 abstract class ReturnState with _$ReturnState {
   const factory ReturnState({
@@ -22,6 +23,7 @@ abstract class ReturnState with _$ReturnState {
 
   int get lateCount => basket.where((loan) => loan.daysLate > 0).length;
 
+  /// Accrued fines across the basket, zeroed when [waiveFines] is set.
   Money get finesDue => waiveFines
       ? Money.zero
       : Money.sum([for (final loan in basket) loan.accruedFine]);

@@ -1,6 +1,7 @@
 import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/domain/models/member_query.dart';
 
+/// Drift access to `members` and the aggregates shown on list rows.
 abstract interface class MemberLocalDataSource {
   Future<MemberListResult> findMembers(MemberQuery query);
 

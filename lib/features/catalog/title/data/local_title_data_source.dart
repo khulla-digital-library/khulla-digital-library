@@ -9,6 +9,10 @@ import 'package:khulla/features/catalog/title/domain/models/title.dart';
 import 'package:khulla/features/catalog/title/domain/models/title_query.dart';
 import 'package:khulla/shared/utils/search_text.dart';
 
+/// Drift-backed [TitleLocalDataSource].
+///
+/// List and detail queries use custom SQL so copy and availability counts arrive
+/// in one round trip. Sort column names match [TitleQuery.sortColumn].
 @LazySingleton(as: TitleLocalDataSource)
 class LocalTitleDataSource implements TitleLocalDataSource {
   LocalTitleDataSource(this._db);

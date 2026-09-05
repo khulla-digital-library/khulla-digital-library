@@ -7,6 +7,7 @@ import 'package:khulla/features/catalog/title/data/title_repository_impl.dart';
 import '../helpers/catalog_fixtures.dart';
 import '../helpers/test_database.dart';
 
+/// Guards [TitleRepositoryImpl.removeTitle] when copies still exist.
 void main() {
   late AppDatabase db;
   late TitleRepositoryImpl repository;

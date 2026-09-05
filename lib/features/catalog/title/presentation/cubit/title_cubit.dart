@@ -8,12 +8,20 @@ import 'package:khulla/features/catalog/title/domain/title_repository.dart';
 import 'package:khulla/features/catalog/title/presentation/cubit/title_state.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// The titles list: search, filters, sort and pagination.
+///
+/// Page-scoped `@injectable` cubit for the title list page. Delegates reads to
+/// [TitleRepository]; [loadTitles] failures emit into [TitleState.error].
 @injectable
 class TitleCubit extends Cubit<TitleState> {
   TitleCubit(this._repository) : super(const TitleState());
 
   final TitleRepository _repository;
 
+  /// Fetches the current page of titles using [TitleState.query].
+  ///
+  /// Failures are emitted into state and swallowed — the list screen already
+  /// watches [TitleState.error].
   Future<void> loadTitles() async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {

@@ -10,12 +10,18 @@ import 'package:khulla/features/circulation/shared/domain/circulation_repository
 import 'package:khulla/features/circulation/shared/domain/loan_status.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// Open loans list plus circulation headline counts.
+///
+/// Page-scoped `@injectable` cubit backed by [CirculationRepository].
+/// [loadOpenLoans] fetches the filtered list and sidebar totals in one
+/// round-trip; failures emit into [LoanListState.error].
 @injectable
 class LoanListCubit extends Cubit<LoanListState> {
   LoanListCubit(this._repository) : super(const LoanListState());
 
   final CirculationRepository _repository;
 
+  /// Loads the filtered loan list and on-loan, due-today, overdue and hold counts.
   Future<void> loadOpenLoans() async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {

@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/features/circulation/reservation/domain/models/reservation.dart';
 
+/// Maps [ReservationRow] to [Reservation] and back for drift writes.
 extension ReservationRowMapper on ReservationRow {
   Reservation toDomain({
     String? titleName,

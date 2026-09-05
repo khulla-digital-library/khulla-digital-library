@@ -14,6 +14,14 @@ import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The returns desk: scan, price, confirm.
+///
+/// A return is several writes in one gesture — the copy goes back on the
+/// shelf, the loan closes, a fine may be raised, and a hold behind the title
+/// may become ready. That is why the confirm button is one button at the
+/// bottom of a summary, rather than an action per row.
+///
+/// [ReturnCubit] owns the basket, the waive-fines toggle and the reported
+/// condition; `returnCopies()` runs the transaction.
 class ReturnPage extends StatefulWidget {
   const ReturnPage({super.key});
 

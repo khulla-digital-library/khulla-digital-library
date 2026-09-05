@@ -6,6 +6,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'loan_list_state.freezed.dart';
 
+/// Open loans list, sidebar counts, and load status.
 @freezed
 abstract class LoanListState with _$LoanListState {
   const factory LoanListState({

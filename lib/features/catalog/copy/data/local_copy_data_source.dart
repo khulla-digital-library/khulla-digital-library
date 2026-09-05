@@ -10,6 +10,10 @@ import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/settings/data/tables/library_settings.dart';
 
+/// Drift-backed [CopyLocalDataSource].
+///
+/// List queries join titles and the current open loan for borrower and due
+/// date. [insertCopy] can allocate the next barcode from library settings.
 @LazySingleton(as: CopyLocalDataSource)
 class LocalCopyDataSource implements CopyLocalDataSource {
   LocalCopyDataSource(this._db);

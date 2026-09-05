@@ -6,6 +6,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'title_state.freezed.dart';
 
+/// Titles list query, page of results, and load status.
 @freezed
 abstract class TitleState with _$TitleState {
   const factory TitleState({

@@ -8,12 +8,17 @@ import 'package:khulla/features/members/domain/models/member_query.dart';
 import 'package:khulla/features/members/presentation/cubit/member_state.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// The members list: search, filters, sort and pagination.
+///
+/// Page-scoped `@injectable` cubit that dies with the list. Delegates to
+/// [MemberRepository]; [loadMembers] failures emit into [MemberState.error].
 @injectable
 class MemberCubit extends Cubit<MemberState> {
   MemberCubit(this._repository) : super(const MemberState());
 
   final MemberRepository _repository;
 
+  /// Fetches the current page of members using [MemberState.query].
   Future<void> loadMembers() async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {

@@ -6,6 +6,7 @@ import 'package:khulla/features/catalog/title/data/mappers/title_format_row_mapp
 import 'package:khulla/features/catalog/title/data/title_format_local_data_source.dart';
 import 'package:khulla/features/catalog/title/domain/models/title_format.dart';
 
+/// Drift-backed [TitleFormatLocalDataSource].
 @LazySingleton(as: TitleFormatLocalDataSource)
 class LocalTitleFormatDataSource implements TitleFormatLocalDataSource {
   LocalTitleFormatDataSource(this._db);

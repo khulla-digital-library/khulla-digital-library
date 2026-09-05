@@ -6,6 +6,12 @@ import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Every item of this work the library holds.
+///
+/// [AppTable] rather than the sliver form: a title has a handful of copies,
+/// the count is known before the card is built, and the table lives inside a
+/// card rather than owning the page's scroll view. Add-copy is wired through
+/// [onAddCopy]; per-copy maintenance routes through [onCopyAction] because
+/// the parent decides what is live yet.
 class TitleCopiesCard extends StatelessWidget {
   const TitleCopiesCard({
     required this.copies,

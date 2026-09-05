@@ -21,7 +21,15 @@ import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// One borrower's record: standing, loans, fines, and contact details.
+/// One borrower's record: their standing, what they are holding, what they
+/// owe, and everything they have read.
+///
+/// The four figures at the top are the ones a desk decides on — copies out,
+/// how many are late, what is owed, and how much they have borrowed over the
+/// life of the card. [MemberDetailCubit] loads the member, open loans, fine
+/// rows and loan history. Two panes from [FormFactor.expanded] up, matching
+/// the title detail page. Renew, suspend and collect-fine still toast as not
+/// wired; check-out and edit are live.
 class MemberDetailPage extends StatelessWidget {
   const MemberDetailPage({required this.memberId, super.key});
 
@@ -214,6 +222,7 @@ class MemberDetailPage extends StatelessWidget {
   }
 }
 
+/// Membership and contact fields the header does not repeat.
 class _MemberDetailsCard extends StatelessWidget {
   const _MemberDetailsCard({required this.member});
 

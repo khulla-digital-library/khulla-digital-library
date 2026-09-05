@@ -6,6 +6,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'title_form_state.freezed.dart';
 
+/// Title form: existing record, format picker options, and save progress.
 @freezed
 abstract class TitleFormState with _$TitleFormState {
   const factory TitleFormState({

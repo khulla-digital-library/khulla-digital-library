@@ -10,6 +10,12 @@ import 'package:khulla/features/circulation/loan/domain/models/loan_query.dart';
 import 'package:khulla/features/circulation/shared/domain/circulation_repository.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// A single title record plus its copies and loan history.
+///
+/// Page-scoped `@injectable` cubit for the title detail page. Pulls the title
+/// from [TitleRepository], copies from [CopyRepository], and returned loans
+/// from [CirculationRepository]. Reads emit into state; writes ([removeTitle],
+/// [addCopy]) rethrow so the gesture can toast.
 @injectable
 class TitleDetailCubit extends Cubit<TitleDetailState> {
   TitleDetailCubit(this._titles, this._copies, this._circulation)
@@ -19,6 +25,10 @@ class TitleDetailCubit extends Cubit<TitleDetailState> {
   final CopyRepository _copies;
   final CirculationRepository _circulation;
 
+  /// Loads the title, its copies, and returned loans for [id].
+  ///
+  /// A missing title becomes a [NotFoundException] in state. Other read
+  /// failures are emitted and swallowed.
   Future<void> loadTitle(String id) async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {
@@ -57,10 +67,12 @@ class TitleDetailCubit extends Cubit<TitleDetailState> {
     }
   }
 
+  /// Deletes the title. Rethrows on failure — the confirming dialog toasts.
   Future<void> removeTitle(String id) async {
     await _titles.removeTitle(id);
   }
 
+  /// Adds a copy and reloads the detail pane. Rethrows on failure.
   Future<void> addCopy(
     String titleId,
     String titleName, {

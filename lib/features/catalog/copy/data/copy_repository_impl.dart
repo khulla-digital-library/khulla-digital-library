@@ -7,6 +7,10 @@ import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:uuid/uuid.dart';
 
+/// [CopyRepository] over the local catalogue.
+///
+/// Assigns copy ids on insert; barcode generation when omitted is delegated to
+/// [CopyLocalDataSource].
 @LazySingleton(as: CopyRepository)
 class CopyRepositoryImpl implements CopyRepository {
   CopyRepositoryImpl(this._dataSource);

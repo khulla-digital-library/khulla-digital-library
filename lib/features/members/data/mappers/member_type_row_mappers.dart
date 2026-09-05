@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/features/members/domain/models/member_type.dart';
 
+/// Maps [MemberTypeRow] to [MemberType] and back for drift writes.
 extension MemberTypeRowX on MemberTypeRow {
   MemberType toDomain() => MemberType(
     id: id,

@@ -16,6 +16,12 @@ import 'package:khulla/features/members/domain/member_repository.dart';
 import 'package:khulla/features/members/domain/models/member_query.dart';
 import 'package:khulla/features/settings/domain/loan_rules_repository.dart';
 
+/// The check-out desk: member lookup, copy basket and loan creation.
+///
+/// Page-scoped `@injectable` cubit coordinating [CirculationRepository],
+/// [CopyRepository], [MemberRepository] and [LoanRulesRepository]. Member
+/// lookup failures emit into state; barcode adds and [checkOutCopies] emit
+/// and rethrow so the scanner field or confirm button can toast.
 @injectable
 class CheckOutCubit extends Cubit<CheckOutState> {
   CheckOutCubit(
@@ -34,6 +40,7 @@ class CheckOutCubit extends Cubit<CheckOutState> {
 
   Timer? _memberLookupTimer;
 
+  /// Formatted due date from the resolved [EffectiveLoanRules], or blank until a member is set.
   String dueDateLabel() {
     final rules = state.rules;
     if (rules == null) return '';
@@ -56,6 +63,10 @@ class CheckOutCubit extends Cubit<CheckOutState> {
     });
   }
 
+  /// Resolves a member by card number or unambiguous name search.
+  ///
+  /// Loads [EffectiveLoanRules] for their type on success. Failures emit
+  /// into state and swallow — the operator stays on the same field.
   Future<void> lookupMember(String query) async {
     emit(state.copyWith(isLookingUpMember: true, error: null));
     try {
@@ -116,6 +127,7 @@ class CheckOutCubit extends Cubit<CheckOutState> {
     );
   }
 
+  /// Adds a copy to the basket by barcode. Emits and rethrows on failure.
   Future<void> addCopyByBarcode(String barcode) async {
     final trimmed = barcode.trim();
     if (trimmed.isEmpty) return;
@@ -146,6 +158,10 @@ class CheckOutCubit extends Cubit<CheckOutState> {
     );
   }
 
+  /// Creates loans for every copy in the basket, then clears the desk.
+  ///
+  /// Emits and rethrows on failure so the confirm action can toast without
+  /// losing the basket.
   Future<void> checkOutCopies() async {
     final member = state.member;
     if (member == null || state.basket.isEmpty) return;

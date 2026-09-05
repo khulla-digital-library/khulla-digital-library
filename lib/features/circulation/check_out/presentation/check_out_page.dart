@@ -16,6 +16,15 @@ import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The checkout desk: a member, a basket of copies, and one button.
+///
+/// Two panes from [FormFactor.expanded] up, with the summary on the right
+/// where it stays visible as copies are scanned; one column below that. The
+/// scan field never leaves the top of the basket, because the barcode reader
+/// is the only input a busy desk uses.
+///
+/// [CheckOutCubit] owns the chosen member and the basket; `checkOutCopies()`
+/// names the outcome rather than the gesture, and a failed write answers as a
+/// toast — not as a screen state.
 class CheckOutPage extends StatefulWidget {
   const CheckOutPage({super.key});
 

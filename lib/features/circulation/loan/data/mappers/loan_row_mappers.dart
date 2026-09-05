@@ -2,6 +2,9 @@ import 'package:drift/drift.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 
+/// Maps [LoanRow] to [Loan] and back for drift writes.
+///
+/// Barcode, title and member names are join columns on list reads.
 extension LoanRowMapper on LoanRow {
   Loan toDomain({
     String? barcode,

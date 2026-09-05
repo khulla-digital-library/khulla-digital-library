@@ -6,6 +6,7 @@ import 'package:khulla/features/members/data/mappers/member_type_row_mappers.dar
 import 'package:khulla/features/members/data/member_type_local_data_source.dart';
 import 'package:khulla/features/members/domain/models/member_type.dart';
 
+/// Drift-backed [MemberTypeLocalDataSource].
 @LazySingleton(as: MemberTypeLocalDataSource)
 class LocalMemberTypeDataSource implements MemberTypeLocalDataSource {
   LocalMemberTypeDataSource(this._db);

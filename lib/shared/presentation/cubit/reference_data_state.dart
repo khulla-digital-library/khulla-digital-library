@@ -6,6 +6,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'reference_data_state.freezed.dart';
 
+/// Cached title formats and member types for forms and filters app-wide.
 @freezed
 abstract class ReferenceDataState with _$ReferenceDataState {
   const factory ReferenceDataState({

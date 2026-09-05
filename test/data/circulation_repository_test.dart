@@ -14,6 +14,11 @@ import '../helpers/catalog_fixtures.dart';
 import '../helpers/stub_loan_data_source.dart';
 import '../helpers/test_database.dart';
 
+/// Integration tests for [CirculationRepositoryImpl] against a real database.
+///
+/// [StubLoanLocalDataSource] keeps the constructor honest while these tests
+/// focus on transactional writes — duplicate loans, fines on return, and copy
+/// status changes — without also asserting loan-list queries.
 void main() {
   late AppDatabase db;
   late CirculationRepositoryImpl repository;

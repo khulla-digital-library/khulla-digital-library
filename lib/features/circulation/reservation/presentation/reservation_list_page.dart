@@ -13,6 +13,12 @@ import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The hold queue, in the order members asked.
+///
+/// Ordering is the whole point of this screen, so the queue position is a
+/// column rather than a detail: two members waiting on the same title is the
+/// case the desk has to get right. [ReservationListCubit] owns search and
+/// status filters. Mark ready, cancel and the empty-state place action still
+/// toast as not wired.
 class ReservationListPage extends StatelessWidget {
   const ReservationListPage({super.key});
 

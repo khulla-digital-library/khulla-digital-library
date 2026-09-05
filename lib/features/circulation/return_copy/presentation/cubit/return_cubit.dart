@@ -7,12 +7,18 @@ import 'package:khulla/features/circulation/loan/domain/models/loan_query.dart';
 import 'package:khulla/features/circulation/return_copy/presentation/cubit/return_state.dart';
 import 'package:khulla/features/circulation/shared/domain/circulation_repository.dart';
 
+/// The returns desk: loan basket, condition, fine waiver and check-in.
+///
+/// Page-scoped `@injectable` cubit backed by [CirculationRepository].
+/// Barcode lookup failures emit and rethrow; [returnCopies] emits and
+/// rethrows so the confirm button can toast while keeping the basket.
 @injectable
 class ReturnCubit extends Cubit<ReturnState> {
   ReturnCubit(this._repository) : super(const ReturnState());
 
   final CirculationRepository _repository;
 
+  /// Adds an open loan to the basket by barcode. Emits and rethrows on failure.
   Future<void> addLoanByBarcode(String barcode) async {
     final trimmed = barcode.trim();
     if (trimmed.isEmpty) return;
@@ -63,6 +69,9 @@ class ReturnCubit extends Cubit<ReturnState> {
     emit(state.copyWith(condition: value, error: null));
   }
 
+  /// Checks in every loan in the basket, then clears the desk.
+  ///
+  /// Emits and rethrows on failure so the confirm action can toast.
   Future<void> returnCopies() async {
     if (state.basket.isEmpty) return;
 

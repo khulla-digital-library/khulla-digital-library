@@ -6,12 +6,17 @@ import 'package:khulla/features/settings/domain/library_settings_repository.dart
 import 'package:khulla/features/settings/presentation/cubit/library_profile_state.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// Library identity settings: name, contact details and currency.
+///
+/// Page-scoped `@injectable` cubit. [loadProfile] is a read — failures emit
+/// into [LibraryProfileState.error]. [saveProfile] emits and rethrows.
 @injectable
 class LibraryProfileCubit extends Cubit<LibraryProfileState> {
   LibraryProfileCubit(this._repository) : super(const LibraryProfileState());
 
   final LibrarySettingsRepository _repository;
 
+  /// Loads the library profile row.
   Future<void> loadProfile() async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {
@@ -30,6 +35,7 @@ class LibraryProfileCubit extends Cubit<LibraryProfileState> {
     }
   }
 
+  /// Persists profile edits. Emits and rethrows on failure so the form can toast.
   Future<void> saveProfile({
     required String name,
     required AppCurrency currency,

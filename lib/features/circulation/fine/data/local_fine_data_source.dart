@@ -9,6 +9,10 @@ import 'package:khulla/features/circulation/fine/domain/models/fine_query.dart';
 import 'package:khulla/features/circulation/shared/domain/fine_reason.dart';
 import 'package:khulla/features/circulation/shared/domain/fine_status.dart';
 
+/// Drift-backed [FineLocalDataSource].
+///
+/// Joins members and, via the loan chain, title names for list display.
+/// The outstanding-only filter compares assessed, paid and waived in SQL.
 @LazySingleton(as: FineLocalDataSource)
 class LocalFineDataSource implements FineLocalDataSource {
   LocalFineDataSource(this._db);

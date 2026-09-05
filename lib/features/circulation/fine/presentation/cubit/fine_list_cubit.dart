@@ -10,12 +10,18 @@ import 'package:khulla/features/circulation/shared/domain/circulation_repository
 import 'package:khulla/features/circulation/shared/domain/fine_status.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
+/// Fines list plus outstanding, collected and waived totals.
+///
+/// Page-scoped `@injectable` cubit backed by [CirculationRepository].
+/// [loadFines] fetches the filtered list and summary money in parallel;
+/// failures emit into [FineListState.error].
 @injectable
 class FineListCubit extends Cubit<FineListState> {
   FineListCubit(this._repository) : super(const FineListState());
 
   final CirculationRepository _repository;
 
+  /// Loads the filtered fine list and summary totals by status.
   Future<void> loadFines() async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {
