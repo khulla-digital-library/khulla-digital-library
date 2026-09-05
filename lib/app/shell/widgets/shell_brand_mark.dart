@@ -61,7 +61,6 @@ class ShellBrandMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final colors = context.appColors;
     final l10n = context.l10n;
 
     if (!extended) {
@@ -71,6 +70,6 @@ class ShellBrandMark extends StatelessWidget {
       );
     }
 
-    return AppLogo.primaryFull(height: spacing.xlg + spacing.lg);
+    return AppLogo.primaryFull(height: spacing.xlg + spacing.md);
   }
 }

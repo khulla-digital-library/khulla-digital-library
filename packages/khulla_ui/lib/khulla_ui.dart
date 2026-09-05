@@ -38,6 +38,7 @@ export 'src/widgets/app_content_constraint.dart';
 export 'src/widgets/app_dashed_border.dart';
 export 'src/widgets/app_detail_row.dart';
 export 'src/widgets/app_dialog.dart';
+export 'src/widgets/app_dialog_close_chip.dart';
 export 'src/widgets/app_donut_chart.dart';
 export 'src/widgets/app_dropdown_field.dart';
 export 'src/widgets/app_empty_view.dart';

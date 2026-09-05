@@ -30,7 +30,6 @@ class ReportsRankedTable extends StatelessWidget {
 
     return AppTable<ReportsRankedRow>(
       items: rows,
-      rowHeight: 52,
       columns: [
         AppTableColumn<ReportsRankedRow>(
           id: 'rank',

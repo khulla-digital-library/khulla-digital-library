@@ -20,7 +20,7 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// {@endtemplate}
 class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// {@macro app_text_styles}
-  const AppTextStyles({this.density = AppDensity.compact});
+  const AppTextStyles({this.density = AppDensity.comfortable});
 
   /// The rung these styles were resolved at.
   final AppDensity density;

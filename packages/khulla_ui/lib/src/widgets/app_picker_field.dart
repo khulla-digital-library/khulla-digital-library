@@ -34,6 +34,8 @@ class AppPickerField extends StatelessWidget {
   final String? label;
 
   /// Placeholder while nothing is chosen.
+  ///
+  /// Defaults to [label] when omitted so labelled fields always show a hint.
   final String? hintText;
 
   /// Validation message shown under the field.
@@ -61,6 +63,7 @@ class AppPickerField extends StatelessWidget {
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
     final fieldLabel = label;
+    final hint = hintText ?? fieldLabel;
     final selected = value;
     final hasValue = selected != null && selected.isNotEmpty;
     final clear = onClear;
@@ -79,7 +82,7 @@ class AppPickerField extends StatelessWidget {
           child: InputDecorator(
             isEmpty: !hasValue,
             decoration: InputDecoration(
-              hintText: hintText,
+              hintText: hint,
               errorText: errorText,
               enabled: enabled,
               suffixIcon: AppFieldAffix(

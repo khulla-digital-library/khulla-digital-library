@@ -29,7 +29,6 @@ class AppSliverTable<T> extends StatelessWidget {
     this.onSort,
     this.compactBuilder,
     this.compactExtent = 108,
-    this.rowHeight,
     this.headerHeight,
     this.pinHeader = true,
     super.key,
@@ -61,10 +60,6 @@ class AppSliverTable<T> extends StatelessWidget {
   /// the scrollbar stays honest. Cards must not exceed it.
   final double compactExtent;
 
-  /// Height of each row. Null resolves to the density's row height, which is
-  /// what keeps a catalogue at the same rhythm as every other table.
-  final double? rowHeight;
-
   /// Height of the heading row. Null resolves to the density's.
   final double? headerHeight;
 
@@ -76,11 +71,11 @@ class AppSliverTable<T> extends StatelessWidget {
     final compact = compactBuilder;
     final asCards = context.formFactor.isCompact && compact != null;
     final metrics = context.appMetrics;
-    final resolvedRowHeight = rowHeight ?? metrics.tableHeaderHeight - 4;
+    final rowHeight = metrics.tableRowHeight;
     final resolvedHeaderHeight = headerHeight ?? metrics.tableHeaderHeight;
 
     final list = SliverFixedExtentList.builder(
-      itemExtent: asCards ? compactExtent : resolvedRowHeight,
+      itemExtent: asCards ? compactExtent : rowHeight,
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
@@ -89,7 +84,6 @@ class AppSliverTable<T> extends StatelessWidget {
           item: item,
           index: index,
           columns: columns,
-          height: resolvedRowHeight,
           selected: isSelected?.call(item) ?? false,
           onTap: onRowTap == null ? null : () => onRowTap!(item),
         );

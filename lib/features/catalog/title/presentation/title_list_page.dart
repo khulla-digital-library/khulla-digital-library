@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/core/di/injection.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
 import 'package:khulla/features/catalog/title/domain/models/title.dart'
@@ -7,6 +10,7 @@ import 'package:khulla/features/catalog/title/domain/models/title.dart'
 import 'package:khulla/features/catalog/title/presentation/cubit/title_cubit.dart';
 import 'package:khulla/features/catalog/title/presentation/cubit/title_state.dart';
 import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
+import 'package:khulla/features/catalog/title/presentation/title_list_refresh.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_card.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/presentation/cubit/reference_data_cubit.dart';
@@ -29,6 +33,30 @@ class TitleListPage extends StatefulWidget {
 }
 
 class _TitleListPageState extends State<TitleListPage> {
+  @override
+  void initState() {
+    super.initState();
+    getIt<TitleListRefresh>().reload = _reload;
+  }
+
+  @override
+  void dispose() {
+    getIt<TitleListRefresh>().reload = null;
+    super.dispose();
+  }
+
+  void _reload() {
+    if (!mounted) return;
+    unawaited(context.read<TitleCubit>().loadTitles());
+  }
+
+  Future<void> _addTitle() async {
+    final saved = await TitleFormDialog.show(context);
+    if (saved == true && mounted) {
+      await context.read<TitleCubit>().loadTitles();
+    }
+  }
+
   bool _isFiltered(TitleState state) =>
       state.query.search.isNotEmpty ||
       state.query.formatId != null ||
@@ -218,7 +246,7 @@ class _TitleListPageState extends State<TitleListPage> {
                   title: l10n.titlesEmptyTitle,
                   message: l10n.titlesEmptyBody,
                   actionLabel: l10n.titlesAdd,
-                  onAction: () => TitleFormDialog.show(context),
+                  onAction: () => unawaited(_addTitle()),
                 ),
           footer: AppPagination(
             rangeLabel: l10n.commonShowingRange(

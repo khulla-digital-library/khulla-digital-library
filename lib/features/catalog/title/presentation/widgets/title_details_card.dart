@@ -40,10 +40,6 @@ class TitleDetailsCard extends StatelessWidget {
               title.formatCode.formatLabel(l10n),
             ),
             (l10n.fieldPages, pages == null ? notSet : '$pages'),
-            (
-              l10n.fieldSubjects,
-              title.subjects.isEmpty ? notSet : title.subjects.join(', '),
-            ),
             (l10n.fieldShelf, title.shelf ?? notSet),
             (l10n.fieldReplacementCost, title.replacementCost.display()),
             (l10n.fieldAddedOn, title.addedOn),

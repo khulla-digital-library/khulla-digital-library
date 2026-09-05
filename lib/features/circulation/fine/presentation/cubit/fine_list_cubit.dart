@@ -23,7 +23,9 @@ class FineListCubit extends Cubit<FineListState> {
 
   /// Loads the filtered fine list and summary totals by status.
   Future<void> loadFines() async {
-    emit(state.copyWith(status: LoadStatus.loading, error: null));
+    emit(
+      state.copyWith(status: state.status.forCollectionFetch(), error: null),
+    );
     try {
       final results = await Future.wait<FineListResult>([
         _repository.findFines(state.query),

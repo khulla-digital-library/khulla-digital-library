@@ -271,7 +271,7 @@ class AppDialog extends StatelessWidget {
               Positioned(
                 top: -spacing.xs,
                 right: -spacing.xs - 2,
-                child: _DialogCloseChip(
+                child: AppDialogCloseChip(
                   onPressed: () => Navigator.of(context).maybePop(),
                 ),
               ),
@@ -318,62 +318,6 @@ class AppDialogActions extends StatelessWidget {
           child,
         ],
       ],
-    );
-  }
-}
-
-/// The close chip: a bordered square that sits *outside* the dialog's corner,
-/// slides a little further out on hover and turns its glyph a quarter turn.
-class _DialogCloseChip extends StatefulWidget {
-  const _DialogCloseChip({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  State<_DialogCloseChip> createState() => _DialogCloseChipState();
-}
-
-class _DialogCloseChipState extends State<_DialogCloseChip> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final spacing = context.appSpacing;
-    final colors = context.appColors;
-    final motion = context.appMotion;
-    final metrics = context.appMetrics;
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onPressed,
-        child: AnimatedSlide(
-          duration: motion.layout,
-          curve: motion.standard,
-          offset: _hovered ? const Offset(0.15, -0.15) : Offset.zero,
-          child: Container(
-            padding: EdgeInsets.all(spacing.xxs),
-            decoration: BoxDecoration(
-              color: context.colorScheme.surface,
-              borderRadius: BorderRadius.circular(context.appRadius.item),
-              border: Border.all(color: colors.hairline),
-              boxShadow: context.appShadows.overlay,
-            ),
-            child: AnimatedRotation(
-              duration: motion.layout,
-              curve: motion.standard,
-              turns: _hovered ? 0.25 : 0,
-              child: AppIcon(
-                AppIcons.close,
-                size: metrics.icon,
-                color: colors.ink500,
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

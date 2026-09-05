@@ -28,8 +28,7 @@ class App extends StatelessWidget {
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: getIt<AppRouter>().router,
           // AppResponsiveTheme re-resolves the theme for the window's size
-          // class, so a resized desktop window switches type ramp and density
-          // without a restart.
+          // class and caps text scaling.
           builder: (context, child) => DismissKeyboard(
             child: AppResponsiveTheme(
               child: child ?? const SizedBox.shrink(),

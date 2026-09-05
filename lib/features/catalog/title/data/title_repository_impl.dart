@@ -35,14 +35,12 @@ class TitleRepositoryImpl implements TitleRepository {
     required bool lendable,
     required Money replacementCost,
     String? id,
-    String? subtitle,
     String? isbn,
     String? publisher,
     int? publishedYear,
     String? edition,
     String language = 'English',
     int? pages,
-    List<String> subjects = const [],
     String? description,
     String? shelf,
   }) async {
@@ -51,12 +49,10 @@ class TitleRepositoryImpl implements TitleRepository {
     final existing = id == null ? null : await _dataSource.findTitleById(id);
     final search = buildSearchText([
       title,
-      subtitle ?? '',
       author,
       isbn ?? '',
       publisher ?? '',
       shelf ?? '',
-      ...subjects,
     ]);
 
     final draft = Title(
@@ -66,14 +62,12 @@ class TitleRepositoryImpl implements TitleRepository {
       formatId: formatId,
       formatName: existing?.formatName ?? '',
       formatCode: existing?.formatCode,
-      subtitle: subtitle?.trim(),
       isbn: isbn?.trim(),
       publisher: publisher?.trim(),
       publishedYear: publishedYear,
       edition: edition?.trim(),
       language: language.trim(),
       pages: pages,
-      subjects: subjects,
       description: description?.trim(),
       shelf: shelf?.trim(),
       lendable: lendable,

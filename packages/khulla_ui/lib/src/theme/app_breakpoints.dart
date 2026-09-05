@@ -105,8 +105,9 @@ class AppBreakpoints extends ThemeExtension<AppBreakpoints> {
   final double wideContentMaxWidth;
 
   /// Resolves [width] to an [AppDensity].
-  AppDensity densityFor(double width) =>
-      width >= comfortable ? AppDensity.comfortable : AppDensity.compact;
+  ///
+  /// Density is not user-configurable; the comfortable rung is always used.
+  AppDensity densityFor(double width) => AppDensity.comfortable;
 
   /// Resolves [width] to a [FormFactor].
   FormFactor formFactorFor(double width) {

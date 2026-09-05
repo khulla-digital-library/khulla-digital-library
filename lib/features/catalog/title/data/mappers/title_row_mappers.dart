@@ -4,19 +4,17 @@ import 'package:khulla/features/catalog/title/domain/models/title.dart';
 
 /// Maps [TitleRow] to [Title] and back for drift writes.
 ///
-/// Joined columns — format name, copy counts, subjects — are passed in from
-/// the data source because they are not on the base row.
+/// Joined columns — format name and copy counts — are passed in from the data
+/// source because they are not on the base row.
 extension TitleRowMapper on TitleRow {
   Title toDomain({
     required String formatName,
     required int copyCount,
     required int availableCount,
-    required List<String> subjects,
     String? formatCode,
   }) => Title(
     id: id,
     title: title,
-    subtitle: subtitle,
     author: author,
     isbn: isbn,
     publisher: publisher,
@@ -24,7 +22,6 @@ extension TitleRowMapper on TitleRow {
     edition: edition,
     language: language,
     pages: pages,
-    subjects: subjects,
     description: description,
     shelf: shelf,
     formatId: formatId,
@@ -44,7 +41,6 @@ extension TitleDomainMapper on Title {
   TitlesCompanion toCompanion({required String searchText}) => TitlesCompanion(
     id: Value(id),
     title: Value(title),
-    subtitle: Value(subtitle),
     author: Value(author),
     isbn: Value(isbn),
     publisher: Value(publisher),
@@ -53,11 +49,6 @@ extension TitleDomainMapper on Title {
     pages: Value(pages),
     formatId: Value(formatId),
     language: Value(language),
-    subjects: Value(
-      subjects.isEmpty
-          ? ''
-          : '|${subjects.map((s) => s.toLowerCase()).join('|')}|',
-    ),
     description: Value(description),
     shelf: Value(shelf),
     lendable: Value(lendable),

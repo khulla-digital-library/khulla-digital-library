@@ -122,7 +122,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
             )
           : AppTable<LabelQueueEntry>(
               items: _queue,
-              rowHeight: 52,
               columns: [
                 AppTableColumn<LabelQueueEntry>(
                   id: 'barcode',

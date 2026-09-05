@@ -61,7 +61,7 @@ class AppFormModal extends StatelessWidget {
     }
     return showDialog<T>(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: builder,
     );
   }
@@ -75,7 +75,7 @@ class AppFormModal extends StatelessWidget {
 
     final heading = Text(
       title,
-      style: typography.sectionTitle.copyWith(color: colors.ink100),
+      style: typography.displaySmall.copyWith(color: colors.ink200),
     );
 
     final body = Column(
@@ -89,14 +89,12 @@ class AppFormModal extends StatelessWidget {
       ],
     );
 
-    final footer = Container(
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        border: Border(top: BorderSide(color: colors.hairline)),
-      ),
-      padding: EdgeInsets.symmetric(
-        horizontal: spacing.lg,
-        vertical: spacing.sm,
+    final footer = Padding(
+      padding: EdgeInsets.fromLTRB(
+        spacing.lg,
+        spacing.sm,
+        spacing.lg,
+        spacing.lg,
       ),
       child: AppDialogActions(children: actions),
     );
@@ -110,7 +108,7 @@ class AppFormModal extends StatelessWidget {
             tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
             onPressed: () => Navigator.of(context).maybePop(),
           ),
-          title: Text(title, style: typography.sectionTitle),
+          title: Text(title, style: typography.displaySmall),
         ),
         body: SafeArea(
           child: Column(
@@ -159,59 +157,58 @@ class AppFormModal extends StatelessWidget {
           maxWidth: width.value,
           maxHeight: MediaQuery.sizeOf(context).height * 0.9,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                spacing.lg,
-                spacing.sm,
-                spacing.xs,
-                0,
-              ),
-              child: Row(
-                children: [
-                  Expanded(child: heading),
-                  AppIconButton(
-                    icon: AppIcons.close,
-                    size: AppIconButtonSize.small,
-                    tooltip: MaterialLocalizations.of(
-                      context,
-                    ).closeButtonTooltip,
-                    onPressed: () => Navigator.of(context).maybePop(),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    spacing.lg,
+                    spacing.lg,
+                    spacing.lg,
+                    spacing.sm,
                   ),
-                ],
+                  child: heading,
+                ),
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      spacing.lg,
+                      0,
+                      spacing.lg,
+                      spacing.lg,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (description case final line?) ...[
+                          Text(
+                            line,
+                            style: typography.body.copyWith(
+                              color: colors.mutedForeground,
+                            ),
+                          ),
+                          SizedBox(height: spacing.sm),
+                        ],
+                        body,
+                      ],
+                    ),
+                  ),
+                ),
+                footer,
+              ],
+            ),
+            Positioned(
+              top: -spacing.xs,
+              right: -spacing.xs - 2,
+              child: AppDialogCloseChip(
+                onPressed: () => Navigator.of(context).maybePop(),
               ),
             ),
-            Divider(height: 1, color: colors.hairline),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                  spacing.lg,
-                  spacing.sm,
-                  spacing.lg,
-                  spacing.lg,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (description case final line?) ...[
-                      Text(
-                        line,
-                        style: typography.body.copyWith(
-                          color: colors.mutedForeground,
-                        ),
-                      ),
-                      SizedBox(height: spacing.sm),
-                    ],
-                    body,
-                  ],
-                ),
-              ),
-            ),
-            footer,
           ],
         ),
       ),

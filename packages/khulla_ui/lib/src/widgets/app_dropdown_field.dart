@@ -62,6 +62,8 @@ class AppDropdownField<T> extends StatelessWidget {
   final String? label;
 
   /// Placeholder while nothing is selected.
+  ///
+  /// Defaults to [label] when omitted so labelled fields always show a hint.
   final String? hintText;
 
   /// Validation message shown under the control.
@@ -104,6 +106,7 @@ class AppDropdownField<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final metrics = context.appMetrics;
     final fieldLabel = label;
+    final hint = hintText ?? fieldLabel;
     final error = errorText;
 
     return Column(
@@ -122,7 +125,7 @@ class AppDropdownField<T> extends StatelessWidget {
           items: items,
           itemLabel: itemLabel,
           onChanged: onChanged,
-          hintText: hintText,
+          hintText: hint,
           enabled: enabled,
           itemIcon: itemIcon,
           searchable: searchable,

@@ -7,7 +7,6 @@ import 'package:khulla/features/catalog/title/data/mappers/title_row_mappers.dar
 import 'package:khulla/features/catalog/title/data/title_local_data_source.dart';
 import 'package:khulla/features/catalog/title/domain/models/title.dart';
 import 'package:khulla/features/catalog/title/domain/models/title_query.dart';
-import 'package:khulla/shared/utils/search_text.dart';
 
 /// Drift-backed [TitleLocalDataSource].
 ///
@@ -103,7 +102,6 @@ LIMIT ? OFFSET ?''';
   Title _mapRow(QueryRow row) => Title(
     id: row.read<String>('id'),
     title: row.read<String>('title'),
-    subtitle: row.readNullable<String>('subtitle'),
     author: row.read<String>('author'),
     isbn: row.readNullable<String>('isbn'),
     publisher: row.readNullable<String>('publisher'),
@@ -111,7 +109,6 @@ LIMIT ? OFFSET ?''';
     edition: row.readNullable<String>('edition'),
     language: row.read<String>('language'),
     pages: row.readNullable<int>('pages'),
-    subjects: decodeSubjects(row.read<String>('subjects')),
     description: row.readNullable<String>('description'),
     shelf: row.readNullable<String>('shelf'),
     formatId: row.read<String>('format_id'),

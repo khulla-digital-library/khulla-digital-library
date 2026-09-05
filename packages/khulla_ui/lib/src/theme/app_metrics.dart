@@ -8,7 +8,7 @@ import 'package:khulla_ui/khulla_ui.dart';
 ///
 /// These numbers are what make the product feel like itself — get the colors
 /// perfect and the heights wrong and it still reads as a different app. A
-/// 36px button next to a 40px field next to a 37px table row is the rhythm;
+/// 36px button next to a 44px field next to a 60px table row is the rhythm;
 /// Material's defaults (48px everything) are roughly a third looser and turn
 /// a dense catalogue screen into a scrolling one.
 ///
@@ -21,6 +21,7 @@ class AppMetrics extends ThemeExtension<AppMetrics> {
     required this.density,
     required this.fieldHeight,
     required this.tableHeaderHeight,
+    required this.tableRowHeight,
     required this.tableCellPaddingY,
     required this.navRowHeight,
     required this.iconNav,
@@ -55,7 +56,8 @@ class AppMetrics extends ThemeExtension<AppMetrics> {
     density: density,
     fieldHeight: density.pick(40, 44),
     tableHeaderHeight: density.pick(40, 48),
-    tableCellPaddingY: density.pick(6, 10),
+    tableRowHeight: 65,
+    tableCellPaddingY: 16,
     navRowHeight: density.pick(42, 46),
     iconNav: density.pick(16, 20),
     labelToControlGap: density.pick(8, 12),
@@ -71,8 +73,11 @@ class AppMetrics extends ThemeExtension<AppMetrics> {
   /// A table's header row.
   final double tableHeaderHeight;
 
-  /// Vertical padding inside a body cell. With a 12–14px line this lands the
-  /// row at roughly 37px, which is the density the whole design assumes.
+  /// A table body row. One global height for every table in the app — not
+  /// tied to [AppDensity] and not overridable per table.
+  final double tableRowHeight;
+
+  /// Vertical padding inside a body cell. Global, like [tableRowHeight].
   final double tableCellPaddingY;
 
   /// A navigation row in the rail.
@@ -173,6 +178,7 @@ class AppMetrics extends ThemeExtension<AppMetrics> {
         other.tableHeaderHeight,
         t,
       )!,
+      tableRowHeight: lerpDouble(tableRowHeight, other.tableRowHeight, t)!,
       tableCellPaddingY: lerpDouble(
         tableCellPaddingY,
         other.tableCellPaddingY,

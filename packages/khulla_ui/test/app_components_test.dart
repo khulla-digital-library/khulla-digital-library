@@ -109,6 +109,40 @@ void main() {
       expect(find.byType(AppFieldError), findsOneWidget);
       expect(find.text('Already taken'), findsOneWidget);
     });
+
+    testWidgets('defaults hint text to the label when hintText is omitted', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 280,
+            child: AppTextField(label: 'ISBN', onChanged: (_) {}),
+          ),
+        ),
+      );
+
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.decoration!.hintText, 'ISBN');
+    });
+
+    testWidgets('keeps an explicit hintText over the label', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 280,
+            child: AppTextField(
+              label: 'ISBN',
+              hintText: '978-0-000-00000-0',
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.decoration!.hintText, '978-0-000-00000-0');
+    });
   });
 
   group('AppDropdownField', () {
@@ -277,20 +311,21 @@ void main() {
         ),
       );
 
-      Color? fillOf(String label) {
-        final container = tester.widget<AnimatedContainer>(
-          find
-              .ancestor(
-                of: find.text(label),
-                matching: find.byType(AnimatedContainer),
-              )
-              .first,
+      final zebra = AppColors.light().tints.rowZebra;
+
+      bool hasZebraStripe(String label) {
+        final row = find.ancestor(
+          of: find.text(label),
+          matching: find.byType(Stack),
         );
-        return (container.decoration! as BoxDecoration).color;
+        final boxes = tester.widgetList<ColoredBox>(
+          find.descendant(of: row, matching: find.byType(ColoredBox)),
+        );
+        return boxes.any((box) => box.color == zebra);
       }
 
-      expect(fillOf('one'), Colors.transparent);
-      expect(fillOf('two'), isNot(Colors.transparent));
+      expect(hasZebraStripe('one'), isFalse);
+      expect(hasZebraStripe('two'), isTrue);
     });
   });
 
@@ -303,8 +338,8 @@ void main() {
           data: const MediaQueryData(size: Size(800, height)),
           child: MaterialApp(
             theme: AppTheme.light(),
-            home: Scaffold(
-              body: const AppEmptyView(
+            home: const Scaffold(
+              body: AppEmptyView(
                 icon: AppIcons.book,
                 title: 'No titles yet',
                 message: 'Catalogue the first work.',

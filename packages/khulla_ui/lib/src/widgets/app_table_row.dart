@@ -2,15 +2,14 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// One row of an [AppTable] or [AppSliverTable].
 ///
-/// Rows are separated by a **zebra stripe**, not by rules: at ~37px per row a
+/// Rows are separated by a **zebra stripe**, not by rules: at ~60px per row a
 /// hairline every line turns a long table into a grid of boxes, while a 10%
 /// tint on even rows reads as texture and lets the eye track across a 1600px
 /// window. Hover and selection are tints of the same family, one step
 /// stronger each, so the three states never compete.
 ///
-/// The row's height is not fixed here — it comes from the cell padding token,
-/// which is what keeps the table at the density the rest of the design
-/// assumes.
+/// The row's height comes from [AppMetrics.tableRowHeight] in the theme —
+/// one global token for every table in the app.
 class AppTableRow<T> extends StatefulWidget {
   const AppTableRow({
     required this.item,
@@ -18,7 +17,6 @@ class AppTableRow<T> extends StatefulWidget {
     required this.index,
     this.onTap,
     this.selected = false,
-    this.height,
     this.divided = false,
     super.key,
   });
@@ -37,10 +35,6 @@ class AppTableRow<T> extends StatefulWidget {
 
   /// Whether this row is the picked one.
   final bool selected;
-
-  /// The row's height. Uniform, so a lazy list can skip measuring. Null
-  /// resolves to the density's row height.
-  final double? height;
 
   /// Draws a hairline under the row. Off by default — the zebra stripe is
   /// the separator. Turn it on only for a short table inside a card, where
@@ -62,19 +56,15 @@ class _AppTableRowState<T> extends State<AppTableRow<T>> {
     final metrics = context.appMetrics;
     final visible = AppTableColumn.visible(widget.columns, context.formFactor);
     final interactive = widget.onTap != null;
+    final rowHeight = metrics.tableRowHeight;
+    final motion = context.appMotion;
+    final showOverlay = widget.selected || (_hovered && interactive);
+    final overlayColor = widget.selected ? tints.rowSelected : tints.rowHover;
 
-    final fill = switch (null) {
-      _ when widget.selected => tints.rowSelected,
-      _ when _hovered && interactive => tints.rowHover,
-      _ when widget.index.isOdd => tints.rowZebra,
-      _ => Colors.transparent,
-    };
-
-    final content = ConstrainedBox(
-      constraints: BoxConstraints(
-        minHeight: widget.height ?? metrics.tableHeaderHeight - 4,
-      ),
+    final content = SizedBox(
+      height: rowHeight,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (final column in visible)
             column.sized(
@@ -104,21 +94,38 @@ class _AppTableRowState<T> extends State<AppTableRow<T>> {
       cursor: interactive ? SystemMouseCursors.click : MouseCursor.defer,
       onEnter: interactive ? (_) => setState(() => _hovered = true) : null,
       onExit: interactive ? (_) => setState(() => _hovered = false) : null,
-      child: AnimatedContainer(
-        duration: context.appMotion.color,
+      child: DecoratedBox(
         decoration: BoxDecoration(
-          color: fill,
           border: widget.divided
               ? Border(bottom: BorderSide(color: colors.hairline))
               : null,
         ),
-        child: interactive
-            ? GestureDetector(
+        child: Stack(
+          children: [
+            if (widget.index.isOdd)
+              Positioned.fill(child: ColoredBox(color: tints.rowZebra)),
+            // Fade the tint in rather than lerping to it. AnimatedContainer
+            // from Colors.transparent lerps through black (transparent is
+            // 0x00000000), which reads as a dark-theme grey for a frame.
+            Positioned.fill(
+              child: IgnorePointer(
+                child: AnimatedOpacity(
+                  duration: motion.color,
+                  opacity: showOverlay ? 1 : 0,
+                  child: ColoredBox(color: overlayColor),
+                ),
+              ),
+            ),
+            if (interactive)
+              GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: widget.onTap,
                 child: content,
               )
-            : content,
+            else
+              content,
+          ],
+        ),
       ),
     );
   }

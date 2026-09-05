@@ -20,7 +20,9 @@ class MemberCubit extends Cubit<MemberState> {
 
   /// Fetches the current page of members using [MemberState.query].
   Future<void> loadMembers() async {
-    emit(state.copyWith(status: LoadStatus.loading, error: null));
+    emit(
+      state.copyWith(status: state.status.forCollectionFetch(), error: null),
+    );
     try {
       final result = await _repository.findMembers(state.query);
       if (isClosed) return;

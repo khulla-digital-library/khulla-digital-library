@@ -32,31 +32,15 @@ class TitleDetailHeader extends StatelessWidget {
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
     final isAvailable = title.availableCount > 0;
-    final subtitle = title.subtitle;
 
     return RecordHeader(
       title: title.title,
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (subtitle != null) ...[
-            Text(
-              subtitle,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: scheme.onSurfaceVariant,
-              ),
-            ),
-            SizedBox(height: spacing.xxs),
-          ],
-          Text(
-            title.author,
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: scheme.primary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+      subtitle: Text(
+        title.author,
+        style: context.textTheme.bodyMedium?.copyWith(
+          color: scheme.primary,
+          fontWeight: FontWeight.w500,
+        ),
       ),
       facts: [
         title.formatCode.formatLabel(l10n),

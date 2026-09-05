@@ -44,7 +44,6 @@ class AppLogo extends StatelessWidget {
   const AppLogo.primaryLight({this.height, this.width, super.key})
     : variant = AppLogoVariant.primaryLight;
 
-
   const AppLogo.primaryFull({this.height, this.width, super.key})
     : variant = AppLogoVariant.primaryFull;
 

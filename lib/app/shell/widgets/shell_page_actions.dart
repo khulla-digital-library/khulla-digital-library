@@ -3,6 +3,7 @@ import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_form_dialog.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_list_refresh.dart';
 import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
+import 'package:khulla/features/catalog/title/presentation/title_list_refresh.dart';
 import 'package:khulla/features/circulation/reservation/presentation/place_hold_dialog.dart';
 import 'package:khulla/features/circulation/reservation/presentation/reservation_list_refresh.dart';
 import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
@@ -59,7 +60,12 @@ List<Widget> shellPageActions(
       modal(
         l10n.titlesAdd,
         AppIcons.add,
-        () => TitleFormDialog.show(context),
+        () async {
+          final saved = await TitleFormDialog.show(context);
+          if (saved == true) {
+            getIt<TitleListRefresh>().notifyChanged();
+          }
+        },
       ),
     ],
     _ when Routes.isUnder(location, Routes.catalogCopies) => [

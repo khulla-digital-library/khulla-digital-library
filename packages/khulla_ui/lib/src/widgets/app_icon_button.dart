@@ -119,7 +119,7 @@ class AppIconButton extends StatelessWidget {
 
 /// The three icon-button sizes, paired with [AppButton]'s heights.
 enum AppIconButtonSize {
-  /// 32px — inside a table row, where the row is only ~37px tall.
+  /// 32px — inside a table row, where the row is only ~60px tall.
   small,
 
   /// 36px — the default, matching a small button.

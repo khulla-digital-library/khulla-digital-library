@@ -39,7 +39,6 @@ class LibraryProfileCubit extends Cubit<LibraryProfileState> {
   Future<void> saveProfile({
     required String name,
     required AppCurrency currency,
-    String? branch,
     String? email,
     String? phone,
     String? address,
@@ -54,7 +53,6 @@ class LibraryProfileCubit extends Cubit<LibraryProfileState> {
         existing.copyWith(
           name: name.trim(),
           currency: currency,
-          branch: _trimOrNull(branch),
           email: _trimOrNull(email),
           phone: _trimOrNull(phone),
           address: _trimOrNull(address),

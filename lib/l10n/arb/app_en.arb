@@ -268,7 +268,7 @@
     "@fieldAddedOn": {
         "description": "Forms - field labels shared by the catalogue screens"
     },
-    "titleFormNewHeading": "New title",
+    "titleFormNewHeading": "Create title",
     "titleFormEditHeading": "Edit title",
     "titleFormBibliographic": "Bibliographic details",
     "titleFormBibliographicDescription": "What the work is. These are the fields a search looks through.",
@@ -1123,10 +1123,6 @@
     "settingsAppearanceLanguageDescription": "Khulla renders Nepali Unicode throughout - the catalogue, receipts and labels included.",
     "settingsLanguageEnglish": "English",
     "settingsLanguageNepali": "नेपाली",
-    "settingsAppearanceDensity": "Row density",
-    "settingsAppearanceDensityDescription": "How much room a table row takes. Comfortable suits a mouse; compact fits more on a laptop screen.",
-    "settingsDensityComfortable": "Comfortable",
-    "settingsDensityCompact": "Compact",
     "settingsDesignSystemTitle": "Design system",
     "settingsDesignSystemBody": "Every component and state on one page, for checking the visual language.",
     "fieldPassword": "Password",

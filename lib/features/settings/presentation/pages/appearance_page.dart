@@ -12,9 +12,6 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// The language the interface is drawn in.
 enum AppLanguage { english, nepali }
 
-/// How much room a table row takes.
-enum RowDensity { comfortable, compact }
-
 class AppearancePage extends StatefulWidget {
   const AppearancePage({super.key});
 
@@ -24,7 +21,6 @@ class AppearancePage extends StatefulWidget {
 
 class _AppearancePageState extends State<AppearancePage> {
   AppLanguage _language = AppLanguage.english;
-  RowDensity _density = RowDensity.comfortable;
 
   String _label(AppLocalizations l10n, ThemeMode mode) => switch (mode) {
     ThemeMode.system => l10n.themeModeSystem,
@@ -86,23 +82,6 @@ class _AppearancePageState extends State<AppearancePage> {
                     AppLanguage.nepali => l10n.settingsLanguageNepali,
                   },
                   onChanged: (value) => setState(() => _language = value),
-                ),
-              ),
-            ),
-            SizedBox(height: spacing.md),
-            SectionCard(
-              title: l10n.settingsAppearanceDensity,
-              subtitle: l10n.settingsAppearanceDensityDescription,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: AppSegmentedControl<RowDensity>(
-                  value: _density,
-                  items: RowDensity.values,
-                  itemLabel: (value) => switch (value) {
-                    RowDensity.comfortable => l10n.settingsDensityComfortable,
-                    RowDensity.compact => l10n.settingsDensityCompact,
-                  },
-                  onChanged: (value) => setState(() => _density = value),
                 ),
               ),
             ),

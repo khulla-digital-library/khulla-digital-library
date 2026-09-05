@@ -21,7 +21,9 @@ class ReservationListCubit extends Cubit<ReservationListState> {
 
   /// Fetches the current page of reservations using [ReservationListState.query].
   Future<void> loadReservations() async {
-    emit(state.copyWith(status: LoadStatus.loading, error: null));
+    emit(
+      state.copyWith(status: state.status.forCollectionFetch(), error: null),
+    );
     try {
       final result = await _repository.findReservations(state.query);
       if (isClosed) return;

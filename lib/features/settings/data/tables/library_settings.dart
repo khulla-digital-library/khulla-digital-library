@@ -29,9 +29,6 @@ class LibrarySettings extends Table {
   /// The currency symbol shown beside amounts, e.g. `Rs`, `€`.
   TextColumn get currencySymbol => text().withLength(min: 1, max: 16)();
 
-  /// Which branch this installation serves, when the library has more than one name.
-  TextColumn get branch => text().nullable().withLength(max: 120)();
-
   TextColumn get email => text().nullable().withLength(max: 254)();
 
   TextColumn get phone => text().nullable().withLength(max: 40)();

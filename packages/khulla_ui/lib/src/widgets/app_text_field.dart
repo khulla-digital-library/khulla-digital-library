@@ -55,6 +55,8 @@ class AppTextField extends StatefulWidget {
   final String? label;
 
   /// Placeholder shown inside the field while empty.
+  ///
+  /// Defaults to [label] when omitted so labelled fields always show a hint.
   final String? hintText;
 
   /// Called on every keystroke.
@@ -174,6 +176,7 @@ class _AppTextFieldState extends State<AppTextField> {
     final metrics = context.appMetrics;
     final typography = context.appTextStyles;
     final fieldLabel = widget.label;
+    final hint = widget.hintText ?? fieldLabel;
     final error = widget.errorText;
     final multiline = widget.maxLines == null || widget.maxLines! > 1;
 
@@ -217,7 +220,7 @@ class _AppTextFieldState extends State<AppTextField> {
             inputFormatters: widget.inputFormatters,
             style: typography.body.copyWith(color: colors.ink100),
             decoration: InputDecoration(
-              hintText: widget.hintText,
+              hintText: hint,
               prefixIcon: switch (widget.prefixIcon) {
                 final prefix? => AppFieldAffix(child: prefix),
                 _ => null,

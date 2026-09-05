@@ -13,7 +13,6 @@ abstract class LibraryProfile with _$LibraryProfile {
     required String name,
     required AppCurrency currency,
     required DateTime createdAt,
-    String? branch,
     String? email,
     String? phone,
     String? address,

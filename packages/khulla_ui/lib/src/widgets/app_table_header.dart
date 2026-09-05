@@ -113,7 +113,7 @@ class _HeaderCellState<T> extends State<_HeaderCell<T>> {
             AnimatedOpacity(
               duration: context.appMotion.color,
               opacity: isSorted || _hovered ? 1 : 0,
-              child: _SortGlyphs(
+              child: _SortGlyph(
                 ascending: isSorted ? current.ascending : null,
                 active: scheme.primary,
                 rest: colors.hairlineStrong,
@@ -144,9 +144,11 @@ class _HeaderCellState<T> extends State<_HeaderCell<T>> {
   }
 }
 
-/// The stacked up/down carets beside a sortable column's label.
-class _SortGlyphs extends StatelessWidget {
-  const _SortGlyphs({
+/// One caret beside a sortable column's label — the direction the column is
+/// sorted in, inverted from the stacked pair that used to highlight the
+/// active chevron in a column of two.
+class _SortGlyph extends StatelessWidget {
+  const _SortGlyph({
     required this.ascending,
     required this.active,
     required this.rest,
@@ -159,27 +161,19 @@ class _SortGlyphs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final direction = ascending;
+    final sorted = ascending;
+    final icon = switch (sorted) {
+      true => AppIcons.caretDown,
+      false => AppIcons.caretUp,
+      null => AppIcons.caretDown,
+    };
 
     return Padding(
       padding: const EdgeInsets.only(left: 4),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AppIcon(
-            AppIcons.caretUp,
-            size: 14,
-            color: direction ?? false ? active : rest,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: AppIcon(
-              AppIcons.caretDown,
-              size: 14,
-              color: direction == false ? active : rest,
-            ),
-          ),
-        ],
+      child: AppIcon(
+        icon,
+        size: context.appMetrics.icon,
+        color: sorted == null ? rest : active,
       ),
     );
   }

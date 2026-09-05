@@ -635,7 +635,7 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
           title: 'Table',
           note:
               'Zebra on even rows, a tint on hover, a warmer tint on the '
-              'selected one. Hover a sortable header to reveal its chevrons.',
+              'selected one. Hover a sortable header to reveal its chevron.',
           children: [
             DecoratedBox(
               decoration: BoxDecoration(

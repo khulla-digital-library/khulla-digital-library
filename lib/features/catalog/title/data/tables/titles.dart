@@ -15,8 +15,6 @@ class Titles extends Table {
 
   TextColumn get title => text().withLength(min: 1, max: 300)();
 
-  TextColumn get subtitle => text().nullable().withLength(max: 300)();
-
   /// Plain text for now — no authors table (see plan §1.11).
   TextColumn get author => text().withLength(max: 200)();
 
@@ -34,9 +32,6 @@ class Titles extends Table {
       text().references(TitleFormats, #id, onDelete: KeyAction.restrict)();
 
   TextColumn get language => text().withDefault(const Constant('English'))();
-
-  /// Stored as `|history|nepal|` for exact subject matching.
-  TextColumn get subjects => text().withDefault(const Constant(''))();
 
   TextColumn get description => text().nullable()();
 

@@ -26,7 +26,6 @@ class LibraryProfilePage extends StatefulWidget {
 class _LibraryProfilePageState extends State<LibraryProfilePage>
     with DisposeBag {
   late final TextEditingController _name = textController();
-  late final TextEditingController _branch = textController();
   late final TextEditingController _email = textController();
   late final TextEditingController _phone = textController();
   late final TextEditingController _address = textController();
@@ -42,7 +41,6 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
     }
     _loadedProfile = profile;
     _name.text = profile.name;
-    _branch.text = profile.branch ?? '';
     _email.text = profile.email ?? '';
     _phone.text = profile.phone ?? '';
     _address.text = profile.address ?? '';
@@ -61,7 +59,6 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
       await context.read<LibraryProfileCubit>().saveProfile(
         name: _name.text,
         currency: _currency,
-        branch: _branch.text,
         email: _email.text,
         phone: _phone.text,
         address: _address.text,
@@ -133,22 +130,12 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
                   title: l10n.settingsLibraryIdentity,
                   description: l10n.settingsLibraryIdentityDescription,
                   children: [
-                    AppFormRow(
-                      children: [
-                        AppTextField(
-                          label: l10n.fieldLibraryName,
-                          required: true,
-                          controller: _name,
-                          textCapitalization: TextCapitalization.words,
-                          onChanged: (_) {},
-                        ),
-                        AppTextField(
-                          label: l10n.fieldBranch,
-                          controller: _branch,
-                          textCapitalization: TextCapitalization.words,
-                          onChanged: (_) {},
-                        ),
-                      ],
+                    AppTextField(
+                      label: l10n.fieldLibraryName,
+                      required: true,
+                      controller: _name,
+                      textCapitalization: TextCapitalization.words,
+                      onChanged: (_) {},
                     ),
                   ],
                 ),

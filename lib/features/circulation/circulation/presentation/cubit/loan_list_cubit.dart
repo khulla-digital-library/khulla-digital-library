@@ -23,7 +23,9 @@ class LoanListCubit extends Cubit<LoanListState> {
 
   /// Loads the filtered loan list and on-loan, due-today, overdue and hold counts.
   Future<void> loadOpenLoans() async {
-    emit(state.copyWith(status: LoadStatus.loading, error: null));
+    emit(
+      state.copyWith(status: state.status.forCollectionFetch(), error: null),
+    );
     try {
       final results = await Future.wait([
         _repository.findOpenLoans(state.query),

@@ -93,9 +93,6 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
   late final TextEditingController _title = textController(
     widget.existing?.title,
   );
-  late final TextEditingController _subtitle = textController(
-    widget.existing?.subtitle,
-  );
   late final TextEditingController _author = textController(
     widget.existing?.author,
   );
@@ -116,9 +113,6 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
   );
   late final TextEditingController _pages = textController(
     widget.existing?.pages?.toString(),
-  );
-  late final TextEditingController _subjects = textController(
-    widget.existing?.subjects.join(', '),
   );
   late final TextEditingController _shelf = textController(
     widget.existing?.shelf,
@@ -166,18 +160,12 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
         : int.tryParse(_initialCopies.text) ?? 0;
     final publishedYear = int.tryParse(_year.text.trim());
     final pages = int.tryParse(_pages.text.trim());
-    final subjects = _subjects.text
-        .split(',')
-        .map((s) => s.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
 
     try {
       await context.read<TitleFormCubit>().saveTitle(
         title: title,
         author: author,
         formatId: _formatId,
-        subtitle: _subtitle.text.trim().isEmpty ? null : _subtitle.text.trim(),
         isbn: _isbn.text.trim().isEmpty ? null : _isbn.text.trim(),
         publisher: _publisher.text.trim().isEmpty
             ? null
@@ -188,7 +176,6 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
             ? 'English'
             : _language.text.trim(),
         pages: pages,
-        subjects: subjects,
         description: _description.text.trim().isEmpty
             ? null
             : _description.text.trim(),
@@ -228,23 +215,17 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
       children: [
         AppFormSection(
           title: l10n.titleFormBibliographic,
-          description: l10n.titleFormBibliographicDescription,
           children: [
-            AppTextField(
-              label: l10n.fieldTitle,
-              required: true,
-              controller: _title,
-              textCapitalization: TextCapitalization.words,
-              onChanged: (_) {},
-            ),
-            AppTextField(
-              label: l10n.fieldSubtitle,
-              controller: _subtitle,
-              textCapitalization: TextCapitalization.sentences,
-              onChanged: (_) {},
-            ),
             AppFormRow(
+              flexes: const [3, 2],
               children: [
+                AppTextField(
+                  label: l10n.fieldTitle,
+                  required: true,
+                  controller: _title,
+                  textCapitalization: TextCapitalization.words,
+                  onChanged: (_) {},
+                ),
                 AppTextField(
                   label: l10n.fieldAuthor,
                   required: true,
@@ -252,6 +233,10 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
                   textCapitalization: TextCapitalization.words,
                   onChanged: (_) {},
                 ),
+              ],
+            ),
+            AppFormRow(
+              children: [
                 AppTextField(
                   label: l10n.fieldIsbn,
                   controller: _isbn,
@@ -263,16 +248,16 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
                   textCapitalization: TextCapitalization.words,
                   onChanged: (_) {},
                 ),
-              ],
-            ),
-            AppFormRow(
-              children: [
                 AppTextField(
                   label: l10n.fieldPublishedYear,
                   controller: _year,
                   keyboardType: TextInputType.number,
                   onChanged: (_) {},
                 ),
+              ],
+            ),
+            AppFormRow(
+              children: [
                 AppTextField(
                   label: l10n.fieldEdition,
                   controller: _edition,
@@ -284,10 +269,6 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
                   keyboardType: TextInputType.number,
                   onChanged: (_) {},
                 ),
-              ],
-            ),
-            AppFormRow(
-              children: [
                 AppDropdownField<TitleFormat>(
                   label: l10n.fieldFormat,
                   value: _selectedFormat,
@@ -307,16 +288,10 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
               ],
             ),
             AppTextField(
-              label: l10n.fieldSubjects,
-              controller: _subjects,
-              hintText: l10n.fieldSubjects,
-              onChanged: (_) {},
-            ),
-            AppTextField(
               label: l10n.fieldDescription,
               controller: _description,
-              maxLines: 4,
-              minLines: 3,
+              maxLines: 3,
+              minLines: 2,
               textCapitalization: TextCapitalization.sentences,
               onChanged: (_) {},
             ),
@@ -324,7 +299,6 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
         ),
         AppFormSection(
           title: l10n.titleFormShelving,
-          description: l10n.titleFormShelvingDescription,
           children: [
             AppFormRow(
               children: [
@@ -343,27 +317,30 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
                 ),
               ],
             ),
-            AppSwitchField(
-              value: _lendable,
-              label: l10n.titleFormLendable,
-              description: l10n.titleFormLendableDescription,
-              onChanged: (value) => setState(() => _lendable = value),
-            ),
+            if (!_isEditing)
+              AppFormRow(
+                children: [
+                  AppTextField(
+                    label: l10n.titleFormInitialCopies,
+                    controller: _initialCopies,
+                    keyboardType: TextInputType.number,
+                    onChanged: (_) {},
+                  ),
+                  AppSwitchField(
+                    value: _lendable,
+                    label: l10n.titleFormLendable,
+                    onChanged: (value) => setState(() => _lendable = value),
+                  ),
+                ],
+              )
+            else
+              AppSwitchField(
+                value: _lendable,
+                label: l10n.titleFormLendable,
+                onChanged: (value) => setState(() => _lendable = value),
+              ),
           ],
         ),
-        if (!_isEditing)
-          AppFormSection(
-            title: l10n.titleFormCopies,
-            description: l10n.titleFormCopiesDescription,
-            children: [
-              AppTextField(
-                label: l10n.titleFormInitialCopies,
-                controller: _initialCopies,
-                keyboardType: TextInputType.number,
-                onChanged: (_) {},
-              ),
-            ],
-          ),
       ],
     );
   }

@@ -23,7 +23,9 @@ class TitleCubit extends Cubit<TitleState> {
   /// Failures are emitted into state and swallowed — the list screen already
   /// watches [TitleState.error].
   Future<void> loadTitles() async {
-    emit(state.copyWith(status: LoadStatus.loading, error: null));
+    emit(
+      state.copyWith(status: state.status.forCollectionFetch(), error: null),
+    );
     try {
       final result = await _repository.findTitles(state.query);
       if (isClosed) return;

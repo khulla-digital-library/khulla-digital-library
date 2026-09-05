@@ -27,16 +27,19 @@ void main() {
     }
 
     test('steps type and control height up exactly once at comfortable', () {
-      // The density rung is the only thing the window changes. Both halves
-      // have to move together: a 14px body in a 40px field is the failure
-      // this catches.
-      final compact = AppTheme.light();
-      final comfortable = AppTheme.light(AppDensity.comfortable);
+      // The comfortable rung is the shipped default. Compact still exists for
+      // tests and the gallery — both rungs must stay in step with each other.
+      final compact = AppTheme.light(AppDensity.compact);
+      final comfortable = AppTheme.light();
 
       expect(compact.textTheme.bodyMedium?.fontSize, 12);
       expect(comfortable.textTheme.bodyMedium?.fontSize, 14);
       expect(compact.extension<AppMetrics>()!.fieldHeight, 40);
       expect(comfortable.extension<AppMetrics>()!.fieldHeight, 44);
+      expect(compact.extension<AppMetrics>()!.tableRowHeight, 65);
+      expect(comfortable.extension<AppMetrics>()!.tableRowHeight, 65);
+      expect(compact.extension<AppMetrics>()!.tableHeaderHeight, 40);
+      expect(comfortable.extension<AppMetrics>()!.tableHeaderHeight, 48);
     });
 
     test('keeps the radius hierarchy: control > container > item', () {
@@ -114,10 +117,10 @@ void main() {
       expect(FormFactor.large.usesNavigationRail, isTrue);
     });
 
-    test('reads the density step off its own threshold', () {
+    test('always uses the comfortable density rung', () {
       const breakpoints = AppBreakpoints();
 
-      expect(breakpoints.densityFor(1599), AppDensity.compact);
+      expect(breakpoints.densityFor(800), AppDensity.comfortable);
       expect(breakpoints.densityFor(1600), AppDensity.comfortable);
     });
 
