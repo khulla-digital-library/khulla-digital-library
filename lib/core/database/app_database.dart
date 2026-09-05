@@ -1,3 +1,4 @@
+import 'package:country_phone_kit/country_phone_kit.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
@@ -8,7 +9,6 @@ import 'package:khulla/core/database/converters/date_only_converter.dart';
 import 'package:khulla/core/database/converters/money_converter.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/logging/app_logger.dart';
-import 'package:khulla/core/money/currency.dart';
 import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/catalog/copy/data/tables/copies.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
@@ -61,7 +61,7 @@ class AppDatabase extends _$AppDatabase {
   static const String _source = 'AppDatabase';
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -268,6 +268,32 @@ class AppDatabase extends _$AppDatabase {
       from6To7: (m, schema) async {
         await m.createTable(schema.staffRecoveryCodes);
         await m.createIndex(schema.staffRecoveryCodesStaff);
+      },
+      from7To8: (m, schema) async {},
+      from8To9: (m, schema) async {
+        await m.addColumn(
+          schema.librarySettings,
+          schema.librarySettings.currencyName,
+        );
+        await m.addColumn(
+          schema.librarySettings,
+          schema.librarySettings.currencySymbol,
+        );
+
+        final rows = await customSelect(
+          'SELECT currency FROM library_settings',
+        ).get();
+        for (final row in rows) {
+          final code = row.read<String>('currency');
+          final kit = Currencies.byCode(code);
+          if (kit == null) continue;
+          await customStatement(
+            'UPDATE library_settings '
+            'SET currency_name = ?, currency_symbol = ? '
+            'WHERE currency = ?',
+            [kit.name, kit.symbol, code],
+          );
+        }
       },
     )(m, from, to);
   }

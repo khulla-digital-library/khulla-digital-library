@@ -1176,16 +1176,23 @@
     "signInSubtitle": "Use the staff account this library was set up with.",
     "signInRejected": "That email and password do not match an active staff account.",
     "signInAction": "Sign in",
-    "signInForgotPassword": "Forgotten the password? If unused recovery codes remain, use them below. Otherwise another administrator can reset it under Staff.",
-    "signInForgotPasswordAction": "Use a recovery code",
-    "@signInForgotPassword": {
-        "description": "Auth - the sign-in screen"
+    "signInEmailHint": "you@library.org",
+    "signInPasswordHint": "Enter your password",
+    "authConfirmPasswordHint": "Re-enter your password",
+    "signInForgotPasswordUnavailable": "Recovery is not set up. Ask another administrator to reset your password from Staff.",
+    "signInForgotPasswordAction": "Forgot password?",
+    "@signInForgotPasswordAction": {
+        "description": "Auth - link under the sign-in password field"
+    },
+    "@signInForgotPasswordUnavailable": {
+        "description": "Auth - shown when no recovery codes remain"
     },
     "currencyNpr": "Nepalese rupee (NPR)",
     "currencyInr": "Indian rupee (INR)",
     "currencyUsd": "US dollar (USD)",
     "currencyEur": "Euro (EUR)",
     "currencyGbp": "Pound sterling (GBP)",
+    "currencySearchHint": "Search currencies",
     "@currencyGbp": {
         "description": "Settings - the currencies a library can be set up in"
     },

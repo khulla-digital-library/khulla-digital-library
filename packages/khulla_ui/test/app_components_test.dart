@@ -169,15 +169,20 @@ void main() {
       );
 
       final fieldWidth = tester.getSize(find.byType(InputDecorator)).width;
-      const menuInset = 4.0;
 
       await tester.tap(find.byType(InputDecorator));
       await tester.pumpAndSettle();
 
-      expect(
-        tester.getSize(find.byType(MenuItemButton).first).width,
-        fieldWidth - menuInset * 2,
+      final panel = tester.getSize(
+        find
+            .descendant(
+              of: find.byType(CompositedTransformFollower),
+              matching: find.byType(SizedBox),
+            )
+            .first,
       );
+
+      expect(panel.width, fieldWidth);
     });
 
     testWidgets('menu opens flush against the field', (tester) async {
@@ -201,9 +206,52 @@ void main() {
       await tester.tap(find.byType(InputDecorator));
       await tester.pumpAndSettle();
 
-      final menuTop = tester.getRect(find.byType(MenuItemButton).first).top;
+      final menuTop = tester.getRect(find.byType(ListView)).top;
 
-      expect(menuTop, fieldBottom);
+      expect(menuTop, closeTo(fieldBottom, 1));
+    });
+
+    testWidgets('searchable menu filters items', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 280,
+            child: AppDropdownField<String>(
+              label: 'Currency',
+              value: 'USD',
+              items: const ['USD', 'EUR', 'NPR', 'INR'],
+              itemLabel: (value) => value,
+              searchable: true,
+              searchHint: 'Search currencies',
+              emptySearchMessage: 'No matches',
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(InputDecorator));
+      await tester.pumpAndSettle();
+
+      expect(find.text('EUR'), findsOneWidget);
+      expect(find.byType(AppSearchField), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'us');
+      await tester.pump();
+
+      final list = find.byType(ListView);
+      expect(
+        find.descendant(of: list, matching: find.text('USD')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: list, matching: find.text('EUR')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: list, matching: find.text('NPR')),
+        findsNothing,
+      );
     });
   });
 

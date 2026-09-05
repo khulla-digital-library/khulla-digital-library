@@ -7,8 +7,8 @@ import 'package:khulla/features/staff_auth/presentation/recover_password/cubit/r
 import 'package:khulla/features/staff_auth/presentation/recover_password/cubit/recover_password_state.dart';
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_error_notice.dart';
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_header.dart';
-import 'package:khulla/features/staff_auth/presentation/widgets/auth_password_field.dart';
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_scaffold.dart';
+import 'package:khulla/features/staff_auth/presentation/widgets/auth_secondary_action.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -26,6 +26,8 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage>
   late final TextEditingController _recoveryCode = textController();
   late final TextEditingController _password = textController();
   late final TextEditingController _confirmPassword = textController();
+  bool _passwordRevealed = false;
+  bool _confirmPasswordRevealed = false;
 
   void _submit() =>
       context.read<RecoverPasswordCubit>().resetPasswordWithRecoveryCode();
@@ -51,6 +53,7 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage>
               SizedBox(height: spacing.lg),
               AppTextField(
                 label: l10n.fieldEmail,
+                hintText: l10n.signInEmailHint,
                 required: true,
                 controller: _email,
                 autofocus: true,
@@ -71,21 +74,50 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage>
                 onChanged: cubit.recoveryCodeChanged,
               ),
               SizedBox(height: spacing.sm),
-              AuthPasswordField(
+              AppTextField(
                 label: l10n.recoverPasswordNewPassword,
+                hintText: l10n.signInPasswordHint,
+                required: true,
                 controller: _password,
+                obscureText: !_passwordRevealed,
                 textInputAction: TextInputAction.next,
                 errorText: state.password.messageFor(l10n),
                 onChanged: cubit.passwordChanged,
+                suffixIcon: AppIconButton(
+                  icon: _passwordRevealed
+                      ? AppIcons.hidePassword
+                      : AppIcons.revealPassword,
+                  tooltip: _passwordRevealed
+                      ? l10n.authHidePassword
+                      : l10n.authRevealPassword,
+                  size: AppIconButtonSize.small,
+                  onPressed: () =>
+                      setState(() => _passwordRevealed = !_passwordRevealed),
+                ),
               ),
               SizedBox(height: spacing.sm),
-              AuthPasswordField(
+              AppTextField(
                 label: l10n.fieldConfirmPassword,
+                hintText: l10n.authConfirmPasswordHint,
+                required: true,
                 controller: _confirmPassword,
+                obscureText: !_confirmPasswordRevealed,
                 textInputAction: TextInputAction.done,
                 errorText: state.confirmPassword.messageFor(l10n),
                 onChanged: cubit.confirmPasswordChanged,
                 onSubmitted: (_) => _submit(),
+                suffixIcon: AppIconButton(
+                  icon: _confirmPasswordRevealed
+                      ? AppIcons.hidePassword
+                      : AppIcons.revealPassword,
+                  tooltip: _confirmPasswordRevealed
+                      ? l10n.authHidePassword
+                      : l10n.authRevealPassword,
+                  size: AppIconButtonSize.small,
+                  onPressed: () => setState(
+                    () => _confirmPasswordRevealed = !_confirmPasswordRevealed,
+                  ),
+                ),
               ),
               if (state.credentialsRejected) ...[
                 SizedBox(height: spacing.md),
@@ -103,11 +135,10 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage>
                 onPressed: _submit,
                 child: Text(l10n.recoverPasswordAction),
               ),
-              SizedBox(height: spacing.md),
-              AppButton(
-                variant: AppButtonVariant.link,
-                onPressed: () => context.go(Routes.signIn),
-                child: Text(l10n.recoverPasswordBackToSignIn),
+              SizedBox(height: spacing.xlg),
+              AuthSecondaryAction(
+                label: l10n.recoverPasswordBackToSignIn,
+                onTap: () => context.go(Routes.signIn),
               ),
             ],
           );

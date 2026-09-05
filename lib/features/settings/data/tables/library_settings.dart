@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:khulla/core/money/currency.dart';
 
 /// The library's own record — one row, for the whole file.
 ///
@@ -16,13 +15,19 @@ class LibrarySettings extends Table {
   /// What the library calls itself, shown on the shell and on printed slips.
   TextColumn get name => text().withLength(min: 1, max: 160)();
 
-  /// The currency every fine and fee is displayed in.
+  /// ISO-4217 code for the currency every fine and fee is displayed in.
   ///
   /// It changes how amounts are *rendered*, never how they are stored — a
   /// fine is an integer number of hundredths whatever this says. Switching it
   /// does not convert existing amounts, and nothing here should ever imply it
   /// does.
-  TextColumn get currency => textEnum<AppCurrency>()();
+  TextColumn get currency => text().withLength(min: 3, max: 3)();
+
+  /// The currency's English name, shown in settings and onboarding.
+  TextColumn get currencyName => text().withLength(min: 1, max: 80)();
+
+  /// The currency symbol shown beside amounts, e.g. `Rs`, `€`.
+  TextColumn get currencySymbol => text().withLength(min: 1, max: 16)();
 
   /// Which branch this installation serves, when the library has more than one name.
   TextColumn get branch => text().nullable().withLength(max: 120)();

@@ -41,9 +41,15 @@ class SignInCubit extends Cubit<SignInState> {
     try {
       final canRecover = await _staff.hasUnusedRecoveryCodes();
       if (isClosed) return;
-      emit(state.copyWith(canRecoverPassword: canRecover));
+      emit(
+        state.copyWith(
+          canRecoverPassword: canRecover,
+          recoveryAvailabilityLoaded: true,
+        ),
+      );
     } on AppException {
       if (isClosed) return;
+      emit(state.copyWith(recoveryAvailabilityLoaded: true));
     }
   }
 

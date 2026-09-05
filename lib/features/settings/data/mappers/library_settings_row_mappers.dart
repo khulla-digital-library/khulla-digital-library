@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:khulla/core/database/app_database.dart';
+import 'package:khulla/core/money/currency.dart';
 import 'package:khulla/features/settings/data/tables/library_settings.dart';
 import 'package:khulla/features/settings/domain/models/library_profile.dart';
 
@@ -7,7 +8,11 @@ import 'package:khulla/features/settings/domain/models/library_profile.dart';
 extension LibrarySettingsRowX on LibrarySettingsRow {
   LibraryProfile toDomain() => LibraryProfile(
     name: name,
-    currency: currency,
+    currency: AppCurrency(
+      code: currency,
+      name: currencyName,
+      symbol: currencySymbol,
+    ),
     createdAt: createdAt,
     branch: branch,
     email: email,
@@ -24,7 +29,9 @@ extension LibraryProfileX on LibraryProfile {
   LibrarySettingsCompanion toCompanion() => LibrarySettingsCompanion(
     id: const Value(LibrarySettings.singletonId),
     name: Value(name),
-    currency: Value(currency),
+    currency: Value(currency.code),
+    currencyName: Value(currency.name),
+    currencySymbol: Value(currency.symbol),
     branch: Value(branch),
     email: Value(email),
     phone: Value(phone),

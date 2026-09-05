@@ -2795,6 +2795,893 @@ i1.GeneratedColumn<String> _column_110(String aliasedName) =>
       type: i1.DriftSqlType.string,
       $customConstraints: 'NULL',
     );
+
+final class Schema8 extends i0.VersionedSchema {
+  Schema8({required super.database}) : super(version: 8);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    librarySettings,
+    staff,
+    staffRecoveryCodes,
+    loanRules,
+    titleFormats,
+    memberTypes,
+    titles,
+    copies,
+    members,
+    loans,
+    fines,
+    reservations,
+    staffRecoveryCodesStaff,
+    titlesSearch,
+    titlesFormat,
+    titlesIsbn,
+    titlesSort,
+    copiesBarcode,
+    copiesStatus,
+    copiesTitle,
+    membersCard,
+    membersSearch,
+    membersType,
+    membersExpiry,
+    loansOneOpenPerCopy,
+    loansOpenByMember,
+    loansDue,
+    loansMemberHistory,
+    loansCopyHistory,
+    finesOutstanding,
+    reservationsOneActivePerMemberTitle,
+    reservationsQueue,
+  ];
+  late final Shape2 librarySettings = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'library_settings',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'CHECK(id = 1)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_14,
+        _column_15,
+        _column_3,
+        _column_16,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape1 staff = Shape1(
+    source: i0.VersionedTable(
+      entityName: 'staff',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_1,
+        _column_5,
+        _column_6,
+        _column_7,
+        _column_8,
+        _column_3,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape12 staffRecoveryCodes = Shape12(
+    source: i0.VersionedTable(
+      entityName: 'staff_recovery_codes',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [_column_4, _column_108, _column_109, _column_110, _column_3],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 loanRules = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'loan_rules',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'CHECK(id = 1)'],
+      columns: [
+        _column_0,
+        _column_43,
+        _column_44,
+        _column_45,
+        _column_20,
+        _column_46,
+        _column_47,
+        _column_48,
+        _column_24,
+        _column_49,
+        _column_50,
+        _column_51,
+        _column_28,
+        _column_29,
+        _column_30,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape4 titleFormats = Shape4(
+    source: i0.VersionedTable(
+      entityName: 'title_formats',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_31,
+        _column_1,
+        _column_32,
+        _column_33,
+        _column_34,
+        _column_3,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 memberTypes = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'member_types',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_31,
+        _column_1,
+        _column_32,
+        _column_33,
+        _column_34,
+        _column_3,
+        _column_35,
+        _column_36,
+        _column_37,
+        _column_20,
+        _column_38,
+        _column_39,
+        _column_40,
+        _column_24,
+        _column_41,
+        _column_42,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 titles = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'titles',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(published_year IS NULL OR(published_year >= 1000 AND published_year <= 2200))',
+        'CHECK(pages IS NULL OR pages > 0)',
+      ],
+      columns: [
+        _column_4,
+        _column_52,
+        _column_53,
+        _column_54,
+        _column_55,
+        _column_56,
+        _column_57,
+        _column_58,
+        _column_59,
+        _column_60,
+        _column_61,
+        _column_62,
+        _column_63,
+        _column_64,
+        _column_65,
+        _column_66,
+        _column_67,
+        _column_3,
+        _column_30,
+        _column_34,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape7 copies = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'copies',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_68,
+        _column_69,
+        _column_64,
+        _column_70,
+        _column_8,
+        _column_71,
+        _column_72,
+        _column_3,
+        _column_30,
+        _column_34,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape8 members = Shape8(
+    source: i0.VersionedTable(
+      entityName: 'members',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_73,
+        _column_74,
+        _column_75,
+        _column_76,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_77,
+        _column_72,
+        _column_78,
+        _column_79,
+        _column_80,
+        _column_81,
+        _column_82,
+        _column_67,
+        _column_3,
+        _column_30,
+        _column_34,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape9 loans = Shape9(
+    source: i0.VersionedTable(
+      entityName: 'loans',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_83,
+        _column_84,
+        _column_85,
+        _column_86,
+        _column_87,
+        _column_88,
+        _column_89,
+        _column_90,
+        _column_91,
+        _column_92,
+        _column_93,
+        _column_94,
+        _column_95,
+        _column_3,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape10 fines = Shape10(
+    source: i0.VersionedTable(
+      entityName: 'fines',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(assessed >= 0)',
+        'CHECK(paid >= 0)',
+        'CHECK(waived >= 0)',
+        'CHECK(paid + waived <= assessed)',
+      ],
+      columns: [
+        _column_4,
+        _column_84,
+        _column_96,
+        _column_97,
+        _column_98,
+        _column_99,
+        _column_100,
+        _column_101,
+        _column_102,
+        _column_103,
+        _column_3,
+        _column_30,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape11 reservations = Shape11(
+    source: i0.VersionedTable(
+      entityName: 'reservations',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_68,
+        _column_84,
+        _column_104,
+        _column_8,
+        _column_105,
+        _column_106,
+        _column_79,
+        _column_107,
+        _column_3,
+        _column_30,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Index staffRecoveryCodesStaff = i1.Index(
+    'staff_recovery_codes_staff',
+    'CREATE INDEX staff_recovery_codes_staff ON staff_recovery_codes (staff_id)',
+  );
+  final i1.Index titlesSearch = i1.Index(
+    'titles_search',
+    'CREATE INDEX titles_search ON titles (search_text)',
+  );
+  final i1.Index titlesFormat = i1.Index(
+    'titles_format',
+    'CREATE INDEX titles_format ON titles (format_id)',
+  );
+  final i1.Index titlesIsbn = i1.Index(
+    'titles_isbn',
+    'CREATE INDEX titles_isbn ON titles (isbn) WHERE isbn IS NOT NULL',
+  );
+  final i1.Index titlesSort = i1.Index(
+    'titles_sort',
+    'CREATE INDEX titles_sort ON titles (title)',
+  );
+  final i1.Index copiesBarcode = i1.Index(
+    'copies_barcode',
+    'CREATE UNIQUE INDEX copies_barcode ON copies (barcode)',
+  );
+  final i1.Index copiesStatus = i1.Index(
+    'copies_status',
+    'CREATE INDEX copies_status ON copies (status) WHERE archived_at IS NULL',
+  );
+  final i1.Index copiesTitle = i1.Index(
+    'copies_title',
+    'CREATE INDEX copies_title ON copies (title_id)',
+  );
+  final i1.Index membersCard = i1.Index(
+    'members_card',
+    'CREATE UNIQUE INDEX members_card ON members (card_number)',
+  );
+  final i1.Index membersSearch = i1.Index(
+    'members_search',
+    'CREATE INDEX members_search ON members (search_text)',
+  );
+  final i1.Index membersType = i1.Index(
+    'members_type',
+    'CREATE INDEX members_type ON members (member_type_id)',
+  );
+  final i1.Index membersExpiry = i1.Index(
+    'members_expiry',
+    'CREATE INDEX members_expiry ON members (expires_at) WHERE archived_at IS NULL',
+  );
+  final i1.Index loansOneOpenPerCopy = i1.Index(
+    'loans_one_open_per_copy',
+    'CREATE UNIQUE INDEX loans_one_open_per_copy ON loans (copy_id) WHERE returned_at IS NULL',
+  );
+  final i1.Index loansOpenByMember = i1.Index(
+    'loans_open_by_member',
+    'CREATE INDEX loans_open_by_member ON loans (member_id) WHERE returned_at IS NULL',
+  );
+  final i1.Index loansDue = i1.Index(
+    'loans_due',
+    'CREATE INDEX loans_due ON loans (due_at) WHERE returned_at IS NULL',
+  );
+  final i1.Index loansMemberHistory = i1.Index(
+    'loans_member_history',
+    'CREATE INDEX loans_member_history ON loans (member_id, checked_out_at DESC)',
+  );
+  final i1.Index loansCopyHistory = i1.Index(
+    'loans_copy_history',
+    'CREATE INDEX loans_copy_history ON loans (copy_id, checked_out_at DESC)',
+  );
+  final i1.Index finesOutstanding = i1.Index(
+    'fines_outstanding',
+    'CREATE INDEX fines_outstanding ON fines (member_id) WHERE paid + waived < assessed',
+  );
+  final i1.Index reservationsOneActivePerMemberTitle = i1.Index(
+    'reservations_one_active_per_member_title',
+    'CREATE UNIQUE INDEX reservations_one_active_per_member_title ON reservations (title_id, member_id) WHERE closed_at IS NULL',
+  );
+  final i1.Index reservationsQueue = i1.Index(
+    'reservations_queue',
+    'CREATE INDEX reservations_queue ON reservations (title_id, placed_at) WHERE closed_at IS NULL',
+  );
+}
+
+final class Schema9 extends i0.VersionedSchema {
+  Schema9({required super.database}) : super(version: 9);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    librarySettings,
+    staff,
+    staffRecoveryCodes,
+    loanRules,
+    titleFormats,
+    memberTypes,
+    titles,
+    copies,
+    members,
+    loans,
+    fines,
+    reservations,
+    staffRecoveryCodesStaff,
+    titlesSearch,
+    titlesFormat,
+    titlesIsbn,
+    titlesSort,
+    copiesBarcode,
+    copiesStatus,
+    copiesTitle,
+    membersCard,
+    membersSearch,
+    membersType,
+    membersExpiry,
+    loansOneOpenPerCopy,
+    loansOpenByMember,
+    loansDue,
+    loansMemberHistory,
+    loansCopyHistory,
+    finesOutstanding,
+    reservationsOneActivePerMemberTitle,
+    reservationsQueue,
+  ];
+  late final Shape13 librarySettings = Shape13(
+    source: i0.VersionedTable(
+      entityName: 'library_settings',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'CHECK(id = 1)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_111,
+        _column_112,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_14,
+        _column_15,
+        _column_3,
+        _column_16,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape1 staff = Shape1(
+    source: i0.VersionedTable(
+      entityName: 'staff',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_1,
+        _column_5,
+        _column_6,
+        _column_7,
+        _column_8,
+        _column_3,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape12 staffRecoveryCodes = Shape12(
+    source: i0.VersionedTable(
+      entityName: 'staff_recovery_codes',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [_column_4, _column_108, _column_109, _column_110, _column_3],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 loanRules = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'loan_rules',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'CHECK(id = 1)'],
+      columns: [
+        _column_0,
+        _column_43,
+        _column_44,
+        _column_45,
+        _column_20,
+        _column_46,
+        _column_47,
+        _column_48,
+        _column_24,
+        _column_49,
+        _column_50,
+        _column_51,
+        _column_28,
+        _column_29,
+        _column_30,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape4 titleFormats = Shape4(
+    source: i0.VersionedTable(
+      entityName: 'title_formats',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_31,
+        _column_1,
+        _column_32,
+        _column_33,
+        _column_34,
+        _column_3,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 memberTypes = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'member_types',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_31,
+        _column_1,
+        _column_32,
+        _column_33,
+        _column_34,
+        _column_3,
+        _column_35,
+        _column_36,
+        _column_37,
+        _column_20,
+        _column_38,
+        _column_39,
+        _column_40,
+        _column_24,
+        _column_41,
+        _column_42,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 titles = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'titles',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(published_year IS NULL OR(published_year >= 1000 AND published_year <= 2200))',
+        'CHECK(pages IS NULL OR pages > 0)',
+      ],
+      columns: [
+        _column_4,
+        _column_52,
+        _column_53,
+        _column_54,
+        _column_55,
+        _column_56,
+        _column_57,
+        _column_58,
+        _column_59,
+        _column_60,
+        _column_61,
+        _column_62,
+        _column_63,
+        _column_64,
+        _column_65,
+        _column_66,
+        _column_67,
+        _column_3,
+        _column_30,
+        _column_34,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape7 copies = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'copies',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_68,
+        _column_69,
+        _column_64,
+        _column_70,
+        _column_8,
+        _column_71,
+        _column_72,
+        _column_3,
+        _column_30,
+        _column_34,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape8 members = Shape8(
+    source: i0.VersionedTable(
+      entityName: 'members',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_73,
+        _column_74,
+        _column_75,
+        _column_76,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_77,
+        _column_72,
+        _column_78,
+        _column_79,
+        _column_80,
+        _column_81,
+        _column_82,
+        _column_67,
+        _column_3,
+        _column_30,
+        _column_34,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape9 loans = Shape9(
+    source: i0.VersionedTable(
+      entityName: 'loans',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_83,
+        _column_84,
+        _column_85,
+        _column_86,
+        _column_87,
+        _column_88,
+        _column_89,
+        _column_90,
+        _column_91,
+        _column_92,
+        _column_93,
+        _column_94,
+        _column_95,
+        _column_3,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape10 fines = Shape10(
+    source: i0.VersionedTable(
+      entityName: 'fines',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(assessed >= 0)',
+        'CHECK(paid >= 0)',
+        'CHECK(waived >= 0)',
+        'CHECK(paid + waived <= assessed)',
+      ],
+      columns: [
+        _column_4,
+        _column_84,
+        _column_96,
+        _column_97,
+        _column_98,
+        _column_99,
+        _column_100,
+        _column_101,
+        _column_102,
+        _column_103,
+        _column_3,
+        _column_30,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape11 reservations = Shape11(
+    source: i0.VersionedTable(
+      entityName: 'reservations',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_4,
+        _column_68,
+        _column_84,
+        _column_104,
+        _column_8,
+        _column_105,
+        _column_106,
+        _column_79,
+        _column_107,
+        _column_3,
+        _column_30,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Index staffRecoveryCodesStaff = i1.Index(
+    'staff_recovery_codes_staff',
+    'CREATE INDEX staff_recovery_codes_staff ON staff_recovery_codes (staff_id)',
+  );
+  final i1.Index titlesSearch = i1.Index(
+    'titles_search',
+    'CREATE INDEX titles_search ON titles (search_text)',
+  );
+  final i1.Index titlesFormat = i1.Index(
+    'titles_format',
+    'CREATE INDEX titles_format ON titles (format_id)',
+  );
+  final i1.Index titlesIsbn = i1.Index(
+    'titles_isbn',
+    'CREATE INDEX titles_isbn ON titles (isbn) WHERE isbn IS NOT NULL',
+  );
+  final i1.Index titlesSort = i1.Index(
+    'titles_sort',
+    'CREATE INDEX titles_sort ON titles (title)',
+  );
+  final i1.Index copiesBarcode = i1.Index(
+    'copies_barcode',
+    'CREATE UNIQUE INDEX copies_barcode ON copies (barcode)',
+  );
+  final i1.Index copiesStatus = i1.Index(
+    'copies_status',
+    'CREATE INDEX copies_status ON copies (status) WHERE archived_at IS NULL',
+  );
+  final i1.Index copiesTitle = i1.Index(
+    'copies_title',
+    'CREATE INDEX copies_title ON copies (title_id)',
+  );
+  final i1.Index membersCard = i1.Index(
+    'members_card',
+    'CREATE UNIQUE INDEX members_card ON members (card_number)',
+  );
+  final i1.Index membersSearch = i1.Index(
+    'members_search',
+    'CREATE INDEX members_search ON members (search_text)',
+  );
+  final i1.Index membersType = i1.Index(
+    'members_type',
+    'CREATE INDEX members_type ON members (member_type_id)',
+  );
+  final i1.Index membersExpiry = i1.Index(
+    'members_expiry',
+    'CREATE INDEX members_expiry ON members (expires_at) WHERE archived_at IS NULL',
+  );
+  final i1.Index loansOneOpenPerCopy = i1.Index(
+    'loans_one_open_per_copy',
+    'CREATE UNIQUE INDEX loans_one_open_per_copy ON loans (copy_id) WHERE returned_at IS NULL',
+  );
+  final i1.Index loansOpenByMember = i1.Index(
+    'loans_open_by_member',
+    'CREATE INDEX loans_open_by_member ON loans (member_id) WHERE returned_at IS NULL',
+  );
+  final i1.Index loansDue = i1.Index(
+    'loans_due',
+    'CREATE INDEX loans_due ON loans (due_at) WHERE returned_at IS NULL',
+  );
+  final i1.Index loansMemberHistory = i1.Index(
+    'loans_member_history',
+    'CREATE INDEX loans_member_history ON loans (member_id, checked_out_at DESC)',
+  );
+  final i1.Index loansCopyHistory = i1.Index(
+    'loans_copy_history',
+    'CREATE INDEX loans_copy_history ON loans (copy_id, checked_out_at DESC)',
+  );
+  final i1.Index finesOutstanding = i1.Index(
+    'fines_outstanding',
+    'CREATE INDEX fines_outstanding ON fines (member_id) WHERE paid + waived < assessed',
+  );
+  final i1.Index reservationsOneActivePerMemberTitle = i1.Index(
+    'reservations_one_active_per_member_title',
+    'CREATE UNIQUE INDEX reservations_one_active_per_member_title ON reservations (title_id, member_id) WHERE closed_at IS NULL',
+  );
+  final i1.Index reservationsQueue = i1.Index(
+    'reservations_queue',
+    'CREATE INDEX reservations_queue ON reservations (title_id, placed_at) WHERE closed_at IS NULL',
+  );
+}
+
+class Shape13 extends i0.VersionedTable {
+  Shape13({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<int> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get currency =>
+      columnsByName['currency']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get currencyName =>
+      columnsByName['currency_name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get currencySymbol =>
+      columnsByName['currency_symbol']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get branch =>
+      columnsByName['branch']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get email =>
+      columnsByName['email']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get phone =>
+      columnsByName['phone']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get address =>
+      columnsByName['address']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get openingHours =>
+      columnsByName['opening_hours']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get barcodePrefix =>
+      columnsByName['barcode_prefix']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get barcodeNextValue =>
+      columnsByName['barcode_next_value']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<String>;
+}
+
+i1.GeneratedColumn<String> _column_111(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'currency_name',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_112(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'currency_symbol',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
@@ -2802,6 +3689,8 @@ i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
   required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
+  required Future<void> Function(i1.Migrator m, Schema8 schema) from7To8,
+  required Future<void> Function(i1.Migrator m, Schema9 schema) from8To9,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -2835,6 +3724,16 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from6To7(migrator, schema);
         return 7;
+      case 7:
+        final schema = Schema8(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from7To8(migrator, schema);
+        return 8;
+      case 8:
+        final schema = Schema9(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from8To9(migrator, schema);
+        return 9;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -2848,6 +3747,8 @@ i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
   required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
+  required Future<void> Function(i1.Migrator m, Schema8 schema) from7To8,
+  required Future<void> Function(i1.Migrator m, Schema9 schema) from8To9,
 }) => i0.VersionedSchema.stepByStepHelper(
   step: migrationSteps(
     from1To2: from1To2,
@@ -2856,5 +3757,7 @@ i1.OnUpgrade stepByStep({
     from4To5: from4To5,
     from5To6: from5To6,
     from6To7: from6To7,
+    from7To8: from7To8,
+    from8To9: from8To9,
   ),
 );

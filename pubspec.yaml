@@ -67,6 +67,12 @@ dependencies:
   cupertino_icons: ^1.0.9
   toastification: ^3.2.0
 
+
+  #
+  country_phone_kit:
+    git:
+      url: https://github.com/sawongam/country_phone_kit
+
 dev_dependencies:
   # Code generation
   build_runner: ^2.16.0

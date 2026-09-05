@@ -1,3 +1,4 @@
+import 'package:country_phone_kit/country_phone_kit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:khulla/core/lifecycle/dispose_bag.dart';
 import 'package:khulla/core/money/currency.dart';
@@ -50,14 +51,20 @@ class _OnboardingLibraryStepState extends State<OnboardingLibraryStep>
           onChanged: cubit.libraryNameChanged,
         ),
         SizedBox(height: spacing.sm),
-        AppDropdownField<AppCurrency>(
+        AppDropdownField<CountryCurrency>(
           label: l10n.onboardingCurrencyLabel,
           required: true,
-          value: state.currency,
-          items: AppCurrency.values,
-          itemLabel: (currency) => currency.label(l10n),
+          value: Currencies.byCode(state.currency.code),
+          items: Currencies.all,
+          itemLabel: (currency) => '${currency.name} (${currency.code})',
+          searchHint: l10n.currencySearchHint,
+          clearSearchTooltip: l10n.commonClearSearch,
+          emptySearchMessage: l10n.commonNoMatchesTitle,
+          itemMatchesSearch: (currency, query) => currency.matchesQuery(query),
           onChanged: (currency) {
-            if (currency != null) cubit.currencyChanged(currency);
+            if (currency != null) {
+              cubit.currencyChanged(AppCurrency.fromCountryCurrency(currency));
+            }
           },
         ),
         SizedBox(height: spacing.xs),

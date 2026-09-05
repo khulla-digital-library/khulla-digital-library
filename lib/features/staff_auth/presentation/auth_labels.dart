@@ -58,11 +58,12 @@ extension RequiredTextErrorX on RequiredText {
 
 extension AppCurrencyLabelX on AppCurrency {
   /// The currency's name, with its code, as the picker shows it.
-  String label(AppLocalizations l10n) => switch (this) {
-    AppCurrency.npr => l10n.currencyNpr,
-    AppCurrency.inr => l10n.currencyInr,
-    AppCurrency.usd => l10n.currencyUsd,
-    AppCurrency.eur => l10n.currencyEur,
-    AppCurrency.gbp => l10n.currencyGbp,
+  String label(AppLocalizations l10n) => switch (code) {
+    'NPR' => l10n.currencyNpr,
+    'INR' => l10n.currencyInr,
+    'USD' => l10n.currencyUsd,
+    'EUR' => l10n.currencyEur,
+    'GBP' => l10n.currencyGbp,
+    _ => '$name ($code)',
   };
 }

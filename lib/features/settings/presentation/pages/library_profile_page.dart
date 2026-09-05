@@ -201,6 +201,12 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
                       value: _currency,
                       items: AppCurrency.values,
                       itemLabel: (currency) => currency.label(l10n),
+                      searchHint: l10n.currencySearchHint,
+                      clearSearchTooltip: l10n.commonClearSearch,
+                      emptySearchMessage: l10n.commonNoMatchesTitle,
+                      itemMatchesSearch: (currency, query) =>
+                          currency.name.toLowerCase().contains(query) ||
+                          currency.code.toLowerCase().contains(query),
                       onChanged: (currency) {
                         if (currency != null) {
                           setState(() => _currency = currency);

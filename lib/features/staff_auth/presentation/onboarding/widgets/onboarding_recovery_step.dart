@@ -92,23 +92,21 @@ class OnboardingRecoveryStep extends StatelessWidget {
         ),
         SizedBox(height: spacing.md),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: AppButton(
-                variant: AppButtonVariant.outline,
-                icon: AppIcons.copy,
-                onPressed: () => _copyCodes(context),
-                child: Text(l10n.onboardingCopyCodes),
-              ),
+            AppButton(
+              variant: AppButtonVariant.outline,
+              icon: AppIcons.copy,
+              onPressed: () => _copyCodes(context),
+              child: Text(l10n.onboardingCopyCodes),
             ),
-            SizedBox(width: spacing.sm),
-            Expanded(
-              child: AppButton(
-                variant: AppButtonVariant.outline,
-                icon: AppIcons.download,
-                onPressed: () => _downloadCodes(context),
-                child: Text(l10n.onboardingDownloadCodes),
-              ),
+            // Spacer(),
+            // Expanded(child: SizedBox(width: spacing.sm)),
+            AppButton(
+              variant: AppButtonVariant.outline,
+              icon: AppIcons.download,
+              onPressed: () => _downloadCodes(context),
+              child: Text(l10n.onboardingDownloadCodes),
             ),
           ],
         ),

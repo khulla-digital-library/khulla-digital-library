@@ -19,8 +19,12 @@ abstract class SignInState with _$SignInState {
     @Default(false) bool credentialsRejected,
 
     /// Whether unused recovery codes exist, so the recover link is worth
-    /// showing. False until the cubit has asked, and false when none remain.
+    /// showing. False when none remain.
     @Default(false) bool canRecoverPassword,
+
+    /// Whether [canRecoverPassword] has been read from the catalogue. Until
+    /// then the sign-in form does not show recovery copy either way.
+    @Default(false) bool recoveryAvailabilityLoaded,
     AppException? error,
   }) = _SignInState;
 

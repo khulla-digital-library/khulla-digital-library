@@ -76,7 +76,7 @@ abstract final class AppToast {
     BuildContext context, {
     required String message,
     String? description,
-    ToastificationStyle style = ToastificationStyle.flatColored,
+    ToastificationStyle style = ToastificationStyle.flat,
     Duration? autoCloseDuration,
   }) => show(
     context,

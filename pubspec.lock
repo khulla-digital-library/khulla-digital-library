@@ -241,6 +241,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  country_phone_kit:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "3d61d4a060b9b2ac5fbdb538813a963d974f2bae"
+      url: "https://github.com/sawongam/country_phone_kit"
+    source: git
+    version: "1.0.0"
   cross_file:
     dependency: transitive
     description:
@@ -289,6 +298,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  dlibphonenumber:
+    dependency: transitive
+    description:
+      name: dlibphonenumber
+      sha256: bd19797bba652e30f1ef61ebb1bf48142b4ff235ee5ca31cc97d1f1f35d38a49
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.71"
   drift:
     dependency: "direct main"
     description:
@@ -956,6 +973,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  protobuf:
+    dependency: transitive
+    description:
+      name: protobuf
+      sha256: "75ec242d22e950bdcc79ee38dd520ce4ee0bc491d7fadc4ea47694604d22bf06"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.0"
   provider:
     dependency: transitive
     description:
