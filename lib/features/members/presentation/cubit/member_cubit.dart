@@ -115,4 +115,18 @@ class MemberCubit extends Cubit<MemberState> {
     );
     unawaited(loadMembers());
   }
+
+  /// Suspends one member and reloads the list. Rethrows on failure.
+  Future<void> suspendMember(String id) async {
+    await _repository.suspendMember(id);
+    if (isClosed) return;
+    await loadMembers();
+  }
+
+  /// Extends membership and reloads the list. Rethrows on failure.
+  Future<void> renewMembership(String id) async {
+    await _repository.renewMembership(id);
+    if (isClosed) return;
+    await loadMembers();
+  }
 }

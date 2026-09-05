@@ -61,4 +61,18 @@ class ReservationListCubit extends Cubit<ReservationListState> {
     emit(state.copyWith(query: const ReservationQuery()));
     unawaited(loadReservations());
   }
+
+  /// Cancels one hold and reloads the list. Rethrows on failure.
+  Future<void> cancelHold(String reservationId) async {
+    await _repository.cancelHold(reservationId);
+    if (isClosed) return;
+    await loadReservations();
+  }
+
+  /// Assigns an available copy and marks a waiting hold ready. Rethrows on failure.
+  Future<void> markHoldReady(String reservationId) async {
+    await _repository.markHoldReady(reservationId);
+    if (isClosed) return;
+    await loadReservations();
+  }
 }

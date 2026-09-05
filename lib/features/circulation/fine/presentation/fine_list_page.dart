@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/money/money.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
@@ -10,7 +12,7 @@ import 'package:khulla/features/circulation/fine/presentation/cubit/fine_list_st
 import 'package:khulla/features/circulation/shared/domain/fine_status.dart';
 import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
+import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -21,8 +23,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// never interpolated, which would print the paisa, and never formatted by
 /// hand, which would put the currency symbol somewhere the library's settings
 /// did not ask for. [FineListCubit] drives search, status filters and the
-/// summary totals. Collect and waive confirm in a dialog, then still toast as
-/// not wired until payment recording lands.
+/// summary totals. Collect and waive confirm in a dialog, then persist through
+/// [FineListCubit].
 class FineListPage extends StatelessWidget {
   const FineListPage({super.key});
 
@@ -59,7 +61,14 @@ class FineListPage extends StatelessWidget {
       ),
     );
     if (!context.mounted || confirmed != true) return;
-    showNotWiredToast(context);
+    try {
+      await context.read<FineListCubit>().collectFine(fine.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.finesCollectSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
   }
 
   Future<void> _waive(BuildContext context, Fine fine) async {
@@ -73,7 +82,14 @@ class FineListPage extends StatelessWidget {
       icon: AppIcons.waiveFine,
     );
     if (!context.mounted || !confirmed) return;
-    showNotWiredToast(context);
+    try {
+      await context.read<FineListCubit>().waiveFine(fine.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.finesWaiveSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
   }
 
   @override

@@ -29,5 +29,11 @@ abstract interface class MemberRepository {
 
   Future<void> archiveMember(String id);
 
+  Future<Member> suspendMember(String id, {String? reason});
+
+  Future<Member> unsuspendMember(String id);
+
+  Future<Member> renewMembership(String id);
+
   Future<void> removeMember(String id);
 }

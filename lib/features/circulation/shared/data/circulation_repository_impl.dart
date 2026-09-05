@@ -550,6 +550,126 @@ class CirculationRepositoryImpl implements CirculationRepository {
   }
 
   @override
+  Future<Reservation> markHoldReady(String reservationId) => guardDatabase(
+    () => _db.transaction(() => _markHoldReady(reservationId)),
+    source: '$_source.markHoldReady',
+  );
+
+  Future<Reservation> _markHoldReady(String reservationId) async {
+    final now = DateTime.now();
+    final today = dateOnly(now);
+
+    final hold =
+        await (_db.select(_db.reservations)..where(
+              (row) => row.id.equals(reservationId) & row.closedAt.isNull(),
+            ))
+            .getSingleOrNull();
+    if (hold == null) {
+      throw const NotFoundException('That hold was not found.');
+    }
+    if (hold.status != ReservationStatus.waiting) {
+      throw const ConflictException(
+        'Only waiting holds can be marked ready for pickup.',
+      );
+    }
+
+    final copyRow =
+        await (_db.select(_db.copies)..where(
+              (copy) =>
+                  copy.titleId.equals(hold.titleId) &
+                  copy.archivedAt.isNull() &
+                  copy.status.equalsValue(CopyStatus.available),
+            ))
+            .getSingleOrNull();
+    if (copyRow == null) {
+      throw const ConflictException(
+        'No available copy to assign to this hold.',
+      );
+    }
+
+    final rules = await _loadLoanRules();
+    final expiresAt = addCalendarDays(today, rules.holdShelfDays);
+
+    await (_db.update(
+      _db.reservations,
+    )..where((row) => row.id.equals(reservationId))).write(
+      ReservationsCompanion(
+        status: const Value(ReservationStatus.ready),
+        readyCopyId: Value(copyRow.id),
+        readyAt: Value(now),
+        expiresAt: Value(expiresAt),
+        updatedAt: Value(now),
+      ),
+    );
+    await (_db.update(
+      _db.copies,
+    )..where((copy) => copy.id.equals(copyRow.id))).write(
+      CopiesCompanion(
+        status: const Value(CopyStatus.reserved),
+        updatedAt: Value(now),
+      ),
+    );
+
+    return (await _loadReservationById(reservationId))!;
+  }
+
+  @override
+  Future<Fine> collectFine(String fineId) => guardDatabase(
+    () => _db.transaction(() async {
+      final row = await (_db.select(
+        _db.fines,
+      )..where((fine) => fine.id.equals(fineId))).getSingleOrNull();
+      if (row == null) {
+        throw const NotFoundException('That fine was not found.');
+      }
+      final outstanding = row.assessed - row.paid - row.waived;
+      if (!outstanding.isPositive) {
+        throw const ConflictException('That fine is already settled.');
+      }
+      final now = DateTime.now();
+      await (_db.update(
+        _db.fines,
+      )..where((fine) => fine.id.equals(fineId))).write(
+        FinesCompanion(
+          paid: Value(row.paid + outstanding),
+          settledAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      return (await findFine(fineId))!;
+    }),
+    source: '$_source.collectFine',
+  );
+
+  @override
+  Future<Fine> waiveFine(String fineId) => guardDatabase(
+    () => _db.transaction(() async {
+      final row = await (_db.select(
+        _db.fines,
+      )..where((fine) => fine.id.equals(fineId))).getSingleOrNull();
+      if (row == null) {
+        throw const NotFoundException('That fine was not found.');
+      }
+      final outstanding = row.assessed - row.paid - row.waived;
+      if (!outstanding.isPositive) {
+        throw const ConflictException('That fine is already settled.');
+      }
+      final now = DateTime.now();
+      await (_db.update(
+        _db.fines,
+      )..where((fine) => fine.id.equals(fineId))).write(
+        FinesCompanion(
+          waived: Value(row.waived + outstanding),
+          settledAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      return (await findFine(fineId))!;
+    }),
+    source: '$_source.waiveFine',
+  );
+
+  @override
   Future<void> expireStaleHolds() => guardDatabase(
     () => _db.transaction(_expireStaleHolds),
     source: '$_source.expireStaleHolds',

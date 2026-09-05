@@ -91,4 +91,18 @@ class FineListCubit extends Cubit<FineListState> {
     emit(state.copyWith(query: const FineQuery()));
     unawaited(loadFines());
   }
+
+  /// Records full payment on one fine and reloads the list. Rethrows on failure.
+  Future<void> collectFine(String fineId) async {
+    await _repository.collectFine(fineId);
+    if (isClosed) return;
+    await loadFines();
+  }
+
+  /// Waives the outstanding balance on one fine and reloads the list. Rethrows on failure.
+  Future<void> waiveFine(String fineId) async {
+    await _repository.waiveFine(fineId);
+    if (isClosed) return;
+    await loadFines();
+  }
 }

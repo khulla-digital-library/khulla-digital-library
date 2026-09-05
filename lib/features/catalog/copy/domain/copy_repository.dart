@@ -24,4 +24,11 @@ abstract interface class CopyRepository {
   });
 
   Future<void> archiveCopy(String id);
+
+  /// Updates standing and optionally condition. Refuses when the copy is on loan.
+  Future<Copy> updateCopyStatus(
+    String id, {
+    required CopyStatus status,
+    CopyCondition? condition,
+  });
 }

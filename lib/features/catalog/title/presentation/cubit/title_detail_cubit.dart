@@ -4,6 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/features/catalog/copy/domain/copy_repository.dart';
+import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
+import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
+import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/catalog/title/domain/title_repository.dart';
 import 'package:khulla/features/catalog/title/presentation/cubit/title_detail_state.dart';
 import 'package:khulla/features/circulation/loan/domain/models/loan_query.dart';
@@ -83,6 +86,38 @@ class TitleDetailCubit extends Cubit<TitleDetailState> {
       titleName: titleName,
       shelf: shelf,
     );
+    if (isClosed) return;
+    await loadTitle(titleId);
+  }
+
+  /// Marks a copy lost and reloads the detail pane. Rethrows on failure.
+  Future<void> markCopyLost(String titleId, Copy copy) async {
+    await _copies.updateCopyStatus(copy.id, status: CopyStatus.lost);
+    if (isClosed) return;
+    await loadTitle(titleId);
+  }
+
+  /// Marks a copy damaged and reloads the detail pane. Rethrows on failure.
+  Future<void> markCopyDamaged(String titleId, Copy copy) async {
+    await _copies.updateCopyStatus(
+      copy.id,
+      status: CopyStatus.damaged,
+      condition: CopyCondition.poor,
+    );
+    if (isClosed) return;
+    await loadTitle(titleId);
+  }
+
+  /// Withdraws a copy from stock and reloads the detail pane. Rethrows on failure.
+  Future<void> withdrawCopy(String titleId, Copy copy) async {
+    await _copies.archiveCopy(copy.id);
+    if (isClosed) return;
+    await loadTitle(titleId);
+  }
+
+  /// Queues a hold for [memberId] on the loaded title. Rethrows on failure.
+  Future<void> placeHold(String titleId, String memberId) async {
+    await _circulation.placeHold(memberId: memberId, titleId: titleId);
     if (isClosed) return;
     await loadTitle(titleId);
   }

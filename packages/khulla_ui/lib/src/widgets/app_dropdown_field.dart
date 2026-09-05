@@ -59,17 +59,9 @@ class AppDropdownField<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final spacing = context.appSpacing;
-    final colors = context.appColors;
     final metrics = context.appMetrics;
-    final typography = context.appTextStyles;
-    final popupTheme = Theme.of(context).popupMenuTheme;
     final fieldLabel = label;
-    final iconFor = itemIcon;
     final error = errorText;
-    final selected = value;
-    final hasValue = selected != null;
-    final radius = context.appRadius.container;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -82,50 +74,153 @@ class AppDropdownField<T> extends StatelessWidget {
           ),
           SizedBox(height: metrics.labelToControlGap),
         ],
-        SizedBox(
-          height: metrics.fieldHeight,
-          width: double.infinity,
-          child: MenuAnchor(
-            crossAxisUnconstrained: false,
-            style: MenuStyle(
-              backgroundColor: WidgetStatePropertyAll(popupTheme.color),
-              elevation: WidgetStatePropertyAll(popupTheme.elevation),
-              shadowColor: WidgetStatePropertyAll(popupTheme.shadowColor),
-              surfaceTintColor: const WidgetStatePropertyAll(
-                Colors.transparent,
-              ),
-              padding: WidgetStatePropertyAll(popupTheme.menuPadding),
-              shape: WidgetStatePropertyAll(
-                popupTheme.shape is OutlinedBorder
-                    ? popupTheme.shape! as OutlinedBorder
-                    : RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(radius),
-                        side: BorderSide(color: colors.hairline),
-                      ),
+        _DropdownFieldControl<T>(
+          value: value,
+          items: items,
+          itemLabel: itemLabel,
+          onChanged: onChanged,
+          hintText: hintText,
+          enabled: enabled,
+          itemIcon: itemIcon,
+        ),
+        if (error != null) ...[
+          SizedBox(height: context.appSpacing.xxs + 2),
+          AppFieldError(message: error),
+        ],
+      ],
+    );
+  }
+}
+
+class _DropdownFieldControl<T> extends StatefulWidget {
+  const _DropdownFieldControl({
+    required this.value,
+    required this.items,
+    required this.itemLabel,
+    required this.onChanged,
+    this.hintText,
+    this.enabled = true,
+    this.itemIcon,
+  });
+
+  final T? value;
+  final List<T> items;
+  final String Function(T value) itemLabel;
+  final ValueChanged<T?> onChanged;
+  final String? hintText;
+  final bool enabled;
+  final AppIconSpec? Function(T value)? itemIcon;
+
+  @override
+  State<_DropdownFieldControl<T>> createState() =>
+      _DropdownFieldControlState<T>();
+}
+
+class _DropdownFieldControlState<T> extends State<_DropdownFieldControl<T>> {
+  final _layerLink = LayerLink();
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.appSpacing;
+    final colors = context.appColors;
+    final metrics = context.appMetrics;
+    final typography = context.appTextStyles;
+    final popupTheme = Theme.of(context).popupMenuTheme;
+    final iconFor = widget.itemIcon;
+    final selected = widget.value;
+    final hasValue = selected != null;
+    final selectedIcon = hasValue ? iconFor?.call(selected) : null;
+    final radius = context.appRadius.container;
+    final itemRadius = context.appRadius.item;
+    final hairline = context.appBorders.hairline;
+    final enabled = widget.enabled;
+    final menuElevation = popupTheme.elevation ?? 6;
+    final menuShadowColor =
+        popupTheme.shadowColor ?? context.appShadows.raised.first.color;
+
+    ButtonStyle menuItemStyleFor(bool isSelected) {
+      return MenuItemButton.styleFrom(
+        padding: EdgeInsets.symmetric(
+          horizontal: spacing.xs,
+          vertical: spacing.xs + 2,
+        ),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        splashFactory: NoSplash.splashFactory,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(itemRadius),
+        ),
+      ).copyWith(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (!enabled) return Colors.transparent;
+          if (isSelected ||
+              states.contains(WidgetState.hovered) ||
+              states.contains(WidgetState.pressed)) {
+            return colors.tints.menuItemFocus;
+          }
+          return Colors.transparent;
+        }),
+        overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final fieldWidth = constraints.maxWidth;
+        final menuInset = spacing.xxs;
+        final itemWidth = fieldWidth - menuInset * 2;
+
+        return MenuAnchor(
+          layerLink: _layerLink,
+          crossAxisUnconstrained: false,
+          reservedPadding: EdgeInsets.zero,
+          alignmentOffset: Offset(0, -hairline),
+          style: MenuStyle(
+            backgroundColor: WidgetStatePropertyAll(popupTheme.color),
+            elevation: WidgetStatePropertyAll(menuElevation),
+            shadowColor: WidgetStatePropertyAll(menuShadowColor),
+            surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+            padding: WidgetStatePropertyAll(
+              EdgeInsets.fromLTRB(menuInset, 0, menuInset, menuInset),
+            ),
+            minimumSize: WidgetStatePropertyAll(Size(fieldWidth, 0)),
+            maximumSize: WidgetStatePropertyAll(
+              Size(fieldWidth, double.infinity),
+            ),
+            shape: WidgetStatePropertyAll(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(radius),
+                  bottomRight: Radius.circular(radius),
+                ),
+                side: BorderSide(color: colors.hairline),
               ),
             ),
-            alignmentOffset: Offset(0, spacing.xxs / 2),
-            menuChildren: [
-              for (final item in items)
-                MenuItemButton(
-                  style: MenuItemButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: spacing.xs,
-                      vertical: spacing.xs + 2,
-                    ),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  onPressed: enabled ? () => onChanged(item) : null,
-                  child: _DropdownMenuRow(
-                    icon: iconFor?.call(item),
-                    label: itemLabel(item),
-                    selected: item == selected,
+          ),
+          menuChildren: [
+            for (final item in widget.items)
+              MenuItemButton(
+                style: menuItemStyleFor(item == selected).merge(
+                  MenuItemButton.styleFrom(
+                    minimumSize: Size(itemWidth, 0),
+                    maximumSize: Size(itemWidth, double.infinity),
                   ),
                 ),
-            ],
-            builder: (context, controller, child) {
-              return InkWell(
+                onPressed: enabled ? () => widget.onChanged(item) : null,
+                child: _DropdownMenuRow(
+                  icon: iconFor?.call(item),
+                  label: widget.itemLabel(item),
+                  selected: item == selected,
+                ),
+              ),
+          ],
+          builder: (context, controller, child) {
+            return MouseRegion(
+              cursor: enabled ? SystemMouseCursors.click : MouseCursor.defer,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: enabled
                     ? () {
                         if (controller.isOpen) {
@@ -135,59 +230,60 @@ class AppDropdownField<T> extends StatelessWidget {
                         }
                       }
                     : null,
-                borderRadius: BorderRadius.circular(radius),
                 child: child,
-              );
-            },
+              ),
+            );
+          },
+          child: SizedBox(
+            height: metrics.fieldHeight,
+            width: fieldWidth,
             child: InputDecorator(
               expands: true,
               isEmpty: !hasValue,
               decoration: InputDecoration(
-                hintText: hintText,
+                isDense: true,
+                hintText: widget.hintText,
                 enabled: enabled,
-                suffixIcon: AppFieldAffix(
-                  child: AppIcon(
+                contentPadding: EdgeInsetsDirectional.only(
+                  start: spacing.sm,
+                  end: spacing.sm,
+                  top: spacing.xs,
+                  bottom: spacing.xs,
+                ),
+              ),
+              child: Row(
+                children: [
+                  if (selectedIcon != null) ...[
+                    AppIcon(
+                      selectedIcon,
+                      size: metrics.icon,
+                      color: colors.ink500,
+                    ),
+                    SizedBox(width: spacing.menuIconGap),
+                  ],
+                  Expanded(
+                    child: hasValue
+                        ? Text(
+                            widget.itemLabel(selected),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: typography.body.copyWith(
+                              color: enabled ? colors.ink100 : colors.ink500,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                  AppIcon(
                     AppIcons.chevronDown,
                     size: metrics.icon,
                     color: colors.ink500,
                   ),
-                ),
+                ],
               ),
-              child: hasValue
-                  ? Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Row(
-                        children: [
-                          if (iconFor?.call(selected) case final glyph?) ...[
-                            AppIcon(
-                              glyph,
-                              size: metrics.icon,
-                              color: colors.ink500,
-                            ),
-                            SizedBox(width: spacing.menuIconGap),
-                          ],
-                          Expanded(
-                            child: Text(
-                              itemLabel(selected),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: typography.body.copyWith(
-                                color: enabled ? colors.ink100 : colors.ink500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : null,
             ),
           ),
-        ),
-        if (error != null) ...[
-          SizedBox(height: spacing.xxs + 2),
-          AppFieldError(message: error),
-        ],
-      ],
+        );
+      },
     );
   }
 }

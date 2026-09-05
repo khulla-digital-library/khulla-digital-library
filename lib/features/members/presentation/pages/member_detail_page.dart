@@ -6,6 +6,7 @@ import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/format/app_date_format.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
 import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/presentation/cubit/member_detail_cubit.dart';
 import 'package:khulla/features/members/presentation/cubit/member_detail_state.dart';
@@ -17,7 +18,6 @@ import 'package:khulla/features/members/presentation/widgets/member_loans_card.d
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -27,9 +27,7 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// The four figures at the top are the ones a desk decides on — copies out,
 /// how many are late, what is owed, and how much they have borrowed over the
 /// life of the card. [MemberDetailCubit] loads the member, open loans, fine
-/// rows and loan history. Two panes from [FormFactor.expanded] up, matching
-/// the title detail page. Renew, suspend and collect-fine still toast as not
-/// wired; check-out and edit are live.
+/// rows and loan history. Check-out and edit are live.
 class MemberDetailPage extends StatelessWidget {
   const MemberDetailPage({required this.memberId, super.key});
 
@@ -59,6 +57,78 @@ class MemberDetailPage extends StatelessWidget {
     final saved = await MemberFormDialog.show(context, memberId: memberId);
     if (saved == true && context.mounted) {
       unawaited(context.read<MemberDetailCubit>().loadMember(memberId));
+    }
+  }
+
+  Future<void> _collectFine(BuildContext context, Fine fine) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.show<bool>(
+      context: context,
+      title: l10n.finesCollectTitle,
+      message: l10n.finesCollectBody(
+        fine.outstanding.display(),
+        fine.memberName ?? l10n.commonNotSet,
+      ),
+      icon: AppIcons.wallet,
+      actionsBuilder: (dialogContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: AppButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.finesCollect),
+            ),
+          ),
+          SizedBox(height: dialogContext.appSpacing.xs),
+          AppDialog.secondaryAction(
+            context: dialogContext,
+            label: l10n.commonCancel,
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted || confirmed != true) return;
+    try {
+      await context.read<MemberDetailCubit>().collectFine(memberId, fine.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.finesCollectSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _renewMembership(BuildContext context) async {
+    final l10n = context.l10n;
+    try {
+      await context.read<MemberDetailCubit>().renewMembership(memberId);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailRenewSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _suspendMembership(BuildContext context) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.memberDetailSuspend,
+      message: l10n.memberDetailSuspendBody,
+      confirmLabel: l10n.memberDetailSuspend,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!context.mounted || !confirmed) return;
+    try {
+      await context.read<MemberDetailCubit>().suspendMember(memberId);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailSuspendSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
     }
   }
 
@@ -103,7 +173,7 @@ class MemberDetailPage extends StatelessWidget {
         );
         final finesCard = MemberFinesCard(
           fines: state.fines,
-          onCollect: (_) => showNotWiredToast(context),
+          onCollect: (fine) => unawaited(_collectFine(context, fine)),
         );
         final detailsCard = _MemberDetailsCard(member: member);
 
@@ -132,12 +202,14 @@ class MemberDetailPage extends StatelessWidget {
                         AppMenuAction(
                           label: l10n.memberDetailRenewMembership,
                           icon: AppIcons.renew,
-                          onSelected: () => showNotWiredToast(context),
+                          onSelected: () =>
+                              unawaited(_renewMembership(context)),
                         ),
                         AppMenuAction(
                           label: l10n.memberDetailSuspend,
                           icon: AppIcons.blocked,
-                          onSelected: () => showNotWiredToast(context),
+                          onSelected: () =>
+                              unawaited(_suspendMembership(context)),
                         ),
                         AppMenuAction(
                           label: l10n.memberDetailDelete,

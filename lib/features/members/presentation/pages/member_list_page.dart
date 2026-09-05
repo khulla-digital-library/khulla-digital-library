@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/presentation/cubit/member_cubit.dart';
@@ -8,7 +12,7 @@ import 'package:khulla/features/members/presentation/member_labels.dart';
 import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/features/members/presentation/widgets/member_card.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
+import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -18,10 +22,41 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// The filters are the questions a desk actually asks of it — who is holding
 /// something, who owes something, whose card has stopped working — rather
 /// than one chip per enum value. [MemberCubit] turns search, those filters,
-/// sort and paging into one query. Renew membership and suspend in the row
-/// menu still toast as not wired; check-out jumps to the circulation desk.
+/// sort and paging into one query. Check-out jumps to the circulation desk.
 class MemberListPage extends StatelessWidget {
   const MemberListPage({super.key});
+
+  Future<void> _renewMembership(BuildContext context, Member member) async {
+    final l10n = context.l10n;
+    try {
+      await context.read<MemberCubit>().renewMembership(member.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailRenewSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _suspendMembership(BuildContext context, Member member) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.memberDetailSuspend,
+      message: l10n.memberDetailSuspendBody,
+      confirmLabel: l10n.memberDetailSuspend,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!context.mounted || !confirmed) return;
+    try {
+      await context.read<MemberCubit>().suspendMember(member.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailSuspendSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
 
   List<AppTableColumn<Member>> _columns(
     BuildContext context,
@@ -152,13 +187,13 @@ class MemberListPage extends StatelessWidget {
             AppMenuAction(
               label: l10n.memberDetailRenewMembership,
               icon: AppIcons.renew,
-              onSelected: () => showNotWiredToast(context),
+              onSelected: () => unawaited(_renewMembership(context, member)),
             ),
             AppMenuAction(
               label: l10n.memberDetailSuspend,
               icon: AppIcons.blocked,
               isDestructive: true,
-              onSelected: () => showNotWiredToast(context),
+              onSelected: () => unawaited(_suspendMembership(context, member)),
             ),
           ],
         ),

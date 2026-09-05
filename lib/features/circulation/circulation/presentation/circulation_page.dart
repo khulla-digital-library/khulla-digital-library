@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/circulation/circulation/presentation/cubit/loan_list_cubit.dart';
 import 'package:khulla/features/circulation/circulation/presentation/cubit/loan_list_state.dart';
@@ -9,6 +13,7 @@ import 'package:khulla/features/circulation/shared/presentation/circulation_labe
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/navigation_group.dart';
 import 'package:khulla/shared/components/navigation_tile.dart';
+import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
@@ -20,12 +25,24 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// *is* what a librarian came here to look at. [LoanListCubit] supplies the
 /// counts, the open-loan query and the holds figure for the stat strip — tapping
 /// *Overdue* selects the same rows the chip does. Renew and mark lost in the row
-/// menu still toast as not wired; return routes to the returns desk.
+/// menu still toast as not wired for mark lost; return routes to the returns desk.
 class CirculationPage extends StatelessWidget {
   const CirculationPage({super.key});
 
   bool _isFiltered(LoanListState state) =>
       state.query.search.isNotEmpty || state.query.status != null;
+
+  Future<void> _renewLoan(BuildContext context, Loan loan) async {
+    final l10n = context.l10n;
+    try {
+      await context.read<LoanListCubit>().renewLoan(loan.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.loansRenewSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
 
   List<AppTableColumn<Loan>> _columns(
     BuildContext context,
@@ -123,7 +140,7 @@ class CirculationPage extends StatelessWidget {
             AppMenuAction(
               label: l10n.loansRenew,
               icon: AppIcons.refresh,
-              onSelected: () => showNotWiredToast(context),
+              onSelected: () => unawaited(_renewLoan(context, loan)),
             ),
             AppMenuAction(
               label: l10n.loansViewMember,

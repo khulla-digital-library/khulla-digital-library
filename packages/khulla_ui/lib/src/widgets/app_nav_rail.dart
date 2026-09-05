@@ -70,21 +70,22 @@ class _AppNavRailState extends State<AppNavRail> {
   @override
   void initState() {
     super.initState();
-    _expandSelected();
+    _expandAllWithChildren();
   }
 
   @override
   void didUpdateWidget(covariant AppNavRail oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedIndex != widget.selectedIndex) _expandSelected();
+    if (oldWidget.destinations.length != widget.destinations.length) {
+      _expandAllWithChildren();
+    }
   }
 
-  void _expandSelected() {
-    final index = widget.selectedIndex;
-    if (index >= 0 &&
-        index < widget.destinations.length &&
-        widget.destinations[index].children.isNotEmpty) {
-      _expanded.add(index);
+  void _expandAllWithChildren() {
+    for (final (index, destination) in widget.destinations.indexed) {
+      if (destination.expandable && destination.children.isNotEmpty) {
+        _expanded.add(index);
+      }
     }
   }
 
@@ -132,15 +133,27 @@ class _AppNavRailState extends State<AppNavRail> {
                   _RailItem(
                     destination: destination,
                     extended: extended,
-                    selected: index == widget.selectedIndex,
-                    expanded: _expanded.contains(index),
+                    selected:
+                        index == widget.selectedIndex &&
+                        !destination.children.any((child) => child.selected),
+                    expanded:
+                        _expanded.contains(index) ||
+                        (destination.expandable &&
+                            destination.children.any(
+                              (child) => child.selected,
+                            )),
                     onTap: () {
                       widget.onDestinationSelected(index);
-                      if (extended && destination.children.isNotEmpty) {
+                      if (extended &&
+                          destination.expandable &&
+                          destination.children.isNotEmpty) {
                         _toggle(index);
                       }
                     },
-                    onToggle: destination.children.isEmpty || !extended
+                    onToggle:
+                        !destination.expandable ||
+                            destination.children.isEmpty ||
+                            !extended
                         ? null
                         : () => _toggle(index),
                   ),
@@ -243,7 +256,7 @@ class _RailItem extends StatelessWidget {
                       SizedBox(width: spacing.xs),
                       _RailBadge(label: count, selected: selected),
                     ],
-                    if (onToggle != null) ...[
+                    if (destination.expandable && onToggle != null) ...[
                       SizedBox(width: spacing.xxs),
                       AnimatedRotation(
                         duration: context.appMotion.overlay,
@@ -271,7 +284,10 @@ class _RailItem extends StatelessWidget {
           );
 
     final children = destination.children;
-    final showChildren = extended && expanded && children.isNotEmpty;
+    final showChildren =
+        extended &&
+        children.isNotEmpty &&
+        (!destination.expandable || expanded);
 
     return Padding(
       padding: EdgeInsets.only(bottom: spacing.xs),

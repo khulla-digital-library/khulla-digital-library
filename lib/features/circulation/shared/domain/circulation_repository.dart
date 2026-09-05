@@ -47,6 +47,13 @@ abstract interface class CirculationRepository {
 
   Future<void> cancelHold(String reservationId);
 
+  /// Assigns the next available copy and moves a waiting hold to ready.
+  Future<Reservation> markHoldReady(String reservationId);
+
+  Future<Fine> collectFine(String fineId);
+
+  Future<Fine> waiveFine(String fineId);
+
   Future<void> expireStaleHolds();
 
   Future<LoanListResult> findOpenLoans(LoanQuery query);

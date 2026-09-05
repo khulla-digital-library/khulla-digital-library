@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/features/catalog/copy/data/copy_local_data_source.dart';
 import 'package:khulla/features/catalog/copy/domain/copy_repository.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
@@ -59,4 +60,33 @@ class CopyRepositoryImpl implements CopyRepository {
   @override
   Future<void> archiveCopy(String id) =>
       _dataSource.archiveCopy(id, DateTime.now());
+
+  @override
+  Future<Copy> updateCopyStatus(
+    String id, {
+    required CopyStatus status,
+    CopyCondition? condition,
+  }) async {
+    final existing = await _dataSource.findCopyById(id);
+    if (existing == null) {
+      throw const NotFoundException('That copy was not found.');
+    }
+    if (existing.status == CopyStatus.onLoan) {
+      throw const ConflictException(
+        'That copy is on loan — return it at the desk first.',
+      );
+    }
+    if (existing.status == CopyStatus.reserved &&
+        status != CopyStatus.reserved) {
+      throw const ConflictException(
+        'That copy is reserved for a hold — cancel or fulfil the hold first.',
+      );
+    }
+    return await _dataSource.updateCopy(
+      existing.copyWith(
+        status: status,
+        condition: condition ?? existing.condition,
+      ),
+    );
+  }
 }

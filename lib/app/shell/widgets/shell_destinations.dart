@@ -14,6 +14,7 @@ class ShellDestination {
     required this.icon,
     required this.route,
     this.children = const [],
+    this.expandable = false,
     this.primary = false,
   });
 
@@ -29,6 +30,10 @@ class ShellDestination {
 
   /// The routes nested under it, listed in the extended rail.
   final List<ShellChild> children;
+
+  /// Whether the rail row expands and collapses [children] on tap. When false,
+  /// children stay visible whenever the rail is extended.
+  final bool expandable;
 
   /// Whether the section earns a slot in the compact bottom bar, which holds
   /// four before it starts eating labels. Everything else lives behind
@@ -65,6 +70,7 @@ List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
     icon: AppIcons.book,
     route: Routes.catalog,
     primary: true,
+    expandable: true,
     children: [
       ShellChild(label: l10n.navCatalogTitles, route: Routes.catalogTitles),
       ShellChild(label: l10n.navCatalogCopies, route: Routes.catalogCopies),
@@ -77,6 +83,7 @@ List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
     icon: AppIcons.transfer,
     route: Routes.circulation,
     primary: true,
+    expandable: true,
     children: [
       ShellChild(
         label: l10n.navCirculationCheckOut,
@@ -102,29 +109,30 @@ List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
     route: Routes.members,
     primary: true,
   ),
-  ShellDestination(
-    label: l10n.navOpac,
-    icon: AppIcons.discover,
-    route: Routes.opac,
-  ),
-  ShellDestination(
-    label: l10n.navReports,
-    icon: AppIcons.insights,
-    route: Routes.reports,
-  ),
-  ShellDestination(
-    label: l10n.navUsers,
-    icon: AppIcons.idCard,
-    route: Routes.users,
-    children: [
-      ShellChild(label: l10n.navUsersAccounts, route: Routes.users),
-      ShellChild(label: l10n.navUsersRoles, route: Routes.usersRoles),
-    ],
-  ),
+  // ShellDestination(
+  //   label: l10n.navOpac,
+  //   icon: AppIcons.discover,
+  //   route: Routes.opac,
+  // ),
+  // ShellDestination(
+  //   label: l10n.navReports,
+  //   icon: AppIcons.insights,
+  //   route: Routes.reports,
+  // ),
+  // ShellDestination(
+  //   label: l10n.navUsers,
+  //   icon: AppIcons.idCard,
+  //   route: Routes.users,
+  //   children: [
+  //     ShellChild(label: l10n.navUsersAccounts, route: Routes.users),
+  //     ShellChild(label: l10n.navUsersRoles, route: Routes.usersRoles),
+  //   ],
+  // ),
   ShellDestination(
     label: l10n.navSettings,
     icon: AppIcons.settings,
     route: Routes.settings,
+    expandable: true,
     children: [
       ShellChild(
         label: l10n.navSettingsLibrary,

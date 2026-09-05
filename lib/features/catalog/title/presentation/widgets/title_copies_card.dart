@@ -10,19 +10,22 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// [AppTable] rather than the sliver form: a title has a handful of copies,
 /// the count is known before the card is built, and the table lives inside a
 /// card rather than owning the page's scroll view. Add-copy is wired through
-/// [onAddCopy]; per-copy maintenance routes through [onCopyAction] because
-/// the parent decides what is live yet.
+/// [onAddCopy]; per-copy maintenance routes through the three action callbacks.
 class TitleCopiesCard extends StatelessWidget {
   const TitleCopiesCard({
     required this.copies,
     required this.onAddCopy,
-    required this.onCopyAction,
+    required this.onMarkLost,
+    required this.onMarkDamaged,
+    required this.onWithdraw,
     super.key,
   });
 
   final List<Copy> copies;
   final VoidCallback onAddCopy;
-  final void Function(Copy copy) onCopyAction;
+  final void Function(Copy copy) onMarkLost;
+  final void Function(Copy copy) onMarkDamaged;
+  final void Function(Copy copy) onWithdraw;
 
   @override
   Widget build(BuildContext context) {
@@ -114,18 +117,18 @@ class TitleCopiesCard extends StatelessWidget {
                       AppMenuAction(
                         label: l10n.copiesMarkLost,
                         icon: AppIcons.help,
-                        onSelected: () => onCopyAction(copy),
+                        onSelected: () => onMarkLost(copy),
                       ),
                       AppMenuAction(
                         label: l10n.copiesMarkDamaged,
                         icon: AppIcons.damage,
-                        onSelected: () => onCopyAction(copy),
+                        onSelected: () => onMarkDamaged(copy),
                       ),
                       AppMenuAction(
                         label: l10n.copiesWithdraw,
                         icon: AppIcons.delete,
                         isDestructive: true,
-                        onSelected: () => onCopyAction(copy),
+                        onSelected: () => onWithdraw(copy),
                       ),
                     ],
                   ),

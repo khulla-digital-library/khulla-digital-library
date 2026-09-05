@@ -124,6 +124,81 @@ class MemberRepositoryImpl implements MemberRepository {
       _dataSource.archiveMember(id, DateTime.now());
 
   @override
+  Future<Member> suspendMember(String id, {String? reason}) async {
+    final existing = await _dataSource.findMemberById(id);
+    if (existing == null) {
+      throw const NotFoundException('That member was not found.');
+    }
+    if (existing.suspendedAt != null) {
+      throw const ConflictException('That membership is already suspended.');
+    }
+    final now = DateTime.now();
+    return await _dataSource.updateMember(
+      existing.copyWith(
+        suspendedAt: now,
+        suspensionReason: reason?.trim(),
+        updatedAt: now,
+      ),
+      searchText: _searchText(existing),
+    );
+  }
+
+  @override
+  Future<Member> unsuspendMember(String id) async {
+    final existing = await _dataSource.findMemberById(id);
+    if (existing == null) {
+      throw const NotFoundException('That member was not found.');
+    }
+    if (existing.suspendedAt == null) {
+      throw const ConflictException('That membership is not suspended.');
+    }
+    final now = DateTime.now();
+    return await _dataSource.updateMember(
+      existing.copyWith(
+        suspendedAt: null,
+        suspensionReason: null,
+        updatedAt: now,
+      ),
+      searchText: _searchText(existing),
+    );
+  }
+
+  @override
+  Future<Member> renewMembership(String id) async {
+    final existing = await _dataSource.findMemberById(id);
+    if (existing == null) {
+      throw const NotFoundException('That member was not found.');
+    }
+    final memberType = await _memberTypes.findMemberTypeById(
+      existing.memberTypeId,
+    );
+    if (memberType == null) {
+      throw const NotFoundException('That member type was not found.');
+    }
+    final defaults = await _loanRules.findRules();
+    if (defaults == null) {
+      throw const NotFoundException('Loan rules have not been configured.');
+    }
+    final rules = resolveLoanRules(defaults, memberType);
+    final now = DateTime.now();
+    final base = existing.expiresAt ?? dateOnly(now);
+    final renewed = _membershipExpiresAt(base, rules.membershipDurationMonths);
+    return await _dataSource.updateMember(
+      existing.copyWith(expiresAt: renewed, updatedAt: now),
+      searchText: _searchText(existing),
+    );
+  }
+
+  String _searchText(Member member) => buildSearchText([
+    member.fullName,
+    member.cardNumber,
+    member.email ?? '',
+    member.phone ?? '',
+    member.address ?? '',
+    member.guardian ?? '',
+  ]);
+
+  @override
   Future<void> removeMember(String id) async {
     if (await _dataSource.hasCirculationHistory(id)) {
       throw const ConflictException(

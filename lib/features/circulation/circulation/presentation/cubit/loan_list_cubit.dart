@@ -104,4 +104,11 @@ class LoanListCubit extends Cubit<LoanListState> {
     'barcode' => 'barcode',
     _ => 'dueAt',
   };
+
+  /// Extends the due date for one open loan. Rethrows on failure.
+  Future<void> renewLoan(String loanId) async {
+    await _repository.renewLoan(loanId);
+    if (isClosed) return;
+    await loadOpenLoans();
+  }
 }

@@ -1,31 +1,35 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/core/di/injection.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
+import 'package:khulla/features/catalog/copy/presentation/copy_form_dialog.dart';
+import 'package:khulla/features/catalog/copy/presentation/copy_list_refresh.dart';
 import 'package:khulla/features/catalog/copy/presentation/cubit/copy_cubit.dart';
 import 'package:khulla/features/catalog/copy/presentation/cubit/copy_state.dart';
 import 'package:khulla/features/catalog/copy/presentation/widgets/copy_card.dart';
 import 'package:khulla/features/catalog/copy/presentation/widgets/copy_status_badge.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
-import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
+import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Every physical item, across every title.
-///
-/// The holdings view: a shelf-reading list, a place to find one barcode, and
-/// the screen a librarian uses to write off a copy that never came back.
-/// [CopyCubit] drives search, copy-status filters, sort and paging — filters
-/// are copy standings, not title availability, which is the distinction the
-/// whole catalogue rests on. Row tap opens the parent title; mark lost, damaged
-/// and withdraw still toast as not wired.
-class CopyListPage extends StatelessWidget {
+class CopyListPage extends StatefulWidget {
   const CopyListPage({super.key});
 
+  @override
+  State<CopyListPage> createState() => _CopyListPageState();
+}
+
+class _CopyListPageState extends State<CopyListPage> {
   static const List<CopyStatus> _filterableStatuses = [
     CopyStatus.available,
     CopyStatus.onLoan,
@@ -34,10 +38,104 @@ class CopyListPage extends StatelessWidget {
     CopyStatus.damaged,
   ];
 
-  List<AppTableColumn<Copy>> _columns(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
+  @override
+  void initState() {
+    super.initState();
+    getIt<CopyListRefresh>().reload = _reload;
+  }
+
+  @override
+  void dispose() {
+    getIt<CopyListRefresh>().reload = null;
+    super.dispose();
+  }
+
+  void _reload() {
+    if (!mounted) return;
+    unawaited(context.read<CopyCubit>().loadCopies());
+  }
+
+  Future<void> _addCopy() async {
+    final saved = await CopyFormDialog.show(context);
+    if (saved == true && mounted) {
+      await context.read<CopyCubit>().loadCopies();
+    }
+  }
+
+  Future<void> _markLost(Copy copy) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.copiesMarkLost,
+      message: l10n.copiesMarkLostBody,
+      confirmLabel: l10n.copiesMarkLost,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!mounted || !confirmed) return;
+    try {
+      await context.read<CopyCubit>().markCopyLost(copy.id);
+      if (!mounted) return;
+      AppToast.success(context, message: l10n.copiesMarkLostSuccess);
+    } on AppException catch (error) {
+      if (!mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _markDamaged(Copy copy) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.show<bool>(
+      context: context,
+      title: l10n.copiesMarkDamaged,
+      message: l10n.copiesMarkDamagedBody,
+      actionsBuilder: (dialogContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AppDialog.primaryAction(
+            context: dialogContext,
+            label: l10n.copiesMarkDamaged,
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+          ),
+          AppDialog.secondaryAction(
+            context: dialogContext,
+            label: l10n.commonCancel,
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+    try {
+      await context.read<CopyCubit>().markCopyDamaged(copy.id);
+      if (!mounted) return;
+      AppToast.success(context, message: l10n.copiesMarkDamagedSuccess);
+    } on AppException catch (error) {
+      if (!mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _withdraw(Copy copy) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.copiesWithdraw,
+      message: l10n.copiesWithdrawBody,
+      confirmLabel: l10n.copiesWithdraw,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!mounted || !confirmed) return;
+    try {
+      await context.read<CopyCubit>().archiveCopy(copy.id);
+      if (!mounted) return;
+      AppToast.success(context, message: l10n.copiesWithdrawSuccess);
+    } on AppException catch (error) {
+      if (!mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  List<AppTableColumn<Copy>> _columns(AppLocalizations l10n) {
     final scheme = context.colorScheme;
     final muted = context.textTheme.bodyMedium?.copyWith(
       color: scheme.onSurfaceVariant,
@@ -105,18 +203,18 @@ class CopyListPage extends StatelessWidget {
             AppMenuAction(
               label: l10n.copiesMarkLost,
               icon: AppIcons.help,
-              onSelected: () => showNotWiredToast(context),
+              onSelected: () => unawaited(_markLost(copy)),
             ),
             AppMenuAction(
               label: l10n.copiesMarkDamaged,
               icon: AppIcons.damage,
-              onSelected: () => showNotWiredToast(context),
+              onSelected: () => unawaited(_markDamaged(copy)),
             ),
             AppMenuAction(
               label: l10n.copiesWithdraw,
               icon: AppIcons.delete,
               isDestructive: true,
-              onSelected: () => showNotWiredToast(context),
+              onSelected: () => unawaited(_withdraw(copy)),
             ),
           ],
         ),
@@ -184,7 +282,7 @@ class CopyListPage extends StatelessWidget {
             ],
           ),
           items: state.copies,
-          columns: _columns(context, l10n),
+          columns: _columns(l10n),
           sort: sort,
           onSort: (next) => cubit.sortChanged(next.columnId, next.ascending),
           onRowTap: (copy) => context.go(Routes.catalogTitle(copy.titleId)),
@@ -205,7 +303,7 @@ class CopyListPage extends StatelessWidget {
                   title: l10n.copiesEmptyTitle,
                   message: l10n.copiesEmptyBody,
                   actionLabel: l10n.copiesAdd,
-                  onAction: () => TitleFormDialog.show(context),
+                  onAction: () => unawaited(_addCopy()),
                 ),
           footer: AppPagination(
             rangeLabel: l10n.commonShowingRange(

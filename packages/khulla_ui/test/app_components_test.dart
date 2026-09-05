@@ -111,6 +111,102 @@ void main() {
     });
   });
 
+  group('AppDropdownField', () {
+    testWidgets('matches AppTextField control height', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 400,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: AppDropdownField<String>(
+                    label: 'Format',
+                    value: 'Book',
+                    items: const ['Book', 'Journal'],
+                    itemLabel: (value) => value,
+                    onChanged: (_) {},
+                  ),
+                ),
+                Expanded(
+                  child: AppTextField(
+                    label: 'Language',
+                    initialValue: 'English',
+                    onChanged: (_) {},
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      final dropdownHeight = tester
+          .getSize(find.byType(InputDecorator).first)
+          .height;
+      final textFieldHeight = tester
+          .getSize(find.byType(TextFormField).first)
+          .height;
+
+      expect(dropdownHeight, textFieldHeight);
+    });
+
+    testWidgets('opens a menu as wide as the field', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 280,
+            child: AppDropdownField<String>(
+              label: 'Format',
+              value: 'Book',
+              items: const ['Book', 'Journal'],
+              itemLabel: (value) => value,
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+
+      final fieldWidth = tester.getSize(find.byType(InputDecorator)).width;
+      const menuInset = 4.0;
+
+      await tester.tap(find.byType(InputDecorator));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.getSize(find.byType(MenuItemButton).first).width,
+        fieldWidth - menuInset * 2,
+      );
+    });
+
+    testWidgets('menu opens flush against the field', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 280,
+            child: AppDropdownField<String>(
+              label: 'Format',
+              value: 'Book',
+              items: const ['Book', 'Journal'],
+              itemLabel: (value) => value,
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+
+      final fieldBottom = tester.getRect(find.byType(InputDecorator)).bottom;
+
+      await tester.tap(find.byType(InputDecorator));
+      await tester.pumpAndSettle();
+
+      final menuTop = tester.getRect(find.byType(MenuItemButton).first).top;
+
+      expect(menuTop, fieldBottom);
+    });
+  });
+
   group('AppTable', () {
     testWidgets('stripes every other row and leaves the first bare', (
       tester,

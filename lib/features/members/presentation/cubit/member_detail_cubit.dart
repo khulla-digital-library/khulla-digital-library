@@ -71,4 +71,32 @@ class MemberDetailCubit extends Cubit<MemberDetailState> {
   Future<void> removeMember(String id) async {
     await _members.removeMember(id);
   }
+
+  /// Records full payment on one fine and reloads the member. Rethrows on failure.
+  Future<void> collectFine(String memberId, String fineId) async {
+    await _circulation.collectFine(fineId);
+    if (isClosed) return;
+    await loadMember(memberId);
+  }
+
+  /// Suspends membership and reloads the record. Rethrows on failure.
+  Future<void> suspendMember(String id) async {
+    await _members.suspendMember(id);
+    if (isClosed) return;
+    await loadMember(id);
+  }
+
+  /// Clears suspension and reloads the record. Rethrows on failure.
+  Future<void> unsuspendMember(String id) async {
+    await _members.unsuspendMember(id);
+    if (isClosed) return;
+    await loadMember(id);
+  }
+
+  /// Extends membership from the current expiry. Rethrows on failure.
+  Future<void> renewMembership(String id) async {
+    await _members.renewMembership(id);
+    if (isClosed) return;
+    await loadMember(id);
+  }
 }

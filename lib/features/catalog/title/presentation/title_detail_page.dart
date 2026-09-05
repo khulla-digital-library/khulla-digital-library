@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
 import 'package:khulla/features/catalog/title/presentation/cubit/title_detail_cubit.dart';
 import 'package:khulla/features/catalog/title/presentation/cubit/title_detail_state.dart';
 import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
@@ -12,6 +13,7 @@ import 'package:khulla/features/catalog/title/presentation/widgets/title_copies_
 import 'package:khulla/features/catalog/title/presentation/widgets/title_detail_header.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_details_card.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_history_card.dart';
+import 'package:khulla/features/circulation/reservation/presentation/place_hold_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
@@ -28,8 +30,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// is still inside the catalogue.
 ///
 /// [TitleDetailCubit] loads the title, its copies and closed loans for
-/// [TitleHistoryCard]. Edit, delete and add-copy are wired; place hold, print
-/// labels and per-copy maintenance actions still toast as not wired.
+/// [TitleHistoryCard]. Edit, delete, add-copy, place hold and copy maintenance
+/// are wired; print labels still toast as not wired.
 class TitleDetailPage extends StatelessWidget {
   const TitleDetailPage({required this.titleId, super.key});
 
@@ -80,6 +82,74 @@ class TitleDetailPage extends StatelessWidget {
     }
   }
 
+  Future<void> _placeHold(BuildContext context) async {
+    final l10n = context.l10n;
+    final saved = await PlaceHoldDialog.show(context, titleId: titleId);
+    if (saved == true && context.mounted) {
+      unawaited(context.read<TitleDetailCubit>().loadTitle(titleId));
+      AppToast.success(context, message: l10n.placeHoldSuccess);
+    }
+  }
+
+  Future<void> _runCopyAction(
+    BuildContext context,
+    Future<void> Function() action,
+    String successMessage,
+  ) async {
+    final l10n = context.l10n;
+    try {
+      await action();
+      if (!context.mounted) return;
+      AppToast.success(context, message: successMessage);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _markCopyLost(BuildContext context, Copy copy) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.copiesMarkLost,
+      message: l10n.copiesMarkLostBody,
+      confirmLabel: l10n.copiesMarkLost,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!context.mounted || !confirmed) return;
+    await _runCopyAction(
+      context,
+      () => context.read<TitleDetailCubit>().markCopyLost(titleId, copy),
+      l10n.copiesMarkLostSuccess,
+    );
+  }
+
+  Future<void> _markCopyDamaged(BuildContext context, Copy copy) async {
+    final l10n = context.l10n;
+    await _runCopyAction(
+      context,
+      () => context.read<TitleDetailCubit>().markCopyDamaged(titleId, copy),
+      l10n.copiesMarkDamagedSuccess,
+    );
+  }
+
+  Future<void> _withdrawCopy(BuildContext context, Copy copy) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.copiesWithdraw,
+      message: l10n.copiesWithdrawBody,
+      confirmLabel: l10n.copiesWithdraw,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!context.mounted || !confirmed) return;
+    await _runCopyAction(
+      context,
+      () => context.read<TitleDetailCubit>().withdrawCopy(titleId, copy),
+      l10n.copiesWithdrawSuccess,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -107,7 +177,9 @@ class TitleDetailPage extends StatelessWidget {
         final copiesCard = TitleCopiesCard(
           copies: state.copies,
           onAddCopy: () => unawaited(_addCopy(context, state)),
-          onCopyAction: (_) => showNotWiredToast(context),
+          onMarkLost: (copy) => unawaited(_markCopyLost(context, copy)),
+          onMarkDamaged: (copy) => unawaited(_markCopyDamaged(context, copy)),
+          onWithdraw: (copy) => unawaited(_withdrawCopy(context, copy)),
         );
         final historyCard = TitleHistoryCard(loans: state.historyLoans);
         final detailsCard = TitleDetailsCard(title: title);
@@ -149,7 +221,7 @@ class TitleDetailPage extends StatelessWidget {
                         AppMenuAction(
                           label: l10n.titleDetailPlaceHold,
                           icon: AppIcons.addBookmark,
-                          onSelected: () => showNotWiredToast(context),
+                          onSelected: () => unawaited(_placeHold(context)),
                         ),
                         AppMenuAction(
                           label: l10n.titlesPrintLabels,

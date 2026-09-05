@@ -1,26 +1,88 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/core/di/injection.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/circulation/reservation/domain/models/reservation.dart';
 import 'package:khulla/features/circulation/reservation/presentation/cubit/reservation_list_cubit.dart';
 import 'package:khulla/features/circulation/reservation/presentation/cubit/reservation_list_state.dart';
+import 'package:khulla/features/circulation/reservation/presentation/place_hold_dialog.dart';
+import 'package:khulla/features/circulation/reservation/presentation/reservation_list_refresh.dart';
 import 'package:khulla/features/circulation/shared/domain/reservation_status.dart';
 import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
+import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The hold queue, in the order members asked.
-///
-/// Ordering is the whole point of this screen, so the queue position is a
-/// column rather than a detail: two members waiting on the same title is the
-/// case the desk has to get right. [ReservationListCubit] owns search and
-/// status filters. Mark ready, cancel and the empty-state place action still
-/// toast as not wired.
-class ReservationListPage extends StatelessWidget {
+class ReservationListPage extends StatefulWidget {
   const ReservationListPage({super.key});
+
+  @override
+  State<ReservationListPage> createState() => _ReservationListPageState();
+}
+
+class _ReservationListPageState extends State<ReservationListPage> {
+  @override
+  void initState() {
+    super.initState();
+    getIt<ReservationListRefresh>().reload = _reload;
+  }
+
+  @override
+  void dispose() {
+    getIt<ReservationListRefresh>().reload = null;
+    super.dispose();
+  }
+
+  void _reload() {
+    if (!mounted) return;
+    unawaited(context.read<ReservationListCubit>().loadReservations());
+  }
+
+  Future<void> _placeHold() async {
+    final saved = await PlaceHoldDialog.show(context);
+    if (saved == true && mounted) {
+      await context.read<ReservationListCubit>().loadReservations();
+    }
+  }
+
+  Future<void> _markReady(Reservation hold) async {
+    final l10n = context.l10n;
+    try {
+      await context.read<ReservationListCubit>().markHoldReady(hold.id);
+      if (!mounted) return;
+      AppToast.success(context, message: l10n.reservationsMarkReadySuccess);
+    } on AppException catch (error) {
+      if (!mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _cancel(Reservation hold) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.reservationsCancel,
+      message: l10n.reservationsCancelBody,
+      confirmLabel: l10n.reservationsCancel,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!mounted || !confirmed) return;
+    try {
+      await context.read<ReservationListCubit>().cancelHold(hold.id);
+      if (!mounted) return;
+      AppToast.success(context, message: l10n.reservationsCancelSuccess);
+    } on AppException catch (error) {
+      if (!mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
 
   bool _isFiltered(ReservationListState state) =>
       state.query.search.isNotEmpty || state.query.status != null;
@@ -140,7 +202,8 @@ class ReservationListPage extends StatelessWidget {
                   AppMenuAction(
                     label: l10n.reservationsMarkReady,
                     icon: AppIcons.notificationsActive,
-                    onSelected: () => showNotWiredToast(context),
+                    enabled: hold.status == ReservationStatus.waiting,
+                    onSelected: () => unawaited(_markReady(hold)),
                   ),
                   AppMenuAction(
                     label: l10n.loansViewMember,
@@ -151,7 +214,8 @@ class ReservationListPage extends StatelessWidget {
                     label: l10n.reservationsCancel,
                     icon: AppIcons.close,
                     isDestructive: true,
-                    onSelected: () => showNotWiredToast(context),
+                    enabled: hold.closedAt == null,
+                    onSelected: () => unawaited(_cancel(hold)),
                   ),
                 ],
               ),
@@ -170,7 +234,7 @@ class ReservationListPage extends StatelessWidget {
                   title: l10n.reservationsEmptyTitle,
                   message: l10n.reservationsEmptyBody,
                   actionLabel: l10n.reservationsPlace,
-                  onAction: () => showNotWiredToast(context),
+                  onAction: () => unawaited(_placeHold()),
                 ),
         );
       },

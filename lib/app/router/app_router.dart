@@ -10,8 +10,6 @@ import 'package:khulla/core/router/go_router_refresh_stream.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/catalog/author/presentation/author_detail_page.dart';
 import 'package:khulla/features/catalog/author/presentation/author_list_page.dart';
-import 'package:khulla/features/catalog/catalog/presentation/catalog_page.dart';
-import 'package:khulla/features/catalog/catalog/presentation/cubit/catalog_overview_cubit.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_list_page.dart';
 import 'package:khulla/features/catalog/copy/presentation/cubit/copy_cubit.dart';
 import 'package:khulla/features/catalog/copy/presentation/label_print_page.dart';
@@ -21,8 +19,6 @@ import 'package:khulla/features/catalog/title/presentation/title_detail_page.dar
 import 'package:khulla/features/catalog/title/presentation/title_list_page.dart';
 import 'package:khulla/features/circulation/check_out/presentation/check_out_page.dart';
 import 'package:khulla/features/circulation/check_out/presentation/cubit/check_out_cubit.dart';
-import 'package:khulla/features/circulation/circulation/presentation/circulation_page.dart';
-import 'package:khulla/features/circulation/circulation/presentation/cubit/loan_list_cubit.dart';
 import 'package:khulla/features/circulation/fine/presentation/cubit/fine_list_cubit.dart';
 import 'package:khulla/features/circulation/fine/presentation/fine_list_page.dart';
 import 'package:khulla/features/circulation/reservation/presentation/cubit/reservation_list_cubit.dart';
@@ -34,15 +30,12 @@ import 'package:khulla/features/members/presentation/cubit/member_cubit.dart';
 import 'package:khulla/features/members/presentation/cubit/member_detail_cubit.dart';
 import 'package:khulla/features/members/presentation/pages/member_detail_page.dart';
 import 'package:khulla/features/members/presentation/pages/member_list_page.dart';
-import 'package:khulla/features/opac/presentation/opac_page.dart';
-import 'package:khulla/features/reports/presentation/reports_page.dart';
 import 'package:khulla/features/settings/presentation/cubit/library_profile_cubit.dart';
 import 'package:khulla/features/settings/presentation/cubit/loan_rules_cubit.dart';
 import 'package:khulla/features/settings/presentation/pages/appearance_page.dart';
 import 'package:khulla/features/settings/presentation/pages/backup_page.dart';
 import 'package:khulla/features/settings/presentation/pages/library_profile_page.dart';
 import 'package:khulla/features/settings/presentation/pages/loan_rules_page.dart';
-import 'package:khulla/features/settings/presentation/pages/settings_page.dart';
 import 'package:khulla/features/settings/presentation/pages/sync_page.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_state.dart';
@@ -50,8 +43,6 @@ import 'package:khulla/features/staff_auth/presentation/onboarding/cubit/onboard
 import 'package:khulla/features/staff_auth/presentation/onboarding/onboarding_page.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/cubit/sign_in_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/sign_in_page.dart';
-import 'package:khulla/features/users/presentation/pages/role_list_page.dart';
-import 'package:khulla/features/users/presentation/pages/user_list_page.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Owns the single [GoRouter] instance.
@@ -120,14 +111,9 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: Routes.catalog,
-                  builder: (context, _) => BlocProvider<CatalogOverviewCubit>(
-                    create: (_) {
-                      final cubit = getIt<CatalogOverviewCubit>();
-                      unawaited(cubit.loadOverview());
-                      return cubit;
-                    },
-                    child: const CatalogPage(),
-                  ),
+                  redirect: (_, state) => state.uri.path == Routes.catalog
+                      ? Routes.catalogTitles
+                      : null,
                   routes: [
                     GoRoute(
                       path: Routes.titlesSegment,
@@ -191,14 +177,9 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: Routes.circulation,
-                  builder: (context, _) => BlocProvider<LoanListCubit>(
-                    create: (_) {
-                      final cubit = getIt<LoanListCubit>();
-                      unawaited(cubit.loadOpenLoans());
-                      return cubit;
-                    },
-                    child: const CirculationPage(),
-                  ),
+                  redirect: (_, state) => state.uri.path == Routes.circulation
+                      ? Routes.circulationCheckOut
+                      : null,
                   routes: [
                     GoRoute(
                       path: Routes.checkOutSegment,
@@ -272,42 +253,43 @@ class AppRouter {
                 ),
               ],
             ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: Routes.opac,
-                  builder: (context, _) => const OpacPage(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: Routes.reports,
-                  builder: (context, _) => const ReportsPage(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: Routes.users,
-                  builder: (context, _) => const UserListPage(),
-                  routes: [
-                    GoRoute(
-                      path: Routes.rolesSegment,
-                      builder: (context, _) => const RoleListPage(),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            // StatefulShellBranch(
+            //   routes: [
+            //     GoRoute(
+            //       path: Routes.opac,
+            //       builder: (context, _) => const OpacPage(),
+            //     ),
+            //   ],
+            // ),
+            // StatefulShellBranch(
+            //   routes: [
+            //     GoRoute(
+            //       path: Routes.reports,
+            //       builder: (context, _) => const ReportsPage(),
+            //     ),
+            //   ],
+            // ),
+            // StatefulShellBranch(
+            //   routes: [
+            //     GoRoute(
+            //       path: Routes.users,
+            //       builder: (context, _) => const UserListPage(),
+            //       routes: [
+            //         GoRoute(
+            //           path: Routes.rolesSegment,
+            //           builder: (context, _) => const RoleListPage(),
+            //         ),
+            //       ],
+            //     ),
+            //   ],
+            // ),
             StatefulShellBranch(
               routes: [
                 GoRoute(
                   path: Routes.settings,
-                  builder: (context, _) =>
-                      SettingsPage(showDesignSystem: !_config.isProduction),
+                  redirect: (_, state) => state.uri.path == Routes.settings
+                      ? Routes.settingsLibrary
+                      : null,
                   routes: [
                     GoRoute(
                       path: Routes.librarySegment,
