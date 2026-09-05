@@ -12,6 +12,8 @@ import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/error/guard.dart';
 import 'package:khulla/core/logging/app_logger.dart';
 import 'package:khulla/core/window/window_setup.dart';
+import 'package:khulla/features/settings/domain/library_settings_repository.dart';
+import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 
 /// Shared startup for every flavor: installs error and bloc observers, sizes
 /// the desktop window, wires up dependency injection for the given [config],
@@ -64,6 +66,16 @@ Future<void> _runApp() async {
       getIt<AppDatabase>().warmUp,
       source: 'bootstrap',
     );
+
+    // Reading the profile is what sets `MoneyFormat.current`, so the first
+    // amount the app draws is already in the library's own currency rather
+    // than in the default it would then have to be corrected from.
+    await getIt<LibrarySettingsRepository>().findProfile();
+
+    // Resolved before the first frame so the router's first redirect already
+    // knows whether this catalogue needs setting up, and nobody sees the
+    // dashboard flash past on the way to sign-in.
+    await getIt<AuthCubit>().restoreSession();
   } on AppException catch (error, stackTrace) {
     AppLogger.error(
       error,

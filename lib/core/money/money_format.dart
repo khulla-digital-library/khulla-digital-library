@@ -45,6 +45,13 @@ class MoneyFormat {
     separator: '',
   );
 
+  /// Pound sterling.
+  static final MoneyFormat britishPound = MoneyFormat(
+    symbol: '£',
+    grouping: MoneyGrouping.western,
+    separator: '',
+  );
+
   /// Euro, symbol trailing.
   static final MoneyFormat euro = MoneyFormat(
     symbol: '€',

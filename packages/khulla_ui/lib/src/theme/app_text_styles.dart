@@ -58,9 +58,10 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   TextStyle get pageHeader =>
       _style(density.pick(18, 22), FontWeight.w500, tight: true);
 
-  /// A form dialog's title.
+  /// A form dialog's title — the same rung as [title], one step heavier so it
+  /// reads above section headings without jumping to [displaySmall].
   TextStyle get formTitle =>
-      _style(density.pick(20, 24), FontWeight.w500, tight: true);
+      _style(density.pick(18, 20), FontWeight.w600, tight: true);
 
   /// A card primitive's title, and a stat tile's figure.
   TextStyle get displaySmall => _style(24, FontWeight.w600, tight: true);

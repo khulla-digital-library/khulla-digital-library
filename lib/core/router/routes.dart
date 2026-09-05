@@ -16,6 +16,17 @@
 abstract final class Routes {
   static const String root = '/';
 
+  /// First-run setup. Reached only when the catalogue holds no staff account,
+  /// and outside the shell — there is no library to navigate yet.
+  static const String onboarding = '/onboarding';
+
+  /// Staff sign-in. Outside the shell, for the same reason.
+  static const String signIn = '/sign-in';
+
+  /// Whether [location] is one of the screens that live outside the shell.
+  static bool isAuthLocation(String location) =>
+      location == onboarding || location == signIn;
+
   /// Dashboard: the shift's starting point — counts, activity, quick actions.
   static const String dashboard = '/dashboard';
 

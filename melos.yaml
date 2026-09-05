@@ -1,6 +1,8 @@
 name: khulla
 repository: https://github.com/khulla-digital-library/khulla-digital-library
 
+sdkPath: .fvm/flutter_sdk
+
 packages:
   - .
   - packages/**

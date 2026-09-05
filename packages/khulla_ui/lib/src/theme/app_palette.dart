@@ -10,7 +10,8 @@ import 'package:flutter/material.dart';
 /// reverse-engineered from the SaaS the product shares a design language
 /// with. Three ramps carry the whole system:
 ///
-/// * **brand** — one deep teal, taken from `assets/icons/app_icon.png`. It is
+/// * **brand** — one deep teal, taken from `assets/images/logos/submark_logo.png`.
+///   It is
 ///   the *only* saturated hue in the chrome. Destructive actions use the
 ///   separate [danger] red so an alarm never reads as brand.
 /// * **ink** — a text ramp that inverts in dark mode. `ink100` is the

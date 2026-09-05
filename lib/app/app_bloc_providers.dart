@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:khulla/core/di/injection.dart';
 import 'package:khulla/core/theme/cubit/theme_cubit.dart';
+import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 
 /// Root [BlocProvider]s for the widget tree.
 ///
@@ -17,6 +18,7 @@ class AppBlocProviders extends StatelessWidget {
   Widget build(BuildContext context) => MultiBlocProvider(
     providers: [
       BlocProvider<ThemeCubit>.value(value: getIt<ThemeCubit>()),
+      BlocProvider<AuthCubit>.value(value: getIt<AuthCubit>()),
     ],
     child: child,
   );

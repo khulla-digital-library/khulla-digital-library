@@ -2,9 +2,18 @@ import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/config/app_config.dart';
+import 'package:khulla/core/database/app_database.steps.dart';
 import 'package:khulla/core/database/connection.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/logging/app_logger.dart';
+import 'package:khulla/core/money/currency.dart';
+import 'package:khulla/features/settings/data/tables/library_settings.dart';
+import 'package:khulla/features/users/data/tables/staff.dart';
+// The enums the tables store through `textEnum` are named in the generated
+// part file, which cannot carry imports of its own — they have to be visible
+// from here even though nothing in this file mentions them.
+import 'package:khulla/features/users/domain/user_role.dart';
+import 'package:khulla/features/users/domain/user_status.dart';
 
 part 'app_database.g.dart';
 
@@ -19,9 +28,9 @@ part 'app_database.g.dart';
 /// can be swapped (after a restore, or an import that replaces the file)
 /// without every collaborator holding a stale handle.
 @lazySingleton
-// Tables are added here as each catalog sub-feature lands; `make migrate`
-// records the resulting schema.
-@DriftDatabase()
+// Tables are added here as each feature lands; `make migrate` records the
+// resulting schema.
+@DriftDatabase(tables: [LibrarySettings, Staff])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(AppConfig config) : super(openDatabaseConnection(config));
 
@@ -35,7 +44,7 @@ class AppDatabase extends _$AppDatabase {
   /// Bumped by exactly one per shipped schema change, alongside a step in
   /// `app_database.steps.dart` recorded by `make migrate`.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -93,16 +102,11 @@ class AppDatabase extends _$AppDatabase {
 
     AppLogger.info('Migrating catalogue from v$from to v$to', source: _source);
 
-    // Once the first schema change ships, `make migrate` writes the steps and
-    // this becomes:
-    //
-    // ```dart
-    // await stepByStep(from1To2: (m, schema) async { ... })(m, from, to);
-    // ```
-    //
-    // Steps take their own schema snapshot as an argument and must never
-    // touch `this` — referring to the live database inside a step silently
-    // uses today's schema instead of that version's, which is how a migration
-    // passes in development and corrupts a real upgrade.
+    await stepByStep(
+      from1To2: (m, schema) async {
+        await m.createTable(schema.librarySettings);
+        await m.createTable(schema.staff);
+      },
+    )(m, from, to);
   }
 }

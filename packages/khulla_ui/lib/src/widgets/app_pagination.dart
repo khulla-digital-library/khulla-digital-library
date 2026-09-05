@@ -12,10 +12,11 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// pages the run is elided around the current one, so the footer never wraps.
 ///
 /// Two conventions here run against the usual instinct and are deliberate.
-/// The **current page is outlined, not filled** — a filled chip in a row of
-/// numbers reads as the primary action of the page, which it is not. And the
-/// prev/next controls are **hidden at the ends rather than disabled**, so
-/// there is no permanently greyed-out control sitting under the table.
+/// The **current page is a filled brand chip** — the reference dashboard
+/// treats pagination as navigation chrome, not a primary action, but the
+/// filled square reads clearly at table scale. And the prev/next controls are
+/// **hidden at the ends rather than disabled**, so there is no permanently
+/// greyed-out control sitting under the table.
 class AppPagination extends StatelessWidget {
   const AppPagination({
     required this.rangeLabel,
@@ -122,10 +123,13 @@ class AppPagination extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (onPrevious != null)
-                AppIconButton(
-                  icon: AppIcons.chevronLeft,
-                  tooltip: previousTooltip,
-                  onPressed: onPrevious,
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: spacing.xxs / 2),
+                  child: _NavButton(
+                    icon: AppIcons.chevronLeft,
+                    tooltip: previousTooltip,
+                    onTap: onPrevious!,
+                  ),
                 ),
               if (showNumbers)
                 for (final page in pageWindow(pageCount, currentPage))
@@ -149,10 +153,13 @@ class AppPagination extends StatelessWidget {
                           ),
                   ),
               if (onNext != null)
-                AppIconButton(
-                  icon: AppIcons.chevronRight,
-                  tooltip: nextTooltip,
-                  onPressed: onNext,
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: spacing.xxs / 2),
+                  child: _NavButton(
+                    icon: AppIcons.chevronRight,
+                    tooltip: nextTooltip,
+                    onTap: onNext!,
+                  ),
                 ),
             ],
           ),
@@ -176,6 +183,7 @@ class _PageButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final scheme = context.colorScheme;
     final metrics = context.appMetrics;
     final radius = BorderRadius.circular(context.appRadius.container);
     final side = metrics.paginationItem;
@@ -189,18 +197,59 @@ class _PageButton extends StatelessWidget {
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(horizontal: context.appSpacing.xs),
         decoration: BoxDecoration(
-          color: selected ? context.colorScheme.surface : Colors.transparent,
+          color: selected ? colors.brand : scheme.surface,
           borderRadius: radius,
           border: Border.all(
-            color: selected ? colors.hairline : Colors.transparent,
+            color: selected ? colors.brand : colors.hairline,
           ),
-          boxShadow: selected ? context.appShadows.card : null,
         ),
         child: Text(
           '${page + 1}',
           style: context.appTextStyles.label.copyWith(
-            color: selected ? colors.ink100 : colors.ink500,
+            color: selected ? scheme.onPrimary : colors.ink500,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavButton extends StatelessWidget {
+  const _NavButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  final AppIconSpec icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final scheme = context.colorScheme;
+    final metrics = context.appMetrics;
+    final radius = BorderRadius.circular(context.appRadius.container);
+    final side = metrics.paginationItem;
+
+    return Tooltip(
+      message: tooltip,
+      child: AppRipple(
+        onTap: onTap,
+        borderRadius: radius,
+        pressScale: 1,
+        child: Container(
+          width: side,
+          height: side,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: radius,
+            border: Border.all(color: colors.hairline),
+          ),
+          child: AppIcon(icon, size: metrics.icon, color: colors.ink500),
         ),
       ),
     );

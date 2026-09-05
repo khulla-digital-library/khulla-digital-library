@@ -14,11 +14,6 @@ class AppBreadcrumb {
 }
 
 /// The trail above a page title: *Dashboard / Members / Livia Hart*.
-///
-/// It answers "where am I and how do I get back one level" on a product where
-/// a record is three clicks deep and the rail only knows the section. Crumbs
-/// past the first are dropped on a phone, where the back control does the job
-/// in less room.
 class AppBreadcrumbs extends StatelessWidget {
   const AppBreadcrumbs({required this.crumbs, super.key});
 
