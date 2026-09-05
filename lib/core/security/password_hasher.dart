@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:bcrypt/bcrypt.dart';
 import 'package:injectable/injectable.dart';
+import 'package:khulla/core/error/app_exception.dart';
 
 /// Hashes and verifies staff passwords.
 ///
@@ -18,6 +21,10 @@ import 'package:injectable/injectable.dart';
 /// already showing a submitting state, never inside `build`.
 @lazySingleton
 class PasswordHasher {
+  /// bcrypt accepts at most this many UTF-8 bytes — longer input throws an
+  /// [ArgumentError] inside the package, past every guard.
+  static const int maxPasswordBytes = 72;
+
   /// A salted bcrypt digest of [password], safe to store as-is.
   ///
   /// The salt is generated per call and travels inside the returned string,
@@ -25,7 +32,16 @@ class PasswordHasher {
   /// the package's default work factor of 2^10; raising it later invalidates
   /// nothing, because the cost is recorded inside each hash and existing
   /// accounts keep verifying at the factor they were created with.
-  String hash(String password) => BCrypt.hashpw(password, BCrypt.gensalt());
+  /// Throws [InvalidInputException] when [password] exceeds
+  /// [maxPasswordBytes], so callers that only handle [AppException] still
+  /// render it instead of sticking in a submitting state. The form validator
+  /// rejects this first; this is the backstop for any path that skips it.
+  String hash(String password) {
+    if (utf8.encode(password).length > maxPasswordBytes) {
+      throw const InvalidInputException('That password is too long.');
+    }
+    return BCrypt.hashpw(password, BCrypt.gensalt());
+  }
 
   /// Whether [password] produced [hash].
   ///

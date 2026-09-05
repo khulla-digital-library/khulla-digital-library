@@ -1158,6 +1158,16 @@
             }
         }
     },
+    "validationPasswordTooLong": "Use at most {maxLength} characters.",
+    "@validationPasswordTooLong": {
+        "description": "Validation - the password exceeds what the password hash supports",
+        "placeholders": {
+            "maxLength": {
+                "type": "int",
+                "example": "72"
+            }
+        }
+    },
     "validationConfirmPasswordRequired": "Type the password again.",
     "validationPasswordsDoNotMatch": "The two passwords do not match.",
     "validationNameRequired": "Enter a name.",

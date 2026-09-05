@@ -28,6 +28,9 @@ extension PasswordErrorX on Password {
           PasswordValidationError.tooShort => l10n.validationPasswordTooShort(
             Password.minLength,
           ),
+          PasswordValidationError.tooLong => l10n.validationPasswordTooLong(
+            Password.maxLengthBytes,
+          ),
         };
 }
 

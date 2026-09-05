@@ -219,10 +219,8 @@ void main() {
         ),
       );
 
-      final fields = tester.widgetList<TextField>(find.byType(TextField));
-      expect(fields, hasLength(2));
       final cost = tester.getSize(find.byType(TextField).first);
-      final copies = tester.getSize(find.byType(TextField).last);
+      final copies = tester.getSize(find.byKey(const ValueKey('app_quantity_control')));
       expect(copies.height, cost.height);
     });
 

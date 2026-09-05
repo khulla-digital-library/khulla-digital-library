@@ -72,6 +72,7 @@ export 'src/widgets/app_section_header.dart';
 export 'src/widgets/app_segmented_control.dart';
 export 'src/widgets/app_side_sheet.dart';
 export 'src/widgets/app_skeleton.dart';
+export 'src/widgets/app_sliding_number.dart';
 export 'src/widgets/app_sliver_table.dart';
 export 'src/widgets/app_spinner.dart';
 export 'src/widgets/app_stat_strip.dart';
