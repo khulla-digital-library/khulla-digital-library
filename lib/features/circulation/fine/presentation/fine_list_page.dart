@@ -103,9 +103,6 @@ class FineListPage extends StatelessWidget {
 
     return BlocBuilder<FineListCubit, FineListState>(
       builder: (context, state) {
-        if (state.isLoading) {
-          return const Center(child: AppSpinner());
-        }
         if (state.hasError) {
           return ErrorRetryView(
             error: state.error,
@@ -113,6 +110,7 @@ class FineListPage extends StatelessWidget {
           );
         }
 
+        final bootstrapping = state.isLoading && state.fines.isEmpty;
         final isFiltered = _isFiltered(state);
 
         return CollectionPageView<Fine>(
@@ -273,7 +271,9 @@ class FineListPage extends StatelessWidget {
               ),
             ),
           ],
-          emptyState: isFiltered
+          emptyState: bootstrapping
+              ? const Center(child: AppSpinner())
+              : isFiltered
               ? AppEmptyView(
                   icon: AppIcons.noResults,
                   title: l10n.commonNoMatchesTitle,

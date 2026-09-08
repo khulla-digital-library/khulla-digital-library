@@ -211,15 +211,14 @@ class _CopyListPageState extends State<CopyListPage> {
 
     return BlocBuilder<CopyCubit, CopyState>(
       builder: (context, state) {
-        if (state.isLoading) {
-          return const Center(child: AppSpinner());
-        }
         if (state.hasError) {
           return ErrorRetryView(
             error: state.error,
             onRetry: cubit.loadCopies,
           );
         }
+
+        final bootstrapping = state.isLoading && state.copies.isEmpty;
 
         final pageSize = state.query.limit;
         final pageCount = (state.totalCount / pageSize).ceil();
@@ -270,7 +269,9 @@ class _CopyListPageState extends State<CopyListPage> {
             copy: copy,
             onTap: () => context.go(Routes.catalogTitle(copy.titleId)),
           ),
-          emptyState: _isFiltered(state)
+          emptyState: bootstrapping
+              ? const Center(child: AppSpinner())
+              : _isFiltered(state)
               ? AppEmptyView(
                   icon: AppIcons.noResults,
                   title: l10n.commonNoMatchesTitle,

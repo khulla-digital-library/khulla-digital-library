@@ -165,9 +165,6 @@ class _TitleListPageState extends State<TitleListPage> {
 
     return BlocBuilder<TitleCubit, TitleState>(
       builder: (context, state) {
-        if (state.isLoading) {
-          return const Center(child: AppSpinner());
-        }
         if (state.hasError) {
           return ErrorRetryView(
             error: state.error,
@@ -175,6 +172,7 @@ class _TitleListPageState extends State<TitleListPage> {
           );
         }
 
+        final bootstrapping = state.isLoading && state.titles.isEmpty;
         final pageSize = state.query.limit;
         final pageCount = (state.totalCount / pageSize).ceil();
         final page = (state.query.offset / pageSize).floor().clamp(
@@ -240,7 +238,9 @@ class _TitleListPageState extends State<TitleListPage> {
             title: title,
             onTap: () => context.go(Routes.catalogTitle(title.id)),
           ),
-          emptyState: _isFiltered(state)
+          emptyState: bootstrapping
+              ? const Center(child: AppSpinner())
+              : _isFiltered(state)
               ? AppEmptyView(
                   icon: AppIcons.noResults,
                   title: l10n.commonNoMatchesTitle,

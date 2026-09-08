@@ -2,7 +2,7 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// One row of an [AppTable] or [AppSliverTable].
 ///
-/// Rows are separated by a **zebra stripe**, not by rules: at ~60px per row a
+/// Rows are separated by a **zebra stripe**, not by rules: at ~52px per row a
 /// hairline every line turns a long table into a grid of boxes, while a 10%
 /// tint on even rows reads as texture and lets the eye track across a 1600px
 /// window. Hover and selection are tints of the same family, one step

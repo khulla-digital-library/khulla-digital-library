@@ -100,15 +100,48 @@ class CollectionPageView<T> extends StatefulWidget {
 
 class _CollectionPageViewState<T> extends State<CollectionPageView<T>> {
   int? _lastReportedPageSize;
+  int? _pendingPageSize;
+  bool _pageSizeReportScheduled = false;
 
-  void _maybeReportPageSize(int size) {
+  void _schedulePageSizeReport(double tableBodyHeight) {
     final callback = widget.onPageSizeChanged;
-    if (callback == null || _lastReportedPageSize == size) return;
+    if (callback == null) return;
+
+    _pendingPageSize = computeCollectionPageSize(
+      tableBodyHeight: tableBodyHeight,
+      metrics: context.appMetrics,
+    );
+
+    if (_pageSizeReportScheduled) return;
+    _pageSizeReportScheduled = true;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _lastReportedPageSize == size) return;
+      _pageSizeReportScheduled = false;
+      if (!mounted) return;
+      final size = _pendingPageSize;
+      if (size == null || _lastReportedPageSize == size) return;
       _lastReportedPageSize = size;
       callback(size);
+    });
+  }
+
+  void _scheduleCompactPageSize() {
+    final callback = widget.onPageSizeChanged;
+    if (callback == null ||
+        _lastReportedPageSize == kCollectionPageSizeCompact) {
+      return;
+    }
+
+    if (_pageSizeReportScheduled) return;
+    _pageSizeReportScheduled = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _pageSizeReportScheduled = false;
+      if (!mounted || _lastReportedPageSize == kCollectionPageSizeCompact) {
+        return;
+      }
+      _lastReportedPageSize = kCollectionPageSizeCompact;
+      callback(kCollectionPageSizeCompact);
     });
   }
 
@@ -162,7 +195,7 @@ class _CollectionPageViewState<T> extends State<CollectionPageView<T>> {
     // filters alone would take half of it. There the whole page scrolls, as
     // it did before.
     if (context.formFactor.isCompact) {
-      _maybeReportPageSize(kCollectionPageSizeCompact);
+      _scheduleCompactPageSize();
 
       return AppPageBody(
         wide: true,
@@ -222,12 +255,7 @@ class _CollectionPageViewState<T> extends State<CollectionPageView<T>> {
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  _maybeReportPageSize(
-                    computeCollectionPageSize(
-                      tableBodyHeight: constraints.maxHeight,
-                      metrics: context.appMetrics,
-                    ),
-                  );
+                  _schedulePageSizeReport(constraints.maxHeight);
 
                   return _buildTableViewport(tableWrapper);
                 },

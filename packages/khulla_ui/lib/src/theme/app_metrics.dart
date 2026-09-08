@@ -8,7 +8,7 @@ import 'package:khulla_ui/khulla_ui.dart';
 ///
 /// These numbers are what make the product feel like itself — get the colors
 /// perfect and the heights wrong and it still reads as a different app. A
-/// 40px button next to a 44px field next to a 60px table row is the rhythm;
+/// 40px button next to a 44px field next to a 52px table row is the rhythm;
 /// Material's defaults (48px everything) are roughly a third looser and turn
 /// a dense catalogue screen into a scrolling one.
 ///
@@ -55,9 +55,9 @@ class AppMetrics extends ThemeExtension<AppMetrics> {
   factory AppMetrics.of(AppDensity density) => AppMetrics(
     density: density,
     fieldHeight: density.pick(40, 44),
-    tableHeaderHeight: density.pick(40, 48),
-    tableRowHeight: 65,
-    tableCellPaddingY: 16,
+    tableHeaderHeight: density.pick(36, 40),
+    tableRowHeight: 50,
+    tableCellPaddingY: 12,
     navRowHeight: density.pick(42, 46),
     iconNav: density.pick(16, 20),
     labelToControlGap: density.pick(8, 12),

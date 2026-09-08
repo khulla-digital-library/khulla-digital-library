@@ -36,10 +36,10 @@ void main() {
       expect(comfortable.textTheme.bodyMedium?.fontSize, 14);
       expect(compact.extension<AppMetrics>()!.fieldHeight, 40);
       expect(comfortable.extension<AppMetrics>()!.fieldHeight, 44);
-      expect(compact.extension<AppMetrics>()!.tableRowHeight, 65);
-      expect(comfortable.extension<AppMetrics>()!.tableRowHeight, 65);
-      expect(compact.extension<AppMetrics>()!.tableHeaderHeight, 40);
-      expect(comfortable.extension<AppMetrics>()!.tableHeaderHeight, 48);
+      expect(compact.extension<AppMetrics>()!.tableRowHeight, 52);
+      expect(comfortable.extension<AppMetrics>()!.tableRowHeight, 52);
+      expect(compact.extension<AppMetrics>()!.tableHeaderHeight, 36);
+      expect(comfortable.extension<AppMetrics>()!.tableHeaderHeight, 40);
     });
 
     test('keeps the radius hierarchy: control > container > item', () {

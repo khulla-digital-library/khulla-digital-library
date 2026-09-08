@@ -215,15 +215,14 @@ class MemberListPage extends StatelessWidget {
 
     return BlocBuilder<MemberCubit, MemberState>(
       builder: (context, state) {
-        if (state.isLoading) {
-          return const Center(child: AppSpinner());
-        }
         if (state.hasError) {
           return ErrorRetryView(
             error: state.error,
             onRetry: cubit.loadMembers,
           );
         }
+
+        final bootstrapping = state.isLoading && state.members.isEmpty;
 
         final pageSize = state.query.limit;
         final pageCount = (state.totalCount / pageSize).ceil();
@@ -293,7 +292,9 @@ class MemberListPage extends StatelessWidget {
             member: member,
             onTap: () => context.go(Routes.member(member.id)),
           ),
-          emptyState: _isFiltered(state)
+          emptyState: bootstrapping
+              ? const Center(child: AppSpinner())
+              : _isFiltered(state)
               ? AppEmptyView(
                   icon: AppIcons.noResults,
                   title: l10n.commonNoMatchesTitle,

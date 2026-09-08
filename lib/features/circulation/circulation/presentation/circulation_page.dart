@@ -167,9 +167,6 @@ class CirculationPage extends StatelessWidget {
 
     return BlocBuilder<LoanListCubit, LoanListState>(
       builder: (context, state) {
-        if (state.isLoading) {
-          return const Center(child: AppSpinner());
-        }
         if (state.hasError) {
           return ErrorRetryView(
             error: state.error,
@@ -177,6 +174,7 @@ class CirculationPage extends StatelessWidget {
           );
         }
 
+        final bootstrapping = state.isLoading && state.loans.isEmpty;
         final isFiltered = _isFiltered(state);
         final sort = AppTableSort(
           columnId: _displaySortColumn(state.query.sortColumn),
@@ -317,7 +315,9 @@ class CirculationPage extends StatelessWidget {
           onSort: (next) => cubit.sortChanged(next.columnId, next.ascending),
           onRowTap: (loan) => context.go(Routes.member(loan.memberId)),
           compactBuilder: (context, loan) => _LoanCard(loan: loan),
-          emptyState: isFiltered
+          emptyState: bootstrapping
+              ? const Center(child: AppSpinner())
+              : isFiltered
               ? AppEmptyView(
                   icon: AppIcons.noResults,
                   title: l10n.commonNoMatchesTitle,

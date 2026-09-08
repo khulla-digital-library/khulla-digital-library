@@ -98,9 +98,6 @@ class _ReservationListPageState extends State<ReservationListPage> {
 
     return BlocBuilder<ReservationListCubit, ReservationListState>(
       builder: (context, state) {
-        if (state.isLoading) {
-          return const Center(child: AppSpinner());
-        }
         if (state.hasError) {
           return ErrorRetryView(
             error: state.error,
@@ -108,6 +105,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
           );
         }
 
+        final bootstrapping = state.isLoading && state.reservations.isEmpty;
         final isFiltered = _isFiltered(state);
 
         return CollectionPageView<Reservation>(
@@ -222,7 +220,9 @@ class _ReservationListPageState extends State<ReservationListPage> {
               ),
             ),
           ],
-          emptyState: isFiltered
+          emptyState: bootstrapping
+              ? const Center(child: AppSpinner())
+              : isFiltered
               ? AppEmptyView(
                   icon: AppIcons.noResults,
                   title: l10n.commonNoMatchesTitle,

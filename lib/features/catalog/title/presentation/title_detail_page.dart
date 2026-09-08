@@ -22,9 +22,7 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// One work's record: what it is, the copies under it, and who has had them.
 ///
-/// A stat strip under the header gives the numbers a librarian checks first —
-/// available, on loan, and total copies — without reading the bibliographic
-/// record. Two panes from [FormFactor.expanded] up — copies and loan history on the left, where the tables need the width, and the
+/// Two panes from [FormFactor.expanded] up — copies and loan history on the left, where the tables need the width, and the
 /// bibliographic record on the right — and one column below that, in the same
 /// order: copies and history before publication details, since checking a
 /// copy's status is why a librarian opens this page more often than checking
@@ -220,35 +218,6 @@ class TitleDetailPage extends StatelessWidget {
                       title: title,
                       onEdit: () => unawaited(_edit(context)),
                       onDelete: () => unawaited(_confirmDelete(context)),
-                    ),
-                    SizedBox(height: spacing.md),
-                    AppStatStrip(
-                      expandedColumns: 3,
-                      largeColumns: 3,
-                      mediumColumns: 3,
-                      tiles: [
-                        AppStatTile(
-                          label: l10n.titleDetailStatAvailable,
-                          value: '${title.availableCount}',
-                          icon: AppIcons.book,
-                          tone: title.availableCount > 0
-                              ? AppStatusTone.success
-                              : AppStatusTone.neutral,
-                        ),
-                        AppStatTile(
-                          label: l10n.titleDetailStatOnLoan,
-                          value: '${title.copyCount - title.availableCount}',
-                          icon: AppIcons.transfer,
-                          tone: title.copyCount - title.availableCount > 0
-                              ? AppStatusTone.brand
-                              : AppStatusTone.neutral,
-                        ),
-                        AppStatTile(
-                          label: l10n.titleDetailStatTotal,
-                          value: '${title.copyCount}',
-                          icon: AppIcons.copy,
-                        ),
-                      ],
                     ),
                     SizedBox(height: spacing.md),
                     if (twoPane)
