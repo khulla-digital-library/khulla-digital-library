@@ -1,24 +1,31 @@
 import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
 import 'package:khulla/features/circulation/fine/presentation/cubit/fine_list_cubit.dart';
+import 'package:khulla/features/circulation/shared/domain/fine_status.dart';
 import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
 import 'package:khulla/features/members/presentation/cubit/member_detail_cubit.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// What a member owes, and the control that settles it.
+/// What a member owes, and the controls that settle it.
 ///
 /// Outstanding amounts come from [FineListCubit] on the ledger page and from
-/// [MemberDetailCubit] here. [onCollect] is passed down from the page.
+/// [MemberDetailCubit] here. [onCollect] and [onWaive] are passed down from
+/// the page, mirroring the actions on the standalone fines ledger. [onCharge]
+/// opens the by-hand fine dialog for a lost/damaged copy or a membership fee.
 class MemberFinesCard extends StatelessWidget {
   const MemberFinesCard({
     required this.fines,
     required this.onCollect,
+    required this.onWaive,
+    required this.onCharge,
     super.key,
   });
 
   final List<Fine> fines;
   final void Function(Fine fine) onCollect;
+  final void Function(Fine fine) onWaive;
+  final VoidCallback onCharge;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +35,10 @@ class MemberFinesCard extends StatelessWidget {
     return SectionCard(
       title: l10n.memberDetailFinesTitle,
       subtitle: l10n.memberDetailFinesSubtitle,
+      trailing: AppTextButton(
+        onPressed: onCharge,
+        child: Text(l10n.finesChargeAction),
+      ),
       child: fines.isEmpty
           ? AppEmptyView(
               variant: AppFeedbackVariant.inline,
@@ -59,7 +70,7 @@ class MemberFinesCard extends StatelessWidget {
                 AppTableColumn<Fine>(
                   id: 'amount',
                   label: l10n.finesColumnAmount,
-                  width: 110,
+                  flex: 2,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, fine) => Text(
                     fine.outstanding.display(),
@@ -72,7 +83,7 @@ class MemberFinesCard extends StatelessWidget {
                 AppTableColumn<Fine>(
                   id: 'status',
                   label: l10n.commonStatus,
-                  width: 120,
+                  flex: 2,
                   cellBuilder: (context, fine) => AppStatusBadge(
                     dense: true,
                     label: fine.status.label(l10n),
@@ -82,11 +93,24 @@ class MemberFinesCard extends StatelessWidget {
                 AppTableColumn<Fine>(
                   id: 'actions',
                   label: l10n.commonActions,
-                  width: 100,
                   alignment: Alignment.centerRight,
-                  cellBuilder: (context, fine) => AppTextButton(
-                    onPressed: () => onCollect(fine),
-                    child: Text(l10n.finesCollect),
+                  cellBuilder: (context, fine) => AppMenuButton(
+                    tooltip: l10n.commonMoreActions,
+                    actions: [
+                      AppMenuAction(
+                        label: l10n.finesCollect,
+                        icon: AppIcons.payment,
+                        enabled: fine.status == FineStatus.unpaid,
+                        onSelected: () => onCollect(fine),
+                      ),
+                      AppMenuAction(
+                        label: l10n.finesWaive,
+                        icon: AppIcons.waiveFine,
+                        isDestructive: true,
+                        enabled: fine.status == FineStatus.unpaid,
+                        onSelected: () => onWaive(fine),
+                      ),
+                    ],
                   ),
                 ),
               ],

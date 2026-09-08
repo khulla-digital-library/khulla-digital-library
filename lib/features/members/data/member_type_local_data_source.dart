@@ -6,7 +6,18 @@ abstract interface class MemberTypeLocalDataSource {
 
   Future<List<MemberType>> findActiveMemberTypes();
 
+  /// Every category, active and archived, for the management sheet.
+  Future<List<MemberType>> findAllMemberTypes();
+
   Future<MemberType?> findMemberTypeById(String id);
 
   Future<MemberType> insertMemberType(MemberType type);
+
+  /// Replaces every editable field on an existing category.
+  Future<MemberType> updateMemberType(MemberType type);
+
+  /// Hides a category from pickers without touching members already on it.
+  Future<void> archiveMemberType(String id);
+
+  Future<void> unarchiveMemberType(String id);
 }

@@ -60,13 +60,22 @@ abstract final class Routes {
   /// Circulation: checkouts, returns, reservations, overdues.
   static const String circulation = '/circulation';
 
+  static const String loansSegment = 'loans';
   static const String checkOutSegment = 'check-out';
   static const String returnsSegment = 'return';
   static const String reservationsSegment = 'reservations';
   static const String finesSegment = 'fines';
 
+  /// The circulation desk's landing page: open loans, headline counts,
+  /// and links into the rest of the section.
+  static const String circulationLoans = '$circulation/$loansSegment';
+
   /// The checkout desk.
   static const String circulationCheckOut = '$circulation/$checkOutSegment';
+
+  /// The checkout desk with a member already looked up by card number.
+  static String circulationCheckOutForMember(String cardNumber) =>
+      '$circulationCheckOut?card=${Uri.encodeComponent(cardNumber)}';
 
   /// The returns desk.
   static const String circulationReturn = '$circulation/$returnsSegment';

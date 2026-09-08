@@ -167,4 +167,80 @@ class ReferenceDataRepositoryImpl implements ReferenceDataRepository {
   @override
   Future<List<MemberType>> findActiveMemberTypes() =>
       _memberTypes.findActiveMemberTypes();
+
+  @override
+  Future<List<MemberType>> findAllMemberTypes() =>
+      _memberTypes.findAllMemberTypes();
+
+  @override
+  Future<MemberType> addMemberType(MemberType draft) async {
+    final name = draft.name.trim();
+    final types = await findActiveMemberTypes();
+    _ensureUniqueMemberTypeName(types, name);
+    var maxOrder = -1;
+    for (final type in types) {
+      if (type.sortOrder > maxOrder) maxOrder = type.sortOrder;
+    }
+    return await _memberTypes.insertMemberType(
+      draft.copyWith(
+        id: _uuid.v4(),
+        name: name,
+        sortOrder: maxOrder + 1,
+        isSystem: false,
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
+  @override
+  Future<MemberType> saveMemberType(MemberType draft) async {
+    final name = draft.name.trim();
+    final current = await _memberTypes.findMemberTypeById(draft.id);
+    if (current == null) {
+      throw const NotFoundException();
+    }
+    final types = await findActiveMemberTypes();
+    _ensureUniqueMemberTypeName(types, name, exceptId: draft.id);
+    return await _memberTypes.updateMemberType(
+      draft.copyWith(
+        name: name,
+        isSystem: current.isSystem,
+        createdAt: current.createdAt,
+      ),
+    );
+  }
+
+  @override
+  Future<void> removeMemberType(String id) async {
+    final types = await findActiveMemberTypes();
+    if (types.length <= 1) {
+      throw const ConflictException();
+    }
+    final exists = types.any((type) => type.id == id);
+    if (!exists) {
+      throw const NotFoundException();
+    }
+    await _memberTypes.archiveMemberType(id);
+  }
+
+  @override
+  Future<void> restoreMemberType(String id) =>
+      _memberTypes.unarchiveMemberType(id);
+
+  void _ensureUniqueMemberTypeName(
+    List<MemberType> types,
+    String name, {
+    String? exceptId,
+  }) {
+    if (name.isEmpty) {
+      throw const InvalidInputException();
+    }
+    final needle = name.toLowerCase();
+    for (final type in types) {
+      if (type.id == exceptId) continue;
+      if (type.name.toLowerCase() == needle) {
+        throw const DuplicateRecordException();
+      }
+    }
+  }
 }

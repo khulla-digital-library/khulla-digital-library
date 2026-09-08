@@ -259,13 +259,27 @@ WHERE m.id = ?
   @override
   Future<bool> hasCirculationHistory(String memberId) => guardDatabase(
     () async {
-      final count = _db.loans.id.count();
-      final row =
+      final loanCount = _db.loans.id.count();
+      final loanRow =
           await (_db.selectOnly(_db.loans)
-                ..addColumns([count])
+                ..addColumns([loanCount])
                 ..where(_db.loans.memberId.equals(memberId)))
               .getSingle();
-      return (row.read(count) ?? 0) > 0;
+      if ((loanRow.read(loanCount) ?? 0) > 0) return true;
+      final fineCount = _db.fines.id.count();
+      final fineRow =
+          await (_db.selectOnly(_db.fines)
+                ..addColumns([fineCount])
+                ..where(_db.fines.memberId.equals(memberId)))
+              .getSingle();
+      if ((fineRow.read(fineCount) ?? 0) > 0) return true;
+      final reservationCount = _db.reservations.id.count();
+      final reservationRow =
+          await (_db.selectOnly(_db.reservations)
+                ..addColumns([reservationCount])
+                ..where(_db.reservations.memberId.equals(memberId)))
+              .getSingle();
+      return (reservationRow.read(reservationCount) ?? 0) > 0;
     },
     source: '$_source.hasCirculationHistory',
   );

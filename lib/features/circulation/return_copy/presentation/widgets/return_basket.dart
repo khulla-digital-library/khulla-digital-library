@@ -80,7 +80,7 @@ class ReturnBasket extends StatelessWidget {
                 AppTableColumn<Loan>(
                   id: 'daysLate',
                   label: l10n.returnsColumnDaysLate,
-                  width: 100,
+                  flex: 2,
                   alignment: Alignment.centerRight,
                   showFrom: FormFactor.medium,
                   cellBuilder: (context, loan) => Text(
@@ -95,7 +95,7 @@ class ReturnBasket extends StatelessWidget {
                 AppTableColumn<Loan>(
                   id: 'fine',
                   label: l10n.returnsColumnFine,
-                  width: 110,
+                  flex: 2,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, loan) => Text(
                     loan.accruedFine.isZero
@@ -114,7 +114,7 @@ class ReturnBasket extends StatelessWidget {
                 AppTableColumn<Loan>(
                   id: 'status',
                   label: l10n.commonStatus,
-                  width: 120,
+                  flex: 2,
                   showFrom: FormFactor.large,
                   cellBuilder: (context, loan) => AppStatusBadge(
                     dense: true,
@@ -125,7 +125,6 @@ class ReturnBasket extends StatelessWidget {
                 AppTableColumn<Loan>(
                   id: 'remove',
                   label: l10n.commonActions,
-                  width: 56,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, loan) => AppIconButton(
                     icon: AppIcons.close,

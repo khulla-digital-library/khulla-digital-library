@@ -1,3 +1,4 @@
+import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
 import 'package:khulla/features/circulation/fine/domain/models/fine_query.dart';
@@ -5,6 +6,7 @@ import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/features/circulation/loan/domain/models/loan_query.dart';
 import 'package:khulla/features/circulation/reservation/domain/models/reservation.dart';
 import 'package:khulla/features/circulation/reservation/domain/models/reservation_query.dart';
+import 'package:khulla/features/circulation/shared/domain/fine_reason.dart';
 
 /// Checkout, return, renew, holds and the ledgers that hang off them.
 ///
@@ -21,6 +23,14 @@ abstract interface class CirculationRepository {
   Future<Loan> checkOutCopy({
     required String memberId,
     required String barcode,
+    String? staffId,
+  });
+
+  /// Processes every item in one transaction so a basket either checks out
+  /// in full or not at all.
+  Future<List<Loan>> checkOutCopies({
+    required String memberId,
+    required List<String> barcodes,
     String? staffId,
   });
 
@@ -53,6 +63,16 @@ abstract interface class CirculationRepository {
   Future<Fine> collectFine(String fineId);
 
   Future<Fine> waiveFine(String fineId);
+
+  /// Assesses a one-off fine by hand — a lost/damaged copy or a membership
+  /// fee. The automatic overdue fine on return does not go through here.
+  Future<Fine> chargeFine({
+    required String memberId,
+    required FineReason reason,
+    required Money amount,
+    String? note,
+    String? staffId,
+  });
 
   Future<void> expireStaleHolds();
 

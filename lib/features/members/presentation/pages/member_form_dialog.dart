@@ -13,7 +13,6 @@ import 'package:khulla/features/members/presentation/cubit/member_form_state.dar
 import 'package:khulla/features/members/presentation/member_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The borrower editor, used for both a new card and an existing one.
@@ -22,7 +21,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// order the counter fills them: who the person is, how to reach them, and
 /// which rules their card runs under. [MemberFormCubit] loads member types and
 /// saves the record; the category sits last because it decides the loan period,
-/// borrowing limit and fine rate. The expiry picker still toasts as not wired.
+/// borrowing limit and fine rate. Expiry is read-only here — it is set from
+/// the loan rules on registration and extended by renewing the membership.
 class MemberFormDialog extends StatelessWidget {
   const MemberFormDialog({this.memberId, super.key});
 
@@ -53,6 +53,7 @@ class MemberFormDialog extends StatelessWidget {
             title: isEditing
                 ? l10n.memberFormEditHeading
                 : l10n.memberFormNewHeading,
+            width: AppDialogWidth.xxxl,
             actions: const [],
             children: const [Center(child: AppSpinner())],
           );
@@ -141,6 +142,12 @@ class _MemberFormBodyState extends State<_MemberFormBody> with DisposeBag {
       AppToast.error(context, message: l10n.validationFieldRequired);
       return;
     }
+    final dateOfBirthText = _dateOfBirth.text.trim();
+    if (dateOfBirthText.isNotEmpty &&
+        AppDateFormat.display.tryParse(dateOfBirthText) == null) {
+      AppToast.error(context, message: l10n.validationDateInvalid);
+      return;
+    }
 
     try {
       await context.read<MemberFormCubit>().saveMember(
@@ -151,6 +158,7 @@ class _MemberFormBodyState extends State<_MemberFormBody> with DisposeBag {
         email: _email.text.trim().isEmpty ? null : _email.text.trim(),
         phone: _phone.text.trim().isEmpty ? null : _phone.text.trim(),
         address: _address.text.trim().isEmpty ? null : _address.text.trim(),
+        dateOfBirthText: dateOfBirthText.isEmpty ? null : dateOfBirthText,
         guardian: _guardian.text.trim().isEmpty ? null : _guardian.text.trim(),
         notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
       );
@@ -170,6 +178,7 @@ class _MemberFormBodyState extends State<_MemberFormBody> with DisposeBag {
       title: _isEditing
           ? l10n.memberFormEditHeading
           : l10n.memberFormNewHeading,
+      width: AppDialogWidth.xxxl,
       actions: [
         AppDialog.secondaryAction(
           context: context,
@@ -268,7 +277,8 @@ class _MemberFormBodyState extends State<_MemberFormBody> with DisposeBag {
                   label: l10n.fieldExpires,
                   value: _expires.isEmpty ? l10n.commonNotSet : _expires,
                   icon: AppIcons.calendar,
-                  onTap: () => showNotWiredToast(context),
+                  enabled: false,
+                  onTap: null,
                 ),
               ],
             ),

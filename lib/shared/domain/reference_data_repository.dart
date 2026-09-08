@@ -29,4 +29,23 @@ abstract interface class ReferenceDataRepository {
 
   /// Active member types in display order.
   Future<List<MemberType>> findActiveMemberTypes();
+
+  /// Every member type, active and archived, for the management sheet.
+  Future<List<MemberType>> findAllMemberTypes();
+
+  /// Inserts an operator-created category. `draft`'s id, sort order,
+  /// `isSystem` and `createdAt` are assigned here and may be anything.
+  Future<MemberType> addMemberType(MemberType draft);
+
+  /// Replaces an existing category's name and rule overrides. `isSystem`
+  /// and `createdAt` are carried over from the stored row regardless of
+  /// what `draft` holds.
+  Future<MemberType> saveMemberType(MemberType draft);
+
+  /// Hides a category from pickers. Members already on it keep the link.
+  /// Refuses to archive the last active category.
+  Future<void> removeMemberType(String id);
+
+  /// Brings an archived category back into pickers.
+  Future<void> restoreMemberType(String id);
 }

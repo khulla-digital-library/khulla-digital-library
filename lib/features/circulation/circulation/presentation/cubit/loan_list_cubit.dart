@@ -8,6 +8,7 @@ import 'package:khulla/features/circulation/loan/domain/models/loan_query.dart';
 import 'package:khulla/features/circulation/reservation/domain/models/reservation_query.dart';
 import 'package:khulla/features/circulation/shared/domain/circulation_repository.dart';
 import 'package:khulla/features/circulation/shared/domain/loan_status.dart';
+import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
 /// Open loans list plus circulation headline counts.
@@ -17,9 +18,10 @@ import 'package:khulla/shared/models/load_status.dart';
 /// round-trip; failures emit into [LoanListState.error].
 @injectable
 class LoanListCubit extends Cubit<LoanListState> {
-  LoanListCubit(this._repository) : super(const LoanListState());
+  LoanListCubit(this._repository, this._auth) : super(const LoanListState());
 
   final CirculationRepository _repository;
+  final AuthCubit _auth;
 
   /// Loads the filtered loan list and on-loan, due-today, overdue and hold counts.
   Future<void> loadOpenLoans() async {
@@ -119,7 +121,7 @@ class LoanListCubit extends Cubit<LoanListState> {
 
   /// Extends the due date for one open loan. Rethrows on failure.
   Future<void> renewLoan(String loanId) async {
-    await _repository.renewLoan(loanId);
+    await _repository.renewLoan(loanId, staffId: _auth.state.staff?.id);
     if (isClosed) return;
     await loadOpenLoans();
   }
