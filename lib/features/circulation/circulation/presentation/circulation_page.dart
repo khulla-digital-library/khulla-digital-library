@@ -11,8 +11,6 @@ import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/features/circulation/shared/domain/loan_status.dart';
 import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/navigation_group.dart';
-import 'package:khulla/shared/components/navigation_tile.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
@@ -161,7 +159,6 @@ class CirculationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final spacing = context.appSpacing;
     final cubit = context.read<LoanListCubit>();
 
     return BlocBuilder<LoanListCubit, LoanListState>(
@@ -182,81 +179,35 @@ class CirculationPage extends StatelessWidget {
 
         return CollectionPageView<Loan>(
           onPageSizeChanged: cubit.limitChanged,
-          intro: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AppStatStrip(
-                tiles: [
-                  AppStatTile(
-                    label: l10n.circulationStatOnLoan,
-                    value: '${state.onLoanCount}',
-                    icon: AppIcons.transfer,
-                    tone: AppStatusTone.brand,
-                    onTap: () => cubit.statusFilterChanged(null),
-                  ),
-                  AppStatTile(
-                    label: l10n.circulationStatDueToday,
-                    value: '${state.dueTodayCount}',
-                    icon: AppIcons.event,
-                    tone: AppStatusTone.warning,
-                    onTap: () => cubit.statusFilterChanged(LoanStatus.dueToday),
-                  ),
-                  AppStatTile(
-                    label: l10n.circulationStatOverdue,
-                    value: '${state.overdueCount}',
-                    icon: AppIcons.error,
-                    tone: AppStatusTone.danger,
-                    onTap: () => cubit.statusFilterChanged(LoanStatus.overdue),
-                  ),
-                  AppStatTile(
-                    label: l10n.circulationStatHolds,
-                    value: '${state.holdsCount}',
-                    icon: AppIcons.bookmark,
-                    tone: AppStatusTone.info,
-                    onTap: () => context.go(Routes.circulationReservations),
-                  ),
-                ],
+          intro: AppStatStrip(
+            tiles: [
+              AppStatTile(
+                label: l10n.circulationStatOnLoan,
+                value: '${state.onLoanCount}',
+                icon: AppIcons.transfer,
+                tone: AppStatusTone.brand,
+                onTap: () => cubit.statusFilterChanged(null),
               ),
-              SizedBox(height: spacing.lg),
-              AppSectionHeader(
-                title: l10n.circulationDeskTitle,
-                subtitle: l10n.circulationDeskSubtitle,
+              AppStatTile(
+                label: l10n.circulationStatDueToday,
+                value: '${state.dueTodayCount}',
+                icon: AppIcons.event,
+                tone: AppStatusTone.warning,
+                onTap: () => cubit.statusFilterChanged(LoanStatus.dueToday),
               ),
-              SizedBox(height: spacing.md),
-              NavigationGroup(
-                children: [
-                  NavigationTile(
-                    label: l10n.circulationCheckOut,
-                    description: l10n.checkOutSubtitle,
-                    icon: AppIcons.scan,
-                    route: Routes.circulationCheckOut,
-                  ),
-                  NavigationTile(
-                    label: l10n.circulationReturn,
-                    description: l10n.returnsSubtitle,
-                    icon: AppIcons.checkIn,
-                    route: Routes.circulationReturn,
-                  ),
-                  NavigationTile(
-                    label: l10n.circulationReservations,
-                    description: l10n.reservationsSubtitle,
-                    count: '${state.holdsCount}',
-                    icon: AppIcons.bookmark,
-                    route: Routes.circulationReservations,
-                  ),
-                  NavigationTile(
-                    label: l10n.circulationFines,
-                    description: l10n.finesSubtitle,
-                    icon: AppIcons.wallet,
-                    route: Routes.circulationFines,
-                  ),
-                ],
+              AppStatTile(
+                label: l10n.circulationStatOverdue,
+                value: '${state.overdueCount}',
+                icon: AppIcons.error,
+                tone: AppStatusTone.danger,
+                onTap: () => cubit.statusFilterChanged(LoanStatus.overdue),
               ),
-              SizedBox(height: spacing.lg),
-              AppSectionHeader(
-                title: l10n.circulationLoansTitle,
-                subtitle: l10n.circulationLoansSubtitle,
+              AppStatTile(
+                label: l10n.circulationStatHolds,
+                value: '${state.holdsCount}',
+                icon: AppIcons.bookmark,
+                tone: AppStatusTone.info,
+                onTap: () => context.go(Routes.circulationReservations),
               ),
             ],
           ),
@@ -300,12 +251,6 @@ class CirculationPage extends StatelessWidget {
                   onPressed: cubit.clearFilters,
                   child: Text(l10n.commonClearFilters),
                 ),
-              AppButton(
-                size: AppButtonSize.medium,
-                variant: AppButtonVariant.outline,
-                onPressed: () => context.go(Routes.circulationReturn),
-                child: Text(l10n.circulationReturn),
-              ),
             ],
           ),
           items: state.loans,

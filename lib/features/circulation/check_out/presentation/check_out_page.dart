@@ -85,8 +85,12 @@ class _CheckOutPageState extends State<CheckOutPage> with DisposeBag {
           memberCategory: member?.memberTypeName,
           initials: member?.initials,
           outstandingFines: member?.finesOwed ?? Money.zero,
+          matches: state.memberMatches,
+          isSearching: state.isLookingUpMember,
+          hasQuery: state.memberQuery.isNotEmpty,
           onSearchChanged: cubit.memberSearchChanged,
           onChangeMember: cubit.clearMember,
+          onSelectMember: (match) => unawaited(cubit.memberSelected(match)),
         );
 
         final basket = CheckOutBasket(

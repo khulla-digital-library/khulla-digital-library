@@ -13,6 +13,7 @@ import 'package:khulla/features/circulation/shared/domain/models/effective_loan_
 import 'package:khulla/features/circulation/shared/domain/resolve_loan_rules.dart';
 import 'package:khulla/features/members/data/member_type_local_data_source.dart';
 import 'package:khulla/features/members/domain/member_repository.dart';
+import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/domain/models/member_query.dart';
 import 'package:khulla/features/settings/domain/loan_rules_repository.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
@@ -58,20 +59,114 @@ class CheckOutCubit extends Cubit<CheckOutState> {
     _memberLookupTimer?.cancel();
     final trimmed = value.trim();
     if (trimmed.isEmpty) {
-      emit(state.copyWith(member: null, rules: null, error: null));
+      emit(
+        state.copyWith(
+          member: null,
+          rules: null,
+          memberMatches: const [],
+          memberQuery: '',
+          error: null,
+        ),
+      );
       return;
     }
     _memberLookupTimer = Timer(const Duration(milliseconds: 300), () {
-      unawaited(lookupMember(trimmed));
+      unawaited(searchMembers(trimmed));
     });
+  }
+
+  /// Searches members without selecting: an exact card-number hit selects
+  /// immediately (a scan, not typing), anything else lists matches for the
+  /// desk to pick from. Never auto-selects a name search, even a single hit.
+  Future<void> searchMembers(String query) async {
+    emit(
+      state.copyWith(
+        isLookingUpMember: true,
+        memberQuery: query.trim(),
+        error: null,
+      ),
+    );
+    try {
+      final trimmed = query.trim();
+      final exact = await _memberRepository.findMemberByCardNumber(trimmed);
+      if (isClosed) return;
+      if (exact != null) {
+        final rules = await _loadEffectiveRules(exact.memberTypeId);
+        if (isClosed) return;
+        emit(
+          state.copyWith(
+            member: exact,
+            rules: rules,
+            memberMatches: const [],
+            isLookingUpMember: false,
+            error: null,
+          ),
+        );
+        return;
+      }
+      final results = await _memberRepository.findMembers(
+        MemberQuery(search: trimmed),
+      );
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          member: null,
+          rules: null,
+          memberMatches: results.items,
+          isLookingUpMember: false,
+          error: null,
+        ),
+      );
+    } on AppException catch (error) {
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          member: null,
+          rules: null,
+          memberMatches: const [],
+          isLookingUpMember: false,
+          error: error,
+        ),
+      );
+    }
+  }
+
+  /// Picks one member from the search matches and loads their loan rules.
+  Future<void> memberSelected(Member member) async {
+    emit(state.copyWith(isLookingUpMember: true, error: null));
+    try {
+      final rules = await _loadEffectiveRules(member.memberTypeId);
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          member: member,
+          rules: rules,
+          memberMatches: const [],
+          memberQuery: '',
+          isLookingUpMember: false,
+          error: null,
+        ),
+      );
+    } on AppException catch (error) {
+      if (isClosed) return;
+      emit(state.copyWith(isLookingUpMember: false, error: error));
+    }
   }
 
   /// Resolves a member by card number or unambiguous name search.
   ///
-  /// Loads [EffectiveLoanRules] for their type on success. Failures emit
+  /// One-shot direct resolution for the `?card=` deep link. Loads
+  /// [EffectiveLoanRules] for their type on success. Failures emit
   /// into state and swallow — the operator stays on the same field.
   Future<void> lookupMember(String query) async {
-    emit(state.copyWith(isLookingUpMember: true, error: null));
+    emit(
+      state.copyWith(
+        isLookingUpMember: true,
+        memberMatches: const [],
+        memberQuery: query.trim(),
+        error: null,
+      ),
+    );
     try {
       final trimmed = query.trim();
       var member = await _memberRepository.findMemberByCardNumber(trimmed);
@@ -89,6 +184,7 @@ class CheckOutCubit extends Cubit<CheckOutState> {
           state.copyWith(
             member: null,
             rules: null,
+            memberMatches: const [],
             isLookingUpMember: false,
             error: const NotFoundException('That member was not found.'),
           ),
@@ -101,6 +197,8 @@ class CheckOutCubit extends Cubit<CheckOutState> {
         state.copyWith(
           member: member,
           rules: rules,
+          memberMatches: const [],
+          memberQuery: '',
           isLookingUpMember: false,
           error: null,
         ),
@@ -111,6 +209,7 @@ class CheckOutCubit extends Cubit<CheckOutState> {
         state.copyWith(
           member: null,
           rules: null,
+          memberMatches: const [],
           isLookingUpMember: false,
           error: error,
         ),
@@ -125,6 +224,8 @@ class CheckOutCubit extends Cubit<CheckOutState> {
         member: null,
         rules: null,
         basket: const [],
+        memberMatches: const [],
+        memberQuery: '',
         error: null,
       ),
     );

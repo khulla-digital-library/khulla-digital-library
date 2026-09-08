@@ -15,6 +15,8 @@ abstract class CheckOutState with _$CheckOutState {
     @Default(<Copy>[]) List<Copy> basket,
     @Default(false) bool isSubmitting,
     @Default(false) bool isLookingUpMember,
+    @Default(<Member>[]) List<Member> memberMatches,
+    @Default('') String memberQuery,
     AppException? error,
   }) = _CheckOutState;
 

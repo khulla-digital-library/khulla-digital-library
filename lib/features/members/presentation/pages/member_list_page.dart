@@ -142,7 +142,7 @@ class _MemberListPageState extends State<MemberListPage> {
       AppTableColumn<Member>(
         id: 'name',
         label: l10n.membersColumnName,
-        flex: 4,
+        flex: 3,
         sortable: true,
         cellBuilder: (context, member) => Row(
           children: [
@@ -181,7 +181,6 @@ class _MemberListPageState extends State<MemberListPage> {
         id: 'loans',
         label: l10n.membersColumnLoans,
         sortable: true,
-        alignment: Alignment.centerRight,
         showFrom: FormFactor.medium,
         cellBuilder: (context, member) => Text(
           '${member.loansOut}',
@@ -196,9 +195,7 @@ class _MemberListPageState extends State<MemberListPage> {
       AppTableColumn<Member>(
         id: 'fines',
         label: l10n.membersColumnFines,
-        flex: 2,
         sortable: true,
-        alignment: Alignment.centerRight,
         showFrom: FormFactor.expanded,
         cellBuilder: (context, member) => Text(
           member.finesOwed.isZero
@@ -214,10 +211,9 @@ class _MemberListPageState extends State<MemberListPage> {
       ),
       AppTableColumn<Member>(
         id: 'expires',
+
         label: l10n.membersColumnExpires,
-        flex: 2,
         sortable: true,
-        alignment: Alignment.centerRight,
         showFrom: FormFactor.large,
         cellBuilder: (context, member) => Text(
           member.expires.isEmpty ? l10n.commonNotSet : member.expires,
@@ -227,7 +223,6 @@ class _MemberListPageState extends State<MemberListPage> {
       AppTableColumn<Member>(
         id: 'status',
         label: l10n.commonStatus,
-        flex: 2,
         cellBuilder: (context, member) => AppStatusBadge(
           dense: true,
           label: member.status.label(l10n),
