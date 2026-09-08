@@ -4,8 +4,6 @@ An open-source library management system, built as a **local-first Flutter app**
 
 *Khulla* (खुल्ला) is Nepali for "open".
 
-> **Status: early scaffold.** The architecture, design system, database layer and navigation shell are in place and building. No library features exist yet.
-
 ## Why local-first
 
 A small library's catalogue is not big data — it is a few thousand rows that must be available at the circulation desk at 9am whether or not the internet is. Running it out of a local database means no hosting bill, no outage, no migration when a grant runs out, and no third party holding a record of who borrowed what.
