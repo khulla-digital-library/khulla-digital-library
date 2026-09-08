@@ -1,9 +1,15 @@
 import 'dart:async';
 
-import 'package:khulla/features/settings/presentation/placeholder/settings_placeholder.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/core/feedback/app_toast.dart';
+import 'package:khulla/core/format/app_date_format.dart';
+import 'package:khulla/features/settings/presentation/cubit/backup_cubit.dart';
+import 'package:khulla/features/settings/presentation/cubit/backup_state.dart';
 import 'package:khulla/features/settings/presentation/widgets/settings_action_card.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
+import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -16,6 +22,42 @@ import 'package:khulla_ui/khulla_ui.dart';
 class BackupPage extends StatelessWidget {
   const BackupPage({super.key});
 
+  Future<void> _export(BuildContext context) async {
+    final l10n = context.l10n;
+    final cubit = context.read<BackupCubit>();
+    try {
+      final exported = await cubit.exportBackup();
+      if (!context.mounted || !exported) return;
+      AppToast.success(context, message: l10n.settingsBackupExported);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _restore(BuildContext context) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.settingsBackupRestoreConfirmTitle,
+      message: l10n.settingsBackupRestoreConfirmBody,
+      confirmLabel: l10n.settingsBackupRestoreAction,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!context.mounted || !confirmed) return;
+
+    final cubit = context.read<BackupCubit>();
+    try {
+      // On success this never returns to a running screen — `restartApp()`
+      // ends the process (or reloads the page on web) before the app can
+      // draw another frame from a catalogue that is being replaced under it.
+      await cubit.restoreBackup();
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
   Future<void> _confirmErase(BuildContext context) async {
     final l10n = context.l10n;
     final confirmed = await AppDialog.confirmDestructive(
@@ -26,13 +68,52 @@ class BackupPage extends StatelessWidget {
       cancelLabel: l10n.commonCancel,
     );
     if (!context.mounted || !confirmed) return;
-    showNotWiredToast(context);
+
+    final cubit = context.read<BackupCubit>();
+    try {
+      await cubit.eraseCatalogue();
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BackupCubit, BackupState>(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return const Center(child: AppSpinner());
+        }
+        return _BackupBody(
+          state: state,
+          onExport: () => unawaited(_export(context)),
+          onRestore: () => unawaited(_restore(context)),
+          onErase: () => unawaited(_confirmErase(context)),
+        );
+      },
+    );
+  }
+}
+
+class _BackupBody extends StatelessWidget {
+  const _BackupBody({
+    required this.state,
+    required this.onExport,
+    required this.onRestore,
+    required this.onErase,
+  });
+
+  final BackupState state;
+  final VoidCallback onExport;
+  final VoidCallback onRestore;
+  final VoidCallback onErase;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
+    final info = state.info;
 
     return AppPageBody(
       wide: true,
@@ -56,17 +137,27 @@ class BackupPage extends StatelessWidget {
                     children: [
                       AppDetailRow(
                         label: l10n.settingsBackupLastBackup,
-                        child: const Text(placeholderLastBackup),
+                        child: Text(
+                          info?.lastBackupAt == null
+                              ? l10n.settingsBackupNever
+                              : AppDateFormat.format(info!.lastBackupAt!),
+                        ),
                       ),
                       SizedBox(height: spacing.sm),
                       AppDetailRow(
                         label: l10n.settingsBackupDatabaseSize,
-                        child: const Text(placeholderDatabaseSize),
+                        child: Text(
+                          info?.databaseSizeBytes == null
+                              ? l10n.commonUnavailable
+                              : _formatBytes(info!.databaseSizeBytes!),
+                        ),
                       ),
                       SizedBox(height: spacing.sm),
                       AppDetailRow(
                         label: l10n.settingsAboutStorage,
-                        child: const Text(placeholderStoragePath),
+                        child: Text(
+                          info?.storagePath ?? l10n.commonUnavailable,
+                        ),
                       ),
                     ],
                   ),
@@ -80,14 +171,16 @@ class BackupPage extends StatelessWidget {
                       description: l10n.settingsBackupExportBody,
                       actionLabel: l10n.settingsBackupExportAction,
                       icon: AppIcons.download,
-                      onAction: () => showNotWiredToast(context),
+                      isLoading: state.isWorking,
+                      onAction: onExport,
                     ),
                     SettingsActionCard(
                       title: l10n.settingsBackupRestoreTitle,
                       description: l10n.settingsBackupRestoreBody,
                       actionLabel: l10n.settingsBackupRestoreAction,
                       icon: AppIcons.restore,
-                      onAction: () => showNotWiredToast(context),
+                      isLoading: state.isWorking,
+                      onAction: onRestore,
                     ),
                     SettingsActionCard(
                       title: l10n.settingsBackupImportTitle,
@@ -111,7 +204,8 @@ class BackupPage extends StatelessWidget {
                   actionLabel: l10n.settingsBackupEraseAction,
                   icon: AppIcons.deleteForever,
                   isDestructive: true,
-                  onAction: () => unawaited(_confirmErase(context)),
+                  isLoading: state.isWorking,
+                  onAction: onErase,
                 ),
               ],
             ),
@@ -120,4 +214,13 @@ class BackupPage extends StatelessWidget {
       ),
     );
   }
+}
+
+String _formatBytes(int bytes) {
+  if (bytes < 1024) return '$bytes B';
+  final kb = bytes / 1024;
+  if (kb < 1024) return '${kb.toStringAsFixed(1)} KB';
+  final mb = kb / 1024;
+  if (mb < 1024) return '${mb.toStringAsFixed(1)} MB';
+  return '${(mb / 1024).toStringAsFixed(2)} GB';
 }

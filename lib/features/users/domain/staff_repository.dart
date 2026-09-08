@@ -1,5 +1,6 @@
 import 'package:khulla/features/users/domain/models/staff_member.dart';
 import 'package:khulla/features/users/domain/user_role.dart';
+import 'package:khulla/features/users/domain/user_status.dart';
 
 /// Staff accounts and the sign-in that authenticates against them.
 abstract interface class StaffRepository {
@@ -48,6 +49,42 @@ abstract interface class StaffRepository {
   Future<StaffMember?> resetPasswordWithRecoveryCode({
     required String email,
     required String recoveryCode,
+    required String newPassword,
+  });
+
+  /// Edits name, email and role for an existing account.
+  ///
+  /// [actingStaffId] is the signed-in administrator making the change — used
+  /// to refuse an account demoting itself out of the administrator role, and
+  /// to refuse a change that would leave the library with no active
+  /// administrator. Throws a `DuplicateRecordException` when [email] is
+  /// already held by another account, and a `ConflictException` for either
+  /// lockout rule.
+  Future<StaffMember> updateStaff({
+    required String id,
+    required String name,
+    required String email,
+    required UserRole role,
+    required String actingStaffId,
+  });
+
+  /// Enables or disables an account.
+  ///
+  /// Subject to the same lockout rules as [updateStaff]: an account may not
+  /// disable itself, and the last active administrator may not be disabled.
+  Future<StaffMember> setStaffStatus({
+    required String id,
+    required UserStatus status,
+    required String actingStaffId,
+  });
+
+  /// Sets a new password for [id], chosen and typed by an administrator.
+  ///
+  /// There is no email to send a reset link to in an offline-first app — the
+  /// administrator hands the new password to the account holder directly, the
+  /// same way the very first administrator's password is set at onboarding.
+  Future<void> adminResetPassword({
+    required String id,
     required String newPassword,
   });
 }

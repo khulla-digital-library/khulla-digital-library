@@ -1,4 +1,8 @@
-import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_placeholder.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:khulla/core/money/money.dart';
+import 'package:khulla/features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import 'package:khulla/features/dashboard/presentation/cubit/dashboard_state.dart';
+import 'package:khulla/features/dashboard/presentation/dashboard_summary_x.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_activity_section.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_attention_section.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_collection_card.dart';
@@ -10,6 +14,8 @@ import 'package:khulla/features/dashboard/presentation/widgets/dashboard_stats_s
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_subjects_card.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_usage_card.dart';
 import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/models/load_status.dart';
+import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The shell's landing tab: what the library looks like right now.
@@ -30,20 +36,34 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// The board is a single [CustomScrollView], so the page scrolls as one
 /// surface and no section nests a scrollable inside another — the rule that
 /// keeps a ten-thousand-title catalogue openable applies here too.
-///
-/// Every figure is placeholder data until the tables exist. The layout, the
-/// breakpoints and the empty copy are settled now so that building
-/// circulation is a matter of dropping a cubit behind a section rather than
-/// redesigning the page around it.
-class DashboardPage extends StatefulWidget {
+class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  Widget build(BuildContext context) {
+    return BlocBuilder<DashboardCubit, DashboardState>(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return const Center(child: AppSpinner());
+        }
+        if (state.status.hasError) {
+          final l10n = context.l10n;
+          return AppErrorView(
+            message: state.error?.localizedMessage(l10n) ?? '',
+            retryLabel: l10n.commonRetry,
+            onRetry: () => context.read<DashboardCubit>().load(),
+          );
+        }
+        return _DashboardBoard(state: state);
+      },
+    );
+  }
 }
 
-class _DashboardPageState extends State<DashboardPage> {
-  DashboardPeriod _period = DashboardPeriod.week;
+class _DashboardBoard extends StatelessWidget {
+  const _DashboardBoard({required this.state});
+
+  final DashboardState state;
 
   @override
   Widget build(BuildContext context) {
@@ -52,29 +72,52 @@ class _DashboardPageState extends State<DashboardPage> {
     final formFactor = context.formFactor;
     final twoPane = formFactor.usesExtendedRail;
     final sideBySide = formFactor.isAtLeast(FormFactor.expanded);
+    final summary = state.summary!;
+    final finesSeries = summary.finesSeries(l10n);
+    final latestFines = summary.finesByMonth.isEmpty
+        ? Money.zero
+        : summary.finesByMonth.last.amount;
 
     final mainColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const DashboardUsageCard(),
+        DashboardUsageCard(series: summary.usageSeries(l10n)),
         SizedBox(height: spacing.md),
         if (sideBySide)
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Expanded(flex: 3, child: DashboardFinesCard()),
+              Expanded(
+                flex: 3,
+                child: DashboardFinesCard(
+                  series: finesSeries,
+                  latest: latestFines,
+                  trend: summary.finesTrendText,
+                  trendValue: summary.finesTrendValue,
+                ),
+              ),
               SizedBox(width: spacing.md),
-              const Expanded(flex: 2, child: DashboardCollectionCard()),
+              Expanded(
+                flex: 2,
+                child: DashboardCollectionCard(
+                  slices: summary.collectionSlices(l10n),
+                ),
+              ),
             ],
           )
         else ...[
-          const DashboardFinesCard(),
+          DashboardFinesCard(
+            series: finesSeries,
+            latest: latestFines,
+            trend: summary.finesTrendText,
+            trendValue: summary.finesTrendValue,
+          ),
           SizedBox(height: spacing.md),
-          const DashboardCollectionCard(),
+          DashboardCollectionCard(slices: summary.collectionSlices(l10n)),
         ],
         SizedBox(height: spacing.md),
-        const DashboardActivitySection(),
+        DashboardActivitySection(entries: summary.activity(l10n)),
         SizedBox(height: spacing.lg),
         AppSectionHeader(
           title: l10n.dashboardQuickActionsTitle,
@@ -89,32 +132,24 @@ class _DashboardPageState extends State<DashboardPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const DashboardAttentionSection(),
+        DashboardAttentionSection(items: summary.attentionItems(l10n)),
         SizedBox(height: spacing.lg),
         DashboardRankedCard(
           title: l10n.dashboardTopTitlesTitle,
           subtitle: l10n.commonThisMonth,
-          entries: dashboardTopTitles(l10n),
+          entries: summary.topTitleEntries(l10n),
         ),
         SizedBox(height: spacing.lg),
         DashboardRankedCard(
           title: l10n.dashboardTopMembersTitle,
           subtitle: l10n.commonThisMonth,
-          entries: dashboardTopMembers(l10n),
+          entries: summary.topMemberEntries(l10n),
         ),
         SizedBox(height: spacing.lg),
-        const DashboardSubjectsCard(),
+        DashboardSubjectsCard(subjects: summary.subjectShares()),
       ],
     );
 
-    // TODO(sawongam): Remove this once the dashboard is implemented.
-    return const AppEmptyView(
-      icon: AppIcons.dashboard,
-      title: 'Dashboard',
-      message: 'This section is under construction',
-    );
-
-    // ignore: dead_code, reason: under-construction gate above.
     return AppPageBody(
       wide: true,
       child: CustomScrollView(
@@ -129,11 +164,12 @@ class _DashboardPageState extends State<DashboardPage> {
             sliver: SliverList.list(
               children: [
                 DashboardHeader(
-                  period: _period,
-                  onPeriodChanged: (period) => setState(() => _period = period),
+                  period: state.period,
+                  onPeriodChanged: (period) =>
+                      context.read<DashboardCubit>().changePeriod(period),
                 ),
                 SizedBox(height: spacing.md),
-                DashboardStatsStrip(stats: dashboardPlaceholderStats(l10n)),
+                DashboardStatsStrip(stats: summary.stats(l10n, state.period)),
                 SizedBox(height: spacing.lg),
                 if (twoPane)
                   Row(

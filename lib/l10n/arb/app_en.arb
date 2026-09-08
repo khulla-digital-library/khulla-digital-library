@@ -821,6 +821,9 @@
     "settingsBackupRestoreTitle": "Restore from a backup",
     "settingsBackupRestoreBody": "Replace everything in this library with the contents of a backup file.",
     "settingsBackupRestoreAction": "Choose a file",
+    "settingsBackupRestoreConfirmTitle": "Restore from a backup?",
+    "settingsBackupRestoreConfirmBody": "Everything currently in this library is replaced with the contents of the file you choose next. The app restarts when it finishes.",
+    "settingsBackupExported": "Backup exported.",
     "settingsBackupImportTitle": "Import records",
     "settingsBackupImportBody": "Bring titles or members in from a CSV file, matching on ISBN or card number.",
     "settingsBackupImportAction": "Import",
@@ -917,6 +920,7 @@
     "commonThisYear": "This year",
     "commonLastWeek": "vs last week",
     "commonLastMonth": "vs last month",
+    "commonYesterday": "vs yesterday",
     "commonLastEightMonths": "Last 8 months",
     "commonSelectPeriod": "Period",
     "commonUnavailable": "-",
@@ -968,9 +972,9 @@
     "dashboardStatCaptionWeek": "this week",
     "dashboardStatCaptionMonth": "this month",
     "dashboardUsageTitle": "Library usage",
-    "dashboardUsageSubtitle": "Visits and loans, day by day",
-    "dashboardUsageVisitors": "Visits",
-    "dashboardUsageLoans": "Loans",
+    "dashboardUsageSubtitle": "Checkouts and returns, day by day",
+    "dashboardUsageLoans": "Checkouts",
+    "dashboardUsageReturns": "Returns",
     "dashboardFinesTitle": "Fines accrued",
     "dashboardFinesSubtitle": "What overdue copies have cost members",
     "dashboardCollectionTitle": "Collection at a glance",
@@ -1076,6 +1080,22 @@
     "reportsColumnMember": "Member",
     "reportsColumnLoans": "Loans",
     "reportsColumnShare": "Share",
+    "reportsColumnMonth": "Month",
+    "reportsColumnFormat": "Format",
+    "reportsColumnCopies": "Copies",
+    "reportsColumnDueDate": "Due date",
+    "reportsColumnDaysLate": "Days late",
+    "reportsColumnAmount": "Amount",
+    "reportsExportedToast": "{title} exported.",
+    "@reportsExportedToast": {
+        "description": "Toast after a saved report's CSV export completes",
+        "placeholders": {
+            "title": {
+                "type": "String",
+                "example": "Circulation"
+            }
+        }
+    },
     "reportsFinesRaised": "Raised",
     "reportsFinesCollected": "Collected",
     "reportsFinesWaived": "Waived",
@@ -1105,7 +1125,7 @@
             }
         }
     },
-    "usersAdd": "Invite staff",
+    "usersAdd": "Add staff",
     "usersSearchHint": "Search staff by name or email",
     "usersColumnName": "Name",
     "usersColumnEmail": "Email",
@@ -1117,17 +1137,54 @@
     "usersFilterActive": "Active",
     "usersFilterInvited": "Invited",
     "usersFilterDisabled": "Disabled",
-    "usersEditRole": "Change role",
-    "usersResendInvite": "Resend invitation",
+    "usersEditRole": "Edit account",
     "usersResetPassword": "Reset password",
     "usersDisable": "Disable account",
     "usersEnable": "Enable account",
     "usersEmptyTitle": "No staff accounts yet",
-    "usersEmptyBody": "Invite the people who work the desk. Each one signs in with their own account, so the ledger says who did what.",
+    "usersEmptyBody": "Add the people who work the desk. Each one signs in with their own account, so the ledger says who did what.",
     "usersNeverSignedIn": "Never signed in",
+    "usersAddHeading": "Add staff account",
+    "usersEditHeading": "Edit staff account",
+    "usersFormIdentity": "Identity",
+    "usersFormIdentityDescription": "Their name and the address they sign in with.",
+    "usersFormAccess": "Access",
+    "usersFormAccessDescription": "What this account is allowed to do.",
+    "usersFormCredentials": "Password",
+    "usersFormCredentialsDescription": "Share this with them directly — there is no email to send it to.",
+    "fieldRole": "Role",
+    "usersCreatedToast": "Staff account added.",
+    "usersUpdatedToast": "Staff account updated.",
+    "usersResetPasswordHeading": "Reset password",
+    "usersResetPasswordDescription": "Set a new password for {name}.",
+    "@usersResetPasswordDescription": {
+        "description": "Reset-password dialog subtitle",
+        "placeholders": {
+            "name": {
+                "type": "String",
+                "example": "Anita Shrestha"
+            }
+        }
+    },
+    "usersResetPasswordToast": "Password reset.",
+    "usersDisableConfirmTitle": "Disable {name}'s account?",
+    "@usersDisableConfirmTitle": {
+        "description": "Confirm-disable dialog title",
+        "placeholders": {
+            "name": {
+                "type": "String",
+                "example": "Anita Shrestha"
+            }
+        }
+    },
+    "usersDisableConfirmBody": "They will not be able to sign in until an administrator re-enables the account.",
+    "usersDisableConfirmAction": "Disable account",
+    "usersEnabledToast": "Account enabled.",
+    "usersDisabledToast": "Account disabled.",
+    "usersLastAdministratorError": "The library must always have at least one active administrator.",
+    "usersSelfDisableError": "You cannot disable your own account.",
     "rolesHeading": "Roles and permissions",
     "rolesSubtitle": "What each role is allowed to do",
-    "rolesAdd": "Add role",
     "rolesColumnRole": "Role",
     "rolesColumnPeople": "People",
     "rolesColumnPermissions": "Permissions",

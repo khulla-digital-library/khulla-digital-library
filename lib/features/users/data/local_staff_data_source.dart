@@ -7,6 +7,8 @@ import 'package:khulla/features/users/data/mappers/staff_row_mappers.dart';
 import 'package:khulla/features/users/data/staff_local_data_source.dart';
 import 'package:khulla/features/users/domain/models/staff_credentials.dart';
 import 'package:khulla/features/users/domain/models/staff_member.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
+import 'package:khulla/features/users/domain/user_status.dart';
 import 'package:uuid/uuid.dart';
 
 /// Drift-backed [StaffLocalDataSource].
@@ -164,5 +166,77 @@ class LocalStaffDataSource implements StaffLocalDataSource {
       }
     }),
     source: '$_source.resetPasswordWithRecoveryCode',
+  );
+
+  @override
+  Future<int> countStaffWithRoleAndStatus({
+    required UserRole role,
+    required UserStatus status,
+  }) => guardDatabase(
+    () async {
+      final count = _db.staff.id.count();
+      final row =
+          await (_db.selectOnly(_db.staff)
+                ..addColumns([count])
+                ..where(
+                  _db.staff.role.equalsValue(role) &
+                      _db.staff.status.equalsValue(status),
+                ))
+              .getSingle();
+      final value = row.read(count) ?? 0;
+      return value;
+    },
+    source: '$_source.countStaffWithRoleAndStatus',
+  );
+
+  @override
+  Future<StaffMember> updateStaff(StaffMember staff) => guardDatabase(
+    () async {
+      final normalized = staff.copyWith(email: normalizeEmail(staff.email));
+      await (_db.update(
+        _db.staff,
+      )..where((row) => row.id.equals(normalized.id))).write(
+        StaffCompanion(
+          name: Value(normalized.name),
+          email: Value(normalized.email),
+          role: Value(normalized.role),
+        ),
+      );
+      return normalized;
+    },
+    source: '$_source.updateStaff',
+  );
+
+  @override
+  Future<StaffMember> setStaffStatus({
+    required String staffId,
+    required UserStatus status,
+  }) => guardDatabase(
+    () async {
+      await (_db.update(
+        _db.staff,
+      )..where((row) => row.id.equals(staffId))).write(
+        StaffCompanion(status: Value(status)),
+      );
+      final row = await (_db.select(
+        _db.staff,
+      )..where((row) => row.id.equals(staffId))).getSingle();
+      return row.toDomain();
+    },
+    source: '$_source.setStaffStatus',
+  );
+
+  @override
+  Future<void> setPasswordHash({
+    required String staffId,
+    required String passwordHash,
+  }) => guardDatabase(
+    () =>
+        (_db.update(
+          _db.staff,
+        )..where((row) => row.id.equals(staffId))).write(
+          StaffCompanion(passwordHash: Value(passwordHash)),
+        ),
+    source: '$_source.setPasswordHash',
   );
 }

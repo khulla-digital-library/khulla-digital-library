@@ -1,10 +1,19 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/core/feedback/app_toast.dart';
+import 'package:khulla/features/users/domain/models/staff_member.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/features/users/domain/user_status.dart';
-import 'package:khulla/features/users/presentation/placeholder/staff_record.dart';
-import 'package:khulla/features/users/presentation/placeholder/users_placeholder.dart';
+import 'package:khulla/features/users/presentation/cubit/staff_list_cubit.dart';
+import 'package:khulla/features/users/presentation/cubit/staff_list_state.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
 import 'package:khulla/features/users/presentation/widgets/staff_card.dart';
+import 'package:khulla/features/users/presentation/widgets/staff_form_dialog.dart';
+import 'package:khulla/features/users/presentation/widgets/staff_reset_password_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
+import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -46,15 +55,15 @@ class _UserListPageState extends State<UserListPage> {
     _page = 0;
   });
 
-  List<StaffRecord> get _matches {
+  List<StaffMember> _matches(List<StaffMember> staff) {
     final needle = _query.trim().toLowerCase();
     final matches = [
-      for (final staff in placeholderStaff)
+      for (final member in staff)
         if ((needle.isEmpty ||
-                staff.name.toLowerCase().contains(needle) ||
-                staff.email.toLowerCase().contains(needle)) &&
-            (_statuses.isEmpty || _statuses.contains(staff.status)))
-          staff,
+                member.name.toLowerCase().contains(needle) ||
+                member.email.toLowerCase().contains(needle)) &&
+            (_statuses.isEmpty || _statuses.contains(member.status)))
+          member,
     ];
 
     return matches..sort((a, b) {
@@ -68,7 +77,85 @@ class _UserListPageState extends State<UserListPage> {
     });
   }
 
-  List<AppTableColumn<StaffRecord>> _columns(AppLocalizations l10n) {
+  Future<void> _add() async {
+    final saved = await StaffFormDialog.show(context);
+    if (saved == true && mounted) {
+      await context.read<StaffListCubit>().load();
+    }
+  }
+
+  Future<void> _edit(StaffMember staff) async {
+    final saved = await StaffFormDialog.show(context, staffId: staff.id);
+    if (saved == true && mounted) {
+      await context.read<StaffListCubit>().load();
+    }
+  }
+
+  Future<void> _resetPassword(StaffMember staff) async {
+    await StaffResetPasswordDialog.show(
+      context,
+      staffId: staff.id,
+      staffName: staff.name,
+    );
+  }
+
+  Future<void> _toggleEnabled(StaffMember staff) async {
+    final l10n = context.l10n;
+    final cubit = context.read<StaffListCubit>();
+    final disabling = staff.status != UserStatus.disabled;
+
+    // Checked here, against data already on screen, so the desk gets an
+    // immediate, specific reason instead of a round trip to the database for
+    // a rule that never changes: an account cannot disable itself, and the
+    // library cannot be left with no active administrator. The repository
+    // enforces the same two rules as a backstop, in case the register
+    // changed under this screen between the load and the tap.
+    if (disabling) {
+      if (staff.id == cubit.actingStaffId) {
+        AppToast.error(context, message: l10n.usersSelfDisableError);
+        return;
+      }
+      if (staff.role == UserRole.administrator) {
+        final activeAdmins = cubit.state.staff
+            .where(
+              (member) =>
+                  member.role == UserRole.administrator &&
+                  member.status == UserStatus.active,
+            )
+            .length;
+        if (activeAdmins <= 1) {
+          AppToast.error(context, message: l10n.usersLastAdministratorError);
+          return;
+        }
+      }
+      final confirmed = await AppDialog.confirmDestructive(
+        context: context,
+        title: l10n.usersDisableConfirmTitle(staff.name),
+        message: l10n.usersDisableConfirmBody,
+        confirmLabel: l10n.usersDisableConfirmAction,
+        cancelLabel: l10n.commonCancel,
+      );
+      if (!mounted) return;
+      if (!confirmed) return;
+    }
+
+    try {
+      await cubit.setStatus(
+        staff.id,
+        disabling ? UserStatus.disabled : UserStatus.active,
+      );
+      if (!mounted) return;
+      AppToast.success(
+        context,
+        message: disabling ? l10n.usersDisabledToast : l10n.usersEnabledToast,
+      );
+    } on AppException catch (error) {
+      if (!mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  List<AppTableColumn<StaffMember>> _columns(AppLocalizations l10n) {
     final spacing = context.appSpacing;
     final colors = context.appColors;
     final muted = context.textTheme.bodyMedium?.copyWith(
@@ -76,7 +163,7 @@ class _UserListPageState extends State<UserListPage> {
     );
 
     return [
-      AppTableColumn<StaffRecord>(
+      AppTableColumn<StaffMember>(
         id: 'name',
         label: l10n.usersColumnName,
         flex: 4,
@@ -113,7 +200,7 @@ class _UserListPageState extends State<UserListPage> {
           ],
         ),
       ),
-      AppTableColumn<StaffRecord>(
+      AppTableColumn<StaffMember>(
         id: 'role',
         label: l10n.usersColumnRole,
         flex: 3,
@@ -131,17 +218,17 @@ class _UserListPageState extends State<UserListPage> {
           ],
         ),
       ),
-      AppTableColumn<StaffRecord>(
+      AppTableColumn<StaffMember>(
         id: 'lastActive',
         label: l10n.usersColumnLastActive,
         flex: 3,
         showFrom: FormFactor.expanded,
-        cellBuilder: (context, staff) => Text(
-          staff.lastActive ?? l10n.usersNeverSignedIn,
-          style: muted,
-        ),
+        // Sign-in history is not recorded anywhere in the catalogue — this
+        // column stays honest about that rather than inventing a value.
+        cellBuilder: (context, staff) =>
+            Text(l10n.usersNeverSignedIn, style: muted),
       ),
-      AppTableColumn<StaffRecord>(
+      AppTableColumn<StaffMember>(
         id: 'status',
         label: l10n.commonStatus,
         width: 130,
@@ -152,7 +239,7 @@ class _UserListPageState extends State<UserListPage> {
           tone: staff.status.tone,
         ),
       ),
-      AppTableColumn<StaffRecord>(
+      AppTableColumn<StaffMember>(
         id: 'actions',
         label: l10n.commonActions,
         width: 56,
@@ -163,18 +250,12 @@ class _UserListPageState extends State<UserListPage> {
             AppMenuAction(
               label: l10n.usersEditRole,
               icon: AppIcons.idCard,
-              onSelected: () => showNotWiredToast(context),
+              onSelected: () => unawaited(_edit(staff)),
             ),
-            if (staff.status == UserStatus.invited)
-              AppMenuAction(
-                label: l10n.usersResendInvite,
-                icon: AppIcons.email,
-                onSelected: () => showNotWiredToast(context),
-              ),
             AppMenuAction(
               label: l10n.usersResetPassword,
               icon: AppIcons.resetPassword,
-              onSelected: () => showNotWiredToast(context),
+              onSelected: () => unawaited(_resetPassword(staff)),
             ),
             AppMenuAction(
               label: staff.status == UserStatus.disabled
@@ -182,7 +263,7 @@ class _UserListPageState extends State<UserListPage> {
                   : l10n.usersDisable,
               icon: AppIcons.blocked,
               isDestructive: staff.status != UserStatus.disabled,
-              onSelected: () => showNotWiredToast(context),
+              onSelected: () => unawaited(_toggleEnabled(staff)),
             ),
           ],
         ),
@@ -201,95 +282,112 @@ class _UserListPageState extends State<UserListPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final matches = _matches;
-    final pageCount = (matches.length / _pageSize).ceil();
-    final page = _page.clamp(0, pageCount == 0 ? 0 : pageCount - 1);
-    final start = page * _pageSize;
-    final end = (start + _pageSize).clamp(0, matches.length);
 
-    return CollectionPageView<StaffRecord>(
-      onPageSizeChanged: _pageSizeChanged,
-      summary: l10n.usersSubtitle('${placeholderStaff.length}'),
-      toolbar: AppToolbar(
-        search: AppSearchField(
-          hintText: l10n.usersSearchHint,
-          clearTooltip: l10n.commonClearSearch,
-          dense: true,
-          onChanged: (value) => setState(() {
-            _query = value;
+    return BlocBuilder<StaffListCubit, StaffListState>(
+      builder: (context, listState) {
+        if (listState.isLoading) {
+          return const Center(child: AppSpinner());
+        }
+
+        final matches = _matches(listState.staff);
+        final pageCount = (matches.length / _pageSize).ceil();
+        final page = _page.clamp(0, pageCount == 0 ? 0 : pageCount - 1);
+        final start = page * _pageSize;
+        final end = (start + _pageSize).clamp(0, matches.length);
+
+        return CollectionPageView<StaffMember>(
+          onPageSizeChanged: _pageSizeChanged,
+          summary: l10n.usersSubtitle('${listState.staff.length}'),
+          toolbar: AppToolbar(
+            search: AppSearchField(
+              hintText: l10n.usersSearchHint,
+              clearTooltip: l10n.commonClearSearch,
+              dense: true,
+              onChanged: (value) => setState(() {
+                _query = value;
+                _page = 0;
+              }),
+            ),
+            filters: [
+              AppFilterChip(
+                label: l10n.usersFilterActive,
+                selected: _statuses.contains(UserStatus.active),
+                tone: AppStatusTone.success,
+                onSelected: (selected) =>
+                    _toggleStatus(UserStatus.active, selected),
+              ),
+              AppFilterChip(
+                label: l10n.usersFilterInvited,
+                selected: _statuses.contains(UserStatus.invited),
+                tone: AppStatusTone.warning,
+                onSelected: (selected) =>
+                    _toggleStatus(UserStatus.invited, selected),
+              ),
+              AppFilterChip(
+                label: l10n.usersFilterDisabled,
+                selected: _statuses.contains(UserStatus.disabled),
+                onSelected: (selected) =>
+                    _toggleStatus(UserStatus.disabled, selected),
+              ),
+            ],
+            actions: [
+              if (_isFiltered)
+                AppTextButton(
+                  onPressed: _clearFilters,
+                  child: Text(l10n.commonClearFilters),
+                ),
+              AppButton(
+                icon: AppIcons.add,
+                onPressed: () => unawaited(_add()),
+                child: Text(l10n.usersAdd),
+              ),
+            ],
+          ),
+          items: matches.sublist(start, end),
+          columns: _columns(l10n),
+          sort: _sort,
+          onSort: (next) => setState(() {
+            _sort = next;
             _page = 0;
           }),
-        ),
-        filters: [
-          AppFilterChip(
-            label: l10n.usersFilterActive,
-            selected: _statuses.contains(UserStatus.active),
-            tone: AppStatusTone.success,
-            onSelected: (selected) =>
-                _toggleStatus(UserStatus.active, selected),
-          ),
-          AppFilterChip(
-            label: l10n.usersFilterInvited,
-            selected: _statuses.contains(UserStatus.invited),
-            tone: AppStatusTone.warning,
-            onSelected: (selected) =>
-                _toggleStatus(UserStatus.invited, selected),
-          ),
-          AppFilterChip(
-            label: l10n.usersFilterDisabled,
-            selected: _statuses.contains(UserStatus.disabled),
-            onSelected: (selected) =>
-                _toggleStatus(UserStatus.disabled, selected),
-          ),
-        ],
-        actions: [
-          if (_isFiltered)
-            AppTextButton(
-              onPressed: _clearFilters,
-              child: Text(l10n.commonClearFilters),
+          onRowTap: (staff) => unawaited(_edit(staff)),
+          compactBuilder: (context, staff) =>
+              StaffCard(staff: staff, onTap: () => unawaited(_edit(staff))),
+          emptyState: _isFiltered
+              ? AppEmptyView(
+                  icon: AppIcons.noResults,
+                  title: l10n.commonNoMatchesTitle,
+                  message: l10n.commonNoMatchesBody,
+                  actionLabel: l10n.commonClearFilters,
+                  onAction: _clearFilters,
+                )
+              : AppEmptyView(
+                  icon: AppIcons.idCard,
+                  title: l10n.usersEmptyTitle,
+                  message: l10n.usersEmptyBody,
+                  actionLabel: l10n.usersAdd,
+                  onAction: () => unawaited(_add()),
+                ),
+          footer: AppPagination(
+            rangeLabel: l10n.commonShowingRange(
+              '${start + 1}',
+              '$end',
+              '${matches.length}',
             ),
-        ],
-      ),
-      items: matches.sublist(start, end),
-      columns: _columns(l10n),
-      sort: _sort,
-      onSort: (next) => setState(() {
-        _sort = next;
-        _page = 0;
-      }),
-      onRowTap: (_) => showNotWiredToast(context),
-      compactBuilder: (context, staff) => StaffCard(staff: staff),
-      emptyState: _isFiltered
-          ? AppEmptyView(
-              icon: AppIcons.noResults,
-              title: l10n.commonNoMatchesTitle,
-              message: l10n.commonNoMatchesBody,
-              actionLabel: l10n.commonClearFilters,
-              onAction: _clearFilters,
-            )
-          : AppEmptyView(
-              icon: AppIcons.idCard,
-              title: l10n.usersEmptyTitle,
-              message: l10n.usersEmptyBody,
-              actionLabel: l10n.usersAdd,
-              onAction: () => showNotWiredToast(context),
-            ),
-      footer: AppPagination(
-        rangeLabel: l10n.commonShowingRange(
-          '${start + 1}',
-          '$end',
-          '${matches.length}',
-        ),
-        previousTooltip: l10n.commonPreviousPage,
-        nextTooltip: l10n.commonNextPage,
-        pageCount: pageCount,
-        currentPage: page,
-        onPageSelected: (next) => setState(() => _page = next),
-        onPrevious: page == 0 ? null : () => setState(() => _page = page - 1),
-        onNext: page >= pageCount - 1
-            ? null
-            : () => setState(() => _page = page + 1),
-      ),
+            previousTooltip: l10n.commonPreviousPage,
+            nextTooltip: l10n.commonNextPage,
+            pageCount: pageCount,
+            currentPage: page,
+            onPageSelected: (next) => setState(() => _page = next),
+            onPrevious: page == 0
+                ? null
+                : () => setState(() => _page = page - 1),
+            onNext: page >= pageCount - 1
+                ? null
+                : () => setState(() => _page = page + 1),
+          ),
+        );
+      },
     );
   }
 }

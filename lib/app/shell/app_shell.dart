@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:khulla/app/shell/widgets/shell_brand_mark.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
@@ -8,6 +9,8 @@ import 'package:khulla/app/shell/widgets/shell_page_actions.dart';
 import 'package:khulla/app/shell/widgets/shell_page_title.dart';
 import 'package:khulla/app/shell/widgets/shell_rail_footer.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -51,13 +54,30 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final formFactor = context.formFactor;
-    final destinations = shellDestinations(l10n);
+    final auth = context.watch<AuthCubit>().state;
+    final role = auth.staff?.role ?? UserRole.readOnly;
+    final destinations = shellDestinations(l10n, role);
+    // Every branch stays in `destinations` at its router index — dropping an
+    // entry here instead would desync the rail's `onDestinationSelected`
+    // from `navigationShell.goBranch`. `visibleIndices` is the list of
+    // original indices a role may actually see; the rail below maps through
+    // it in both directions instead of indexing `destinations` directly.
+    final visibleIndices = [
+      for (var i = 0; i < destinations.length; i++)
+        if (destinations[i].permission == null ||
+            auth.hasPermission(destinations[i].permission!))
+          i,
+    ];
+    final visibleDestinations = [
+      for (final i in visibleIndices) destinations[i],
+    ];
     final location = GoRouterState.of(context).uri.path;
 
     final page = shellPageTitle(
       context,
       location,
       l10n,
+      role: role,
       onNavigate: (route) => _goRoute(context, route),
     );
 
@@ -76,7 +96,7 @@ class AppShell extends StatelessWidget {
               onPressed: () => unawaited(
                 showShellMoreSheet(
                   context,
-                  destinations: destinations,
+                  destinations: visibleDestinations,
                   current: location,
                 ),
               ),
@@ -84,7 +104,10 @@ class AppShell extends StatelessWidget {
     );
 
     if (!formFactor.usesNavigationRail) {
-      final compact = destinations.where((d) => d.primary).toList();
+      // Primary destinations carry no permission (see `shellDestinations`),
+      // so they are always a stable, always-visible prefix of the branch
+      // list — `_goBranch(selected)` below can keep indexing them directly.
+      final compact = visibleDestinations.where((d) => d.primary).toList();
       final index = navigationShell.currentIndex;
 
       return Scaffold(
@@ -104,7 +127,7 @@ class AppShell extends StatelessWidget {
             unawaited(
               showShellMoreSheet(
                 context,
-                destinations: destinations,
+                destinations: visibleDestinations,
                 current: location,
               ),
             );
@@ -143,13 +166,16 @@ class AppShell extends StatelessWidget {
                   ShellBrandHeader(extended: extended),
                   Expanded(
                     child: AppNavRail(
-                      selectedIndex: navigationShell.currentIndex,
-                      onDestinationSelected: _goBranch,
+                      selectedIndex: visibleIndices.indexOf(
+                        navigationShell.currentIndex,
+                      ),
+                      onDestinationSelected: (i) =>
+                          _goBranch(visibleIndices[i]),
                       extended: extended,
                       wrapSafeArea: false,
                       footer: ShellRailFooter(extended: extended),
                       destinations: [
-                        for (final destination in destinations)
+                        for (final destination in visibleDestinations)
                           AppNavDestination(
                             icon: AppIcon(destination.icon),
                             label: destination.label,
