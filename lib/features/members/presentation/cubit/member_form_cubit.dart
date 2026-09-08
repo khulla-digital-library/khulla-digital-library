@@ -4,6 +4,7 @@ import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/format/app_date_format.dart';
 import 'package:khulla/features/members/domain/member_repository.dart';
 import 'package:khulla/features/members/domain/models/member.dart';
+import 'package:khulla/features/members/domain/models/member_type.dart';
 import 'package:khulla/features/members/presentation/cubit/member_form_state.dart';
 import 'package:khulla/shared/domain/reference_data_repository.dart';
 import 'package:khulla/shared/models/load_status.dart';
@@ -40,6 +41,33 @@ class MemberFormCubit extends Cubit<MemberFormState> {
     } on AppException catch (error) {
       if (isClosed) return;
       emit(state.copyWith(status: LoadStatus.failure, error: error));
+    }
+  }
+
+  /// Inserts a category, refreshes the picker list, and rethrows on failure.
+  ///
+  /// Quick-add from the member form only names the category; every rule
+  /// override stays null so the library defaults apply until tuned in
+  /// the manage-categories sheet.
+  Future<MemberType> addMemberType(String name) async {
+    try {
+      final draft = MemberType(
+        id: '',
+        name: name,
+        sortOrder: 0,
+        isSystem: false,
+        createdAt: DateTime.now(),
+      );
+      final type = await _referenceData.addMemberType(draft);
+      if (isClosed) return type;
+      final memberTypes = await _referenceData.findActiveMemberTypes();
+      if (isClosed) return type;
+      emit(state.copyWith(memberTypes: memberTypes, error: null));
+      return type;
+    } on AppException catch (error) {
+      if (isClosed) rethrow;
+      emit(state.copyWith(error: error));
+      rethrow;
     }
   }
 

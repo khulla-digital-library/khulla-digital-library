@@ -23,6 +23,7 @@
     "commonArchive": "Archive",
     "commonClose": "Close",
     "commonSearch": "Search",
+    "commonClear": "Clear",
     "commonClearSearch": "Clear search",
     "commonMoreActions": "More actions",
     "commonPreviousPage": "Previous page",
@@ -368,7 +369,7 @@
     "titleFormShelvingDescription": "Where copies live, and what one costs to replace if it is lost.",
     "titleFormCopies": "Copies",
     "titleFormCopiesDescription": "Create the first items now, or add them later from the title's page.",
-    "titleFormInitialCopies": "Copies to create",
+    "titleFormInitialCopies": "Initial copies",
     "titleFormLendable": "Lendable",
     "titleFormLendableDescription": "Turn this off for reference works that never leave the building.",
     "titleFormSave": "Save title",
@@ -747,6 +748,10 @@
     "memberFormIdentityDescription": "Who the card belongs to. The name is what the desk searches on.",
     "memberFormContactDescription": "Used for overdue notices and hold pickups.",
     "memberFormMembershipDescription": "The category decides the loan period, the borrowing limit and the fine rate.",
+    "memberFormExpiresHint": "Expiry is set automatically from the category when the member is saved.",
+    "@memberFormExpiresHint": {
+        "description": "Members - helper under the read-only expiry field in the borrower editor"
+    },
     "memberFormNotifications": "Send overdue notices",
     "memberFormNotificationsDescription": "Turn off for a member who has asked not to be contacted.",
     "memberFormSave": "Save member",

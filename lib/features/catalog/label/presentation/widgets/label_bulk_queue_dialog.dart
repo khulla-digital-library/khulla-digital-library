@@ -71,7 +71,7 @@ class _LabelBulkQueueDialogState extends State<LabelBulkQueueDialog>
     return AppDialog(
       title: l10n.labelsBulkTitle,
       message: l10n.labelsBulkSubtitle,
-      width: AppDialogWidth.lg,
+      width: AppDialogWidth.xxxl,
       showClose: !_isQueueing,
       content: AppTextField(
         controller: _controller,

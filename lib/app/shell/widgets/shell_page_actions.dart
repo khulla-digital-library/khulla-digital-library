@@ -47,6 +47,7 @@ List<Widget> shellPageActions(
       AppIconButton(
         icon: AppIcons.bookBookmark,
         tooltip: l10n.titlesManageFormats,
+        outlined: true,
         onPressed: () => unawaited(TitleFormatListDialog.show(context)),
       ),
       modal(
@@ -90,6 +91,7 @@ List<Widget> shellPageActions(
       AppIconButton(
         icon: AppIcons.idCard,
         tooltip: l10n.membersManageCategories,
+        outlined: true,
         onPressed: () => unawaited(MemberTypeListDialog.show(context)),
       ),
       modal(

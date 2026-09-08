@@ -128,7 +128,7 @@ LIMIT ? OFFSET ?
     id: row.read<String>('id'),
     memberId: row.read<String>('member_id'),
     loanId: row.readNullable<String>('loan_id'),
-    reason: row.read<FineReason>('reason'),
+    reason: FineReason.values.byName(row.read<String>('reason')),
     assessed: Money(row.read<int>('assessed')),
     paid: Money(row.read<int>('paid')),
     waived: Money(row.read<int>('waived')),

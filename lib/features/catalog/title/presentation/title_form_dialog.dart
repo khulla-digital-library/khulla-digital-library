@@ -358,7 +358,12 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
           description: l10n.titleFormShelvingDescription,
           children: [
             AppFormRow(
+              // The stepper keeps its compact width while its control stays
+              // fieldHeight tall like the text fields: flex 0 stops the row
+              // stretching it full-width. Stacks below 480px so the labels
+              // still fit when side by side.
               flexes: _isEditing ? null : const [2, 2, 0],
+              stackBelow: _isEditing ? null : 480,
               children: [
                 AppTextField(
                   label: l10n.fieldShelf,

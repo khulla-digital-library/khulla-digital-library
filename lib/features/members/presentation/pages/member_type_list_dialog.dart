@@ -400,7 +400,7 @@ class _MemberTypeFormDialogState extends State<_MemberTypeFormDialog>
     return AppFormModal(
       title: widget.heading,
       description: l10n.membersManageCategoriesBody,
-      width: AppDialogWidth.lg,
+      width: AppDialogWidth.xxxl,
       actions: [
         AppDialog.secondaryAction(
           context: context,
@@ -436,26 +436,22 @@ class _MemberTypeFormDialogState extends State<_MemberTypeFormDialog>
               keyboardType: numberInput,
               onChanged: (_) {},
             ),
-          ],
-        ),
-        AppFormRow(
-          children: [
             AppTextField(
               label: l10n.fieldRenewalLimit,
               controller: _renewalLimit,
               keyboardType: numberInput,
               onChanged: (_) {},
             ),
+          ],
+        ),
+        AppFormRow(
+          children: [
             AppTextField(
               label: l10n.fieldRenewalPeriodDays,
               controller: _renewalPeriodDays,
               keyboardType: numberInput,
               onChanged: (_) {},
             ),
-          ],
-        ),
-        AppFormRow(
-          children: [
             AppTextField(
               label: l10n.fieldFinePerDay,
               controller: _finePerDay,

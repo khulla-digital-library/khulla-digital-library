@@ -121,7 +121,7 @@ LIMIT ? OFFSET ?
     titleId: row.read<String>('title_id'),
     memberId: row.read<String>('member_id'),
     placedAt: row.read<DateTime>('placed_at'),
-    status: row.read<ReservationStatus>('status'),
+    status: ReservationStatus.values.byName(row.read<String>('status')),
     readyCopyId: row.readNullable<String>('ready_copy_id'),
     readyAt: row.readNullable<DateTime>('ready_at'),
     expiresAt: row.readNullable<DateTime>('expires_at'),

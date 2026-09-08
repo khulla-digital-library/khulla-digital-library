@@ -31,10 +31,6 @@ class ReferenceDataRepositoryImpl implements ReferenceDataRepository {
   static const _formatCodes = [
     'book',
     'journal',
-    'magazine',
-    'audiobook',
-    'video',
-    'ebook',
     'other',
   ];
 

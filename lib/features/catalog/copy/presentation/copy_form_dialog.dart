@@ -41,7 +41,7 @@ class CopyFormDialog extends StatelessWidget {
         if (state.isLoading) {
           return AppFormModal(
             title: l10n.copyFormHeading,
-            width: AppDialogWidth.lg,
+            width: AppDialogWidth.xxxl,
             actions: const [],
             children: const [Center(child: AppSpinner())],
           );
@@ -98,7 +98,7 @@ class _CopyFormBodyState extends State<_CopyFormBody> with DisposeBag {
 
     return AppFormModal(
       title: l10n.copyFormHeading,
-      width: AppDialogWidth.lg,
+      width: AppDialogWidth.xxxl,
       actions: [
         AppDialog.secondaryAction(
           context: context,

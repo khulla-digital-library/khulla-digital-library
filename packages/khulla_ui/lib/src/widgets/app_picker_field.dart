@@ -61,7 +61,9 @@ class AppPickerField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
+    final metrics = context.appMetrics;
     final scheme = context.colorScheme;
+    final typography = context.textTheme;
     final fieldLabel = label;
     final hint = hintText ?? fieldLabel;
     final selected = value;
@@ -69,48 +71,79 @@ class AppPickerField extends StatelessWidget {
     final clear = onClear;
     final clearLabel = clearTooltip;
 
+    // The trailing glyph lives in a plain Row, not the decoration's
+    // suffix slot: Material enforces a 48px minimum box on that slot,
+    // which is what pushed the box taller than its neighbours and left
+    // the calendar floating. Same content-sized pattern as the
+    // dropdown, so the two match in any row.
+    final trailing = hasValue && clear != null && clearLabel != null
+        ? Tooltip(
+            message: clearLabel,
+            child: InkWell(
+              onTap: clear,
+              child: Padding(
+                padding: const EdgeInsets.all(2),
+                child: AppIcon(
+                  AppIcons.close,
+                  size: metrics.icon,
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          )
+        : AppIcon(
+            icon,
+            size: metrics.icon,
+            color: scheme.onSurfaceVariant,
+          );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (fieldLabel != null) ...[
           AppFieldLabel(label: fieldLabel, required: required),
-          SizedBox(height: spacing.xs),
+          SizedBox(height: metrics.labelToControlGap),
         ],
         InkWell(
           onTap: enabled ? onTap : null,
           borderRadius: BorderRadius.circular(context.appRadius.container),
-          child: InputDecorator(
-            isEmpty: !hasValue,
-            decoration: InputDecoration(
-              hintText: hint,
-              errorText: errorText,
-              enabled: enabled,
-              suffixIcon: AppFieldAffix(
-                child: hasValue && clear != null && clearLabel != null
-                    ? AppIconButton(
-                        icon: AppIcons.close,
-                        tooltip: clearLabel,
-                        onPressed: clear,
-                      )
-                    : AppIcon(
-                        icon,
-                        size: context.appMetrics.icon,
-                        color: scheme.onSurfaceVariant,
-                      ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: metrics.fieldHeight),
+            child: InputDecorator(
+              isEmpty: !hasValue,
+              decoration: InputDecoration(
+                isDense: true,
+                hintText: hint,
+                errorText: errorText,
+                enabled: enabled,
+                contentPadding: EdgeInsetsDirectional.only(
+                  start: spacing.sm,
+                  end: spacing.sm,
+                  top: spacing.xs,
+                  bottom: spacing.xs,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: hasValue
+                        ? Text(
+                            selected,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: typography.bodyMedium?.copyWith(
+                              color: enabled
+                                  ? scheme.onSurface
+                                  : scheme.onSurfaceVariant,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                  SizedBox(width: spacing.menuIconGap),
+                  trailing,
+                ],
               ),
             ),
-            child: hasValue
-                ? Text(
-                    selected,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      color: enabled
-                          ? scheme.onSurface
-                          : scheme.onSurfaceVariant,
-                    ),
-                  )
-                : null,
           ),
         ),
       ],

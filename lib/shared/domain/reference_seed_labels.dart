@@ -2,10 +2,6 @@
 String seedFormatName(String code) => switch (code) {
   'book' => 'Book',
   'journal' => 'Journal',
-  'magazine' => 'Magazine',
-  'audiobook' => 'Audiobook',
-  'video' => 'Video',
-  'ebook' => 'E-book',
   'other' => 'Other',
   _ => code,
 };

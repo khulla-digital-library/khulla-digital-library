@@ -61,7 +61,7 @@ class _ChargeFineDialogState extends State<ChargeFineDialog> with DisposeBag {
     return AppFormModal(
       title: l10n.finesChargeTitle,
       description: l10n.finesChargeDescription,
-      width: AppDialogWidth.sm,
+      width: AppDialogWidth.xxxl,
       actions: [
         AppDialog.secondaryAction(
           context: context,
@@ -75,21 +75,29 @@ class _ChargeFineDialogState extends State<ChargeFineDialog> with DisposeBag {
         ),
       ],
       children: [
-        AppDropdownField<FineReason>(
-          label: l10n.fieldReason,
-          required: true,
-          value: _reason,
-          items: ChargeFineDialog._chargeableReasons,
-          itemLabel: (reason) => reason.label(l10n),
-          itemIcon: (reason) => reason.icon,
-          onChanged: (reason) => setState(() => _reason = reason ?? _reason),
-        ),
-        AppTextField(
-          label: l10n.fieldAmount,
-          required: true,
-          controller: _amount,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          onChanged: (_) {},
+        AppFormRow(
+          flexes: const [3, 2],
+          children: [
+            AppDropdownField<FineReason>(
+              label: l10n.fieldReason,
+              required: true,
+              value: _reason,
+              items: ChargeFineDialog._chargeableReasons,
+              itemLabel: (reason) => reason.label(l10n),
+              itemIcon: (reason) => reason.icon,
+              onChanged: (reason) =>
+                  setState(() => _reason = reason ?? _reason),
+            ),
+            AppTextField(
+              label: l10n.fieldAmount,
+              required: true,
+              controller: _amount,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              onChanged: (_) {},
+            ),
+          ],
         ),
         AppTextField(
           label: l10n.fieldNotes,

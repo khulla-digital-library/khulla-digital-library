@@ -152,116 +152,242 @@ class _AppQuantityFieldState extends State<AppQuantityField> {
     );
     final error = widget.errorText;
     final fieldLabel = widget.label;
-    final controlHeight = switch (widget.size) {
-      AppQuantityFieldSize.small => metrics.iconButtonSmall,
-      AppQuantityFieldSize.regular => metrics.fieldHeight,
-    };
-    final width = switch (widget.size) {
-      AppQuantityFieldSize.small => metrics.iconButtonSmall * 2.75,
-      AppQuantityFieldSize.regular => metrics.fieldHeight * 3,
-    };
+    final isSmall = widget.size == AppQuantityFieldSize.small;
+    final controlHeight = isSmall
+        ? metrics.iconButtonSmall
+        : metrics.fieldHeight;
+    final width = isSmall
+        ? metrics.iconButtonSmall * 2.75
+        : metrics.fieldHeight * 3;
+    final iconSlot = BoxConstraints(
+      minWidth: metrics.iconButtonSmall,
+      maxWidth: metrics.iconButtonSmall,
+      maxHeight: controlHeight,
+    );
     final focused = _focus.hasFocus;
 
-    return SizedBox(
-      width: width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (fieldLabel != null) ...[
-            AppFieldLabel(
-              label: fieldLabel,
-              required: widget.required,
-              hasError: error != null,
-            ),
-            SizedBox(height: metrics.labelToControlGap),
-          ],
-          ConstrainedBox(
-            key: const ValueKey('app_quantity_control'),
-            constraints: BoxConstraints.tightFor(height: controlHeight),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(
-                  context.appRadius.container,
-                ),
-                border: Border.all(
-                  color: colors.hairline,
-                  width: context.appBorders.hairline,
-                ),
-              ),
-              child: ValueListenableBuilder<TextEditingValue>(
-                valueListenable: widget.controller,
-                builder: (context, value, _) {
-                  final parsed = _parsed(value.text);
-                  final canDecrease =
-                      widget.enabled && parsed != null && parsed > widget.min;
-                  final canIncrease =
-                      widget.enabled && (parsed == null || parsed < widget.max);
-                  final showSlide = !focused && parsed != null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (fieldLabel != null) ...[
+          AppFieldLabel(
+            label: fieldLabel,
+            required: widget.required,
+            hasError: error != null,
+          ),
+          SizedBox(height: metrics.labelToControlGap),
+        ],
+        SizedBox(
+          width: width,
+          child: ValueListenableBuilder<TextEditingValue>(
+            valueListenable: widget.controller,
+            builder: (context, value, _) {
+              final parsed = _parsed(value.text);
+              final canDecrease =
+                  widget.enabled && parsed != null && parsed > widget.min;
+              final canIncrease =
+                  widget.enabled && (parsed == null || parsed < widget.max);
+              final showSlide = !focused && parsed != null;
 
-                  return Row(
-                    children: [
-                      AppIconButton(
-                        icon: AppIcons.remove,
-                        tooltip: widget.decreaseTooltip,
-                        size: AppIconButtonSize.small,
-                        onPressed: canDecrease ? () => _step(-1) : null,
+              if (isSmall) {
+                return _CompactQuantityControl(
+                  controlHeight: controlHeight,
+                  canDecrease: canDecrease,
+                  canIncrease: canIncrease,
+                  showSlide: showSlide,
+                  parsed: parsed,
+                  numeric: numeric,
+                  colors: colors,
+                  controller: widget.controller,
+                  focusNode: _focus,
+                  enabled: widget.enabled,
+                  max: widget.max,
+                  decreaseTooltip: widget.decreaseTooltip,
+                  increaseTooltip: widget.increaseTooltip,
+                  onChanged: widget.onChanged,
+                  onDecrease: () => _step(-1),
+                  onIncrease: () => _step(1),
+                );
+              }
+
+              return ConstrainedBox(
+                key: const ValueKey('app_quantity_control'),
+                constraints: BoxConstraints(
+                  minHeight: controlHeight,
+                  maxHeight: controlHeight,
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    TextFormField(
+                      controller: widget.controller,
+                      focusNode: _focus,
+                      enabled: widget.enabled,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      inputFormatters: [
+                        AppPositiveIntFormatter(max: widget.max),
+                      ],
+                      style: numeric.copyWith(
+                        color: showSlide ? Colors.transparent : colors.ink100,
                       ),
-                      Expanded(
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            TextField(
-                              controller: widget.controller,
-                              focusNode: _focus,
-                              enabled: widget.enabled,
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              inputFormatters: [
-                                AppPositiveIntFormatter(max: widget.max),
-                              ],
-                              style: numeric.copyWith(
-                                color: showSlide
-                                    ? Colors.transparent
-                                    : colors.ink100,
-                              ),
-                              cursorColor: colors.ink100,
-                              decoration: const InputDecoration(
-                                isDense: true,
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.zero,
-                                counterText: '',
-                              ),
-                              onChanged: widget.onChanged,
-                            ),
-                            if (showSlide)
-                              IgnorePointer(
-                                child: AppSlidingNumber(
-                                  value: parsed,
-                                  style: numeric,
-                                ),
-                              ),
-                          ],
+                      decoration: InputDecoration(
+                        prefixIcon: AppFieldAffix(
+                          child: AppIconButton(
+                            icon: AppIcons.remove,
+                            tooltip: widget.decreaseTooltip,
+                            size: AppIconButtonSize.small,
+                            onPressed: canDecrease ? () => _step(-1) : null,
+                          ),
+                        ),
+                        suffixIcon: AppFieldAffix(
+                          child: AppIconButton(
+                            icon: AppIcons.add,
+                            tooltip: widget.increaseTooltip,
+                            size: AppIconButtonSize.small,
+                            onPressed: canIncrease ? () => _step(1) : null,
+                          ),
+                        ),
+                        prefixIconConstraints: iconSlot,
+                        suffixIconConstraints: iconSlot,
+                        counterText: '',
+                        contentPadding: EdgeInsetsDirectional.only(
+                          start: spacing.sm,
+                          end: spacing.sm,
+                          top: spacing.xs,
+                          bottom: spacing.xs,
                         ),
                       ),
-                      AppIconButton(
-                        icon: AppIcons.add,
-                        tooltip: widget.increaseTooltip,
-                        size: AppIconButtonSize.small,
-                        onPressed: canIncrease ? () => _step(1) : null,
+                      onChanged: widget.onChanged,
+                    ),
+                    if (showSlide)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: metrics.iconButtonSmall,
+                        ),
+                        child: IgnorePointer(
+                          child: AppSlidingNumber(
+                            value: parsed,
+                            style: numeric,
+                          ),
+                        ),
                       ),
-                    ],
-                  );
-                },
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        if (error != null) ...[
+          SizedBox(height: spacing.xxs + 2),
+          AppFieldError(message: error),
+        ],
+      ],
+    );
+  }
+}
+
+class _CompactQuantityControl extends StatelessWidget {
+  const _CompactQuantityControl({
+    required this.controlHeight,
+    required this.canDecrease,
+    required this.canIncrease,
+    required this.showSlide,
+    required this.parsed,
+    required this.numeric,
+    required this.colors,
+    required this.controller,
+    required this.focusNode,
+    required this.enabled,
+    required this.max,
+    required this.decreaseTooltip,
+    required this.increaseTooltip,
+    required this.onChanged,
+    required this.onDecrease,
+    required this.onIncrease,
+  });
+
+  final double controlHeight;
+  final bool canDecrease;
+  final bool canIncrease;
+  final bool showSlide;
+  final int? parsed;
+  final TextStyle numeric;
+  final AppColors colors;
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool enabled;
+  final int max;
+  final String decreaseTooltip;
+  final String increaseTooltip;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onDecrease;
+  final VoidCallback onIncrease;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: BoxConstraints.tightFor(height: controlHeight),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(context.appRadius.container),
+          border: Border.all(
+            color: colors.hairline,
+            width: context.appBorders.hairline,
+          ),
+        ),
+        child: Row(
+          children: [
+            AppIconButton(
+              icon: AppIcons.remove,
+              tooltip: decreaseTooltip,
+              size: AppIconButtonSize.small,
+              onPressed: canDecrease ? onDecrease : null,
+            ),
+            Expanded(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  TextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    enabled: enabled,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    inputFormatters: [AppPositiveIntFormatter(max: max)],
+                    style: numeric.copyWith(
+                      color: showSlide ? Colors.transparent : colors.ink100,
+                    ),
+                    cursorColor: colors.ink100,
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      counterText: '',
+                    ),
+                    onChanged: onChanged,
+                  ),
+                  if (showSlide)
+                    IgnorePointer(
+                      child: AppSlidingNumber(
+                        value: parsed!,
+                        style: numeric,
+                      ),
+                    ),
+                ],
               ),
             ),
-          ),
-          if (error != null) ...[
-            SizedBox(height: spacing.xxs + 2),
-            AppFieldError(message: error),
+            AppIconButton(
+              icon: AppIcons.add,
+              tooltip: increaseTooltip,
+              size: AppIconButtonSize.small,
+              onPressed: canIncrease ? onIncrease : null,
+            ),
           ],
-        ],
+        ),
       ),
     );
   }

@@ -17,6 +17,7 @@ class AppIconButton extends StatelessWidget {
     required this.onPressed,
     this.tone,
     this.filled = false,
+    this.outlined = false,
     this.selected = false,
     this.badge = false,
     this.badgeTone = AppStatusTone.danger,
@@ -40,6 +41,10 @@ class AppIconButton extends StatelessWidget {
 
   /// Gives the button a tinted fill, for a primary toolbar action.
   final bool filled;
+
+  /// Draws a hairline outline, for a quiet toolbar action that sits
+  /// beside a primary button and should read as a control.
+  final bool outlined;
 
   /// Marks the control as the active choice — a toggled view switch.
   final bool selected;
@@ -84,6 +89,7 @@ class AppIconButton extends StatelessWidget {
               ? (resolvedTone ?? AppStatusTone.brand).background(context)
               : Colors.transparent,
           borderRadius: radius,
+          border: outlined ? Border.all(color: colors.hairline) : null,
         ),
         child: AppIcon(icon, size: metrics.icon, color: foreground),
       ),

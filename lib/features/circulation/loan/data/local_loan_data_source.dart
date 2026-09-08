@@ -153,27 +153,32 @@ LIMIT ? OFFSET ?
         '${today.day.toString().padLeft(2, '0')}';
   }
 
-  Loan _mapRow(QueryRow row) => Loan(
-    id: row.read<String>('id'),
-    copyId: row.read<String>('copy_id'),
-    memberId: row.read<String>('member_id'),
-    checkedOutAt: row.read<DateTime>('checked_out_at'),
-    dueAt: row.read<DateTime>('due_at'),
-    returnedAt: row.readNullable<DateTime>('returned_at'),
-    renewalCount: row.read<int>('renewal_count'),
-    returnCondition: row.readNullable<CopyCondition>('return_condition'),
-    checkedOutByStaffId: row.readNullable<String>('checked_out_by_staff_id'),
-    returnedByStaffId: row.readNullable<String>('returned_by_staff_id'),
-    ruleLoanPeriodDays: row.read<int>('rule_loan_period_days'),
-    ruleFinePerDay: Money(row.read<int>('rule_fine_per_day')),
-    ruleGraceDays: row.read<int>('rule_grace_days'),
-    ruleMaximumFine: Money(row.read<int>('rule_maximum_fine')),
-    createdAt: row.read<DateTime>('created_at'),
-    barcode: row.read<String>('barcode'),
-    titleId: row.read<String>('title_id'),
-    titleName: row.read<String>('title_name'),
-    memberName: row.read<String>('member_name'),
-  );
+  Loan _mapRow(QueryRow row) {
+    final returnRaw = row.readNullable<String>('return_condition');
+    return Loan(
+      id: row.read<String>('id'),
+      copyId: row.read<String>('copy_id'),
+      memberId: row.read<String>('member_id'),
+      checkedOutAt: row.read<DateTime>('checked_out_at'),
+      dueAt: DateTime.parse(row.read<String>('due_at')),
+      returnedAt: row.readNullable<DateTime>('returned_at'),
+      renewalCount: row.read<int>('renewal_count'),
+      returnCondition: returnRaw == null
+          ? null
+          : CopyCondition.values.byName(returnRaw),
+      checkedOutByStaffId: row.readNullable<String>('checked_out_by_staff_id'),
+      returnedByStaffId: row.readNullable<String>('returned_by_staff_id'),
+      ruleLoanPeriodDays: row.read<int>('rule_loan_period_days'),
+      ruleFinePerDay: Money(row.read<int>('rule_fine_per_day')),
+      ruleGraceDays: row.read<int>('rule_grace_days'),
+      ruleMaximumFine: Money(row.read<int>('rule_maximum_fine')),
+      createdAt: row.read<DateTime>('created_at'),
+      barcode: row.read<String>('barcode'),
+      titleId: row.read<String>('title_id'),
+      titleName: row.read<String>('title_name'),
+      memberName: row.read<String>('member_name'),
+    );
+  }
 
   @override
   Future<Loan?> findLoanById(String id) => guardDatabase(

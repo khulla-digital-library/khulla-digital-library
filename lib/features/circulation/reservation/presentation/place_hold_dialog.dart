@@ -40,7 +40,7 @@ class PlaceHoldDialog extends StatelessWidget {
         if (state.isLoading) {
           return AppFormModal(
             title: l10n.placeHoldHeading,
-            width: AppDialogWidth.lg,
+            width: AppDialogWidth.xxxl,
             actions: const [],
             children: const [Center(child: AppSpinner())],
           );
@@ -80,7 +80,7 @@ class _PlaceHoldBody extends StatelessWidget {
 
     return AppFormModal(
       title: l10n.placeHoldHeading,
-      width: AppDialogWidth.lg,
+      width: AppDialogWidth.xxxl,
       actions: [
         AppDialog.secondaryAction(
           context: context,
