@@ -15,6 +15,7 @@ import 'package:khulla/features/members/data/member_type_local_data_source.dart'
 import 'package:khulla/features/members/domain/member_repository.dart';
 import 'package:khulla/features/members/domain/models/member_query.dart';
 import 'package:khulla/features/settings/domain/loan_rules_repository.dart';
+import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 
 /// The check-out desk: member lookup, copy basket and loan creation.
 ///
@@ -30,6 +31,7 @@ class CheckOutCubit extends Cubit<CheckOutState> {
     this._memberRepository,
     this._loanRulesRepository,
     this._memberTypes,
+    this._auth,
   ) : super(const CheckOutState());
 
   final CirculationRepository _circulationRepository;
@@ -37,6 +39,7 @@ class CheckOutCubit extends Cubit<CheckOutState> {
   final MemberRepository _memberRepository;
   final LoanRulesRepository _loanRulesRepository;
   final MemberTypeLocalDataSource _memberTypes;
+  final AuthCubit _auth;
 
   Timer? _memberLookupTimer;
 
@@ -168,13 +171,12 @@ class CheckOutCubit extends Cubit<CheckOutState> {
 
     emit(state.copyWith(isSubmitting: true, error: null));
     try {
-      for (final copy in state.basket) {
-        await _circulationRepository.checkOutCopy(
-          memberId: member.id,
-          barcode: copy.barcode,
-        );
-        if (isClosed) return;
-      }
+      await _circulationRepository.checkOutCopies(
+        memberId: member.id,
+        barcodes: state.basket.map((copy) => copy.barcode).toList(),
+        staffId: _auth.state.staff?.id,
+      );
+      if (isClosed) return;
       emit(const CheckOutState());
     } on AppException catch (error) {
       if (isClosed) return;

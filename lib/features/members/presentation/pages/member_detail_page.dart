@@ -11,6 +11,7 @@ import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/presentation/cubit/member_detail_cubit.dart';
 import 'package:khulla/features/members/presentation/cubit/member_detail_state.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
+import 'package:khulla/features/members/presentation/pages/charge_fine_dialog.dart';
 import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/features/members/presentation/widgets/member_detail_header.dart';
 import 'package:khulla/features/members/presentation/widgets/member_fines_card.dart';
@@ -100,6 +101,78 @@ class MemberDetailPage extends StatelessWidget {
     }
   }
 
+  Future<void> _waiveFine(BuildContext context, Fine fine) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.finesWaiveTitle,
+      message: l10n.finesWaiveBody,
+      confirmLabel: l10n.finesWaive,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!context.mounted || !confirmed) return;
+    try {
+      await context.read<MemberDetailCubit>().waiveFine(memberId, fine.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.finesWaiveSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _chargeFine(BuildContext context) async {
+    final l10n = context.l10n;
+    final result = await ChargeFineDialog.show(context);
+    if (result == null || !context.mounted) return;
+    try {
+      await context.read<MemberDetailCubit>().chargeFine(
+        memberId,
+        result.reason,
+        result.amount,
+        result.note,
+      );
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.finesChargeSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _unsuspendMembership(BuildContext context) async {
+    final l10n = context.l10n;
+    try {
+      await context.read<MemberDetailCubit>().unsuspendMember(memberId);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailUnsuspendSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _archiveMember(BuildContext context) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.memberDetailArchiveTitle,
+      message: l10n.memberDetailArchiveBody,
+      confirmLabel: l10n.memberDetailArchive,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!context.mounted || !confirmed) return;
+    try {
+      await context.read<MemberDetailCubit>().archiveMember(memberId);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailArchiveSuccess);
+      context.go(Routes.members);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
   Future<void> _renewMembership(BuildContext context) async {
     final l10n = context.l10n;
     try {
@@ -174,6 +247,8 @@ class MemberDetailPage extends StatelessWidget {
         final finesCard = MemberFinesCard(
           fines: state.fines,
           onCollect: (fine) => unawaited(_collectFine(context, fine)),
+          onWaive: (fine) => unawaited(_waiveFine(context, fine)),
+          onCharge: () => unawaited(_chargeFine(context)),
         );
         final detailsCard = _MemberDetailsCard(member: member);
 
@@ -192,7 +267,9 @@ class MemberDetailPage extends StatelessWidget {
                   children: [
                     MemberDetailHeader(
                       member: member,
-                      onCheckOut: () => context.go(Routes.circulationCheckOut),
+                      onCheckOut: () => context.go(
+                        Routes.circulationCheckOutForMember(member.cardNumber),
+                      ),
                       menuActions: [
                         AppMenuAction(
                           label: l10n.memberDetailEdit,
@@ -205,11 +282,25 @@ class MemberDetailPage extends StatelessWidget {
                           onSelected: () =>
                               unawaited(_renewMembership(context)),
                         ),
+                        if (member.suspendedAt != null)
+                          AppMenuAction(
+                            label: l10n.memberDetailUnsuspend,
+                            icon: AppIcons.restore,
+                            onSelected: () =>
+                                unawaited(_unsuspendMembership(context)),
+                          )
+                        else
+                          AppMenuAction(
+                            label: l10n.memberDetailSuspend,
+                            icon: AppIcons.blocked,
+                            onSelected: () =>
+                                unawaited(_suspendMembership(context)),
+                          ),
                         AppMenuAction(
-                          label: l10n.memberDetailSuspend,
-                          icon: AppIcons.blocked,
-                          onSelected: () =>
-                              unawaited(_suspendMembership(context)),
+                          label: l10n.memberDetailArchive,
+                          icon: AppIcons.delete,
+                          isDestructive: true,
+                          onSelected: () => unawaited(_archiveMember(context)),
                         ),
                         AppMenuAction(
                           label: l10n.memberDetailDelete,

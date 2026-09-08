@@ -8,6 +8,7 @@ import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/circulation/fine/data/fine_local_data_source.dart';
+import 'package:khulla/features/circulation/fine/data/mappers/fine_row_mappers.dart';
 import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
 import 'package:khulla/features/circulation/fine/domain/models/fine_query.dart';
 import 'package:khulla/features/circulation/loan/data/loan_local_data_source.dart';
@@ -67,6 +68,28 @@ class CirculationRepositoryImpl implements CirculationRepository {
       ),
     ),
     source: '$_source.checkOutCopy',
+  );
+
+  @override
+  Future<List<Loan>> checkOutCopies({
+    required String memberId,
+    required List<String> barcodes,
+    String? staffId,
+  }) => guardDatabase(
+    () => _db.transaction(() async {
+      final loans = <Loan>[];
+      for (final barcode in barcodes) {
+        loans.add(
+          await _checkOutCopy(
+            memberId: memberId,
+            barcode: barcode.trim(),
+            staffId: staffId,
+          ),
+        );
+      }
+      return loans;
+    }),
+    source: '$_source.checkOutCopies',
   );
 
   Future<Loan> _checkOutCopy({
@@ -666,6 +689,51 @@ class CirculationRepositoryImpl implements CirculationRepository {
       return (await findFine(fineId))!;
     }),
     source: '$_source.waiveFine',
+  );
+
+  @override
+  Future<Fine> chargeFine({
+    required String memberId,
+    required FineReason reason,
+    required Money amount,
+    String? note,
+    String? staffId,
+  }) => guardDatabase(
+    () => _db.transaction(() async {
+      if (!amount.isPositive) {
+        throw const ConflictException('A charged fine must be more than zero.');
+      }
+      final memberRow = await (_db.select(
+        _db.members,
+      )..where((member) => member.id.equals(memberId))).getSingleOrNull();
+      if (memberRow == null) {
+        throw const NotFoundException('That member was not found.');
+      }
+      _rejectArchivedMember(memberRow.archivedAt);
+
+      final now = DateTime.now();
+      final id = _uuid.v4();
+      await _db
+          .into(_db.fines)
+          .insert(
+            FinesCompanion.insert(
+              id: id,
+              memberId: memberId,
+              reason: reason,
+              assessed: amount,
+              raisedAt: now,
+              createdAt: now,
+              updatedAt: now,
+              note: Value(note),
+            ),
+          );
+
+      final row = await (_db.select(
+        _db.fines,
+      )..where((fine) => fine.id.equals(id))).getSingle();
+      return row.toDomain(memberName: memberRow.fullName);
+    }),
+    source: '$_source.chargeFine',
   );
 
   @override

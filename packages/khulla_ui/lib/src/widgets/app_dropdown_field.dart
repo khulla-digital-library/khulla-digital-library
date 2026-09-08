@@ -564,6 +564,7 @@ class _DropdownMenuOverlay<T> extends StatelessWidget {
                               thumbVisibility: true,
                               child: ListView.builder(
                                 controller: scrollController,
+                                shrinkWrap: true,
                                 padding: EdgeInsets.fromLTRB(
                                   menuInset,
                                   0,

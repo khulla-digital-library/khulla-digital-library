@@ -42,6 +42,17 @@ class LocalMemberTypeDataSource implements MemberTypeLocalDataSource {
   );
 
   @override
+  Future<List<MemberType>> findAllMemberTypes() => guardDatabase(
+    () async {
+      final rows = await (_db.select(
+        _db.memberTypes,
+      )..orderBy([(type) => OrderingTerm(expression: type.sortOrder)])).get();
+      return rows.map((row) => row.toDomain()).toList();
+    },
+    source: '$_source.findAllMemberTypes',
+  );
+
+  @override
   Future<MemberType?> findMemberTypeById(String id) => guardDatabase(
     () async {
       final row = await (_db.select(
@@ -59,5 +70,36 @@ class LocalMemberTypeDataSource implements MemberTypeLocalDataSource {
       return type;
     },
     source: '$_source.insertMemberType',
+  );
+
+  @override
+  Future<MemberType> updateMemberType(MemberType type) => guardDatabase(
+    () async {
+      await _db.update(_db.memberTypes).replace(type.toCompanion());
+      return type;
+    },
+    source: '$_source.updateMemberType',
+  );
+
+  @override
+  Future<void> archiveMemberType(String id) => guardDatabase(
+    () =>
+        (_db.update(
+          _db.memberTypes,
+        )..where((type) => type.id.equals(id))).write(
+          MemberTypesCompanion(archivedAt: Value(DateTime.now())),
+        ),
+    source: '$_source.archiveMemberType',
+  );
+
+  @override
+  Future<void> unarchiveMemberType(String id) => guardDatabase(
+    () =>
+        (_db.update(
+          _db.memberTypes,
+        )..where((type) => type.id.equals(id))).write(
+          const MemberTypesCompanion(archivedAt: Value(null)),
+        ),
+    source: '$_source.unarchiveMemberType',
   );
 }

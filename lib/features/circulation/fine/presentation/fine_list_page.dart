@@ -219,7 +219,7 @@ class FineListPage extends StatelessWidget {
             AppTableColumn<Fine>(
               id: 'amount',
               label: l10n.finesColumnAmount,
-              width: 110,
+              flex: 2,
               alignment: Alignment.centerRight,
               cellBuilder: (context, fine) => Text(
                 fine.outstanding.display(),
@@ -234,7 +234,7 @@ class FineListPage extends StatelessWidget {
             AppTableColumn<Fine>(
               id: 'status',
               label: l10n.commonStatus,
-              width: 110,
+              flex: 2,
               cellBuilder: (context, fine) => AppStatusBadge(
                 dense: true,
                 label: fine.status.label(l10n),
@@ -244,7 +244,6 @@ class FineListPage extends StatelessWidget {
             AppTableColumn<Fine>(
               id: 'actions',
               label: l10n.commonActions,
-              width: 56,
               alignment: Alignment.centerRight,
               cellBuilder: (context, fine) => AppMenuButton(
                 tooltip: l10n.commonMoreActions,

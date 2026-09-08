@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/core/format/app_date_format.dart';
 import 'package:khulla/features/members/domain/member_repository.dart';
 import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/presentation/cubit/member_form_state.dart';
@@ -43,6 +44,9 @@ class MemberFormCubit extends Cubit<MemberFormState> {
   }
 
   /// Persists the member. Emits [MemberFormState.isSaving] and rethrows on failure.
+  ///
+  /// [dateOfBirthText] is the `d MMM y` display string from the form field;
+  /// blank means unknown, anything else must parse or the save is refused.
   Future<Member> saveMember({
     required String fullName,
     required String cardNumber,
@@ -57,6 +61,15 @@ class MemberFormCubit extends Cubit<MemberFormState> {
   }) async {
     emit(state.copyWith(isSaving: true, error: null));
     try {
+      final trimmedDob = dateOfBirthText?.trim();
+      final dateOfBirth = trimmedDob == null || trimmedDob.isEmpty
+          ? null
+          : AppDateFormat.display.tryParse(trimmedDob);
+      if (trimmedDob != null && trimmedDob.isNotEmpty && dateOfBirth == null) {
+        throw const InvalidInputException(
+          'That date of birth could not be read.',
+        );
+      }
       final saved = await _members.saveMember(
         id: state.existing?.id,
         fullName: fullName,
@@ -66,6 +79,7 @@ class MemberFormCubit extends Cubit<MemberFormState> {
         email: email,
         phone: phone,
         address: address,
+        dateOfBirth: dateOfBirth,
         guardian: guardian,
         notes: notes,
       );

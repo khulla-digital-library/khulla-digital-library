@@ -9,7 +9,9 @@ import 'package:khulla/features/catalog/title/presentation/title_format_list_dia
 import 'package:khulla/features/catalog/title/presentation/title_list_refresh.dart';
 import 'package:khulla/features/circulation/reservation/presentation/place_hold_dialog.dart';
 import 'package:khulla/features/circulation/reservation/presentation/reservation_list_refresh.dart';
+import 'package:khulla/features/members/presentation/member_list_refresh.dart';
 import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
+import 'package:khulla/features/members/presentation/pages/member_type_list_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -85,10 +87,20 @@ List<Widget> shellPageActions(
     _ when Routes.isUnder(location, Routes.circulationCheckOut) => const [],
     _ when Routes.isUnder(location, Routes.circulationReturn) => const [],
     _ when Routes.isUnder(location, Routes.members) => [
+      AppIconButton(
+        icon: AppIcons.idCard,
+        tooltip: l10n.membersManageCategories,
+        onPressed: () => unawaited(MemberTypeListDialog.show(context)),
+      ),
       modal(
         l10n.membersAdd,
         AppIcons.addPerson,
-        () => MemberFormDialog.show(context),
+        () async {
+          final saved = await MemberFormDialog.show(context);
+          if (saved == true) {
+            getIt<MemberListRefresh>().notifyChanged();
+          }
+        },
       ),
     ],
     _ => const [],

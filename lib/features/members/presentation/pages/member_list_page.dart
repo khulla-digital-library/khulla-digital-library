@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/core/di/injection.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/router/routes.dart';
@@ -9,6 +10,7 @@ import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/presentation/cubit/member_cubit.dart';
 import 'package:khulla/features/members/presentation/cubit/member_state.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
+import 'package:khulla/features/members/presentation/member_list_refresh.dart';
 import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/features/members/presentation/widgets/member_card.dart';
 import 'package:khulla/l10n/l10n.dart';
@@ -23,8 +25,44 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// something, who owes something, whose card has stopped working — rather
 /// than one chip per enum value. [MemberCubit] turns search, those filters,
 /// sort and paging into one query. Check-out jumps to the circulation desk.
-class MemberListPage extends StatelessWidget {
+class MemberListPage extends StatefulWidget {
   const MemberListPage({super.key});
+
+  @override
+  State<MemberListPage> createState() => _MemberListPageState();
+}
+
+class _MemberListPageState extends State<MemberListPage> {
+  @override
+  void initState() {
+    super.initState();
+    getIt<MemberListRefresh>().reload = _reload;
+  }
+
+  @override
+  void dispose() {
+    getIt<MemberListRefresh>().reload = null;
+    super.dispose();
+  }
+
+  void _reload() {
+    if (!mounted) return;
+    unawaited(context.read<MemberCubit>().loadMembers());
+  }
+
+  Future<void> _addMember() async {
+    final saved = await MemberFormDialog.show(context);
+    if (saved == true && mounted) {
+      await context.read<MemberCubit>().loadMembers();
+    }
+  }
+
+  Future<void> _editMember(Member member) async {
+    final saved = await MemberFormDialog.show(context, memberId: member.id);
+    if (saved == true && mounted) {
+      await context.read<MemberCubit>().loadMembers();
+    }
+  }
 
   Future<void> _renewMembership(BuildContext context, Member member) async {
     final l10n = context.l10n;
@@ -52,6 +90,38 @@ class MemberListPage extends StatelessWidget {
       await context.read<MemberCubit>().suspendMember(member.id);
       if (!context.mounted) return;
       AppToast.success(context, message: l10n.memberDetailSuspendSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _unsuspendMembership(BuildContext context, Member member) async {
+    final l10n = context.l10n;
+    try {
+      await context.read<MemberCubit>().unsuspendMember(member.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailUnsuspendSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _archiveMember(BuildContext context, Member member) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.memberDetailArchiveTitle,
+      message: l10n.memberDetailArchiveBody,
+      confirmLabel: l10n.memberDetailArchive,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!context.mounted || !confirmed) return;
+    try {
+      await context.read<MemberCubit>().archiveMember(member.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailArchiveSuccess);
     } on AppException catch (error) {
       if (!context.mounted) return;
       AppToast.error(context, message: error.localizedMessage(l10n));
@@ -110,7 +180,6 @@ class MemberListPage extends StatelessWidget {
       AppTableColumn<Member>(
         id: 'loans',
         label: l10n.membersColumnLoans,
-        width: 90,
         sortable: true,
         alignment: Alignment.centerRight,
         showFrom: FormFactor.medium,
@@ -127,7 +196,7 @@ class MemberListPage extends StatelessWidget {
       AppTableColumn<Member>(
         id: 'fines',
         label: l10n.membersColumnFines,
-        width: 110,
+        flex: 2,
         sortable: true,
         alignment: Alignment.centerRight,
         showFrom: FormFactor.expanded,
@@ -158,7 +227,7 @@ class MemberListPage extends StatelessWidget {
       AppTableColumn<Member>(
         id: 'status',
         label: l10n.commonStatus,
-        width: 130,
+        flex: 2,
         cellBuilder: (context, member) => AppStatusBadge(
           dense: true,
           label: member.status.label(l10n),
@@ -168,7 +237,6 @@ class MemberListPage extends StatelessWidget {
       AppTableColumn<Member>(
         id: 'actions',
         label: l10n.commonActions,
-        width: 56,
         alignment: Alignment.centerRight,
         cellBuilder: (context, member) => AppMenuButton(
           tooltip: l10n.commonMoreActions,
@@ -176,24 +244,40 @@ class MemberListPage extends StatelessWidget {
             AppMenuAction(
               label: l10n.memberDetailCheckOut,
               icon: AppIcons.scan,
-              onSelected: () => context.go(Routes.circulationCheckOut),
+              onSelected: () => context.go(
+                Routes.circulationCheckOutForMember(member.cardNumber),
+              ),
             ),
             AppMenuAction(
               label: l10n.memberDetailEdit,
               icon: AppIcons.edit,
-              onSelected: () =>
-                  MemberFormDialog.show(context, memberId: member.id),
+              onSelected: () => unawaited(_editMember(member)),
             ),
             AppMenuAction(
               label: l10n.memberDetailRenewMembership,
               icon: AppIcons.renew,
               onSelected: () => unawaited(_renewMembership(context, member)),
             ),
+            if (member.suspendedAt != null)
+              AppMenuAction(
+                label: l10n.memberDetailUnsuspend,
+                icon: AppIcons.restore,
+                onSelected: () =>
+                    unawaited(_unsuspendMembership(context, member)),
+              )
+            else
+              AppMenuAction(
+                label: l10n.memberDetailSuspend,
+                icon: AppIcons.blocked,
+                isDestructive: true,
+                onSelected: () =>
+                    unawaited(_suspendMembership(context, member)),
+              ),
             AppMenuAction(
-              label: l10n.memberDetailSuspend,
-              icon: AppIcons.blocked,
+              label: l10n.memberDetailArchive,
+              icon: AppIcons.delete,
               isDestructive: true,
-              onSelected: () => unawaited(_suspendMembership(context, member)),
+              onSelected: () => unawaited(_archiveMember(context, member)),
             ),
           ],
         ),
@@ -307,7 +391,7 @@ class MemberListPage extends StatelessWidget {
                   title: l10n.membersEmptyTitle,
                   message: l10n.membersEmptyBody,
                   actionLabel: l10n.membersAdd,
-                  onAction: () => MemberFormDialog.show(context),
+                  onAction: () => unawaited(_addMember()),
                 ),
           footer: AppPagination(
             rangeLabel: l10n.commonShowingRange(

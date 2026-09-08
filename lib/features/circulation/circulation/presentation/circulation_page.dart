@@ -98,7 +98,7 @@ class CirculationPage extends StatelessWidget {
       AppTableColumn<Loan>(
         id: 'fine',
         label: l10n.loansColumnFine,
-        width: 100,
+        flex: 2,
         sortable: true,
         alignment: Alignment.centerRight,
         showFrom: FormFactor.expanded,
@@ -117,7 +117,7 @@ class CirculationPage extends StatelessWidget {
       AppTableColumn<Loan>(
         id: 'status',
         label: l10n.commonStatus,
-        width: 120,
+        flex: 2,
         cellBuilder: (context, loan) => AppStatusBadge(
           dense: true,
           label: loan.status.label(l10n),
@@ -127,7 +127,6 @@ class CirculationPage extends StatelessWidget {
       AppTableColumn<Loan>(
         id: 'actions',
         label: l10n.commonActions,
-        width: 56,
         alignment: Alignment.centerRight,
         cellBuilder: (context, loan) => AppMenuButton(
           tooltip: l10n.commonMoreActions,

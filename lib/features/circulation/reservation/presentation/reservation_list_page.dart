@@ -142,7 +142,6 @@ class _ReservationListPageState extends State<ReservationListPage> {
             AppTableColumn<Reservation>(
               id: 'queue',
               label: l10n.reservationsColumnQueue,
-              width: 72,
               cellBuilder: (context, hold) => Text(
                 l10n.reservationsQueuePosition('${hold.queuePosition}'),
                 style: context.textTheme.bodyMedium?.copyWith(
@@ -183,7 +182,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
             AppTableColumn<Reservation>(
               id: 'status',
               label: l10n.commonStatus,
-              width: 150,
+              flex: 2,
               cellBuilder: (context, hold) => AppStatusBadge(
                 dense: true,
                 label: hold.status.label(l10n),
@@ -193,7 +192,6 @@ class _ReservationListPageState extends State<ReservationListPage> {
             AppTableColumn<Reservation>(
               id: 'actions',
               label: l10n.commonActions,
-              width: 56,
               alignment: Alignment.centerRight,
               cellBuilder: (context, hold) => AppMenuButton(
                 tooltip: l10n.commonMoreActions,

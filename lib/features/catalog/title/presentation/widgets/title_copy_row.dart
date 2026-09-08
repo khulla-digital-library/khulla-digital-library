@@ -47,7 +47,6 @@ class TitleCopyRow extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: spacing.sm),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             flex: wideMeta ? 2 : 1,

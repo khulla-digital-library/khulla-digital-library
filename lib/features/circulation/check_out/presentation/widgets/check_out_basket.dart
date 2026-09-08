@@ -89,7 +89,6 @@ class CheckOutBasket extends StatelessWidget {
                 AppTableColumn<Copy>(
                   id: 'remove',
                   label: l10n.commonActions,
-                  width: 56,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, copy) => AppIconButton(
                     icon: AppIcons.close,

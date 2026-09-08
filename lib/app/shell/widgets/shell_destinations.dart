@@ -78,6 +78,10 @@ List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
     primary: true,
     children: [
       ShellChild(
+        label: l10n.navCirculationLoans,
+        route: Routes.circulationLoans,
+      ),
+      ShellChild(
         label: l10n.navCirculationCheckOut,
         route: Routes.circulationCheckOut,
       ),

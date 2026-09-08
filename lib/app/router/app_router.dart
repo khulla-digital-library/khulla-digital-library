@@ -18,6 +18,8 @@ import 'package:khulla/features/catalog/title/presentation/title_detail_page.dar
 import 'package:khulla/features/catalog/title/presentation/title_list_page.dart';
 import 'package:khulla/features/circulation/check_out/presentation/check_out_page.dart';
 import 'package:khulla/features/circulation/check_out/presentation/cubit/check_out_cubit.dart';
+import 'package:khulla/features/circulation/circulation/presentation/circulation_page.dart';
+import 'package:khulla/features/circulation/circulation/presentation/cubit/loan_list_cubit.dart';
 import 'package:khulla/features/circulation/fine/presentation/cubit/fine_list_cubit.dart';
 import 'package:khulla/features/circulation/fine/presentation/fine_list_page.dart';
 import 'package:khulla/features/circulation/reservation/presentation/cubit/reservation_list_cubit.dart';
@@ -186,15 +188,35 @@ class AppRouter {
                 GoRoute(
                   path: Routes.circulation,
                   redirect: (_, state) => state.uri.path == Routes.circulation
-                      ? Routes.circulationCheckOut
+                      ? Routes.circulationLoans
                       : null,
                   routes: [
                     GoRoute(
-                      path: Routes.checkOutSegment,
-                      builder: (context, _) => BlocProvider<CheckOutCubit>(
-                        create: (_) => getIt<CheckOutCubit>(),
-                        child: const CheckOutPage(),
+                      path: Routes.loansSegment,
+                      builder: (context, _) => BlocProvider<LoanListCubit>(
+                        create: (_) {
+                          final cubit = getIt<LoanListCubit>();
+                          unawaited(cubit.loadOpenLoans());
+                          return cubit;
+                        },
+                        child: const CirculationPage(),
                       ),
+                    ),
+                    GoRoute(
+                      path: Routes.checkOutSegment,
+                      builder: (context, state) {
+                        final card = state.uri.queryParameters['card'];
+                        return BlocProvider<CheckOutCubit>(
+                          create: (_) {
+                            final cubit = getIt<CheckOutCubit>();
+                            if (card != null && card.isNotEmpty) {
+                              unawaited(cubit.lookupMember(card));
+                            }
+                            return cubit;
+                          },
+                          child: const CheckOutPage(),
+                        );
+                      },
                     ),
                     GoRoute(
                       path: Routes.returnsSegment,

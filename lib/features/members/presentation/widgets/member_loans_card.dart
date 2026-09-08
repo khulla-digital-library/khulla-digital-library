@@ -90,13 +90,11 @@ class MemberLoansCard extends StatelessWidget {
                 AppTableColumn<Loan>(
                   id: 'fine',
                   label: l10n.loansColumnFine,
-                  width: 100,
+                  flex: 2,
                   alignment: Alignment.centerRight,
                   showFrom: FormFactor.expanded,
                   cellBuilder: (context, loan) {
-                    final fine = isHistory
-                        ? loan.accruedFine
-                        : loan.accruedFine;
+                    final fine = loan.accruedFine;
                     return Text(
                       fine.isZero ? l10n.commonNotSet : fine.display(),
                       style: fine.isZero
@@ -110,15 +108,12 @@ class MemberLoansCard extends StatelessWidget {
                 AppTableColumn<Loan>(
                   id: 'status',
                   label: l10n.commonStatus,
-                  width: 120,
-                  cellBuilder: (context, loan) {
-                    final status = isHistory ? loan.status : loan.status;
-                    return AppStatusBadge(
-                      dense: true,
-                      label: status.label(l10n),
-                      tone: status.tone,
-                    );
-                  },
+                  flex: 2,
+                  cellBuilder: (context, loan) => AppStatusBadge(
+                    dense: true,
+                    label: loan.status.label(l10n),
+                    tone: loan.status.tone,
+                  ),
                 ),
               ],
             ),
