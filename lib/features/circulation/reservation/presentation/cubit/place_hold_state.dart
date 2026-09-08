@@ -16,6 +16,8 @@ abstract class PlaceHoldState with _$PlaceHoldState {
     @Default(<Title>[]) List<Title> titleMatches,
     Title? selectedTitle,
     @Default(false) bool isLookingUpMember,
+    @Default(<Member>[]) List<Member> memberMatches,
+    @Default('') String memberQuery,
     AppException? error,
     @Default(false) bool isSaving,
   }) = _PlaceHoldState;

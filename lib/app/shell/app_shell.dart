@@ -38,12 +38,21 @@ class AppShell extends StatelessWidget {
   /// How many sections the compact bottom bar shows before *More*.
   static const int _compactSlots = 4;
 
-  void _goBranch(int index) => navigationShell.goBranch(
-    index,
-    // Tapping the active destination returns to the top of that branch, the
-    // behaviour every tabbed app has trained people to expect.
-    initialLocation: index == navigationShell.currentIndex,
-  );
+  void _goBranch(BuildContext context, int index) {
+    final destinations = shellDestinations(context.l10n);
+    final target = index < destinations.length
+        ? destinations[index].route
+        : null;
+    navigationShell.goBranch(
+      index,
+      // Tapping the active destination returns to the top of that branch, the
+      // behaviour every tabbed app has trained people to expect. The members
+      // section always re-enters at the register: a profile left open on its
+      // stack would otherwise greet the next visit instead of the list.
+      initialLocation:
+          index == navigationShell.currentIndex || target == Routes.members,
+    );
+  }
 
   void _goRoute(BuildContext context, String route) => context.go(route);
 
@@ -98,7 +107,7 @@ class AppShell extends StatelessWidget {
           selectedIndex: index < _compactSlots ? index : _compactSlots,
           onDestinationSelected: (selected) {
             if (selected < _compactSlots) {
-              _goBranch(selected);
+              _goBranch(context, selected);
               return;
             }
             unawaited(
@@ -144,7 +153,8 @@ class AppShell extends StatelessWidget {
                   Expanded(
                     child: AppNavRail(
                       selectedIndex: navigationShell.currentIndex,
-                      onDestinationSelected: _goBranch,
+                      onDestinationSelected: (index) =>
+                          _goBranch(context, index),
                       extended: extended,
                       wrapSafeArea: false,
                       footer: ShellRailFooter(extended: extended),

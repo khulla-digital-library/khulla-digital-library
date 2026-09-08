@@ -8,8 +8,10 @@ import 'package:khulla/features/catalog/title/domain/models/title.dart'
     as catalog;
 import 'package:khulla/features/circulation/reservation/presentation/cubit/place_hold_cubit.dart';
 import 'package:khulla/features/circulation/reservation/presentation/cubit/place_hold_state.dart';
+import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
+import 'package:khulla/shared/widgets/empty_result_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Queues a member on a title.
@@ -139,6 +141,30 @@ class _PlaceHoldBody extends StatelessWidget {
               SizedBox(height: spacing.sm),
               const Center(child: AppSpinner()),
             ],
+            if (member == null &&
+                !state.isLookingUpMember &&
+                state.memberMatches.isNotEmpty) ...[
+              SizedBox(height: spacing.sm),
+              for (final match in state.memberMatches)
+                Padding(
+                  padding: EdgeInsets.only(bottom: spacing.xxs),
+                  child: _MemberPickRow(
+                    member: match,
+                    onTap: () => cubit.memberSelected(match),
+                  ),
+                ),
+            ],
+            if (member == null &&
+                !state.isLookingUpMember &&
+                state.memberMatches.isEmpty &&
+                state.memberQuery.isNotEmpty) ...[
+              SizedBox(height: spacing.sm),
+              EmptyResultView(
+                variant: AppFeedbackVariant.inline,
+                title: l10n.commonNoMatchesTitle,
+                subtitle: l10n.commonNoMatchesBody,
+              ),
+            ],
           ],
         ),
         AppFormSection(
@@ -178,6 +204,56 @@ class _PlaceHoldBody extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// One tappable member in the lookup matches.
+class _MemberPickRow extends StatelessWidget {
+  const _MemberPickRow({required this.member, required this.onTap});
+
+  final Member member;
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
+    final spacing = context.appSpacing;
+
+    return AppCard(
+      onTap: onTap,
+      child: Row(
+        children: [
+          AppAvatar(initials: member.initials),
+          SizedBox(width: spacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  member.fullName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: scheme.onSurface,
+                  ),
+                ),
+                Text(
+                  member.cardNumber,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

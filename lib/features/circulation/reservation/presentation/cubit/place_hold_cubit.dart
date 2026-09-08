@@ -10,6 +10,7 @@ import 'package:khulla/features/circulation/reservation/domain/models/reservatio
 import 'package:khulla/features/circulation/reservation/presentation/cubit/place_hold_state.dart';
 import 'package:khulla/features/circulation/shared/domain/circulation_repository.dart';
 import 'package:khulla/features/members/domain/member_repository.dart';
+import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/domain/models/member_query.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
@@ -49,44 +50,92 @@ class PlaceHoldCubit extends Cubit<PlaceHoldState> {
     _memberLookupTimer?.cancel();
     final trimmed = value.trim();
     if (trimmed.isEmpty) {
-      emit(state.copyWith(member: null, error: null));
+      emit(
+        state.copyWith(
+          member: null,
+          memberMatches: const [],
+          memberQuery: '',
+          error: null,
+        ),
+      );
       return;
     }
     _memberLookupTimer = Timer(const Duration(milliseconds: 300), () {
-      unawaited(_lookupMember(trimmed));
+      unawaited(searchMembers(trimmed));
     });
   }
 
-  void clearMember() {
-    emit(state.copyWith(member: null, error: null));
-  }
-
-  Future<void> _lookupMember(String query) async {
-    emit(state.copyWith(isLookingUpMember: true, error: null));
+  /// Searches members without selecting: an exact card-number hit selects
+  /// immediately (a scan, not typing), anything else lists matches for the
+  /// desk to pick from. Never auto-selects a name search, even a single hit.
+  Future<void> searchMembers(String query) async {
+    emit(
+      state.copyWith(
+        isLookingUpMember: true,
+        memberQuery: query.trim(),
+        error: null,
+      ),
+    );
     try {
-      var member = await _members.findMemberByCardNumber(query);
-      if (member == null) {
-        final results = await _members.findMembers(
-          MemberQuery(search: query, limit: 2),
+      final trimmed = query.trim();
+      final exact = await _members.findMemberByCardNumber(trimmed);
+      if (isClosed) return;
+      if (exact != null) {
+        emit(
+          state.copyWith(
+            member: exact,
+            memberMatches: const [],
+            isLookingUpMember: false,
+            error: null,
+          ),
         );
-        if (results.items.length == 1) {
-          member = results.items.first;
-        }
+        return;
       }
+      final results = await _members.findMembers(MemberQuery(search: trimmed));
       if (isClosed) return;
       emit(
         state.copyWith(
-          member: member,
+          member: null,
+          memberMatches: results.items,
           isLookingUpMember: false,
-          error: member == null
-              ? const NotFoundException('No member matches that lookup.')
-              : null,
+          error: null,
         ),
       );
     } on AppException catch (error) {
       if (isClosed) return;
-      emit(state.copyWith(isLookingUpMember: false, error: error));
+      emit(
+        state.copyWith(
+          member: null,
+          memberMatches: const [],
+          isLookingUpMember: false,
+          error: error,
+        ),
+      );
     }
+  }
+
+  /// Picks one member from the search matches.
+  void memberSelected(Member member) {
+    emit(
+      state.copyWith(
+        member: member,
+        memberMatches: const [],
+        memberQuery: '',
+        error: null,
+      ),
+    );
+  }
+
+  void clearMember() {
+    _memberLookupTimer?.cancel();
+    emit(
+      state.copyWith(
+        member: null,
+        memberMatches: const [],
+        memberQuery: '',
+        error: null,
+      ),
+    );
   }
 
   void titleSearchChanged(String value) {

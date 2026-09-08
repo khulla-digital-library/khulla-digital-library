@@ -596,12 +596,15 @@ class CirculationRepositoryImpl implements CirculationRepository {
     }
 
     final copyRow =
-        await (_db.select(_db.copies)..where(
-              (copy) =>
-                  copy.titleId.equals(hold.titleId) &
-                  copy.archivedAt.isNull() &
-                  copy.status.equalsValue(CopyStatus.available),
-            ))
+        await (_db.select(_db.copies)
+              ..where(
+                (copy) =>
+                    copy.titleId.equals(hold.titleId) &
+                    copy.archivedAt.isNull() &
+                    copy.status.equalsValue(CopyStatus.available),
+              )
+              ..orderBy([(copy) => OrderingTerm(expression: copy.barcode)])
+              ..limit(1))
             .getSingleOrNull();
     if (copyRow == null) {
       throw const ConflictException(

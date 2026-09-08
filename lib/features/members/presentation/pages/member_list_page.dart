@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/app/router/app_router.dart';
 import 'package:khulla/core/di/injection.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/feedback/app_toast.dart';
+import 'package:khulla/core/lifecycle/dispose_bag.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/members/domain/models/member.dart';
+import 'package:khulla/features/members/domain/models/member_query.dart';
 import 'package:khulla/features/members/presentation/cubit/member_cubit.dart';
 import 'package:khulla/features/members/presentation/cubit/member_state.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
@@ -32,22 +35,54 @@ class MemberListPage extends StatefulWidget {
   State<MemberListPage> createState() => _MemberListPageState();
 }
 
-class _MemberListPageState extends State<MemberListPage> {
+class _MemberListPageState extends State<MemberListPage> with DisposeBag {
+  late final TextEditingController _search = textController();
+  late final GoRouterDelegate _routerDelegate =
+      getIt<AppRouter>().router.routerDelegate;
+
   @override
   void initState() {
     super.initState();
     getIt<MemberListRefresh>().reload = _reload;
+    _routerDelegate.addListener(_handleRouteChange);
   }
 
   @override
   void dispose() {
+    _routerDelegate.removeListener(_handleRouteChange);
     getIt<MemberListRefresh>().reload = null;
     super.dispose();
+  }
+
+  /// Resets the list whenever the operator leaves the members section —
+  /// switching rail tabs, checking out to a member, anything that moves the
+  /// location out from under `/members`. The shell keeps every branch alive,
+  /// so without this the stale search is still sitting there on return.
+  /// Dialogs never change the location, so add/edit dialogs are unaffected.
+  void _handleRouteChange() {
+    if (!mounted) return;
+    final location = _routerDelegate.currentConfiguration.uri.toString();
+    if (Routes.isUnder(location, Routes.members)) return;
+    final cubit = context.read<MemberCubit>();
+    if (cubit.state.query == MemberQuery(limit: cubit.state.query.limit)) {
+      return;
+    }
+    _search.clear();
+    cubit.clearFilters();
   }
 
   void _reload() {
     if (!mounted) return;
     unawaited(context.read<MemberCubit>().loadMembers());
+  }
+
+  /// Opens a member's detail page from a clean list: the list cubit outlives
+  /// the push (detail is a sub-route), so the search field and its query are
+  /// cleared up front — otherwise coming back shows the stale search.
+  void _openMember(Member member) {
+    _search.clear();
+    context.read<MemberCubit>().clearFilters();
+    context.go(Routes.member(member.id));
   }
 
   Future<void> _addMember() async {
@@ -323,6 +358,7 @@ class _MemberListPageState extends State<MemberListPage> {
             search: AppSearchField(
               hintText: l10n.membersSearchHint,
               clearTooltip: l10n.commonClearSearch,
+              controller: _search,
               onChanged: cubit.searchChanged,
             ),
             filters: [
@@ -366,10 +402,10 @@ class _MemberListPageState extends State<MemberListPage> {
           columns: _columns(context, l10n),
           sort: sort,
           onSort: (next) => cubit.sortChanged(next.columnId, next.ascending),
-          onRowTap: (member) => context.go(Routes.member(member.id)),
+          onRowTap: _openMember,
           compactBuilder: (context, member) => MemberCard(
             member: member,
-            onTap: () => context.go(Routes.member(member.id)),
+            onTap: () => _openMember(member),
           ),
           emptyState: bootstrapping
               ? const Center(child: AppSpinner())
