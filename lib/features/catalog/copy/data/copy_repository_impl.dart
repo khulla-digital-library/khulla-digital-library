@@ -4,7 +4,6 @@ import 'package:khulla/features/catalog/copy/data/copy_local_data_source.dart';
 import 'package:khulla/features/catalog/copy/domain/copy_repository.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy_query.dart';
-import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:uuid/uuid.dart';
 
@@ -36,7 +35,6 @@ class CopyRepositoryImpl implements CopyRepository {
     required String titleId,
     required String titleName,
     String? shelf,
-    CopyCondition condition = CopyCondition.good,
     String? barcode,
     String? notes,
   }) async {
@@ -48,7 +46,6 @@ class CopyRepositoryImpl implements CopyRepository {
         titleId: titleId,
         titleName: titleName,
         shelf: shelf?.trim() ?? '',
-        condition: condition,
         status: CopyStatus.available,
         acquiredAt: now,
         notes: notes?.trim(),
@@ -65,7 +62,6 @@ class CopyRepositoryImpl implements CopyRepository {
   Future<Copy> updateCopyStatus(
     String id, {
     required CopyStatus status,
-    CopyCondition? condition,
   }) async {
     final existing = await _dataSource.findCopyById(id);
     if (existing == null) {
@@ -83,10 +79,7 @@ class CopyRepositoryImpl implements CopyRepository {
       );
     }
     return await _dataSource.updateCopy(
-      existing.copyWith(
-        status: status,
-        condition: condition ?? existing.condition,
-      ),
+      existing.copyWith(status: status),
     );
   }
 }

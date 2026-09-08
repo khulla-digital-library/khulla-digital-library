@@ -6,7 +6,6 @@ import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/features/catalog/copy/domain/copy_repository.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
 import 'package:khulla/features/catalog/copy/presentation/cubit/copy_form_state.dart';
-import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/title/domain/models/title.dart';
 import 'package:khulla/features/catalog/title/domain/models/title_query.dart';
 import 'package:khulla/features/catalog/title/domain/title_repository.dart';
@@ -85,7 +84,6 @@ class CopyFormCubit extends Cubit<CopyFormState> {
   /// Inserts one copy for the chosen title. Rethrows on failure.
   Future<Copy> saveCopy({
     required String shelf,
-    required CopyCondition condition,
     required String barcode,
     required String notes,
   }) async {
@@ -100,7 +98,6 @@ class CopyFormCubit extends Cubit<CopyFormState> {
         titleId: title.id,
         titleName: title.title,
         shelf: shelf.trim().isEmpty ? title.shelf : shelf.trim(),
-        condition: condition,
         barcode: barcode.trim().isEmpty ? null : barcode.trim(),
         notes: notes.trim().isEmpty ? null : notes.trim(),
       );

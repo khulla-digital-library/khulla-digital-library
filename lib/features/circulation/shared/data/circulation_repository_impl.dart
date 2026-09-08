@@ -330,7 +330,6 @@ class CirculationRepositoryImpl implements CirculationRepository {
       titleId: copyRow.titleId,
       now: now,
       today: today,
-      condition: condition,
     );
 
     return (await _loadLoanById(loanRow.id))!;
@@ -723,7 +722,6 @@ class CirculationRepositoryImpl implements CirculationRepository {
     required String titleId,
     required DateTime now,
     required DateTime today,
-    required CopyCondition condition,
   }) async {
     final nextHold =
         await (_db.select(_db.reservations)
@@ -755,7 +753,6 @@ class CirculationRepositoryImpl implements CirculationRepository {
       )..where((copy) => copy.id.equals(copyId))).write(
         CopiesCompanion(
           status: const Value(CopyStatus.reserved),
-          condition: Value(condition),
           updatedAt: Value(now),
         ),
       );
@@ -767,7 +764,6 @@ class CirculationRepositoryImpl implements CirculationRepository {
     )..where((copy) => copy.id.equals(copyId))).write(
       CopiesCompanion(
         status: const Value(CopyStatus.available),
-        condition: Value(condition),
         updatedAt: Value(now),
       ),
     );

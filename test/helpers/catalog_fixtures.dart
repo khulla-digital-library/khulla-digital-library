@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/core/money/money.dart';
-import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/catalog/title/data/local_title_format_data_source.dart';
 import 'package:khulla/features/members/data/local_member_type_data_source.dart';
@@ -86,7 +85,6 @@ Future<TitleWithCopySeed> seedTitleWithCopy(
           id: copyId,
           titleId: titleId,
           barcode: barcode,
-          condition: CopyCondition.good,
           status: CopyStatus.available,
           acquiredAt: now,
           createdAt: now,

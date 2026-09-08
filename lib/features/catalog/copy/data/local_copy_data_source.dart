@@ -6,7 +6,6 @@ import 'package:khulla/features/catalog/copy/data/copy_local_data_source.dart';
 import 'package:khulla/features/catalog/copy/data/mappers/copy_row_mappers.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy_query.dart';
-import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/settings/data/tables/library_settings.dart';
 
@@ -106,7 +105,6 @@ LIMIT ? OFFSET ?''';
       titleId: row.read<String>('title_id'),
       titleName: row.read<String>('title_name'),
       shelf: row.readNullable<String>('shelf') ?? '',
-      condition: CopyCondition.values.byName(row.read<String>('condition')),
       status: CopyStatus.values.byName(row.read<String>('status')),
       acquiredAt: row.read<DateTime>('acquired_at'),
       notes: row.readNullable<String>('notes'),

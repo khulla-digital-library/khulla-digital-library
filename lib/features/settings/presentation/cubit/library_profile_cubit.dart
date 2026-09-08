@@ -6,7 +6,7 @@ import 'package:khulla/features/settings/domain/library_settings_repository.dart
 import 'package:khulla/features/settings/presentation/cubit/library_profile_state.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
-/// Library identity settings: name, contact details and currency.
+/// Library identity settings: name, contact details, currency and barcodes.
 ///
 /// Page-scoped `@injectable` cubit. [loadProfile] is a read — failures emit
 /// into [LibraryProfileState.error]. [saveProfile] emits and rethrows.
@@ -39,6 +39,8 @@ class LibraryProfileCubit extends Cubit<LibraryProfileState> {
   Future<void> saveProfile({
     required String name,
     required AppCurrency currency,
+    required String barcodePrefix,
+    required int barcodeNextValue,
     String? email,
     String? phone,
     String? address,
@@ -53,6 +55,8 @@ class LibraryProfileCubit extends Cubit<LibraryProfileState> {
         existing.copyWith(
           name: name.trim(),
           currency: currency,
+          barcodePrefix: barcodePrefix.trim(),
+          barcodeNextValue: barcodeNextValue,
           email: _trimOrNull(email),
           phone: _trimOrNull(phone),
           address: _trimOrNull(address),

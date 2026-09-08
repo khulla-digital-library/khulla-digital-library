@@ -5,7 +5,6 @@ import 'package:injectable/injectable.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/features/catalog/copy/domain/copy_repository.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
-import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/catalog/title/domain/title_repository.dart';
 import 'package:khulla/features/catalog/title/presentation/cubit/title/title_detail_state.dart';
@@ -102,11 +101,7 @@ class TitleDetailCubit extends Cubit<TitleDetailState> {
 
   /// Marks a copy damaged and reloads the detail pane. Rethrows on failure.
   Future<void> markCopyDamaged(String titleId, Copy copy) async {
-    await _copies.updateCopyStatus(
-      copy.id,
-      status: CopyStatus.damaged,
-      condition: CopyCondition.poor,
-    );
+    await _copies.updateCopyStatus(copy.id, status: CopyStatus.damaged);
     if (isClosed) return;
     await loadTitle(titleId);
   }

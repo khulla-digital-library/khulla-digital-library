@@ -61,7 +61,7 @@ class AppDatabase extends _$AppDatabase {
   static const String _source = 'AppDatabase';
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -299,6 +299,9 @@ class AppDatabase extends _$AppDatabase {
         await m.dropColumn(schema.librarySettings, 'branch');
         await m.dropColumn(schema.titles, 'subtitle');
         await m.dropColumn(schema.titles, 'subjects');
+      },
+      from10To11: (m, schema) async {
+        await m.dropColumn(schema.copies, 'condition');
       },
     )(m, from, to);
   }

@@ -30,27 +30,34 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
   late final TextEditingController _phone = textController();
   late final TextEditingController _address = textController();
   late final TextEditingController _openingHours = textController();
+  late final TextEditingController _barcodePrefix = textController();
+  late final TextEditingController _barcodeNextValue = textController();
 
   AppCurrency _currency = AppCurrency.npr;
   LibraryProfile? _loadedProfile;
 
   void _syncFromProfile(LibraryProfile profile) {
-    if (_loadedProfile?.updatedAt == profile.updatedAt &&
-        _loadedProfile?.name == profile.name) {
-      return;
-    }
+    if (_loadedProfile?.updatedAt == profile.updatedAt) return;
     _loadedProfile = profile;
     _name.text = profile.name;
     _email.text = profile.email ?? '';
     _phone.text = profile.phone ?? '';
     _address.text = profile.address ?? '';
     _openingHours.text = profile.openingHours ?? '';
+    _barcodePrefix.text = profile.barcodePrefix;
+    _barcodeNextValue.text = '${profile.barcodeNextValue}';
     _currency = profile.currency;
   }
 
+  int? _parseInt(String text) => int.tryParse(text.trim());
+
   Future<void> _save(BuildContext context) async {
     final l10n = context.l10n;
-    if (_name.text.trim().isEmpty) {
+    final barcodeNextValue = _parseInt(_barcodeNextValue.text);
+    if (_name.text.trim().isEmpty ||
+        _barcodePrefix.text.trim().isEmpty ||
+        barcodeNextValue == null ||
+        barcodeNextValue < 1) {
       AppToast.error(context, message: l10n.validationFieldRequired);
       return;
     }
@@ -59,6 +66,8 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
       await context.read<LibraryProfileCubit>().saveProfile(
         name: _name.text,
         currency: _currency,
+        barcodePrefix: _barcodePrefix.text,
+        barcodeNextValue: barcodeNextValue,
         email: _email.text,
         phone: _phone.text,
         address: _address.text,
@@ -80,6 +89,7 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
+    const numberInput = TextInputType.number;
 
     return BlocConsumer<LibraryProfileCubit, LibraryProfileState>(
       listenWhen: (previous, current) => current.profile != previous.profile,
@@ -199,6 +209,30 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
                           setState(() => _currency = currency);
                         }
                       },
+                    ),
+                  ],
+                ),
+                SizedBox(height: spacing.lg),
+                AppFormSection(
+                  title: l10n.settingsLibraryBarcodes,
+                  description: l10n.settingsLibraryBarcodesDescription,
+                  children: [
+                    AppFormRow(
+                      children: [
+                        AppTextField(
+                          label: l10n.fieldBarcodePrefix,
+                          required: true,
+                          controller: _barcodePrefix,
+                          onChanged: (_) {},
+                        ),
+                        AppTextField(
+                          label: l10n.fieldBarcodeNextValue,
+                          required: true,
+                          controller: _barcodeNextValue,
+                          keyboardType: numberInput,
+                          onChanged: (_) {},
+                        ),
+                      ],
                     ),
                   ],
                 ),

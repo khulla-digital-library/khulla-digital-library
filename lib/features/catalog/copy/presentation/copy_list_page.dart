@@ -153,14 +153,6 @@ class _CopyListPageState extends State<CopyListPage> {
         cellBuilder: (context, copy) => Text(copy.shelf, style: muted),
       ),
       AppTableColumn<Copy>(
-        id: 'condition',
-        label: l10n.copiesColumnCondition,
-        flex: 2,
-        showFrom: FormFactor.large,
-        cellBuilder: (context, copy) =>
-            Text(copy.condition.label(l10n), style: muted),
-      ),
-      AppTableColumn<Copy>(
         id: 'borrower',
         label: l10n.copiesColumnBorrower,
         flex: 2,

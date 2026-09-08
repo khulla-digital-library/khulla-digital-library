@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/catalog/title/data/tables/titles.dart';
 
@@ -20,8 +19,6 @@ class Copies extends Table {
 
   /// When null, inherits the title's shelf location.
   TextColumn get shelf => text().nullable().withLength(max: 60)();
-
-  TextColumn get condition => textEnum<CopyCondition>()();
 
   TextColumn get status => textEnum<CopyStatus>()();
 

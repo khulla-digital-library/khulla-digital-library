@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:khulla/core/format/app_date_format.dart';
-import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 
 part 'copy.freezed.dart';
@@ -14,7 +13,6 @@ abstract class Copy with _$Copy {
     required String titleId,
     required String titleName,
     required String shelf,
-    required CopyCondition condition,
     required CopyStatus status,
     required DateTime acquiredAt,
     String? borrower,

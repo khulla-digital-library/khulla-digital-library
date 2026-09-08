@@ -8,12 +8,14 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// A title's identity block: what the work is, how it stands, and what the
 /// librarian can do with it.
 ///
-/// Secondary actions sit in the open rather than behind an overflow menu. Delete
-/// uses the destructive button variant so it reads clearly without competing
-/// with edit for emphasis; the confirm dialog still carries the full sentence.
-/// The status row is two badges at most: whether a copy can be taken off the shelf,
-/// and whether the title is reference only. Format and copy count moved into the
-/// fact line — a librarian reads them, but nobody has to act on them.
+/// Edit is the one action in the open — it is the thing a librarian reaches
+/// for most. Delete sits behind the overflow menu instead of beside Edit as a
+/// second loud button: a destructive control never shares an edge with the
+/// primary one, so a rushed click can't land on the wrong thing. The confirm
+/// dialog still carries the full sentence. The status row is two badges at
+/// most: whether a copy can be taken off the shelf, and whether the title is
+/// reference only. Format, shelf and copy count moved into the fact line — a
+/// librarian reads them, but nobody has to act on them.
 class TitleDetailHeader extends StatelessWidget {
   const TitleDetailHeader({
     required this.title,
@@ -44,6 +46,7 @@ class TitleDetailHeader extends StatelessWidget {
       ),
       facts: [
         title.formatCode.formatLabel(l10n),
+        if (title.shelf case final shelf?) l10n.titleDetailShelfFact(shelf),
         l10n.titlesCopiesOf(
           '${title.availableCount}',
           '${title.copyCount}',
@@ -63,24 +66,22 @@ class TitleDetailHeader extends StatelessWidget {
           ),
       ],
       actions: [
-        Wrap(
-          spacing: spacing.xs,
-          runSpacing: spacing.xs,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            AppButton(
-              variant: AppButtonVariant.destructive,
-              size: AppButtonSize.medium,
+        AppMenuButton(
+          tooltip: l10n.commonMoreActions,
+          actions: [
+            AppMenuAction(
+              label: l10n.titleDetailDelete,
               icon: AppIcons.delete,
-              onPressed: onDelete,
-              child: Text(l10n.titleDetailDelete),
-            ),
-            AppButton(
-              size: AppButtonSize.medium,
-              onPressed: onEdit,
-              child: Text(l10n.titleDetailEdit(title.title)),
+              isDestructive: true,
+              onSelected: onDelete,
             ),
           ],
+        ),
+        SizedBox(width: spacing.xs),
+        AppButton(
+          size: AppButtonSize.medium,
+          onPressed: onEdit,
+          child: Text(l10n.titleDetailEdit(title.title)),
         ),
       ],
     );

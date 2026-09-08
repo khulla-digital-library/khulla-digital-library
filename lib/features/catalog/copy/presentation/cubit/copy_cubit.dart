@@ -6,7 +6,6 @@ import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/features/catalog/copy/domain/copy_repository.dart';
 import 'package:khulla/features/catalog/copy/domain/models/copy_query.dart';
 import 'package:khulla/features/catalog/copy/presentation/cubit/copy_state.dart';
-import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
@@ -111,11 +110,7 @@ class CopyCubit extends Cubit<CopyState> {
 
   /// Marks a copy damaged and reloads the list. Rethrows on failure.
   Future<void> markCopyDamaged(String id) async {
-    await _repository.updateCopyStatus(
-      id,
-      status: CopyStatus.damaged,
-      condition: CopyCondition.poor,
-    );
+    await _repository.updateCopyStatus(id, status: CopyStatus.damaged);
     if (isClosed) return;
     await loadCopies();
   }

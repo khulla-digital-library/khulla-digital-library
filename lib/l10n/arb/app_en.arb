@@ -172,7 +172,7 @@
     "catalogStatAvailable": "Available now",
     "catalogStatAuthors": "Authors",
     "catalogBrowseTitlesBody": "Browse, add and edit the works the library catalogues.",
-    "catalogBrowseCopiesBody": "Every physical item, with its barcode, shelf and condition.",
+    "catalogBrowseCopiesBody": "Every physical item, with its barcode and shelf.",
     "catalogBrowseAuthorsBody": "People and organisations credited on a title.",
     "catalogRecentTitle": "Recently catalogued",
     "catalogRecentSubtitle": "The last works added to the shelves",
@@ -241,6 +241,62 @@
         "description": "Catalogue - first-run empty state for the titles list"
     },
     "titleDetailOverview": "Overview",
+    "titleDetailPublication": "Publication",
+    "@titleDetailPublication": {
+        "description": "Catalogue - bibliographic section on a title's detail screen"
+    },
+    "titleDetailLibrary": "In the library",
+    "@titleDetailLibrary": {
+        "description": "Catalogue - shelving and lending section on a title's detail screen"
+    },
+    "titleDetailLendable": "Lending",
+    "@titleDetailLendable": {
+        "description": "Catalogue - whether copies of this title may leave the building"
+    },
+    "titleDetailLendableYes": "May be lent",
+    "@titleDetailLendableYes": {
+        "description": "Catalogue - a title whose copies circulate"
+    },
+    "titleDetailShelfFact": "Shelf {location}",
+    "@titleDetailShelfFact": {
+        "description": "Catalogue - shelf location in a title's header fact line",
+        "placeholders": {
+            "location": {
+                "type": "String",
+                "example": "A-12"
+            }
+        }
+    },
+    "titleDetailStatAvailable": "Available",
+    "@titleDetailStatAvailable": {
+        "description": "Catalogue - copies ready to lend on a title's detail screen"
+    },
+    "titleDetailStatOnLoan": "On loan",
+    "@titleDetailStatOnLoan": {
+        "description": "Catalogue - copies currently borrowed on a title's detail screen"
+    },
+    "titleDetailStatTotal": "Total copies",
+    "@titleDetailStatTotal": {
+        "description": "Catalogue - every copy held for a title"
+    },
+    "titleDetailCopyCheckedOut": "Out to {borrower} · due {due}",
+    "@titleDetailCopyCheckedOut": {
+        "description": "Catalogue - who has a copy out on a title's detail screen",
+        "placeholders": {
+            "borrower": {
+                "type": "String",
+                "example": "Anita Rai"
+            },
+            "due": {
+                "type": "String",
+                "example": "14 Sep 2026"
+            }
+        }
+    },
+    "titleDetailStatReplacement": "Replacement cost",
+    "@titleDetailStatReplacement": {
+        "description": "Catalogue - cost to replace one lost copy"
+    },
     "titleDetailDescription": "Description",
     "titleDetailCopiesTitle": "Copies",
     "titleDetailCopiesSubtitle": "Every item of this work the library holds",
@@ -296,6 +352,8 @@
     "fieldNotes": "Notes",
     "fieldReplacementCost": "Replacement cost",
     "fieldBarcode": "Barcode",
+    "fieldBarcodePrefix": "Barcode prefix",
+    "fieldBarcodeNextValue": "Next barcode number",
     "fieldCondition": "Condition",
     "fieldAcquired": "Acquired",
     "fieldAddedOn": "Added",
@@ -690,6 +748,8 @@
     "settingsLibraryContactDescription": "Printed on overdue notices so a member knows who to call.",
     "settingsLibraryLocale": "Money and locale",
     "settingsLibraryLocaleDescription": "The currency every fine, fee and replacement cost is shown in.",
+    "settingsLibraryBarcodes": "Barcodes",
+    "settingsLibraryBarcodesDescription": "How the next copy barcode is built when staff leave the field blank on add copy.",
     "fieldLibraryName": "Library name",
     "fieldBranch": "Branch",
     "fieldOpeningHours": "Opening hours",
@@ -993,7 +1053,7 @@
     "reportsSavedCirculation": "Monthly circulation summary",
     "reportsSavedCirculationBody": "Loans, returns, renewals and overdue counts for one month.",
     "reportsSavedCollection": "Collection inventory",
-    "reportsSavedCollectionBody": "Every title and copy, with shelf location and condition.",
+    "reportsSavedCollectionBody": "Every title and copy, with shelf location.",
     "reportsSavedMembers": "Membership register",
     "reportsSavedMembersBody": "Active, expiring and suspended members with their borrowing history.",
     "reportsSavedFines": "Fine ledger",

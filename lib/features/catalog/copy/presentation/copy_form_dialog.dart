@@ -7,8 +7,6 @@ import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/lifecycle/dispose_bag.dart';
 import 'package:khulla/features/catalog/copy/presentation/cubit/copy_form_cubit.dart';
 import 'package:khulla/features/catalog/copy/presentation/cubit/copy_form_state.dart';
-import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
-import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
 import 'package:khulla/features/catalog/title/domain/models/title.dart'
     as catalog;
 import 'package:khulla/l10n/l10n.dart';
@@ -73,14 +71,12 @@ class _CopyFormBodyState extends State<_CopyFormBody> with DisposeBag {
   );
   late final TextEditingController _barcode = textController();
   late final TextEditingController _notes = textController();
-  late CopyCondition _condition = CopyCondition.good;
 
   Future<void> _save() async {
     final l10n = context.l10n;
     try {
       await context.read<CopyFormCubit>().saveCopy(
         shelf: _shelf.text,
-        condition: _condition,
         barcode: _barcode.text,
         notes: _notes.text,
       );
@@ -172,14 +168,6 @@ class _CopyFormBodyState extends State<_CopyFormBody> with DisposeBag {
                   onChanged: (_) {},
                 ),
               ],
-            ),
-            AppDropdownField<CopyCondition>(
-              label: l10n.copiesColumnCondition,
-              value: _condition,
-              items: CopyCondition.values,
-              itemLabel: (condition) => condition.label(l10n),
-              onChanged: (value) =>
-                  setState(() => _condition = value ?? _condition),
             ),
             AppTextField(
               label: l10n.fieldNotes,
