@@ -142,7 +142,6 @@
     "statusDueToday": "Due today",
     "statusLost": "Lost",
     "statusDamaged": "Damaged",
-    "statusWithdrawn": "Withdrawn",
     "statusReturned": "Returned",
     "@statusReturned": {
         "description": "Domain - standings shared by copies, loans and reservations"
@@ -1183,6 +1182,35 @@
     "labelsScanTitle": "Scan a barcode",
     "labelsScanSubtitle": "Works with a handheld scanner or the keyboard - press enter to queue it.",
     "labelsScanHint": "Barcode",
+    "labelsBulkAction": "Paste a list",
+    "labelsBulkTitle": "Paste a list of barcodes",
+    "labelsBulkSubtitle": "One barcode per line - from a spreadsheet, or an accession list.",
+    "labelsBulkHint": "9781234567890\n9789876543210",
+    "labelsBulkQueueAction": "Queue barcodes",
+    "labelsBulkAllQueued": "{count} labels queued",
+    "@labelsBulkAllQueued": {
+        "description": "Labels - toast after a pasted list is queued with every barcode matching",
+        "placeholders": {
+            "count": {
+                "type": "String",
+                "example": "12"
+            }
+        }
+    },
+    "labelsBulkPartial": "{queued} queued - {notFound} not found",
+    "@labelsBulkPartial": {
+        "description": "Labels - toast after a pasted list is queued with some barcodes unmatched",
+        "placeholders": {
+            "queued": {
+                "type": "String",
+                "example": "10"
+            },
+            "notFound": {
+                "type": "String",
+                "example": "2"
+            }
+        }
+    },
     "labelsQueueTitle": "Print queue",
     "labelsQueueSubtitle": "{count} labels queued",
     "@labelsQueueSubtitle": {

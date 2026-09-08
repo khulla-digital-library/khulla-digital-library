@@ -9,6 +9,7 @@ import 'package:khulla/features/catalog/label/domain/models/label_size.dart';
 import 'package:khulla/features/catalog/label/presentation/cubit/label_cubit.dart';
 import 'package:khulla/features/catalog/label/presentation/cubit/label_state.dart';
 import 'package:khulla/features/catalog/label/presentation/label_labels.dart';
+import 'package:khulla/features/catalog/label/presentation/widgets/label_bulk_queue_dialog.dart';
 import 'package:khulla/features/catalog/label/presentation/widgets/label_preview.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
@@ -69,9 +70,36 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
     }
   }
 
+  Future<void> _bulkQueue() async {
+    final l10n = context.l10n;
+    final result = await LabelBulkQueueDialog.show(context);
+    if (result == null || !mounted) return;
+    _scanFocus.requestFocus();
+    if (result.isComplete) {
+      if (result.queuedCount == 0) return;
+      AppToast.success(
+        context,
+        message: l10n.labelsBulkAllQueued('${result.queuedCount}'),
+      );
+    } else {
+      AppToast.warning(
+        context,
+        message: l10n.labelsBulkPartial(
+          '${result.queuedCount}',
+          '${result.notFound.length}',
+        ),
+      );
+    }
+  }
+
   Widget _scanCard(AppLocalizations l10n) => SectionCard(
     title: l10n.labelsScanTitle,
     subtitle: l10n.labelsScanSubtitle,
+    trailing: AppTextButton(
+      icon: AppIcons.bulkEntry,
+      onPressed: () => unawaited(_bulkQueue()),
+      child: Text(l10n.labelsBulkAction),
+    ),
     child: AppTextField(
       controller: _scanController,
       focusNode: _scanFocus,

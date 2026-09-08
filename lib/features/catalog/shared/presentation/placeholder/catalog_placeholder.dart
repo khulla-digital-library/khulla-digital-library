@@ -310,7 +310,7 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-8',
     titleName: 'Everest: Beyond the Limit',
     shelf: 'AV 796.522',
-    status: CopyStatus.withdrawn,
+    status: CopyStatus.available,
     acquired: '19 Jun 2024',
   ),
 ];

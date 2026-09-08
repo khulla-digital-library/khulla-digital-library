@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/features/catalog/copy/domain/copy_repository.dart';
 import 'package:khulla/features/catalog/label/data/label_sheet_printer.dart';
+import 'package:khulla/features/catalog/label/domain/models/label_bulk_queue_result.dart';
 import 'package:khulla/features/catalog/label/domain/models/label_queue_entry.dart';
 import 'package:khulla/features/catalog/label/domain/models/label_size.dart';
 import 'package:khulla/features/catalog/label/presentation/cubit/label_state.dart';
@@ -57,44 +58,91 @@ class LabelCubit extends Cubit<LabelState> {
     if (trimmed.isEmpty) return;
 
     try {
-      final copy = await _copies.findCopyByBarcode(trimmed);
-      if (isClosed) return;
-      if (copy == null) {
-        throw const NotFoundException('No copy matches that barcode.');
-      }
-      final title = await _titles.findTitle(copy.titleId);
-      if (isClosed) return;
-      final index = state.queue.indexWhere(
-        (entry) => entry.copy.id == copy.id,
-      );
-      if (index == -1) {
-        emit(
-          state.copyWith(
-            queue: [
-              ...state.queue,
-              LabelQueueEntry(copy: copy, author: title?.author),
-            ],
-            error: null,
-          ),
-        );
-      } else {
-        emit(
-          state.copyWith(
-            queue: [
-              for (final (position, entry) in state.queue.indexed)
-                if (position == index)
-                  entry.withCount(entry.count + 1)
-                else
-                  entry,
-            ],
-            error: null,
-          ),
-        );
-      }
+      await _queueOne(trimmed);
     } on AppException catch (error) {
       if (isClosed) return;
       emit(state.copyWith(error: error));
       rethrow;
+    }
+  }
+
+  /// Queues every barcode in [barcodes] — one per pasted line, for a stack of
+  /// copies that arrived with a printed accession list instead of a scanner
+  /// at hand. A barcode matching nothing is skipped and reported back rather
+  /// than aborting the rest, since one typo shouldn't cost the whole batch.
+  ///
+  /// A genuine data-layer failure still emits and rethrows, same as a single
+  /// scan — the difference is that "no copy matches" is expected here, not
+  /// exceptional.
+  Future<LabelBulkQueueResult> queueBarcodes(List<String> barcodes) async {
+    final notFound = <String>[];
+    var queuedCount = 0;
+    final seen = <String>{};
+
+    try {
+      for (final raw in barcodes) {
+        final trimmed = raw.trim();
+        if (trimmed.isEmpty || !seen.add(trimmed)) continue;
+        try {
+          await _queueOne(trimmed);
+          if (isClosed) {
+            return LabelBulkQueueResult(
+              queuedCount: queuedCount,
+              notFound: notFound,
+            );
+          }
+          queuedCount++;
+        } on NotFoundException {
+          notFound.add(trimmed);
+        }
+      }
+    } on AppException catch (error) {
+      if (isClosed) {
+        return LabelBulkQueueResult(
+          queuedCount: queuedCount,
+          notFound: notFound,
+        );
+      }
+      emit(state.copyWith(error: error));
+      rethrow;
+    }
+    return LabelBulkQueueResult(queuedCount: queuedCount, notFound: notFound);
+  }
+
+  /// Looks up [barcode] and queues it, bumping the count when it is already
+  /// queued. Throws [NotFoundException] when nothing matches.
+  Future<void> _queueOne(String barcode) async {
+    final copy = await _copies.findCopyByBarcode(barcode);
+    if (isClosed) return;
+    if (copy == null) {
+      throw const NotFoundException('No copy matches that barcode.');
+    }
+    final title = await _titles.findTitle(copy.titleId);
+    if (isClosed) return;
+    final index = state.queue.indexWhere((entry) => entry.copy.id == copy.id);
+    if (index == -1) {
+      emit(
+        state.copyWith(
+          queue: [
+            ...state.queue,
+            LabelQueueEntry(copy: copy, author: title?.author),
+          ],
+          error: null,
+        ),
+      );
+    } else {
+      emit(
+        state.copyWith(
+          queue: [
+            for (final (position, entry) in state.queue.indexed)
+              if (position == index)
+                entry.withCount(entry.count + 1)
+              else
+                entry,
+          ],
+          error: null,
+        ),
+      );
     }
   }
 

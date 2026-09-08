@@ -46,7 +46,6 @@ extension CopyStatusX on CopyStatus {
     CopyStatus.reserved => l10n.statusReserved,
     CopyStatus.lost => l10n.statusLost,
     CopyStatus.damaged => l10n.statusDamaged,
-    CopyStatus.withdrawn => l10n.statusWithdrawn,
   };
 
   AppStatusTone get tone => switch (this) {
@@ -55,7 +54,6 @@ extension CopyStatusX on CopyStatus {
     CopyStatus.reserved => AppStatusTone.info,
     CopyStatus.lost => AppStatusTone.danger,
     CopyStatus.damaged => AppStatusTone.warning,
-    CopyStatus.withdrawn => AppStatusTone.neutral,
   };
 }
 

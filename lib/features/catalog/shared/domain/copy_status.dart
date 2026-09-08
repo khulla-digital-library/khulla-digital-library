@@ -9,5 +9,4 @@ enum CopyStatus {
   reserved,
   lost,
   damaged,
-  withdrawn,
 }

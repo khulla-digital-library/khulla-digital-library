@@ -161,6 +161,9 @@ abstract final class AppIcons {
   /// Read a barcode or QR label with a scanner.
   static const AppIconSpec scan = AppIconSpec(SolarIcons.codeScan);
 
+  /// Many barcodes entered at once, typed or pasted.
+  static const AppIconSpec bulkEntry = AppIconSpec(SolarIcons.clipboardList);
+
   /// A written piece — an article, a periodical entry.
   static const AppIconSpec article = AppIconSpec(SolarIcons.documentText);
 

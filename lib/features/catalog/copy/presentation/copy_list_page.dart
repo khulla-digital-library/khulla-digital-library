@@ -185,7 +185,6 @@ class _CopyListPageState extends State<CopyListPage> {
         cellBuilder: (context, copy) => AppMenuButton(
           tooltip: l10n.commonMoreActions,
           actions: [
-            
             AppMenuAction(
               label: l10n.copiesMarkLost,
               icon: AppIcons.help,
