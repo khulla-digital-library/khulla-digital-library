@@ -183,7 +183,7 @@ class TitleDetailPage extends StatelessWidget {
 
         final copiesCard = TitleCopiesCard(
           copies: state.copies,
-          onAddCopy: () => unawaited(_addCopy(context, state)),
+          // onAddCopy: () => unawaited(_addCopy(context, state)),
           onMarkLost: (copy) => unawaited(_markCopyLost(context, copy)),
           onMarkDamaged: (copy) => unawaited(_markCopyDamaged(context, copy)),
           onWithdraw: (copy) => unawaited(_withdrawCopy(context, copy)),

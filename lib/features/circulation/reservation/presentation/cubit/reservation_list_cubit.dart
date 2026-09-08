@@ -60,7 +60,21 @@ class ReservationListCubit extends Cubit<ReservationListState> {
   }
 
   void clearFilters() {
-    emit(state.copyWith(query: const ReservationQuery()));
+    emit(
+      state.copyWith(
+        query: ReservationQuery(limit: state.query.limit),
+      ),
+    );
+    unawaited(loadReservations());
+  }
+
+  void limitChanged(int limit) {
+    if (state.query.limit == limit) return;
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(limit: limit, offset: 0),
+      ),
+    );
     unawaited(loadReservations());
   }
 

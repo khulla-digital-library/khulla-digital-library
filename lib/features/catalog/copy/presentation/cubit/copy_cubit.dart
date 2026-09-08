@@ -79,7 +79,17 @@ class CopyCubit extends Cubit<CopyState> {
   }
 
   void clearFilters() {
-    emit(state.copyWith(query: const CopyQuery()));
+    emit(state.copyWith(query: CopyQuery(limit: state.query.limit)));
+    unawaited(loadCopies());
+  }
+
+  void limitChanged(int limit) {
+    if (state.query.limit == limit) return;
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(limit: limit, offset: 0),
+      ),
+    );
     unawaited(loadCopies());
   }
 

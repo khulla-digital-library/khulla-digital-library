@@ -239,6 +239,7 @@ class MemberListPage extends StatelessWidget {
         );
 
         return CollectionPageView<Member>(
+          onPageSizeChanged: cubit.limitChanged,
           summary: l10n.membersSubtitle('${state.totalCount}'),
           toolbar: AppToolbar(
             search: AppSearchField(

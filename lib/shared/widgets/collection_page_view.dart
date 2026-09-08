@@ -1,3 +1,4 @@
+import 'package:khulla/shared/utils/collection_page_size.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The page recipe every collection screen in the app follows.
@@ -18,10 +19,16 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// makes the screen read as one heavy object; leaving them outside lets the
 /// border say exactly one thing — *here is the data*.
 ///
-/// The wrapper is a [DecoratedSliver] rather than an [AppCard] around a list,
-/// so the table inside it stays lazy. A catalogue of ten thousand titles must
-/// not lay out ten thousand rows to draw a border.
-class CollectionPageView<T> extends StatelessWidget {
+/// The wrapper is a [DecoratedBox] around the table's scroll viewport rather
+/// than a [DecoratedSliver] around its rows, so the border fills the
+/// [Expanded] slot even when the current page has fewer records than fit.
+/// The list inside stays lazy — a catalogue of ten thousand titles must not
+/// lay out ten thousand rows to draw a border.
+///
+/// Wire [onPageSizeChanged] to the list cubit's `limitChanged` so the query
+/// fetches enough rows to fill the table body. Without it the table still
+/// expands, but only the default page size of records is drawn inside it.
+class CollectionPageView<T> extends StatefulWidget {
   const CollectionPageView({
     required this.items,
     required this.columns,
@@ -36,6 +43,7 @@ class CollectionPageView<T> extends StatelessWidget {
     this.compactBuilder,
     this.compactExtent = 116,
     this.footer,
+    this.onPageSizeChanged,
     super.key,
   });
 
@@ -83,35 +91,64 @@ class CollectionPageView<T> extends StatelessWidget {
   /// The pagination footer.
   final Widget? footer;
 
+  /// Called when the viewport fits a different number of rows than before.
+  final ValueChanged<int>? onPageSizeChanged;
+
+  @override
+  State<CollectionPageView<T>> createState() => _CollectionPageViewState<T>();
+}
+
+class _CollectionPageViewState<T> extends State<CollectionPageView<T>> {
+  int? _lastReportedPageSize;
+
+  void _maybeReportPageSize(int size) {
+    final callback = widget.onPageSizeChanged;
+    if (callback == null || _lastReportedPageSize == size) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _lastReportedPageSize == size) return;
+      _lastReportedPageSize = size;
+      callback(size);
+    });
+  }
+
+  Widget _buildTableSliver() {
+    return AppSliverTable<T>(
+      items: widget.items,
+      columns: widget.columns,
+      onRowTap: widget.onRowTap,
+      isSelected: widget.isSelected,
+      sort: widget.sort,
+      onSort: widget.onSort,
+      compactBuilder: widget.compactBuilder,
+      compactExtent: widget.compactExtent,
+    );
+  }
+
+  Widget _buildTableViewport(BoxDecoration tableWrapper) {
+    if (widget.items.isEmpty) {
+      return DecoratedBox(decoration: tableWrapper, child: widget.emptyState);
+    }
+
+    return DecoratedBox(
+      decoration: tableWrapper,
+      child: CustomScrollView(slivers: [_buildTableSliver()]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
     final colors = context.appColors;
-    final bar = toolbar;
-    final end = footer;
-    final top = intro;
-    final count = summary;
+    final bar = widget.toolbar;
+    final end = widget.footer;
+    final top = widget.intro;
+    final count = widget.summary;
 
     final tableWrapper = BoxDecoration(
       borderRadius: BorderRadius.circular(context.appRadius.container),
       border: Border.all(color: colors.hairline),
     );
-
-    final table = items.isEmpty
-        ? DecoratedBox(decoration: tableWrapper, child: emptyState)
-        : DecoratedSliver(
-            decoration: tableWrapper,
-            sliver: AppSliverTable<T>(
-              items: items,
-              columns: columns,
-              onRowTap: onRowTap,
-              isSelected: isSelected,
-              sort: sort,
-              onSort: onSort,
-              compactBuilder: compactBuilder,
-              compactExtent: compactExtent,
-            ),
-          );
 
     final head = <Widget>[
       if (top != null) ...[top, SizedBox(height: spacing.lg)],
@@ -125,6 +162,8 @@ class CollectionPageView<T> extends StatelessWidget {
     // filters alone would take half of it. There the whole page scrolls, as
     // it did before.
     if (context.formFactor.isCompact) {
+      _maybeReportPageSize(kCollectionPageSizeCompact);
+
       return AppPageBody(
         wide: true,
         child: CustomScrollView(
@@ -139,13 +178,19 @@ class CollectionPageView<T> extends StatelessWidget {
               sliver: SliverMainAxisGroup(
                 slivers: [
                   for (final widget in head) SliverToBoxAdapter(child: widget),
-                  if (items.isEmpty)
+                  if (widget.items.isEmpty)
                     SliverFillRemaining(
                       hasScrollBody: false,
-                      child: table,
+                      child: DecoratedBox(
+                        decoration: tableWrapper,
+                        child: widget.emptyState,
+                      ),
                     )
                   else
-                    table,
+                    DecoratedSliver(
+                      decoration: tableWrapper,
+                      sliver: _buildTableSliver(),
+                    ),
                   if (end != null)
                     SliverToBoxAdapter(
                       child: Padding(
@@ -175,7 +220,18 @@ class CollectionPageView<T> extends StatelessWidget {
           children: [
             ...head,
             Expanded(
-              child: items.isEmpty ? table : CustomScrollView(slivers: [table]),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  _maybeReportPageSize(
+                    computeCollectionPageSize(
+                      tableBodyHeight: constraints.maxHeight,
+                      metrics: context.appMetrics,
+                    ),
+                  );
+
+                  return _buildTableViewport(tableWrapper);
+                },
+              ),
             ),
             if (end != null) ...[
               SizedBox(height: spacing.xs),

@@ -218,11 +218,17 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (state.queue.isEmpty)
-            AppEmptyView(
-              icon: AppIcons.qrCode,
-              title: l10n.labelsQueueEmptyTitle,
-              message: l10n.labelsQueueEmptyBody,
-              variant: AppFeedbackVariant.inline,
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: spacing.lg),
+              child: Center(
+                child: Text(
+                  l10n.labelsPreviewEmpty,
+                  textAlign: TextAlign.center,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: context.appColors.textMuted,
+                  ),
+                ),
+              ),
             )
           else
             Center(

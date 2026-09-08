@@ -90,7 +90,17 @@ class FineListCubit extends Cubit<FineListState> {
   }
 
   void clearFilters() {
-    emit(state.copyWith(query: const FineQuery()));
+    emit(state.copyWith(query: FineQuery(limit: state.query.limit)));
+    unawaited(loadFines());
+  }
+
+  void limitChanged(int limit) {
+    if (state.query.limit == limit) return;
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(limit: limit, offset: 0),
+      ),
+    );
     unawaited(loadFines());
   }
 

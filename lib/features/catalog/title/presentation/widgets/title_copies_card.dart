@@ -8,12 +8,11 @@ import 'package:khulla_ui/khulla_ui.dart';
 ///
 /// A short row list rather than a table: a title has a handful of copies, so
 /// column headers and a "With" column of dashes bought more chrome than
-/// clarity. Add-copy is wired through [onAddCopy]; per-copy maintenance routes
+/// clarity. Add-copy lives in the page header; per-copy maintenance routes
 /// through the three action callbacks on each [TitleCopyRow].
 class TitleCopiesCard extends StatelessWidget {
   const TitleCopiesCard({
     required this.copies,
-    required this.onAddCopy,
     required this.onMarkLost,
     required this.onMarkDamaged,
     required this.onWithdraw,
@@ -21,7 +20,6 @@ class TitleCopiesCard extends StatelessWidget {
   });
 
   final List<Copy> copies;
-  final VoidCallback onAddCopy;
   final void Function(Copy copy) onMarkLost;
   final void Function(Copy copy) onMarkDamaged;
   final void Function(Copy copy) onWithdraw;
@@ -34,12 +32,6 @@ class TitleCopiesCard extends StatelessWidget {
     return SectionCard(
       title: l10n.titleDetailCopiesTitle,
       subtitle: l10n.titleDetailCopiesSubtitle,
-      trailing: AppButton(
-        variant: AppButtonVariant.outline,
-        icon: AppIcons.add,
-        onPressed: onAddCopy,
-        child: Text(l10n.titleDetailAddCopy),
-      ),
       child: copies.isEmpty
           ? AppEmptyView(
               variant: AppFeedbackVariant.inline,

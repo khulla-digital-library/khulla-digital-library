@@ -101,7 +101,17 @@ class MemberCubit extends Cubit<MemberState> {
   void clearFilters() {
     emit(
       state.copyWith(
-        query: const MemberQuery(),
+        query: MemberQuery(limit: state.query.limit),
+      ),
+    );
+    unawaited(loadMembers());
+  }
+
+  void limitChanged(int limit) {
+    if (state.query.limit == limit) return;
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(limit: limit, offset: 0),
       ),
     );
     unawaited(loadMembers());

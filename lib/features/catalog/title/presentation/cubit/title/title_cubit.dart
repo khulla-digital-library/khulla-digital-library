@@ -86,7 +86,17 @@ class TitleCubit extends Cubit<TitleState> {
   void clearFilters() {
     emit(
       state.copyWith(
-        query: const TitleQuery(),
+        query: TitleQuery(limit: state.query.limit),
+      ),
+    );
+    unawaited(loadTitles());
+  }
+
+  void limitChanged(int limit) {
+    if (state.query.limit == limit) return;
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(limit: limit, offset: 0),
       ),
     );
     unawaited(loadTitles());

@@ -235,6 +235,7 @@ class _CopyListPageState extends State<CopyListPage> {
         );
 
         return CollectionPageView<Copy>(
+          onPageSizeChanged: cubit.limitChanged,
           summary: l10n.copiesSubtitle('${state.totalCount}'),
           toolbar: AppToolbar(
             search: AppSearchField(

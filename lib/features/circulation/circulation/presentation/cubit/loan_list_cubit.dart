@@ -93,7 +93,17 @@ class LoanListCubit extends Cubit<LoanListState> {
   void clearFilters() {
     emit(
       state.copyWith(
-        query: const LoanQuery(openOnly: true),
+        query: LoanQuery(openOnly: true, limit: state.query.limit),
+      ),
+    );
+    unawaited(loadOpenLoans());
+  }
+
+  void limitChanged(int limit) {
+    if (state.query.limit == limit) return;
+    emit(
+      state.copyWith(
+        query: state.query.copyWith(limit: limit, offset: 0),
       ),
     );
     unawaited(loadOpenLoans());

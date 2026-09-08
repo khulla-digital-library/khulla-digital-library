@@ -184,6 +184,7 @@ class CirculationPage extends StatelessWidget {
         );
 
         return CollectionPageView<Loan>(
+          onPageSizeChanged: cubit.limitChanged,
           intro: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,

@@ -189,6 +189,7 @@ class _TitleListPageState extends State<TitleListPage> {
         );
 
         return CollectionPageView<catalog.Title>(
+          onPageSizeChanged: cubit.limitChanged,
           summary: l10n.titlesSubtitle('${state.totalCount}'),
           toolbar: AppToolbar(
             search: AppSearchField(

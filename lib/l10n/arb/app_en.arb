@@ -1180,9 +1180,9 @@
     "syncHistoryEmptyBody": "Once sync is configured, every snapshot is listed here with its size and outcome.",
     "labelsHeading": "Labels and barcodes",
     "labelsSubtitle": "Print spine labels and barcode stickers for copies as they are accessioned.",
-    "labelsScanTitle": "Scan or type a barcode",
-    "labelsScanSubtitle": "A handheld scanner types the barcode and presses enter - the queue below fills as you scan.",
-    "labelsScanHint": "Scan a barcode, or type one and press enter",
+    "labelsScanTitle": "Scan a barcode",
+    "labelsScanSubtitle": "Works with a handheld scanner or the keyboard - press enter to queue it.",
+    "labelsScanHint": "Barcode",
     "labelsQueueTitle": "Print queue",
     "labelsQueueSubtitle": "{count} labels queued",
     "@labelsQueueSubtitle": {
@@ -1212,6 +1212,7 @@
     "labelsIncludeLibrary": "Print the library name",
     "labelsPreviewTitle": "Preview",
     "labelsPreviewSubtitle": "One sticker, at the chosen size",
+    "labelsPreviewEmpty": "Queue a copy to see its label here.",
     "labelsPrint": "Print sheet",
     "labelsPrintSuccess": "{count} labels sent to the printer",
     "@labelsPrintSuccess": {

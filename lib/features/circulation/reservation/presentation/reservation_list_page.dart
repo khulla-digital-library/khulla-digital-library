@@ -111,6 +111,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
         final isFiltered = _isFiltered(state);
 
         return CollectionPageView<Reservation>(
+          onPageSizeChanged: cubit.limitChanged,
           summary: l10n.reservationsSubtitle,
           toolbar: AppToolbar(
             search: AppSearchField(

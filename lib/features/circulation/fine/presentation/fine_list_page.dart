@@ -116,6 +116,7 @@ class FineListPage extends StatelessWidget {
         final isFiltered = _isFiltered(state);
 
         return CollectionPageView<Fine>(
+          onPageSizeChanged: cubit.limitChanged,
           summary: l10n.finesSubtitle,
           intro: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
