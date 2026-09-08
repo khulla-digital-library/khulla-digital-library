@@ -81,7 +81,7 @@ class _TitleListPageState extends State<TitleListPage> {
       AppTableColumn<catalog.Title>(
         id: 'title',
         label: l10n.titlesColumnTitle,
-        flex: 3,
+        flex: 4,
         sortable: true,
         cellBuilder: (context, title) => Row(
           children: [
@@ -106,7 +106,7 @@ class _TitleListPageState extends State<TitleListPage> {
       AppTableColumn<catalog.Title>(
         id: 'isbn',
         label: l10n.titlesColumnIsbn,
-        width: 152,
+        flex: 2,
         cellBuilder: (context, title) =>
             Text(_displayOrDash(title.isbn), style: isbnStyle),
       ),
@@ -122,7 +122,6 @@ class _TitleListPageState extends State<TitleListPage> {
         id: 'year',
         label: l10n.titlesColumnYear,
         sortable: true,
-        alignment: Alignment.centerRight,
         cellBuilder: (context, title) => Text(_displayOrDash(title.year)),
       ),
       AppTableColumn<catalog.Title>(
@@ -130,7 +129,6 @@ class _TitleListPageState extends State<TitleListPage> {
         flex: 2,
         label: l10n.titlesColumnAvailable,
         sortable: true,
-        alignment: Alignment.centerRight,
         cellBuilder: (context, title) => Text(
           l10n.titlesCopiesOf(
             '${title.availableCount}',
@@ -142,10 +140,9 @@ class _TitleListPageState extends State<TitleListPage> {
       AppTableColumn<catalog.Title>(
         id: 'status',
         label: l10n.commonStatus,
-        width: 125,
+        alignment: Alignment.centerRight,
         cellBuilder: (context, title) => AppStatusBadge(
           dense: true,
-          showDot: false,
           label: title.availableCount > 0
               ? l10n.statusAvailable
               : l10n.statusOnLoan,

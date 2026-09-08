@@ -63,7 +63,6 @@ class TitleHistoryCard extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, loan) => AppStatusBadge(
                     dense: true,
-                    showDot: false,
                     label: loan.isOpen
                         ? l10n.statusOnLoan
                         : l10n.statusReturned,

@@ -139,7 +139,7 @@ class _CopyListPageState extends State<CopyListPage> {
       AppTableColumn<Copy>(
         id: 'title',
         label: l10n.copiesColumnTitle,
-        flex: 4,
+        flex: 3,
         sortable: true,
         showFrom: FormFactor.medium,
         cellBuilder: (context, copy) => Text(copy.titleName),
@@ -162,23 +162,30 @@ class _CopyListPageState extends State<CopyListPage> {
       ),
       AppTableColumn<Copy>(
         id: 'status',
+        flex: 2,
         label: l10n.commonStatus,
-        width: 130,
         cellBuilder: (context, copy) => CopyStatusBadge(status: copy.status),
+      ),
+      AppTableColumn<Copy>(
+        id: 'notes',
+        label: l10n.fieldNotes,
+        flex: 2,
+        showFrom: FormFactor.large,
+        cellBuilder: (context, copy) => Text(
+          copy.notes ?? l10n.commonNotSet,
+          style: muted,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
       AppTableColumn<Copy>(
         id: 'actions',
         label: l10n.commonActions,
-        width: 56,
         alignment: Alignment.centerRight,
         cellBuilder: (context, copy) => AppMenuButton(
           tooltip: l10n.commonMoreActions,
           actions: [
-            AppMenuAction(
-              label: l10n.commonOpen,
-              icon: AppIcons.openExternal,
-              onSelected: () => context.go(Routes.catalogTitle(copy.titleId)),
-            ),
+            
             AppMenuAction(
               label: l10n.copiesMarkLost,
               icon: AppIcons.help,

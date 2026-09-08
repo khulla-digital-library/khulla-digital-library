@@ -12,19 +12,16 @@ class CopyStatusBadge extends StatelessWidget {
   const CopyStatusBadge({
     required this.status,
     this.dense = true,
-    this.showDot = true,
     super.key,
   });
 
   final CopyStatus status;
   final bool dense;
-  final bool showDot;
 
   @override
   Widget build(BuildContext context) => AppStatusBadge(
     label: status.label(context.l10n),
     tone: status.tone,
     dense: dense,
-    showDot: showDot,
   );
 }

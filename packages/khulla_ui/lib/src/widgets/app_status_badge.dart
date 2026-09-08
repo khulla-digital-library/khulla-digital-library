@@ -2,9 +2,9 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// The standing pill — *Available*, *Overdue*, *Reserved*, *Active*.
 ///
-/// A quiet tag: secondary wash, hairline, ink for the label. Hue lives on a
-/// leading dot (or [icon]), not on the whole pill — a table of saturated
-/// greens and cyans reads as decoration, not as data.
+/// A quiet tag: secondary wash, hairline, ink for the label. Hue lives on an
+/// optional [icon], not on the whole pill — a table of saturated greens and
+/// cyans reads as decoration, not as data.
 ///
 /// [AppStatusTone.danger] is the exception: overdue and lost keep a red wash
 /// so an alarm still interrupts the row.
@@ -18,7 +18,6 @@ class AppStatusBadge extends StatelessWidget {
     this.tone = AppStatusTone.neutral,
     this.icon,
     this.dense = false,
-    this.showDot = true,
     super.key,
   });
 
@@ -28,15 +27,11 @@ class AppStatusBadge extends StatelessWidget {
   /// Which meaning to paint.
   final AppStatusTone tone;
 
-  /// Replaces the dot with a glyph, where one says more than a color does.
+  /// Optional leading glyph, where one says more than the label alone.
   final AppIconSpec? icon;
 
   /// Tightens the pill for use inside a table row.
   final bool dense;
-
-  /// Draws a leading dot in the status hue. On by default so meaning still
-  /// has a color channel once the pill itself is ink.
-  final bool showDot;
 
   @override
   Widget build(BuildContext context) {
@@ -70,16 +65,6 @@ class AppStatusBadge extends StatelessWidget {
                 color: mark,
               ),
               SizedBox(width: spacing.xxs),
-            ] else if (showDot) ...[
-              Container(
-                width: spacing.xxs + 1,
-                height: spacing.xxs + 1,
-                decoration: BoxDecoration(
-                  color: mark,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              SizedBox(width: spacing.xxs + 2),
             ],
             // Flexible, not bare: a badge is routinely dropped into a fixed
             // -width table column, and a min-size Row would overflow rather

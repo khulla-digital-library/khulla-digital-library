@@ -59,6 +59,7 @@ class AppMenuButton extends StatelessWidget {
     return AppIconButton(
       icon: icon,
       tooltip: tooltip,
+      size: AppIconButtonSize.small,
       onPressed: () => _openMenu(context),
     );
   }

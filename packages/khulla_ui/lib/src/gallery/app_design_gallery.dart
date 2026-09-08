@@ -552,8 +552,8 @@ class _AppDesignGalleryState extends State<AppDesignGallery> {
         AppGallerySection(
           title: 'Badges',
           note:
-              'Ink on a secondary wash; hue sits on a leading dot. Danger '
-              'keeps a red wash. 10px semibold, deliberately small.',
+              'Ink on a secondary wash; danger keeps a red wash. 10px semibold, '
+              'deliberately small.',
           children: [
             AppGalleryRow(
               label: 'tones',

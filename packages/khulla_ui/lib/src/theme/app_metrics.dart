@@ -56,7 +56,7 @@ class AppMetrics extends ThemeExtension<AppMetrics> {
     density: density,
     fieldHeight: density.pick(40, 44),
     tableHeaderHeight: density.pick(36, 40),
-    tableRowHeight: 50,
+    tableRowHeight: 51.5,
     tableCellPaddingY: 12,
     navRowHeight: density.pick(42, 46),
     iconNav: density.pick(16, 20),

@@ -11,9 +11,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// Secondary actions sit in the open rather than behind an overflow menu. Delete
 /// uses the destructive button variant so it reads clearly without competing
 /// with edit for emphasis; the confirm dialog still carries the full sentence.
-/// The status row is two badges at most: whether a copy can be taken off the shelf,
-/// and whether the title is reference only. Format and copy count moved into the
-/// fact line — a librarian reads them, but nobody has to act on them.
+/// Author, format, availability and standing share one meta row under the title
+/// so a librarian reads format, status and copy count in one pass.
 class TitleDetailHeader extends StatelessWidget {
   const TitleDetailHeader({
     required this.title,
@@ -30,38 +29,67 @@ class TitleDetailHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
+    final colors = context.appColors;
     final scheme = context.colorScheme;
     final isAvailable = title.availableCount > 0;
+    final muted = colors.mutedForeground;
+    final metaStyle = context.appTextStyles.body.copyWith(color: muted);
 
     return RecordHeader(
       title: title.title,
-      subtitle: Text(
-        title.author,
-        style: context.textTheme.bodyMedium?.copyWith(
-          color: scheme.primary,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      facts: [
-        title.formatCode.formatLabel(l10n),
-        l10n.titlesCopiesOf(
-          '${title.availableCount}',
-          '${title.copyCount}',
-        ),
-      ],
-      badges: [
-        AppStatusBadge(
-          showDot: false,
-          label: isAvailable ? l10n.statusAvailable : l10n.statusOnLoan,
-          tone: isAvailable ? AppStatusTone.success : AppStatusTone.brand,
-        ),
-        if (!title.lendable)
-          AppStatusBadge(
-            showDot: false,
-            label: l10n.titlesReferenceOnly,
-            tone: AppStatusTone.warning,
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title.author,
+            style: context.appTextStyles.bodyLarge.copyWith(color: muted),
           ),
-      ],
+          SizedBox(height: spacing.sm),
+          Wrap(
+            spacing: spacing.xs,
+            runSpacing: spacing.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AppIcon(
+                    title.formatCode.formatIcon,
+                    size: context.appMetrics.iconDense,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                  SizedBox(width: spacing.xxs),
+                  Text(
+                    title.formatCode.formatLabel(l10n),
+                    style: metaStyle,
+                  ),
+                ],
+              ),
+              const _MetaDot(),
+              AppStatusBadge(
+                label: isAvailable ? l10n.statusAvailable : l10n.statusOnLoan,
+                tone: isAvailable ? AppStatusTone.success : AppStatusTone.brand,
+              ),
+              const _MetaDot(),
+              Text(
+                l10n.titlesCopiesOf(
+                  '${title.availableCount}',
+                  '${title.copyCount}',
+                ),
+                style: metaStyle,
+              ),
+              if (!title.lendable) ...[
+                const _MetaDot(),
+                AppStatusBadge(
+                  label: l10n.titlesReferenceOnly,
+                  tone: AppStatusTone.warning,
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
       actions: [
         Wrap(
           spacing: spacing.xs,
@@ -83,6 +111,20 @@ class TitleDetailHeader extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _MetaDot extends StatelessWidget {
+  const _MetaDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      '·',
+      style: context.appTextStyles.body.copyWith(
+        color: context.appColors.textMuted,
+      ),
     );
   }
 }

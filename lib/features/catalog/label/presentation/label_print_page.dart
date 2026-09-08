@@ -119,7 +119,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
                 AppTableColumn<LabelQueueEntry>(
                   id: 'title',
                   label: l10n.labelsColumnTitle,
-                  flex: 4,
+                  flex: 3,
                   showFrom: FormFactor.medium,
                   cellBuilder: (context, entry) => Text(
                     entry.copy.titleName,
@@ -138,8 +138,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
                 AppTableColumn<LabelQueueEntry>(
                   id: 'count',
                   label: l10n.labelsColumnCopies,
-                  width: 116,
-                  alignment: Alignment.centerRight,
+                  flex: 3,
                   cellBuilder: (context, entry) => _CountStepper(
                     count: entry.count,
                     onChanged: (next) => cubit.setEntryCount(entry, next),
@@ -148,11 +147,10 @@ class _LabelPrintPageState extends State<LabelPrintPage> with DisposeBag {
                 AppTableColumn<LabelQueueEntry>(
                   id: 'actions',
                   label: l10n.commonActions,
-                  width: 56,
-                  alignment: Alignment.centerRight,
                   cellBuilder: (context, entry) => AppIconButton(
                     icon: AppIcons.close,
                     tooltip: l10n.labelsRemove,
+                    size: AppIconButtonSize.small,
                     onPressed: () => cubit.removeEntry(entry),
                   ),
                 ),
@@ -372,12 +370,21 @@ class _CountStepper extends StatelessWidget {
         AppIconButton(
           icon: AppIcons.remove,
           tooltip: l10n.commonDecrease,
+          size: AppIconButtonSize.small,
           onPressed: count <= 1 ? null : () => onChanged(count - 1),
         ),
-        Text('$count', style: context.textTheme.bodyMedium),
+        SizedBox(
+          width: 28,
+          child: Text(
+            '$count',
+            textAlign: TextAlign.center,
+            style: context.textTheme.bodyMedium,
+          ),
+        ),
         AppIconButton(
           icon: AppIcons.add,
           tooltip: l10n.commonIncrease,
+          size: AppIconButtonSize.small,
           onPressed: () => onChanged(count + 1),
         ),
       ],
