@@ -4,6 +4,21 @@ An open-source library management system, built as a **local-first Flutter app**
 
 *Khulla* (खुल्ला) is Nepali for "open".
 
+## Download
+
+Ready-to-run builds are attached to every release: **[latest release](https://github.com/khulla-digital-library/khulla-digital-library/releases/latest)**.
+
+| Platform | File | How to run it |
+| --- | --- | --- |
+| Windows | `khulla-<version>-windows-x64.zip` | Unzip anywhere and run `khulla.exe`. It is a portable folder, not an installer. Windows warns about an unknown publisher because the build is unsigned — *More info* → *Run anyway*. |
+| Android | `khulla-<version>-android.apk` | Sideload it, allowing installs from your browser or file manager. |
+| Web | `khulla-<version>-web.tar.gz` | Serve the extracted folder from any static host. |
+| Linux | `khulla-<version>-linux-x64.tar.gz` | Extract and run `./khulla`. |
+
+You can also **[try it in a browser](https://khulla-digital-library.github.io/khulla-digital-library/)** — a demo with no server behind it, where the catalogue lives in that browser's storage and clearing site data wipes it.
+
+Your catalogue is a SQLite file on your own machine, so uninstalling does not delete it and nothing is uploaded anywhere. Take a backup from **Settings → Backup** before moving between machines.
+
 ## Why local-first
 
 A small library's catalogue is not big data — it is a few thousand rows that must be available at the circulation desk at 9am whether or not the internet is. Running it out of a local database means no hosting bill, no outage, no migration when a grant runs out, and no third party holding a record of who borrowed what.
@@ -14,10 +29,13 @@ The same codebase compiles to a Windows executable and to a web app, so a librar
 
 | Target | Status | SQLite backend |
 | --- | --- | --- |
-| Windows | Primary | `sqflite_common_ffi` (bundled SQLite over `dart:ffi`) |
-| Web | Primary | `sqflite_common_ffi_web` (SQLite in WebAssembly, stored in IndexedDB) |
-| Linux, macOS | Builds | `sqflite_common_ffi` |
-| Android, iOS | Builds | `sqflite` (system SQLite) |
+| Windows | Primary, released | drift on a background isolate, over bundled SQLite |
+| Web | Primary, released | drift over SQLite in WebAssembly, in a worker |
+| Android | Released | drift on a background isolate |
+| Linux | Released | drift on a background isolate |
+| macOS, iOS | Builds, not released | drift on a background isolate |
+
+Releases are built by CI for the four released targets. macOS and iOS compile from the same source but are not published — both need an Apple Developer account to produce anything a user can open. See [docs/contributing/releasing.md](./docs/contributing/releasing.md).
 
 ## Getting started
 
@@ -69,9 +87,10 @@ khulla-digital-library/
 | `make bootstrap` | Resolve dependencies across the workspace |
 | `make build` | Run code generation |
 | `make localize` | Regenerate localizations from `lib/l10n/arb/` |
-| `make check` | Format, analyze and test — run this before a PR |
+| `make check` | Format, copyright, analyze and test — run this before a PR |
+| `make ci` | The same gates CI runs, failing on unformatted code instead of rewriting it |
 | `make run-web` / `run-windows` / `run-linux` | Run the dev flavor |
-| `make build-web` / `build-windows` / `build-apk` | Release builds |
+| `make build-web` / `build-windows` / `build-linux` / `build-apk` | Release builds |
 
 ## Architecture
 
