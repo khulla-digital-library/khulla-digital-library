@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/core/format/app_date_format.dart';
 import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';

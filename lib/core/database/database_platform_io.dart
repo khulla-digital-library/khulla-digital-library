@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/core/logging/app_logger.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';

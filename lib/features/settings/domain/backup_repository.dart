@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/features/settings/domain/models/backup_info.dart';
 
 /// Export, restore and erase for the local catalogue.

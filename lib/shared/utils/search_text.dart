@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// Builds the denormalized search column for list queries.
 String buildSearchText(Iterable<String> parts) {
   final buffer = StringBuffer();

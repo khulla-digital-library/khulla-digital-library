@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/services.dart';
 
 /// Digits-only whole numbers, capped at [max], with leading zeros stripped.

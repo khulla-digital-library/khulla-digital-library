@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// One measurement in a chart: what it is, and how much of it there was.

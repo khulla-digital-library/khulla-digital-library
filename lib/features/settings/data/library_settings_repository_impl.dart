@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/money/money_format.dart';
 import 'package:khulla/features/settings/data/library_settings_local_data_source.dart';

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 // Seeds mock books (titles + copies) into a Khulla catalogue file.
 //
 // This is a scratch-data helper, not part of the app. It talks to the SQLite

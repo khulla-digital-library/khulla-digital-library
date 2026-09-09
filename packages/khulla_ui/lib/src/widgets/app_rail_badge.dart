@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// A count pinned to a rail row, e.g. overdue loans on Circulation.

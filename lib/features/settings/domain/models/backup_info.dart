@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'backup_info.freezed.dart';

@@ -1,4 +1,8 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
+import 'package:khulla_ui/src/theme/app_palette.dart';
 
 /// {@template app_swatch_picker}
 /// A row of color choices, one of them active.
@@ -11,6 +15,12 @@ import 'package:khulla_ui/khulla_ui.dart';
 ///
 /// Use for a small, fixed set of colors. Anything data-driven or longer than
 /// about a dozen belongs in a dropdown.
+///
+/// The optional last swatch is *mix your own*: give [onCustomTap] and
+/// [customLabel] and the row ends with a spectrum circle that opens whatever
+/// picker the caller wants. It sits in this widget rather than beside it so
+/// the presets and the escape hatch stay one control — the same size, the
+/// same ring, the same row.
 /// {@endtemplate}
 class AppSwatchPicker<T> extends StatelessWidget {
   /// {@macro app_swatch_picker}
@@ -20,11 +30,17 @@ class AppSwatchPicker<T> extends StatelessWidget {
     required this.itemColor,
     required this.itemLabel,
     required this.onChanged,
+    this.customColor,
+    this.customLabel,
+    this.onCustomTap,
     super.key,
-  });
+  }) : assert(
+         (customLabel == null) == (onCustomTap == null),
+         'A custom swatch needs both a label and a tap handler.',
+       );
 
-  /// The active choice.
-  final T value;
+  /// The active choice, or null while a custom color is active.
+  final T? value;
 
   /// The choices, in display order.
   final List<T> items;
@@ -37,6 +53,16 @@ class AppSwatchPicker<T> extends StatelessWidget {
 
   /// Called with the new choice.
   final ValueChanged<T> onChanged;
+
+  /// The custom color currently in use, if any. When set, the custom swatch
+  /// shows it and reads as selected; otherwise it shows the spectrum.
+  final Color? customColor;
+
+  /// The localized name of the custom swatch, shown as its tooltip.
+  final String? customLabel;
+
+  /// Opens the caller's color picker. Omit to offer presets only.
+  final VoidCallback? onCustomTap;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +78,13 @@ class AppSwatchPicker<T> extends StatelessWidget {
             label: itemLabel(item),
             selected: item == value,
             onTap: () => onChanged(item),
+          ),
+        if (onCustomTap case final onTap?)
+          _Swatch(
+            color: customColor,
+            label: customLabel!,
+            selected: customColor != null,
+            onTap: onTap,
           ),
       ],
     );
@@ -70,7 +103,9 @@ class _Swatch extends StatelessWidget {
   static const double _ring = 2;
   static const double _gap = 3;
 
-  final Color color;
+  /// The color painted, or null for the *mix your own* swatch, which shows
+  /// the spectrum instead.
+  final Color? color;
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -79,9 +114,10 @@ class _Swatch extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final motion = context.appMotion;
+    final fill = color;
     // White on a dark swatch, near-black on a pale one — the same rule the
     // brand ramp uses for the ink on a primary fill.
-    final tick = color.computeLuminance() > 0.45
+    final tick = (fill ?? colors.textHigh).computeLuminance() > 0.45
         ? colors.textHigh
         : colors.onSuccess;
 
@@ -100,14 +136,22 @@ class _Swatch extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: selected ? color : Colors.transparent,
+                color: selected
+                    ? (fill ?? colors.hairlineStrong)
+                    : Colors.transparent,
                 width: _ring,
               ),
             ),
             child: Container(
               width: _size,
               height: _size,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: fill,
+                shape: BoxShape.circle,
+                gradient: fill == null
+                    ? const SweepGradient(colors: AppPalette.hueStops)
+                    : null,
+              ),
               child: selected
                   ? Center(
                       child: AppIcon(

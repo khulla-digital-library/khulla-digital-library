@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/theme/cubit/theme_state.dart';
@@ -16,6 +19,7 @@ class ThemeCubit extends Cubit<ThemeState> {
         ThemeState(
           mode: _storage.readThemeMode(),
           brandTheme: _storage.readBrandTheme(),
+          customSeed: _storage.readCustomBrand(),
         ),
       );
 
@@ -35,8 +39,25 @@ class ThemeCubit extends Cubit<ThemeState> {
   });
 
   Future<void> setBrandTheme(AppBrandTheme brand) async {
-    if (state.brandTheme == brand) return;
-    emit(state.copyWith(brandTheme: brand));
-    await _storage.saveBrandTheme(brand);
+    if (state.brandTheme == brand && state.customSeed == null) return;
+    emit(state.copyWith(brandTheme: brand, customSeed: null));
+    await _storage.saveBrand(brand, null);
+  }
+
+  /// Adopts a color the operator mixed rather than one of the presets.
+  ///
+  /// A mixed color that lands exactly on a preset is stored as that preset —
+  /// otherwise the swatch row would show nothing selected while sitting next
+  /// to an identical color.
+  Future<void> setCustomBrand(Color seed) async {
+    for (final preset in AppBrandTheme.values) {
+      if (preset.seed == seed) {
+        await setBrandTheme(preset);
+        return;
+      }
+    }
+    if (state.customSeed == seed) return;
+    emit(state.copyWith(customSeed: seed));
+    await _storage.saveBrand(state.brandTheme, seed);
   }
 }

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 // Generates docs/database/schema.md — a Mermaid ER diagram plus per-table
 // notes — from the latest drift schema snapshot. Run with `make db-diagram`.
 //

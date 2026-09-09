@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:go_router/go_router.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
 import 'package:khulla/l10n/l10n.dart';

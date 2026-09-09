@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/features/dashboard/domain/models/dashboard_summary.dart';
 
 /// The board's figures, aggregated over the catalogue's tables.

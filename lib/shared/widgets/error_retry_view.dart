@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';

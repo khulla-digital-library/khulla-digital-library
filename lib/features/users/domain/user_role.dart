@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// What a staff account is allowed to do.
 ///
 /// Roles are a fixed set rather than a table because a library's desk has

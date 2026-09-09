@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// Centralized route paths for the app router.
 ///
 /// Navigate with `context.go(Routes.catalog)` — never a hard-coded string, so

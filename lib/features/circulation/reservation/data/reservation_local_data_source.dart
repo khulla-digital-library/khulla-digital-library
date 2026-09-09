@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/features/circulation/reservation/domain/models/reservation.dart';
 import 'package:khulla/features/circulation/reservation/domain/models/reservation_query.dart';
 

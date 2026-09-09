@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/core/money/money.dart';
 
 /// Calendar date with no time-of-day — safe for due dates and shelf expiry.

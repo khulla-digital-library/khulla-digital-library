@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/core/money/money_format.dart';
 
 /// Minor units in one major unit — paisa in a rupee, cents in a dollar.

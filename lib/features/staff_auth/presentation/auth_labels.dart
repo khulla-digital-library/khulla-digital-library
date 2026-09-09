@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/core/form/inputs/confirmed_password.dart';
 import 'package:khulla/core/form/inputs/email.dart';
 import 'package:khulla/core/form/inputs/full_name.dart';

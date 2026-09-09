@@ -21,7 +21,7 @@ Verify your setup with `make check`.
 ## Before you open a pull request
 
 ```sh
-make check      # format + analyze + test, the same three steps CI runs
+make check      # format + copyright-check + analyze + test, the same steps CI runs
 ```
 
 Analysis runs with `--fatal-infos`, so an info-level lint fails the build. Run `make fix` first — it resolves most of them automatically.
@@ -37,6 +37,7 @@ The architecture guide is [CLAUDE.md](../../CLAUDE.md) at the repository root. I
 - **No hard-coded user-facing strings.** Every label goes in `lib/l10n/arb/app_en.arb` and is read via `context.l10n`.
 - **`App`-prefixed class names are reserved** for the design system. Feature widgets take the feature's name as a prefix instead.
 - **Schema changes are append-only migrations.** Never edit a migration that has shipped — someone's catalogue was built by running exactly that SQL.
+- **Every handwritten Dart file starts with the Khulla copyright header.** `make copyright` adds it to new files; `make check` fails without it. Generated files are exempt.
 
 ## Branches and commits
 

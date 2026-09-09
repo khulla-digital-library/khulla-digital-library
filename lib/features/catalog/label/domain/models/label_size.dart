@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// The sticker stocks the library keeps on the shelf behind the desk.
 ///
 /// The millimetre sizes are the common thermal-label stocks; the logical

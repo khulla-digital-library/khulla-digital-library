@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:khulla/core/form/inputs/password.dart';
 import 'package:khulla/core/lifecycle/dispose_bag.dart';

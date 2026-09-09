@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The tinted row plus the active bar, shared by every rail item.

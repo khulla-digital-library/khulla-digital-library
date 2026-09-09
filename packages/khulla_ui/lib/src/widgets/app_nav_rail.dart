@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The side navigation for every window wider than a phone.
