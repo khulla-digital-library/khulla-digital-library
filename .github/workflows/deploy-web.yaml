@@ -1,0 +1,57 @@
+name: Deploy web demo
+
+# Publishes the web build to GitHub Pages so a library can try Khulla without
+# installing anything. It is a demo, not a service: the catalogue lives in the
+# browser's own storage, so every visitor gets their own empty library and
+# clearing site data wipes it.
+#
+# One-time setup: repository Settings → Pages → Source: "GitHub Actions".
+on:
+  push:
+    branches: [prod]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; let a newer one wait rather than cancel.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          bootstrap: pub
+
+      # Pages serves a project site from /<repo>/, so the build needs a base
+      # href to match. Routing uses the hash strategy (/#/catalog), which
+      # deep-links correctly on Pages with no rewrite rules — path URLs would
+      # need a server-side rewrite this host cannot do. See
+      # docs/architecture/decisions/0005-gorouter-for-navigation.md.
+      - name: Build
+        run: |
+          flutter build web --release \
+            -t lib/main_prod.dart \
+            --base-href "/${{ github.event.repository.name }}/"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -1,37 +1,44 @@
 name: CI
 
 on:
-  # push:
-  #   branches: [dev, prod]
-  # pull_request:
-    # branches: [dev]
+  push:
+    branches: [dev, prod]
+  pull_request:
+    branches: [dev, prod]
+  workflow_dispatch:
+
+# A new push to a pull request makes the previous run's answer irrelevant.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
+    name: Format, analyze, test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dart-lang/setup-dart@v1
+      - uses: ./.github/actions/setup-flutter
         with:
-          sdk: stable
+          bootstrap: melos
 
-      - name: Install FVM
-        run: dart pub global activate fvm
+      - name: Format, copyright, analysis, tests
+        run: make ci
 
-      - name: Add pub-cache bin to PATH
-        run: echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+  build-web:
+    name: Build web
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Bootstrap workspace
-        run: |
-          fvm install
-          make bootstrap
+      - uses: ./.github/actions/setup-flutter
+        with:
+          bootstrap: pub
 
-      - name: Generate code
-        run: make build
-
-      - name: Generate localizations
-        run: make localize
-
-      - name: Check formatting, analysis, and tests
-        run: make check
+      # Analysis does not compile — this is what catches a change that passes
+      # `dart analyze` but breaks the release build.
+      - name: Build web (prod flavor)
+        run: flutter build web --release -t lib/main_prod.dart
