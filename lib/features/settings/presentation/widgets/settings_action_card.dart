@@ -15,6 +15,7 @@ class SettingsActionCard extends StatelessWidget {
     required this.onAction,
     required this.icon,
     this.isDestructive = false,
+    this.isLoading = false,
     super.key,
   });
 
@@ -24,6 +25,10 @@ class SettingsActionCard extends StatelessWidget {
   final VoidCallback onAction;
   final AppIconSpec icon;
   final bool isDestructive;
+
+  /// Shows the action button's spinner and disables it — a card whose
+  /// action restarts the app on success has nowhere else to put that state.
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +68,7 @@ class SettingsActionCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: AppButton(
                     variant: AppButtonVariant.outline,
+                    isLoading: isLoading,
                     onPressed: onAction,
                     child: Text(actionLabel),
                   ),

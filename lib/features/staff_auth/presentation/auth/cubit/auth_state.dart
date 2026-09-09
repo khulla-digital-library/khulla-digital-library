@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/features/users/domain/models/staff_member.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 
 part 'auth_state.freezed.dart';
 
@@ -36,4 +37,12 @@ abstract class AuthState with _$AuthState {
 
   /// Whether a staff account is signed in on this device.
   bool get isSignedIn => status == AuthStatus.signedIn;
+
+  /// Whether the signed-in account's role carries [permission].
+  ///
+  /// False whenever nobody is signed in — there is no permission to lack
+  /// more safely than by lacking all of them.
+  bool hasPermission(StaffPermission permission) =>
+      staff != null &&
+      (rolePermissions[staff!.role]?.contains(permission) ?? false);
 }

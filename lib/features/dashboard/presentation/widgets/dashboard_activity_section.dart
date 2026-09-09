@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
-import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_activity_entry.dart';
-import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_placeholder.dart';
+import 'package:khulla/features/dashboard/presentation/models/dashboard_activity_entry.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_section_card.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -13,7 +12,10 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// When circulation has a table behind it, the rows come from a query and
 /// the four screen states arrive with it — the layout does not change.
 class DashboardActivitySection extends StatelessWidget {
-  const DashboardActivitySection({super.key});
+  const DashboardActivitySection({required this.entries, super.key});
+
+  /// The last few things that happened at the desk, most recent first.
+  final List<DashboardActivityEntry> entries;
 
   List<AppTableColumn<DashboardActivityEntry>> _columns(
     BuildContext context,
@@ -27,26 +29,14 @@ class DashboardActivitySection extends StatelessWidget {
         id: 'item',
         label: l10n.dashboardActivityColumnItem,
         flex: 4,
-        cellBuilder: (context, entry) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              entry.item,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: colors.textHigh,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Text(
-              entry.itemCode,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: colors.textMuted,
-              ),
-            ),
-          ],
+        cellBuilder: (context, entry) => Text(
+          entry.item,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: colors.textHigh,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
       AppTableColumn<DashboardActivityEntry>(
@@ -55,27 +45,16 @@ class DashboardActivitySection extends StatelessWidget {
         flex: 4,
         showFrom: FormFactor.medium,
         cellBuilder: (context, entry) => Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            AppAvatar(initials: entry.memberInitials, size: 28),
+            AppAvatar(initials: entry.memberInitials, size: 24),
             SizedBox(width: spacing.xs),
             Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    entry.member,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.bodyMedium,
-                  ),
-                  Text(
-                    entry.memberCode,
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: colors.textMuted,
-                    ),
-                  ),
-                ],
+              child: Text(
+                entry.member,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.bodyMedium,
               ),
             ),
           ],
@@ -123,7 +102,6 @@ class DashboardActivitySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final entries = dashboardRecentActivity();
 
     return DashboardSectionCard(
       title: l10n.dashboardActivityTitle,

@@ -1,4 +1,4 @@
-import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_ranked_entry.dart';
+import 'package:khulla/features/dashboard/presentation/models/dashboard_ranked_entry.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 

@@ -1,41 +1,38 @@
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/database/app_database.dart';
-import 'package:khulla/core/database/converters/date_only_converter.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/error/guard.dart';
 import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/circulation/fine/data/fine_local_data_source.dart';
-import 'package:khulla/features/circulation/fine/data/mappers/fine_row_mappers.dart';
 import 'package:khulla/features/circulation/fine/domain/models/fine.dart';
 import 'package:khulla/features/circulation/fine/domain/models/fine_query.dart';
 import 'package:khulla/features/circulation/loan/data/loan_local_data_source.dart';
-import 'package:khulla/features/circulation/loan/data/mappers/loan_row_mappers.dart';
 import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/features/circulation/loan/domain/models/loan_query.dart';
 import 'package:khulla/features/circulation/reservation/data/reservation_local_data_source.dart';
 import 'package:khulla/features/circulation/reservation/domain/models/reservation.dart';
 import 'package:khulla/features/circulation/reservation/domain/models/reservation_query.dart';
+import 'package:khulla/features/circulation/shared/data/circulation_copies.dart';
+import 'package:khulla/features/circulation/shared/data/circulation_fine_writes.dart';
+import 'package:khulla/features/circulation/shared/data/circulation_hold_queue.dart';
+import 'package:khulla/features/circulation/shared/data/circulation_loan_writes.dart';
+import 'package:khulla/features/circulation/shared/data/circulation_policy.dart';
 import 'package:khulla/features/circulation/shared/domain/circulation_fine.dart';
 import 'package:khulla/features/circulation/shared/domain/circulation_repository.dart';
 import 'package:khulla/features/circulation/shared/domain/fine_reason.dart';
-import 'package:khulla/features/circulation/shared/domain/models/effective_loan_rules.dart';
-import 'package:khulla/features/circulation/shared/domain/reservation_status.dart';
-import 'package:khulla/features/circulation/shared/domain/resolve_loan_rules.dart';
-import 'package:khulla/features/members/data/mappers/member_type_row_mappers.dart';
-import 'package:khulla/features/settings/data/mappers/loan_rules_row_mappers.dart';
-import 'package:khulla/features/settings/data/tables/loan_rules.dart';
-import 'package:uuid/uuid.dart';
 
 /// [CirculationRepository] over the local catalogue.
 ///
-/// Checkout, return, renew and holds run in transactions here — copy status,
-/// loan rows, fine snapshots and reservation queue stay consistent. List reads
-/// delegate to [LoanLocalDataSource], [FineLocalDataSource] and
-/// [ReservationLocalDataSource]; writes touch [AppDatabase] directly until
-/// those sources grow insert/update paths.
+/// Orchestration only: each desk write runs in one transaction here so copy
+/// status, loan rows, fine snapshots and the reservation queue stay
+/// consistent. Row writes live in transaction-scoped helpers sharing this
+/// database instance ([CirculationPolicy], [CirculationLoanWrites],
+/// [CirculationFineWrites], [CirculationHoldQueue]); list reads delegate to
+/// [LoanLocalDataSource], [FineLocalDataSource] and
+/// [ReservationLocalDataSource].
 @LazySingleton(as: CirculationRepository)
 class CirculationRepositoryImpl implements CirculationRepository {
   CirculationRepositoryImpl(
@@ -50,8 +47,11 @@ class CirculationRepositoryImpl implements CirculationRepository {
   final FineLocalDataSource _fineDataSource;
   final ReservationLocalDataSource _reservationDataSource;
 
-  static const Uuid _uuid = Uuid();
-  static const DateOnlyConverter _dates = DateOnlyConverter();
+  late final _policy = CirculationPolicy(_db);
+  late final _loanWrites = CirculationLoanWrites(_db);
+  late final _fineWrites = CirculationFineWrites(_db, _policy);
+  late final _holdQueue = CirculationHoldQueue(_db, _policy);
+
   static const String _source = 'CirculationRepositoryImpl';
 
   @override
@@ -121,11 +121,11 @@ class CirculationRepositoryImpl implements CirculationRepository {
       throw const NotFoundException('That member was not found.');
     }
 
-    final rules = await _loadEffectiveRules(memberRow.memberTypeId);
+    final rules = await _policy.loadEffectiveRules(memberRow.memberTypeId);
 
-    _rejectArchivedMember(memberRow.archivedAt);
-    _rejectSuspendedMember(memberRow.suspendedAt);
-    _rejectExpiredMember(memberRow.expiresAt, today);
+    _policy.rejectArchivedMember(memberRow.archivedAt);
+    _policy.rejectSuspendedMember(memberRow.suspendedAt);
+    _policy.rejectExpiredMember(memberRow.expiresAt, today);
 
     if (copyRow.archivedAt != null) {
       throw const ConflictException('That copy has been archived.');
@@ -138,14 +138,7 @@ class CirculationRepositoryImpl implements CirculationRepository {
     }
 
     if (copyRow.status == CopyStatus.reserved) {
-      final readyHold =
-          await (_db.select(_db.reservations)..where(
-                (hold) =>
-                    hold.readyCopyId.equals(copyRow.id) &
-                    hold.closedAt.isNull() &
-                    hold.status.equalsValue(ReservationStatus.ready),
-              ))
-              .getSingleOrNull();
+      final readyHold = await _holdQueue.findReadyHoldForCopy(copyRow.id);
       if (readyHold == null || readyHold.memberId != memberId) {
         throw const ConflictException(
           'That copy is reserved for another member.',
@@ -155,21 +148,22 @@ class CirculationRepositoryImpl implements CirculationRepository {
       throw const ConflictException('That copy is not available to borrow.');
     }
 
-    final openLoans = await _countOpenLoans(memberId);
+    final openLoans = await _loanDataSource.countOpenLoansForMember(memberId);
     if (openLoans >= rules.borrowingLimit) {
       throw const ConflictException(
         'That member has reached their borrowing limit.',
       );
     }
 
-    if (rules.blockOverdueBorrowers && await _memberHasOverdueLoans(memberId)) {
+    if (rules.blockOverdueBorrowers &&
+        await _loanDataSource.memberHasOverdueLoans(memberId)) {
       throw const ConflictException(
         'That member has overdue loans and cannot borrow.',
       );
     }
 
     if (rules.maxOutstandingFine != null) {
-      final owed = await _outstandingFines(memberId);
+      final owed = await _fineDataSource.outstandingForMember(memberId);
       if (owed > rules.maxOutstandingFine!) {
         throw const ConflictException(
           'That member owes more than the allowed outstanding fine.',
@@ -177,73 +171,34 @@ class CirculationRepositoryImpl implements CirculationRepository {
       }
     }
 
-    final firstWaiting =
-        await (_db.select(_db.reservations)
-              ..where(
-                (hold) =>
-                    hold.titleId.equals(copyRow.titleId) &
-                    hold.closedAt.isNull() &
-                    hold.status.equalsValue(ReservationStatus.waiting),
-              )
-              ..orderBy([(hold) => OrderingTerm(expression: hold.placedAt)]))
-            .getSingleOrNull();
+    final firstWaiting = await _reservationDataSource
+        .findFirstWaitingHoldForTitle(copyRow.titleId);
     if (firstWaiting != null && firstWaiting.memberId != memberId) {
       throw const ConflictException(
         'Another member has an earlier hold on this title.',
       );
     }
 
-    final loanId = _uuid.v4();
     final dueAt = addCalendarDays(today, rules.loanPeriodDays);
-
-    await _db
-        .into(_db.loans)
-        .insert(
-          LoansCompanion.insert(
-            id: loanId,
-            copyId: copyRow.id,
-            memberId: memberId,
-            checkedOutAt: now,
-            dueAt: dueAt,
-            ruleLoanPeriodDays: rules.loanPeriodDays,
-            ruleFinePerDay: rules.finePerDay,
-            ruleGraceDays: rules.graceDays,
-            ruleMaximumFine: rules.maximumFinePerCopy,
-            createdAt: now,
-            checkedOutByStaffId: Value(staffId),
-          ),
-        );
-
-    await (_db.update(
-      _db.copies,
-    )..where((copy) => copy.id.equals(copyRow.id))).write(
-      CopiesCompanion(
-        status: const Value(CopyStatus.onLoan),
-        updatedAt: Value(now),
-      ),
+    final loanId = await _loanWrites.insertCheckoutLoan(
+      copyId: copyRow.id,
+      memberId: memberId,
+      checkedOutAt: now,
+      dueAt: dueAt,
+      ruleLoanPeriodDays: rules.loanPeriodDays,
+      ruleFinePerDay: rules.finePerDay,
+      ruleGraceDays: rules.graceDays,
+      ruleMaximumFine: rules.maximumFinePerCopy,
+      staffId: staffId,
     );
 
-    final memberHold =
-        await (_db.select(_db.reservations)..where(
-              (hold) =>
-                  hold.titleId.equals(copyRow.titleId) &
-                  hold.memberId.equals(memberId) &
-                  hold.closedAt.isNull(),
-            ))
-            .getSingleOrNull();
-    if (memberHold != null) {
-      await (_db.update(
-        _db.reservations,
-      )..where((hold) => hold.id.equals(memberHold.id))).write(
-        ReservationsCompanion(
-          status: const Value(ReservationStatus.fulfilled),
-          closedAt: Value(now),
-          updatedAt: Value(now),
-        ),
-      );
-    }
+    await setCopyStatus(_db, copyRow.id, CopyStatus.onLoan);
+    await _holdQueue.fulfillMemberHold(
+      memberId: memberId,
+      titleId: copyRow.titleId,
+    );
 
-    return (await _loadLoanById(loanId))!;
+    return (await _loanDataSource.findLoanById(loanId))!;
   }
 
   @override
@@ -303,59 +258,39 @@ class CirculationRepositoryImpl implements CirculationRepository {
       throw const NotFoundException('No copy matches that barcode.');
     }
 
-    final loanRow =
-        await (_db.select(_db.loans)..where(
-              (loan) =>
-                  loan.copyId.equals(copyRow.id) & loan.returnedAt.isNull(),
-            ))
-            .getSingleOrNull();
-    if (loanRow == null) {
+    final openLoan = await _loanDataSource.findOpenLoanByCopyId(copyRow.id);
+    if (openLoan == null) {
       throw const NotFoundException('That copy is not on loan.');
     }
 
-    await (_db.update(
-      _db.loans,
-    )..where((loan) => loan.id.equals(loanRow.id))).write(
-      LoansCompanion(
-        returnedAt: Value(now),
-        returnCondition: Value(condition),
-        returnedByStaffId: Value(staffId),
-      ),
+    await _loanWrites.markLoanReturned(
+      loanId: openLoan.id,
+      condition: condition,
+      staffId: staffId,
     );
 
     final fineAmount = computeOverdueFine(
-      dueAt: loanRow.dueAt,
+      dueAt: openLoan.dueAt,
       asOf: today,
-      finePerDay: loanRow.ruleFinePerDay,
-      graceDays: loanRow.ruleGraceDays,
-      maximumFine: loanRow.ruleMaximumFine,
+      finePerDay: openLoan.ruleFinePerDay,
+      graceDays: openLoan.ruleGraceDays,
+      maximumFine: openLoan.ruleMaximumFine,
     );
 
     if (fineAmount.isPositive && !waiveFine) {
-      await _db
-          .into(_db.fines)
-          .insert(
-            FinesCompanion.insert(
-              id: _uuid.v4(),
-              memberId: loanRow.memberId,
-              loanId: Value(loanRow.id),
-              reason: FineReason.overdue,
-              assessed: fineAmount,
-              raisedAt: now,
-              createdAt: now,
-              updatedAt: now,
-            ),
-          );
+      await _fineWrites.insertOverdueFine(
+        memberId: openLoan.memberId,
+        loanId: openLoan.id,
+        amount: fineAmount,
+      );
     }
 
-    await _promoteHoldOrReleaseCopy(
+    await _holdQueue.promoteOrRelease(
       copyId: copyRow.id,
       titleId: copyRow.titleId,
-      now: now,
-      today: today,
     );
 
-    return (await _loadLoanById(loanRow.id))!;
+    return (await _loanDataSource.findLoanById(openLoan.id))!;
   }
 
   @override
@@ -365,30 +300,28 @@ class CirculationRepositoryImpl implements CirculationRepository {
   );
 
   Future<Loan> _renewLoan({required String loanId}) async {
-    final loanRow = await (_db.select(
-      _db.loans,
-    )..where((loan) => loan.id.equals(loanId))).getSingleOrNull();
-    if (loanRow == null) {
+    final loan = await _loanDataSource.findLoanById(loanId);
+    if (loan == null) {
       throw const NotFoundException('That loan was not found.');
     }
-    if (loanRow.returnedAt != null) {
+    if (loan.returnedAt != null) {
       throw const ConflictException('That loan has already been returned.');
     }
 
     final copyRow = await (_db.select(
       _db.copies,
-    )..where((copy) => copy.id.equals(loanRow.copyId))).getSingleOrNull();
+    )..where((copy) => copy.id.equals(loan.copyId))).getSingleOrNull();
     if (copyRow == null) {
       throw const NotFoundException('The copy for that loan was not found.');
     }
 
-    final rules = await _loadEffectiveRulesForMember(loanRow.memberId);
+    final rules = await _policy.loadEffectiveRulesForMember(loan.memberId);
 
-    if (loanRow.renewalCount >= rules.renewalLimit) {
+    if (loan.renewalCount >= rules.renewalLimit) {
       throw const ConflictException('That loan has reached its renewal limit.');
     }
 
-    final waitingHolds = await _countWaitingHolds(copyRow.titleId);
+    final waitingHolds = await _holdQueue.countWaitingHolds(copyRow.titleId);
     if (waitingHolds > 0) {
       throw const ConflictException(
         'A hold is waiting on this title and the loan cannot be renewed.',
@@ -396,18 +329,12 @@ class CirculationRepositoryImpl implements CirculationRepository {
     }
 
     final extendBy = rules.renewalPeriodDays ?? rules.loanPeriodDays;
-    final newDueAt = addCalendarDays(loanRow.dueAt, extendBy);
-
-    await (_db.update(
-      _db.loans,
-    )..where((loan) => loan.id.equals(loanId))).write(
-      LoansCompanion(
-        dueAt: Value(newDueAt),
-        renewalCount: Value(loanRow.renewalCount + 1),
-      ),
+    await _loanWrites.extendLoanDue(
+      loanId: loanId,
+      newDueAt: addCalendarDays(loan.dueAt, extendBy),
     );
 
-    return (await _loadLoanById(loanId))!;
+    return (await _loanDataSource.findLoanById(loanId))!;
   }
 
   @override
@@ -442,11 +369,11 @@ class CirculationRepositoryImpl implements CirculationRepository {
       throw const NotFoundException('That title was not found.');
     }
 
-    final rules = await _loadEffectiveRules(memberRow.memberTypeId);
+    final rules = await _policy.loadEffectiveRules(memberRow.memberTypeId);
 
-    _rejectArchivedMember(memberRow.archivedAt);
-    _rejectSuspendedMember(memberRow.suspendedAt);
-    _rejectExpiredMember(memberRow.expiresAt, today);
+    _policy.rejectArchivedMember(memberRow.archivedAt);
+    _policy.rejectSuspendedMember(memberRow.suspendedAt);
+    _policy.rejectExpiredMember(memberRow.expiresAt, today);
 
     if (titleRow.archivedAt != null) {
       throw const ConflictException('That title has been archived.');
@@ -455,212 +382,43 @@ class CirculationRepositoryImpl implements CirculationRepository {
       throw const ConflictException('That title is not lendable.');
     }
 
-    final activeHolds = await _countActiveHolds(memberId);
+    final activeHolds = await _reservationDataSource.countActiveHoldsForMember(
+      memberId,
+    );
     if (activeHolds >= rules.reservationLimit) {
       throw const ConflictException(
         'That member has reached their hold limit.',
       );
     }
 
-    final reservationId = _uuid.v4();
-    await _db
-        .into(_db.reservations)
-        .insert(
-          ReservationsCompanion.insert(
-            id: reservationId,
-            titleId: titleId,
-            memberId: memberId,
-            placedAt: now,
-            status: ReservationStatus.waiting,
-            createdAt: now,
-            updatedAt: now,
-          ),
-        );
-
-    return (await _loadReservationById(reservationId))!;
-  }
-
-  Future<Reservation?> _loadReservationById(String id) async {
-    final row = await (_db.select(
-      _db.reservations,
-    )..where((hold) => hold.id.equals(id))).getSingleOrNull();
-    if (row == null) return null;
-
-    final title = await (_db.select(
-      _db.titles,
-    )..where((item) => item.id.equals(row.titleId))).getSingleOrNull();
-    final member = await (_db.select(
-      _db.members,
-    )..where((item) => item.id.equals(row.memberId))).getSingleOrNull();
-    final queuePosition = await _queuePosition(row);
-
-    return Reservation(
-      id: row.id,
-      titleId: row.titleId,
-      memberId: row.memberId,
-      placedAt: row.placedAt,
-      status: row.status,
-      readyCopyId: row.readyCopyId,
-      readyAt: row.readyAt,
-      expiresAt: row.expiresAt,
-      closedAt: row.closedAt,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      titleName: title?.title,
-      memberName: member?.fullName,
-      queuePosition: queuePosition,
+    final reservationId = await _holdQueue.insertWaitingHold(
+      memberId: memberId,
+      titleId: titleId,
     );
-  }
-
-  Future<int> _queuePosition(ReservationRow row) async {
-    if (row.closedAt != null) return 0;
-    final count = _db.reservations.id.count(
-      filter:
-          _db.reservations.titleId.equals(row.titleId) &
-          _db.reservations.closedAt.isNull() &
-          _db.reservations.placedAt.isSmallerThanValue(row.placedAt),
-    );
-    final result = await (_db.selectOnly(
-      _db.reservations,
-    )..addColumns([count])).getSingle();
-    return (result.read(count) ?? 0) + 1;
+    return (await _reservationDataSource.findReservationById(
+      reservationId,
+    ))!;
   }
 
   @override
   Future<void> cancelHold(String reservationId) => guardDatabase(
-    () => _db.transaction(() => _cancelHold(reservationId)),
+    () => _db.transaction(() => _holdQueue.cancelOpenHold(reservationId)),
     source: '$_source.cancelHold',
   );
 
-  Future<void> _cancelHold(String reservationId) async {
-    final now = DateTime.now();
-    final hold =
-        await (_db.select(_db.reservations)..where(
-              (row) => row.id.equals(reservationId) & row.closedAt.isNull(),
-            ))
-            .getSingleOrNull();
-    if (hold == null) {
-      throw const NotFoundException('That hold was not found.');
-    }
-
-    await (_db.update(
-      _db.reservations,
-    )..where((row) => row.id.equals(reservationId))).write(
-      ReservationsCompanion(
-        status: const Value(ReservationStatus.cancelled),
-        closedAt: Value(now),
-        updatedAt: Value(now),
-      ),
-    );
-
-    if (hold.readyCopyId != null) {
-      await (_db.update(
-        _db.copies,
-      )..where((copy) => copy.id.equals(hold.readyCopyId!))).write(
-        CopiesCompanion(
-          status: const Value(CopyStatus.available),
-          updatedAt: Value(now),
-        ),
-      );
-      await _promoteNextWaitingHold(
-        titleId: hold.titleId,
-        copyId: hold.readyCopyId!,
-        now: now,
-        today: dateOnly(now),
-      );
-    }
-  }
-
   @override
   Future<Reservation> markHoldReady(String reservationId) => guardDatabase(
-    () => _db.transaction(() => _markHoldReady(reservationId)),
+    () => _db.transaction(() async {
+      final id = await _holdQueue.markHoldReady(reservationId);
+      return (await _reservationDataSource.findReservationById(id))!;
+    }),
     source: '$_source.markHoldReady',
   );
-
-  Future<Reservation> _markHoldReady(String reservationId) async {
-    final now = DateTime.now();
-    final today = dateOnly(now);
-
-    final hold =
-        await (_db.select(_db.reservations)..where(
-              (row) => row.id.equals(reservationId) & row.closedAt.isNull(),
-            ))
-            .getSingleOrNull();
-    if (hold == null) {
-      throw const NotFoundException('That hold was not found.');
-    }
-    if (hold.status != ReservationStatus.waiting) {
-      throw const ConflictException(
-        'Only waiting holds can be marked ready for pickup.',
-      );
-    }
-
-    final copyRow =
-        await (_db.select(_db.copies)
-              ..where(
-                (copy) =>
-                    copy.titleId.equals(hold.titleId) &
-                    copy.archivedAt.isNull() &
-                    copy.status.equalsValue(CopyStatus.available),
-              )
-              ..orderBy([(copy) => OrderingTerm(expression: copy.barcode)])
-              ..limit(1))
-            .getSingleOrNull();
-    if (copyRow == null) {
-      throw const ConflictException(
-        'No available copy to assign to this hold.',
-      );
-    }
-
-    final rules = await _loadLoanRules();
-    final expiresAt = addCalendarDays(today, rules.holdShelfDays);
-
-    await (_db.update(
-      _db.reservations,
-    )..where((row) => row.id.equals(reservationId))).write(
-      ReservationsCompanion(
-        status: const Value(ReservationStatus.ready),
-        readyCopyId: Value(copyRow.id),
-        readyAt: Value(now),
-        expiresAt: Value(expiresAt),
-        updatedAt: Value(now),
-      ),
-    );
-    await (_db.update(
-      _db.copies,
-    )..where((copy) => copy.id.equals(copyRow.id))).write(
-      CopiesCompanion(
-        status: const Value(CopyStatus.reserved),
-        updatedAt: Value(now),
-      ),
-    );
-
-    return (await _loadReservationById(reservationId))!;
-  }
 
   @override
   Future<Fine> collectFine(String fineId) => guardDatabase(
     () => _db.transaction(() async {
-      final row = await (_db.select(
-        _db.fines,
-      )..where((fine) => fine.id.equals(fineId))).getSingleOrNull();
-      if (row == null) {
-        throw const NotFoundException('That fine was not found.');
-      }
-      final outstanding = row.assessed - row.paid - row.waived;
-      if (!outstanding.isPositive) {
-        throw const ConflictException('That fine is already settled.');
-      }
-      final now = DateTime.now();
-      await (_db.update(
-        _db.fines,
-      )..where((fine) => fine.id.equals(fineId))).write(
-        FinesCompanion(
-          paid: Value(row.paid + outstanding),
-          settledAt: Value(now),
-          updatedAt: Value(now),
-        ),
-      );
+      await _fineWrites.settleFine(id: fineId, waive: false);
       return (await findFine(fineId))!;
     }),
     source: '$_source.collectFine',
@@ -669,26 +427,7 @@ class CirculationRepositoryImpl implements CirculationRepository {
   @override
   Future<Fine> waiveFine(String fineId) => guardDatabase(
     () => _db.transaction(() async {
-      final row = await (_db.select(
-        _db.fines,
-      )..where((fine) => fine.id.equals(fineId))).getSingleOrNull();
-      if (row == null) {
-        throw const NotFoundException('That fine was not found.');
-      }
-      final outstanding = row.assessed - row.paid - row.waived;
-      if (!outstanding.isPositive) {
-        throw const ConflictException('That fine is already settled.');
-      }
-      final now = DateTime.now();
-      await (_db.update(
-        _db.fines,
-      )..where((fine) => fine.id.equals(fineId))).write(
-        FinesCompanion(
-          waived: Value(row.waived + outstanding),
-          settledAt: Value(now),
-          updatedAt: Value(now),
-        ),
-      );
+      await _fineWrites.settleFine(id: fineId, waive: true);
       return (await findFine(fineId))!;
     }),
     source: '$_source.waiveFine',
@@ -703,332 +442,22 @@ class CirculationRepositoryImpl implements CirculationRepository {
     String? staffId,
   }) => guardDatabase(
     () => _db.transaction(() async {
-      if (!amount.isPositive) {
-        throw const ConflictException('A charged fine must be more than zero.');
-      }
-      final memberRow = await (_db.select(
-        _db.members,
-      )..where((member) => member.id.equals(memberId))).getSingleOrNull();
-      if (memberRow == null) {
-        throw const NotFoundException('That member was not found.');
-      }
-      _rejectArchivedMember(memberRow.archivedAt);
-
-      final now = DateTime.now();
-      final id = _uuid.v4();
-      await _db
-          .into(_db.fines)
-          .insert(
-            FinesCompanion.insert(
-              id: id,
-              memberId: memberId,
-              reason: reason,
-              assessed: amount,
-              raisedAt: now,
-              createdAt: now,
-              updatedAt: now,
-              note: Value(note),
-            ),
-          );
-
-      final row = await (_db.select(
-        _db.fines,
-      )..where((fine) => fine.id.equals(id))).getSingle();
-      return row.toDomain(memberName: memberRow.fullName);
+      final id = await _fineWrites.chargeManualFine(
+        memberId: memberId,
+        reason: reason,
+        amount: amount,
+        note: note,
+      );
+      return (await findFine(id))!;
     }),
     source: '$_source.chargeFine',
   );
 
   @override
   Future<void> expireStaleHolds() => guardDatabase(
-    () => _db.transaction(_expireStaleHolds),
+    () => _db.transaction(_holdQueue.expireStaleReady),
     source: '$_source.expireStaleHolds',
   );
-
-  Future<void> _expireStaleHolds() async {
-    final now = DateTime.now();
-    final today = dateOnly(now);
-
-    final stale =
-        await (_db.select(_db.reservations)..where(
-              (hold) =>
-                  hold.closedAt.isNull() &
-                  hold.status.equalsValue(ReservationStatus.ready) &
-                  hold.expiresAt.isSmallerThanValue(_dates.toSql(today)),
-            ))
-            .get();
-
-    for (final hold in stale) {
-      await (_db.update(
-        _db.reservations,
-      )..where((row) => row.id.equals(hold.id))).write(
-        ReservationsCompanion(
-          status: const Value(ReservationStatus.expired),
-          closedAt: Value(now),
-          updatedAt: Value(now),
-        ),
-      );
-
-      if (hold.readyCopyId != null) {
-        await (_db.update(
-          _db.copies,
-        )..where((copy) => copy.id.equals(hold.readyCopyId!))).write(
-          CopiesCompanion(
-            status: const Value(CopyStatus.available),
-            updatedAt: Value(now),
-          ),
-        );
-        await _promoteNextWaitingHold(
-          titleId: hold.titleId,
-          copyId: hold.readyCopyId!,
-          now: now,
-          today: today,
-        );
-      }
-    }
-  }
-
-  Future<void> _promoteHoldOrReleaseCopy({
-    required String copyId,
-    required String titleId,
-    required DateTime now,
-    required DateTime today,
-  }) async {
-    final nextHold =
-        await (_db.select(_db.reservations)
-              ..where(
-                (hold) =>
-                    hold.titleId.equals(titleId) &
-                    hold.closedAt.isNull() &
-                    hold.status.equalsValue(ReservationStatus.waiting),
-              )
-              ..orderBy([(hold) => OrderingTerm(expression: hold.placedAt)]))
-            .getSingleOrNull();
-
-    if (nextHold != null) {
-      final rules = await _loadLoanRules();
-      final expiresAt = addCalendarDays(today, rules.holdShelfDays);
-      await (_db.update(
-        _db.reservations,
-      )..where((hold) => hold.id.equals(nextHold.id))).write(
-        ReservationsCompanion(
-          status: const Value(ReservationStatus.ready),
-          readyCopyId: Value(copyId),
-          readyAt: Value(now),
-          expiresAt: Value(expiresAt),
-          updatedAt: Value(now),
-        ),
-      );
-      await (_db.update(
-        _db.copies,
-      )..where((copy) => copy.id.equals(copyId))).write(
-        CopiesCompanion(
-          status: const Value(CopyStatus.reserved),
-          updatedAt: Value(now),
-        ),
-      );
-      return;
-    }
-
-    await (_db.update(
-      _db.copies,
-    )..where((copy) => copy.id.equals(copyId))).write(
-      CopiesCompanion(
-        status: const Value(CopyStatus.available),
-        updatedAt: Value(now),
-      ),
-    );
-  }
-
-  Future<void> _promoteNextWaitingHold({
-    required String titleId,
-    required String copyId,
-    required DateTime now,
-    required DateTime today,
-  }) async {
-    final nextHold =
-        await (_db.select(_db.reservations)
-              ..where(
-                (hold) =>
-                    hold.titleId.equals(titleId) &
-                    hold.closedAt.isNull() &
-                    hold.status.equalsValue(ReservationStatus.waiting),
-              )
-              ..orderBy([(hold) => OrderingTerm(expression: hold.placedAt)]))
-            .getSingleOrNull();
-    if (nextHold == null) return;
-
-    final rules = await _loadLoanRules();
-    final expiresAt = addCalendarDays(today, rules.holdShelfDays);
-    await (_db.update(
-      _db.reservations,
-    )..where((hold) => hold.id.equals(nextHold.id))).write(
-      ReservationsCompanion(
-        status: const Value(ReservationStatus.ready),
-        readyCopyId: Value(copyId),
-        readyAt: Value(now),
-        expiresAt: Value(expiresAt),
-        updatedAt: Value(now),
-      ),
-    );
-    await (_db.update(
-      _db.copies,
-    )..where((copy) => copy.id.equals(copyId))).write(
-      CopiesCompanion(
-        status: const Value(CopyStatus.reserved),
-        updatedAt: Value(now),
-      ),
-    );
-  }
-
-  Future<EffectiveLoanRules> _loadEffectiveRules(String memberTypeId) async {
-    final typeRow = await (_db.select(
-      _db.memberTypes,
-    )..where((type) => type.id.equals(memberTypeId))).getSingleOrNull();
-    if (typeRow == null) {
-      throw const NotFoundException('That member type was not found.');
-    }
-    final rulesRow =
-        await (_db.select(_db.loanRules)..where(
-              (rules) => rules.id.equals(LoanRules.singletonId),
-            ))
-            .getSingleOrNull();
-    if (rulesRow == null) {
-      throw const NotFoundException('Loan rules have not been configured.');
-    }
-    return resolveLoanRules(rulesRow.toDomain(), typeRow.toDomain());
-  }
-
-  Future<EffectiveLoanRules> _loadEffectiveRulesForMember(
-    String memberId,
-  ) async {
-    final memberRow = await (_db.select(
-      _db.members,
-    )..where((member) => member.id.equals(memberId))).getSingleOrNull();
-    if (memberRow == null) {
-      throw const NotFoundException('That member was not found.');
-    }
-    return await _loadEffectiveRules(memberRow.memberTypeId);
-  }
-
-  Future<LoanRulesRow> _loadLoanRules() async {
-    final rulesRow =
-        await (_db.select(_db.loanRules)..where(
-              (rules) => rules.id.equals(LoanRules.singletonId),
-            ))
-            .getSingleOrNull();
-    if (rulesRow == null) {
-      throw const NotFoundException('Loan rules have not been configured.');
-    }
-    return rulesRow;
-  }
-
-  Future<int> _countOpenLoans(String memberId) {
-    final count = _db.loans.id.count();
-    return (_db.selectOnly(_db.loans)
-          ..addColumns([count])
-          ..where(
-            _db.loans.memberId.equals(memberId) & _db.loans.returnedAt.isNull(),
-          ))
-        .getSingle()
-        .then((row) => row.read(count) ?? 0);
-  }
-
-  Future<bool> _memberHasOverdueLoans(String memberId) async {
-    final today = dateOnly(DateTime.now());
-    final row =
-        await (_db.select(_db.loans)..where(
-              (loan) =>
-                  loan.memberId.equals(memberId) &
-                  loan.returnedAt.isNull() &
-                  loan.dueAt.isSmallerThanValue(_dates.toSql(today)),
-            ))
-            .getSingleOrNull();
-    return row != null;
-  }
-
-  Future<Money> _outstandingFines(String memberId) async {
-    final row = await _db
-        .customSelect(
-          '''
-SELECT COALESCE(SUM(assessed - paid - waived), 0) AS outstanding
-FROM fines
-WHERE member_id = ?
-  AND paid + waived < assessed
-''',
-          variables: [Variable<String>(memberId)],
-        )
-        .getSingle();
-    return Money(row.read<int>('outstanding'));
-  }
-
-  Future<int> _countWaitingHolds(String titleId) {
-    final count = _db.reservations.id.count(
-      filter:
-          _db.reservations.titleId.equals(titleId) &
-          _db.reservations.closedAt.isNull() &
-          _db.reservations.status.equalsValue(ReservationStatus.waiting),
-    );
-    return (_db.selectOnly(
-      _db.reservations,
-    )..addColumns([count])).getSingle().then((row) => row.read(count) ?? 0);
-  }
-
-  Future<int> _countActiveHolds(String memberId) {
-    final count = _db.reservations.id.count();
-    return (_db.selectOnly(_db.reservations)
-          ..addColumns([count])
-          ..where(
-            _db.reservations.memberId.equals(memberId) &
-                _db.reservations.closedAt.isNull(),
-          ))
-        .getSingle()
-        .then((row) => row.read(count) ?? 0);
-  }
-
-  Future<Loan?> _loadLoanById(String id) async {
-    final row = await (_db.select(
-      _db.loans,
-    )..where((loan) => loan.id.equals(id))).getSingleOrNull();
-    if (row == null) return null;
-
-    final copy = await (_db.select(
-      _db.copies,
-    )..where((item) => item.id.equals(row.copyId))).getSingleOrNull();
-    final member = await (_db.select(
-      _db.members,
-    )..where((item) => item.id.equals(row.memberId))).getSingleOrNull();
-    final title = copy == null
-        ? null
-        : await (_db.select(
-            _db.titles,
-          )..where((item) => item.id.equals(copy.titleId))).getSingleOrNull();
-
-    return row.toDomain(
-      barcode: copy?.barcode,
-      titleId: copy?.titleId,
-      titleName: title?.title,
-      memberName: member?.fullName,
-    );
-  }
-
-  void _rejectArchivedMember(DateTime? archivedAt) {
-    if (archivedAt != null) {
-      throw const ConflictException('That member has been archived.');
-    }
-  }
-
-  void _rejectSuspendedMember(DateTime? suspendedAt) {
-    if (suspendedAt != null) {
-      throw const ConflictException('That member is suspended.');
-    }
-  }
-
-  void _rejectExpiredMember(DateTime? expiresAt, DateTime today) {
-    if (expiresAt != null && dateOnly(expiresAt).isBefore(today)) {
-      throw const ConflictException('That member membership has expired.');
-    }
-  }
 
   @override
   Future<LoanListResult> findOpenLoans(LoanQuery query) =>

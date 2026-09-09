@@ -26,11 +26,15 @@ import 'package:khulla/features/circulation/reservation/presentation/cubit/reser
 import 'package:khulla/features/circulation/reservation/presentation/reservation_list_page.dart';
 import 'package:khulla/features/circulation/return_copy/presentation/cubit/return_cubit.dart';
 import 'package:khulla/features/circulation/return_copy/presentation/return_page.dart';
+import 'package:khulla/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import 'package:khulla/features/dashboard/presentation/dashboard_page.dart';
 import 'package:khulla/features/members/presentation/cubit/member_cubit.dart';
 import 'package:khulla/features/members/presentation/cubit/member_detail_cubit.dart';
 import 'package:khulla/features/members/presentation/pages/member_detail_page.dart';
 import 'package:khulla/features/members/presentation/pages/member_list_page.dart';
+import 'package:khulla/features/reports/presentation/cubit/reports_cubit.dart';
+import 'package:khulla/features/reports/presentation/reports_page.dart';
+import 'package:khulla/features/settings/presentation/cubit/backup_cubit.dart';
 import 'package:khulla/features/settings/presentation/cubit/library_profile_cubit.dart';
 import 'package:khulla/features/settings/presentation/cubit/loan_rules_cubit.dart';
 import 'package:khulla/features/settings/presentation/pages/appearance_page.dart';
@@ -46,6 +50,10 @@ import 'package:khulla/features/staff_auth/presentation/recover_password/cubit/r
 import 'package:khulla/features/staff_auth/presentation/recover_password/recover_password_page.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/cubit/sign_in_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/sign_in_page.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
+import 'package:khulla/features/users/presentation/cubit/staff_list_cubit.dart';
+import 'package:khulla/features/users/presentation/pages/role_list_page.dart';
+import 'package:khulla/features/users/presentation/pages/user_list_page.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Owns the single [GoRouter] instance.
@@ -74,7 +82,7 @@ class AppRouter {
   AppRouter(this._config, this._auth) {
     router = GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: Routes.catalogTitles,
+      initialLocation: Routes.dashboard,
       refreshListenable: GoRouterRefreshStream(_auth.stream),
       redirect: _redirect,
       routes: [
@@ -118,7 +126,14 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: Routes.dashboard,
-                  builder: (context, _) => const DashboardPage(),
+                  builder: (context, _) => BlocProvider<DashboardCubit>(
+                    create: (_) {
+                      final cubit = getIt<DashboardCubit>();
+                      unawaited(cubit.load());
+                      return cubit;
+                    },
+                    child: const DashboardPage(),
+                  ),
                 ),
               ],
             ),
@@ -291,28 +306,49 @@ class AppRouter {
             //     ),
             //   ],
             // ),
-            // StatefulShellBranch(
-            //   routes: [
-            //     GoRoute(
-            //       path: Routes.reports,
-            //       builder: (context, _) => const ReportsPage(),
-            //     ),
-            //   ],
-            // ),
-            // StatefulShellBranch(
-            //   routes: [
-            //     GoRoute(
-            //       path: Routes.users,
-            //       builder: (context, _) => const UserListPage(),
-            //       routes: [
-            //         GoRoute(
-            //           path: Routes.rolesSegment,
-            //           builder: (context, _) => const RoleListPage(),
-            //         ),
-            //       ],
-            //     ),
-            //   ],
-            // ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.reports,
+                  builder: (context, _) => BlocProvider<ReportsCubit>(
+                    create: (_) {
+                      final cubit = getIt<ReportsCubit>();
+                      unawaited(cubit.load());
+                      return cubit;
+                    },
+                    child: const ReportsPage(),
+                  ),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.users,
+                  builder: (context, _) => BlocProvider<StaffListCubit>(
+                    create: (_) {
+                      final cubit = getIt<StaffListCubit>();
+                      unawaited(cubit.load());
+                      return cubit;
+                    },
+                    child: const UserListPage(),
+                  ),
+                  routes: [
+                    GoRoute(
+                      path: Routes.rolesSegment,
+                      builder: (context, _) => BlocProvider<StaffListCubit>(
+                        create: (_) {
+                          final cubit = getIt<StaffListCubit>();
+                          unawaited(cubit.load());
+                          return cubit;
+                        },
+                        child: const RoleListPage(),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -350,7 +386,14 @@ class AppRouter {
                     ),
                     GoRoute(
                       path: Routes.backupSegment,
-                      builder: (context, _) => const BackupPage(),
+                      builder: (context, _) => BlocProvider<BackupCubit>(
+                        create: (_) {
+                          final cubit = getIt<BackupCubit>();
+                          unawaited(cubit.load());
+                          return cubit;
+                        },
+                        child: const BackupPage(),
+                      ),
                     ),
                     GoRoute(
                       path: Routes.syncSegment,
@@ -402,7 +445,28 @@ class AppRouter {
             ? null
             : Routes.signIn,
       AuthStatus.signedIn =>
-        Routes.isAuthLocation(location) ? Routes.dashboard : null,
+        Routes.isAuthLocation(location)
+            ? Routes.dashboard
+            : _redirectForPermission(location),
     };
+  }
+
+  /// Sends a signed-in operator away from a section their role cannot open.
+  ///
+  /// A role change is rare and the shell already hides these destinations, so
+  /// this only matters for a stale link, a typed URL, or a role change on
+  /// another window — quiet cases that still deserve a real answer rather
+  /// than a section that renders and then throws on missing data.
+  String? _redirectForPermission(String location) {
+    StaffPermission? permission;
+    if (Routes.isUnder(location, Routes.users)) {
+      permission = StaffPermission.users;
+    } else if (Routes.isUnder(location, Routes.reports)) {
+      permission = StaffPermission.reports;
+    } else if (Routes.isUnder(location, Routes.settingsBackup)) {
+      permission = StaffPermission.backup;
+    }
+    if (permission == null) return null;
+    return _auth.state.hasPermission(permission) ? null : Routes.dashboard;
   }
 }

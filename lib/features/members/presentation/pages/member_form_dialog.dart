@@ -176,7 +176,6 @@ class _MemberFormBodyState extends State<_MemberFormBody> with DisposeBag {
       AppToast.error(context, message: l10n.validationFieldRequired);
       return;
     }
-
     try {
       await context.read<MemberFormCubit>().saveMember(
         fullName: name,
