@@ -10,8 +10,8 @@ local-first app, so a release is four builds and a page to put them on.
 
 | Workflow | Runs when | Does |
 | --- | --- | --- |
-| [`ci.yaml`](../../.github/workflows/ci.yaml) | Push to `dev`/`prod`, PR into either | `make ci` (format, copyright, analyze, test) and a web build |
-| [`release.yaml`](../../.github/workflows/release.yaml) | A `v*` tag, or run by hand | Builds Windows, Linux, Android and web; publishes a GitHub Release |
+| [`ci.yaml`](../../.github/workflows/ci.yaml) | Push to `dev`/`prod`, PR into either | `make ci` (format, copyright, analyze, test) and a web build; on a PR into `prod`, also checks the version has been bumped |
+| [`release.yaml`](../../.github/workflows/release.yaml) | Push to `prod`, or run by hand | Builds Windows, Linux, Android and web; publishes a GitHub Release |
 | [`deploy-web.yaml`](../../.github/workflows/deploy-web.yaml) | Push to `prod`, or run by hand | Publishes the web build to GitHub Pages |
 
 All three share [`.github/actions/setup-flutter`](../../.github/actions/setup-flutter/action.yml),
@@ -25,33 +25,79 @@ nobody will commit from.
 
 ## Cutting a release
 
-1. Merge everything you want in the release into `dev`, then open a PR from
-   `dev` into `prod` and merge it once CI is green.
-2. Bump `version:` in `pubspec.yaml` on `prod`. The format is
-   `<major>.<minor>.<patch>+<build>` — bump the build number too, because
-   Android refuses an install whose `versionCode` did not increase.
-3. Tag the merge commit and push the tag:
+**Landing on `prod` is the release.** There is no tag to push and no button to
+press afterwards:
 
-   ```sh
-   git checkout prod && git pull
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
+```
+PR into prod (with the version bumped)  →  merge  →  release.yaml builds all
+four targets  →  GitHub Release published, tagged v<version>
+```
 
-The tag must match the pubspec version exactly (`v1.0.0` ↔ `version: 1.0.0+n`).
-The workflow checks this and fails the release if they disagree, so that the
-version a tester reports is the version you can check out.
+So the whole of releasing is one thing: **bump `version:` in `pubspec.yaml` in
+the pull request that goes into `prod`.**
 
-The release job builds all four targets in parallel, checksums them into
-`SHA256SUMS.txt`, and publishes a GitHub Release with generated notes plus a
-download table. Roughly 15–25 minutes end to end.
+```yaml
+version: 1.0.0+2 # <major>.<minor>.<patch>+<build>
+```
+
+Bump the build number as well as the version. Android refuses to install an APK
+whose `versionCode` did not increase, and `+<build>` is where that comes from.
+
+### One version, three readers
+
+[`tools/version.dart`](../../tools/version.dart) is the only thing that reads
+`version:` out of `pubspec.yaml`, and everything that needs the number goes
+through it:
+
+| Reader | How |
+| --- | --- |
+| The release workflow | `dart tools/version.dart` — names the release and its tag |
+| CI, on a PR into `prod` | the same call — fails the PR if that version is already released |
+| The app | `--write` generates `lib/gen/app_version.dart`; `AppInfo.version` reads `kAppVersion`, and the help dialog's About panel shows it |
+
+So the version a librarian reads in the app names the download they installed
+and the tag you can check out. There is no second copy to update — the file the
+app imports is generated and gitignored, exactly so it cannot sit at `0.1.0`
+while the pubspec says `1.0.0`.
+
+`make build` regenerates it along with everything else; `make version` does it
+alone after a bump. The script imports nothing but `dart:io`, so CI runs it on a
+bare Dart SDK with no pub get and no Flutter.
+
+The workflow reads that version, builds all four targets in parallel, checksums
+them into `SHA256SUMS.txt`, and publishes a GitHub Release tagged `v1.0.0` with
+generated notes and a download table. Roughly 15–25 minutes end to end. Nobody
+creates the tag by hand — the release job does, and that tag is the record of
+what shipped.
+
+### When you merge without bumping
+
+Nothing is published, and the run says so with a warning rather than a red
+tick. The tag `v<version>` already exists, so re-releasing over it would change
+what a download at that version contains — which is the one thing a version
+number is supposed to rule out.
+
+CI catches this earlier: a pull request into `prod` whose version is already
+released **fails** its `Version bumped for release` check. Fix it while it is
+still one commit, not one merge, away.
+
+To ship a merge that landed without a bump, bump the version and merge again.
+
+### What does *not* release
+
+- Merging into `dev`. Only `prod` releases.
+- A push to `prod` that changes nothing else — same version, no release.
+- A manual run of the workflow, whatever branch it is fired from.
 
 ## Sending someone a test build
 
-You do not need a tag. From the **Actions** tab, pick **Release** → **Run
-workflow** → the branch you want. It builds the same four targets and attaches
-them as workflow artifacts, versioned `0.1.0-dev.<sha>`, with nothing
-published. Send the run's URL — anyone signed into GitHub can download from it.
+From the **Actions** tab, pick **Release** → **Run workflow** → the branch you
+want. It builds the same four targets and attaches them as workflow artifacts,
+versioned `0.1.0-dev.<sha>`, and publishes nothing. Send the run's URL — anyone
+signed into GitHub can download from it.
+
+This is the way to get a build of unreleased work in front of a librarian. It
+does not touch `prod`, the releases page, or the version.
 
 ## What each target produces
 

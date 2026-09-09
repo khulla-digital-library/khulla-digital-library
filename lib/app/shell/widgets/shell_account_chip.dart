@@ -5,12 +5,12 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/app/shell/help/help_dialog.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
 import 'package:khulla/features/users/presentation/widgets/staff_profile_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Who is signed in, at the foot of the rail.
@@ -65,7 +65,11 @@ class ShellAccountChip extends StatelessWidget {
           ),
         ),
         PopupMenuItem<int>(
-          onTap: () => showNotWiredToast(context),
+          onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              unawaited(HelpDialog.show(context));
+            }
+          }),
           child: _MenuRow(
             icon: AppIcons.help,
             label: l10n.shellHelp,

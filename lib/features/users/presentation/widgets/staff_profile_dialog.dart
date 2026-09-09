@@ -193,7 +193,6 @@ class _StaffProfileBodyState extends State<_StaffProfileBody> with DisposeBag {
                           ),
                         ),
                       ),
-                      
                     ],
                   ),
                   SizedBox(height: spacing.xxs),
