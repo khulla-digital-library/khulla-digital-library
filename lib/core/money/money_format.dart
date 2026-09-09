@@ -38,30 +38,6 @@ class MoneyFormat {
   /// Nepali rupee — the default, and the currency Khulla was written for.
   static final MoneyFormat nepaliRupee = MoneyFormat(symbol: 'Rs');
 
-  /// Indian rupee.
-  static final MoneyFormat indianRupee = MoneyFormat(symbol: '₹');
-
-  /// US dollar.
-  static final MoneyFormat usDollar = MoneyFormat(
-    symbol: r'$',
-    grouping: MoneyGrouping.western,
-    separator: '',
-  );
-
-  /// Pound sterling.
-  static final MoneyFormat britishPound = MoneyFormat(
-    symbol: '£',
-    grouping: MoneyGrouping.western,
-    separator: '',
-  );
-
-  /// Euro, symbol trailing.
-  static final MoneyFormat euro = MoneyFormat(
-    symbol: '€',
-    grouping: MoneyGrouping.western,
-    symbolOnRight: true,
-  );
-
   /// The format every `Money.display()` uses unless handed an override.
   ///
   /// Set once during `bootstrap` from the library's settings, before the first

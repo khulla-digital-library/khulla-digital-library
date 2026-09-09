@@ -14,7 +14,7 @@ import 'package:khulla/shared/models/load_status.dart';
 
 part 'staff_form_state.freezed.dart';
 
-/// What [StaffFormCubit] is doing: adding a new account, editing an existing
+/// What `StaffFormCubit` is doing: adding a new account, editing an existing
 /// one's identity and role, or setting a new password for one.
 ///
 /// One cubit, three modes, rather than three cubits — every mode mutates the

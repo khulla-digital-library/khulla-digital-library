@@ -240,17 +240,13 @@ class _AppGalleryControlsState extends State<AppGalleryControls> {
                 ),
                 SizedBox(
                   width: 260,
-                  child: Column(
-                    children: [
-                      for (final option in const ['spine', 'pocket'])
-                        AppRadioField<String>(
-                          value: option,
-                          groupValue: _radio,
-                          label:
-                              '${option[0].toUpperCase()}${option.substring(1)} label',
-                          onChanged: (value) => setState(() => _radio = value),
-                        ),
-                    ],
+                  child: AppSegmentedControl<String>(
+                    value: _radio,
+                    items: const ['spine', 'pocket'],
+                    itemLabel: (option) =>
+                        option[0].toUpperCase() + option.substring(1),
+                    expand: true,
+                    onChanged: (value) => setState(() => _radio = value),
                   ),
                 ),
               ],

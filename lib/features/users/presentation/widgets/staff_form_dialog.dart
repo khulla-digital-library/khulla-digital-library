@@ -24,7 +24,7 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// A modal, matching `MemberFormDialog` — the account list is the record,
 /// there is no separate detail route to push. Password only appears when
 /// adding: an existing account's password is changed from the row menu's
-/// *Reset password* instead (see [StaffResetPasswordDialog]), which is its
+/// *Reset password* instead (see `StaffResetPasswordDialog`), which is its
 /// own smaller form rather than an optional section here.
 class StaffFormDialog extends StatelessWidget {
   const StaffFormDialog({this.staffId, super.key});

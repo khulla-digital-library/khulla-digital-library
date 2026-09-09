@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:khulla/app/shell/widgets/shell_account_chip.dart';
+import 'package:khulla/app/shell/widgets/shell_copyright_notice.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The app-wide chrome, parked at the foot of the rail.
@@ -21,13 +22,36 @@ class ShellRailFooter extends StatelessWidget {
     final spacing = context.appSpacing;
     final colors = context.appColors;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Divider(height: spacing.md, color: colors.hairline),
-        ShellAccountChip(compact: !extended),
-      ],
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colors.hairline)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(top: spacing.xs),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ShellAccountChip(compact: !extended),
+            // Collapsed rails stay glyphs-only at 64px — no room for a line of
+            // text, and the brand tooltip already carries the name there.
+            if (extended) ...[
+              SizedBox(height: spacing.xs),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  spacing.sm,
+                  0,
+                  spacing.sm,
+                  spacing.xxs,
+                ),
+                child: const ShellCopyrightNotice(
+                  textAlign: TextAlign.start,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

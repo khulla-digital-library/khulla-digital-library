@@ -9,11 +9,16 @@ void main() {
   group('computeCollectionPageSize', () {
     final metrics = AppMetrics.of(AppDensity.compact);
 
+    // Heights are derived from the metrics rather than written out, because
+    // row height is a design token that gets tuned. A literal here turns any
+    // visual adjustment into a red test about a number nobody promised.
     test('subtracts the header and rounds up row slots', () {
-      // 36 header + 14 * 52 body = 764
+      final exactly14Rows =
+          metrics.tableHeaderHeight + 14 * metrics.tableRowHeight;
+
       expect(
         computeCollectionPageSize(
-          tableBodyHeight: 764,
+          tableBodyHeight: exactly14Rows,
           metrics: metrics,
         ),
         14,
@@ -21,9 +26,12 @@ void main() {
     });
 
     test('rounds up when the viewport fits a partial row', () {
+      final fourteenRowsAndASliver =
+          metrics.tableHeaderHeight + 14.2 * metrics.tableRowHeight;
+
       expect(
         computeCollectionPageSize(
-          tableBodyHeight: 770,
+          tableBodyHeight: fourteenRowsAndASliver,
           metrics: metrics,
         ),
         15,

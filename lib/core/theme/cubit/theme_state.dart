@@ -2,19 +2,22 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:khulla/core/theme/app_language.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 part 'theme_state.freezed.dart';
 
-/// The two device-level appearance choices: light or dark, and which brand the
-/// product is painted in. Both are read from storage at startup, so the app's
-/// first frame is already the operator's.
+/// The device-level appearance and language choices: light or dark, which
+/// brand the product is painted in, and which language it is drawn in. All
+/// are read from storage at startup, so the app's first frame is already
+/// the operator's.
 @freezed
 abstract class ThemeState with _$ThemeState {
   const factory ThemeState({
     @Default(ThemeMode.light) ThemeMode mode,
     @Default(AppBrandTheme.teal) AppBrandTheme brandTheme,
     Color? customSeed,
+    @Default(AppLanguage.english) AppLanguage language,
   }) = _ThemeState;
 
   const ThemeState._();

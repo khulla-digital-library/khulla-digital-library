@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:injectable/injectable.dart';
+import 'package:khulla/core/theme/app_language.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +21,7 @@ class ThemeStorage {
   static const String _themeModeKey = 'khulla.theme_mode';
   static const String _brandThemeKey = 'khulla.brand_theme';
   static const String _customBrandKey = 'khulla.brand_custom';
+  static const String _languageKey = 'khulla.app_language';
 
   /// The persisted choice, or [ThemeMode.light] when none was saved yet.
   ThemeMode readThemeMode() {
@@ -61,4 +63,17 @@ class ThemeStorage {
       await _prefs.setInt(_customBrandKey, customSeed.toARGB32());
     }
   }
+
+  /// The persisted interface language, or [AppLanguage.english] when none
+  /// was saved yet.
+  AppLanguage readAppLanguage() {
+    final value = _prefs.getString(_languageKey);
+    return AppLanguage.values.firstWhere(
+      (language) => language.name == value,
+      orElse: () => AppLanguage.english,
+    );
+  }
+
+  Future<void> saveAppLanguage(AppLanguage language) =>
+      _prefs.setString(_languageKey, language.name);
 }

@@ -12,7 +12,7 @@ import 'package:khulla/core/files/saved_text_file.dart';
 ///
 /// A field containing a comma, a quote or a newline is wrapped in quotes with
 /// its own quotes doubled — the one escaping rule CSV has. Returns null when
-/// the operator cancels the save dialog, the same as [saveTextFile].
+/// the operator cancels the save dialog, the same as `saveTextFile`.
 Future<SavedTextFile?> saveCsvFile({
   required String filename,
   required List<String> header,

@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:khulla/core/files/saved_text_file.dart';
 
 /// Writes binary [bytes] to a location the operator picked — the same
-/// `file_selector` pattern as [saveTextFile], for content that isn't text.
+/// `file_selector` pattern as `saveTextFile`, for content that isn't text.
 ///
 /// Returns null when they cancel the save dialog.
 Future<SavedTextFile?> saveBinaryFile({

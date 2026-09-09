@@ -282,7 +282,7 @@ LIMIT 8
   }
 
   /// Active memberships expiring within 30 days — the same window
-  /// `Member.status` uses to compute [MemberStatus.expiring].
+  /// `Member.status` uses to compute `MemberStatus.expiring`.
   Future<int> _countExpiringMemberships() {
     final today = dateOnly(DateTime.now());
     final horizon = today.add(const Duration(days: 30));

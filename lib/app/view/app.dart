@@ -6,6 +6,7 @@ import 'package:khulla/app/app_bloc_providers.dart';
 import 'package:khulla/app/router/app_router.dart';
 import 'package:khulla/core/di/injection.dart';
 import 'package:khulla/core/feedback/app_toast_wrapper.dart';
+import 'package:khulla/core/theme/app_language.dart';
 import 'package:khulla/core/theme/cubit/theme_cubit.dart';
 import 'package:khulla/core/theme/cubit/theme_state.dart';
 import 'package:khulla/l10n/l10n.dart';
@@ -30,6 +31,7 @@ class App extends StatelessWidget {
           scrollBehavior: const AppScrollBehavior(),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          locale: appearance.language.locale,
           routerConfig: getIt<AppRouter>().router,
           // AppResponsiveTheme re-resolves the theme for the window's size
           // class and caps text scaling.

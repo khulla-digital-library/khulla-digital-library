@@ -95,14 +95,6 @@ class AppRouter {
             catalogBranch(),
             circulationBranch(),
             membersBranch(),
-            // StatefulShellBranch(
-            //   routes: [
-            //     GoRoute(
-            //       path: Routes.opac,
-            //       builder: (context, _) => const OpacPage(),
-            //     ),
-            //   ],
-            // ),
             reportsBranch(),
             usersBranch(),
             settingsBranch(
