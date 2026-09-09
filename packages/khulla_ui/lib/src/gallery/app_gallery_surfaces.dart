@@ -104,19 +104,15 @@ class _AppGallerySurfacesState extends State<AppGallerySurfaces> {
         context: context,
         title: 'Label size',
         caption: 'Applies to every label in this print run.',
-        builder: (sheetContext) => Column(
-          children: [
-            for (final option in const ['spine', 'pocket'])
-              AppRadioField<String>(
-                value: option,
-                groupValue: _radio,
-                label: '${option[0].toUpperCase()}${option.substring(1)} label',
-                onChanged: (value) {
-                  setState(() => _radio = value);
-                  Navigator.of(sheetContext).pop();
-                },
-              ),
-          ],
+        builder: (sheetContext) => AppSegmentedControl<String>(
+          value: _radio,
+          items: const ['spine', 'pocket'],
+          itemLabel: (option) => option[0].toUpperCase() + option.substring(1),
+          expand: true,
+          onChanged: (value) {
+            setState(() => _radio = value);
+            Navigator.of(sheetContext).pop();
+          },
         ),
       ),
     );
