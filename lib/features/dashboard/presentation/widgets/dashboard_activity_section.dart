@@ -29,26 +29,14 @@ class DashboardActivitySection extends StatelessWidget {
         id: 'item',
         label: l10n.dashboardActivityColumnItem,
         flex: 4,
-        cellBuilder: (context, entry) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              entry.item,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: colors.textHigh,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Text(
-              entry.itemCode,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: colors.textMuted,
-              ),
-            ),
-          ],
+        cellBuilder: (context, entry) => Text(
+          entry.item,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: colors.textHigh,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
       AppTableColumn<DashboardActivityEntry>(
@@ -57,27 +45,16 @@ class DashboardActivitySection extends StatelessWidget {
         flex: 4,
         showFrom: FormFactor.medium,
         cellBuilder: (context, entry) => Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            AppAvatar(initials: entry.memberInitials, size: 28),
+            AppAvatar(initials: entry.memberInitials, size: 24),
             SizedBox(width: spacing.xs),
             Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    entry.member,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.bodyMedium,
-                  ),
-                  Text(
-                    entry.memberCode,
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: colors.textMuted,
-                    ),
-                  ),
-                ],
+              child: Text(
+                entry.member,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.bodyMedium,
               ),
             ),
           ],

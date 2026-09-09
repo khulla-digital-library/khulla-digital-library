@@ -11,6 +11,7 @@ class AppNavDestination {
     required this.label,
     this.badge,
     this.children = const [],
+    this.expandedByDefault = false,
   });
 
   /// The destination's glyph.
@@ -30,6 +31,11 @@ class AppNavDestination {
   /// The sections nested under this one, revealed when the rail is extended
   /// and this destination is expanded. Empty means a leaf destination.
   final List<AppNavChild> children;
+
+  /// Whether this group starts expanded on first paint. The app sets this
+  /// for the one section it wants open at startup; a deep link into any
+  /// other sub-section still auto-expands its own parent.
+  final bool expandedByDefault;
 }
 
 /// One row nested under an [AppNavDestination] in an extended rail.

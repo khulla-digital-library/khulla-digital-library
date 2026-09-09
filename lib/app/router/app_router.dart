@@ -82,7 +82,7 @@ class AppRouter {
   AppRouter(this._config, this._auth) {
     router = GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: Routes.catalogTitles,
+      initialLocation: Routes.dashboard,
       refreshListenable: GoRouterRefreshStream(_auth.stream),
       redirect: _redirect,
       routes: [

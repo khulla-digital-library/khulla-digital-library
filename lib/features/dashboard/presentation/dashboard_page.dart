@@ -8,7 +8,6 @@ import 'package:khulla/features/dashboard/presentation/widgets/dashboard_attenti
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_collection_card.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_fines_card.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_header.dart';
-import 'package:khulla/features/dashboard/presentation/widgets/dashboard_quick_actions.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_ranked_card.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_stats_strip.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_subjects_card.dart';
@@ -118,13 +117,6 @@ class _DashboardBoard extends StatelessWidget {
         ],
         SizedBox(height: spacing.md),
         DashboardActivitySection(entries: summary.activity(l10n)),
-        SizedBox(height: spacing.lg),
-        AppSectionHeader(
-          title: l10n.dashboardQuickActionsTitle,
-          subtitle: l10n.dashboardQuickActionsSubtitle,
-        ),
-        SizedBox(height: spacing.sm),
-        const DashboardQuickActions(),
       ],
     );
 

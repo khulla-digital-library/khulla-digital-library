@@ -23,6 +23,7 @@ class ShellDestination {
     this.children = const [],
     this.primary = false,
     this.permission,
+    this.expandedByDefault = false,
   });
 
   /// The section's name.
@@ -47,6 +48,10 @@ class ShellDestination {
   /// means every role sees it — the operational sections every shift needs,
   /// as opposed to the administrative ones a role can be built without.
   final StaffPermission? permission;
+
+  /// Whether this group starts expanded in the extended rail. Only one
+  /// section should opt in, so first paint stays compact.
+  final bool expandedByDefault;
 }
 
 /// One route nested under a [ShellDestination].
@@ -90,6 +95,7 @@ List<ShellDestination> shellDestinations(
       icon: AppIcons.book,
       route: Routes.catalog,
       primary: true,
+      expandedByDefault: true,
       children: [
         ShellChild(label: l10n.navCatalogTitles, route: Routes.catalogTitles),
         ShellChild(label: l10n.navCatalogCopies, route: Routes.catalogCopies),
@@ -101,6 +107,7 @@ List<ShellDestination> shellDestinations(
       icon: AppIcons.transfer,
       route: Routes.circulation,
       primary: true,
+      expandedByDefault: true,
       children: [
         ShellChild(
           label: l10n.navCirculationLoans,

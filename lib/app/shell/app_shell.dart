@@ -188,6 +188,7 @@ class AppShell extends StatelessWidget {
                           AppNavDestination(
                             icon: AppIcon(destination.icon),
                             label: destination.label,
+                            expandedByDefault: destination.expandedByDefault,
                             children: [
                               for (final child in destination.children)
                                 AppNavChild(
