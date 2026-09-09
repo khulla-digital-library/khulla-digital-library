@@ -14,16 +14,20 @@ import 'package:khulla_ui/khulla_ui.dart';
 class TitleCopyRow extends StatelessWidget {
   const TitleCopyRow({
     required this.copy,
-    required this.onMarkLost,
-    required this.onMarkDamaged,
-    required this.onWithdraw,
+    this.onMarkLost,
+    this.onMarkDamaged,
+    this.onWithdraw,
     super.key,
   });
 
   final Copy copy;
-  final VoidCallback onMarkLost;
-  final VoidCallback onMarkDamaged;
-  final VoidCallback onWithdraw;
+
+  /// Per-copy maintenance. All three are null for a role that may read the
+  /// catalogue but not change it, and the row then draws no menu at all —
+  /// a menu whose every entry is disabled is worse than no menu.
+  final VoidCallback? onMarkLost;
+  final VoidCallback? onMarkDamaged;
+  final VoidCallback? onWithdraw;
 
   static String _displayOrDash(String? value) =>
       value == null || value.trim().isEmpty ? '-' : value.trim();
@@ -32,6 +36,9 @@ class TitleCopyRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
+    final markLost = onMarkLost;
+    final markDamaged = onMarkDamaged;
+    final withdraw = onWithdraw;
     final scheme = context.colorScheme;
     final checkedOut =
         copy.status == CopyStatus.onLoan && copy.borrower != null;
@@ -117,27 +124,31 @@ class TitleCopyRow extends StatelessWidget {
           SizedBox(width: spacing.sm),
           CopyStatusBadge(status: copy.status),
           SizedBox(width: spacing.xs),
-          AppMenuButton(
-            tooltip: l10n.commonMoreActions,
-            actions: [
-              AppMenuAction(
-                label: l10n.copiesMarkLost,
-                icon: AppIcons.help,
-                onSelected: onMarkLost,
-              ),
-              AppMenuAction(
-                label: l10n.copiesMarkDamaged,
-                icon: AppIcons.damage,
-                onSelected: onMarkDamaged,
-              ),
-              AppMenuAction(
-                label: l10n.copiesWithdraw,
-                icon: AppIcons.delete,
-                isDestructive: true,
-                onSelected: onWithdraw,
-              ),
-            ],
-          ),
+          if (markLost != null || markDamaged != null || withdraw != null)
+            AppMenuButton(
+              tooltip: l10n.commonMoreActions,
+              actions: [
+                if (markLost != null)
+                  AppMenuAction(
+                    label: l10n.copiesMarkLost,
+                    icon: AppIcons.help,
+                    onSelected: markLost,
+                  ),
+                if (markDamaged != null)
+                  AppMenuAction(
+                    label: l10n.copiesMarkDamaged,
+                    icon: AppIcons.damage,
+                    onSelected: markDamaged,
+                  ),
+                if (withdraw != null)
+                  AppMenuAction(
+                    label: l10n.copiesWithdraw,
+                    icon: AppIcons.delete,
+                    isDestructive: true,
+                    onSelected: withdraw,
+                  ),
+              ],
+            ),
         ],
       ),
     );

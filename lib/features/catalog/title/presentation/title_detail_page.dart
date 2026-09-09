@@ -14,9 +14,11 @@ import 'package:khulla/features/catalog/title/presentation/widgets/title_copies_
 import 'package:khulla/features/catalog/title/presentation/widgets/title_detail_header.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_details_card.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_history_card.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
+import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -148,12 +150,24 @@ class TitleDetailPage extends StatelessWidget {
         final twoPane = context.formFactor.isAtLeast(FormFactor.expanded);
         final description = title.description;
 
+        // A record is readable by anyone who can open the catalogue; changing
+        // it is a separate permission, so every control that writes — the
+        // header's edit and delete, and each copy's maintenance menu — is
+        // absent rather than disabled for a role that only reads.
+        final canManage = context.canManage(StaffPermission.catalog);
+
         final copiesCard = TitleCopiesCard(
           copies: state.copies,
           // onAddCopy: () => unawaited(_addCopy(context, state)),
-          onMarkLost: (copy) => unawaited(_markCopyLost(context, copy)),
-          onMarkDamaged: (copy) => unawaited(_markCopyDamaged(context, copy)),
-          onWithdraw: (copy) => unawaited(_withdrawCopy(context, copy)),
+          onMarkLost: !canManage
+              ? null
+              : (copy) => unawaited(_markCopyLost(context, copy)),
+          onMarkDamaged: !canManage
+              ? null
+              : (copy) => unawaited(_markCopyDamaged(context, copy)),
+          onWithdraw: !canManage
+              ? null
+              : (copy) => unawaited(_withdrawCopy(context, copy)),
         );
         final historyCard = TitleHistoryCard(loans: state.historyLoans);
         final detailsCard = TitleDetailsCard(title: title);
@@ -185,8 +199,12 @@ class TitleDetailPage extends StatelessWidget {
                   children: [
                     TitleDetailHeader(
                       title: title,
-                      onEdit: () => unawaited(_edit(context)),
-                      onDelete: () => unawaited(_confirmDelete(context)),
+                      onEdit: !canManage
+                          ? null
+                          : () => unawaited(_edit(context)),
+                      onDelete: !canManage
+                          ? null
+                          : () => unawaited(_confirmDelete(context)),
                     ),
                     SizedBox(height: spacing.md),
                     if (twoPane)

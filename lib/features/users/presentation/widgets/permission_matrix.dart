@@ -12,6 +12,12 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// memory exercise. The grid scrolls horizontally on a narrow window rather
 /// than dropping columns: a matrix missing a role is worse than one you have
 /// to push sideways.
+///
+/// Three marks, not two. A permission is held at a level — a desk assistant
+/// looks a book up without editing it — and a matrix that flattened that
+/// back into a tick would promise access the app does not grant, or deny one
+/// it does. It reads the same `rolePermissions` the router and every button
+/// read, so what is shown here is what is enforced.
 class PermissionMatrix extends StatelessWidget {
   const PermissionMatrix({super.key});
 
@@ -106,20 +112,9 @@ class PermissionMatrix extends StatelessWidget {
                             SizedBox(
                               width: roleWidth,
                               child: Center(
-                                child:
-                                    (rolePermissions[role] ??
-                                            const <StaffPermission>{})
-                                        .contains(permission)
-                                    ? AppIcon(
-                                        AppIcons.success,
-                                        size: spacing.md + 2,
-                                        color: colors.success,
-                                      )
-                                    : AppIcon(
-                                        AppIcons.remove,
-                                        size: spacing.md + 2,
-                                        color: colors.hairlineStrong,
-                                      ),
+                                child: _LevelMark(
+                                  level: role.levelOf(permission),
+                                ),
                               ),
                             ),
                         ],
@@ -131,6 +126,46 @@ class PermissionMatrix extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// One cell: how far a role reaches into a permission.
+class _LevelMark extends StatelessWidget {
+  const _LevelMark({required this.level});
+
+  final PermissionLevel level;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final colors = context.appColors;
+    final size = context.appSpacing.md + 2;
+
+    final (icon, color, label) = switch (level) {
+      PermissionLevel.manage => (
+        AppIcons.success,
+        colors.success,
+        l10n.rolesLevelManage,
+      ),
+      PermissionLevel.view => (
+        AppIcons.preview,
+        colors.textMuted,
+        l10n.rolesLevelView,
+      ),
+      PermissionLevel.none => (
+        AppIcons.remove,
+        colors.hairlineStrong,
+        l10n.rolesLevelNone,
+      ),
+    };
+
+    // The three marks differ by glyph as well as by colour, so the grid is
+    // still readable without colour vision; the tooltip names the level for
+    // anyone reading it through a screen reader.
+    return Tooltip(
+      message: label,
+      child: AppIcon(icon, size: size, color: color),
     );
   }
 }
