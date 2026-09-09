@@ -5,7 +5,6 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:khulla/app/shell/widgets/shell_brand_mark.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
 import 'package:khulla/app/shell/widgets/shell_more_sheet.dart';
 import 'package:khulla/app/shell/widgets/shell_page_actions.dart';
@@ -183,7 +182,8 @@ class AppShell extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ShellBrandHeader(extended: extended),
+                  // TODO(sawongam): Add brand header
+                  // ShellBrandHeader(extended: extended),
                   Expanded(
                     child: AppNavRail(
                       selectedIndex: visibleIndices.indexOf(
