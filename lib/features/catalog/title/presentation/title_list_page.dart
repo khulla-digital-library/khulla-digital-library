@@ -12,8 +12,10 @@ import 'package:khulla/features/catalog/title/presentation/cubit/title/title_sta
 import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
 import 'package:khulla/features/catalog/title/presentation/title_list_refresh.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_card.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/presentation/cubit/reference_data_cubit.dart';
+import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -249,8 +251,14 @@ class _TitleListPageState extends State<TitleListPage> {
                   icon: AppIcons.book,
                   title: l10n.titlesEmptyTitle,
                   message: l10n.titlesEmptyBody,
-                  actionLabel: l10n.titlesAdd,
-                  onAction: () => unawaited(_addTitle()),
+                  // An empty catalogue still reads as empty to a role that
+                  // cannot fill it; what it must not do is offer the way in.
+                  actionLabel: context.canManage(StaffPermission.catalog)
+                      ? l10n.titlesAdd
+                      : null,
+                  onAction: context.canManage(StaffPermission.catalog)
+                      ? () => unawaited(_addTitle())
+                      : null,
                 ),
           footer: AppPagination(
             rangeLabel: l10n.commonShowingRange(

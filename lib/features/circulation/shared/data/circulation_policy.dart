@@ -34,7 +34,7 @@ class CirculationPolicy {
 
   /// Pickup-window length for ready holds, without leaking the drift row.
   Future<int> loadHoldShelfDays() => guardDatabase(
-    () async => (await _loadLoanRulesRow()).holdShelfDays,
+    () => _loadLoanRulesRow().then((row) => row.holdShelfDays),
     source: '$_source.loadHoldShelfDays',
   );
 
@@ -58,7 +58,7 @@ class CirculationPolicy {
     if (memberRow == null) {
       throw const NotFoundException('That member was not found.');
     }
-    return _loadEffectiveRules(memberRow.memberTypeId);
+    return await _loadEffectiveRules(memberRow.memberTypeId);
   }
 
   Future<LoanRulesRow> _loadLoanRulesRow() async {
@@ -71,6 +71,19 @@ class CirculationPolicy {
       throw const NotFoundException('Loan rules have not been configured.');
     }
     return rulesRow;
+  }
+
+  /// Rejects archived, suspended and expired members in one call so
+  /// checkout and hold placement share a single eligibility entry.
+  void rejectIneligibleMember({
+    required DateTime? archivedAt,
+    required DateTime? suspendedAt,
+    required DateTime? expiresAt,
+    required DateTime today,
+  }) {
+    rejectArchivedMember(archivedAt);
+    rejectSuspendedMember(suspendedAt);
+    rejectExpiredMember(expiresAt, today);
   }
 
   void rejectArchivedMember(DateTime? archivedAt) {

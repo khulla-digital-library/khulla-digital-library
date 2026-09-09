@@ -38,11 +38,24 @@ abstract class AuthState with _$AuthState {
   /// Whether a staff account is signed in on this device.
   bool get isSignedIn => status == AuthStatus.signedIn;
 
-  /// Whether the signed-in account's role carries [permission].
+  /// The signed-in account's role, or the most restricted one when nobody is
+  /// signed in. There is no safer role to be than the one that changes
+  /// nothing.
+  UserRole get role => staff?.role ?? UserRole.readOnly;
+
+  /// How far the signed-in account reaches into [permission].
   ///
-  /// False whenever nobody is signed in — there is no permission to lack
-  /// more safely than by lacking all of them.
-  bool hasPermission(StaffPermission permission) =>
-      staff != null &&
-      (rolePermissions[staff!.role]?.contains(permission) ?? false);
+  /// [PermissionLevel.none] whenever nobody is signed in — there is no
+  /// permission to lack more safely than by lacking all of them.
+  PermissionLevel levelFor(StaffPermission permission) =>
+      staff == null ? PermissionLevel.none : role.levelOf(permission);
+
+  /// Whether the signed-in account may open the section [permission] guards.
+  bool canView(StaffPermission permission) => levelFor(permission).canView;
+
+  /// Whether the signed-in account may change what that section holds.
+  ///
+  /// This is the check every button, menu action and form submit asks. A
+  /// screen that only reads asks [canView].
+  bool canManage(StaffPermission permission) => levelFor(permission).canManage;
 }

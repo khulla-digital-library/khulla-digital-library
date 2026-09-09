@@ -13,8 +13,10 @@ import 'package:khulla/features/circulation/reservation/presentation/place_hold_
 import 'package:khulla/features/circulation/reservation/presentation/reservation_list_refresh.dart';
 import 'package:khulla/features/circulation/shared/domain/reservation_status.dart';
 import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
+import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -95,6 +97,8 @@ class _ReservationListPageState extends State<ReservationListPage> {
     final muted = context.textTheme.bodyMedium?.copyWith(
       color: scheme.onSurfaceVariant,
     );
+    final canWorkTheDesk = context.canManage(StaffPermission.circulation);
+    final canSeeMembers = context.canView(StaffPermission.members);
 
     return BlocBuilder<ReservationListCubit, ReservationListState>(
       builder: (context, state) {
@@ -189,34 +193,41 @@ class _ReservationListPageState extends State<ReservationListPage> {
                 tone: hold.status.tone,
               ),
             ),
-            AppTableColumn<Reservation>(
-              id: 'actions',
-              label: l10n.commonActions,
-              alignment: Alignment.centerRight,
-              cellBuilder: (context, hold) => AppMenuButton(
-                tooltip: l10n.commonMoreActions,
-                actions: [
-                  AppMenuAction(
-                    label: l10n.reservationsMarkReady,
-                    icon: AppIcons.notificationsActive,
-                    enabled: hold.status == ReservationStatus.waiting,
-                    onSelected: () => unawaited(_markReady(hold)),
-                  ),
-                  AppMenuAction(
-                    label: l10n.loansViewMember,
-                    icon: AppIcons.person,
-                    onSelected: () => context.go(Routes.member(hold.memberId)),
-                  ),
-                  AppMenuAction(
-                    label: l10n.reservationsCancel,
-                    icon: AppIcons.close,
-                    isDestructive: true,
-                    enabled: hold.closedAt == null,
-                    onSelected: () => unawaited(_cancel(hold)),
-                  ),
-                ],
+            // The queue is readable by anyone who can open circulation;
+            // moving a hold along it is the desk's work.
+            if (canWorkTheDesk || canSeeMembers)
+              AppTableColumn<Reservation>(
+                id: 'actions',
+                label: l10n.commonActions,
+                alignment: Alignment.centerRight,
+                cellBuilder: (context, hold) => AppMenuButton(
+                  tooltip: l10n.commonMoreActions,
+                  actions: [
+                    if (canWorkTheDesk)
+                      AppMenuAction(
+                        label: l10n.reservationsMarkReady,
+                        icon: AppIcons.notificationsActive,
+                        enabled: hold.status == ReservationStatus.waiting,
+                        onSelected: () => unawaited(_markReady(hold)),
+                      ),
+                    if (canSeeMembers)
+                      AppMenuAction(
+                        label: l10n.loansViewMember,
+                        icon: AppIcons.person,
+                        onSelected: () =>
+                            context.go(Routes.member(hold.memberId)),
+                      ),
+                    if (canWorkTheDesk)
+                      AppMenuAction(
+                        label: l10n.reservationsCancel,
+                        icon: AppIcons.close,
+                        isDestructive: true,
+                        enabled: hold.closedAt == null,
+                        onSelected: () => unawaited(_cancel(hold)),
+                      ),
+                  ],
+                ),
               ),
-            ),
           ],
           emptyState: bootstrapping
               ? const Center(child: AppSpinner())
@@ -232,8 +243,10 @@ class _ReservationListPageState extends State<ReservationListPage> {
                   icon: AppIcons.bookmark,
                   title: l10n.reservationsEmptyTitle,
                   message: l10n.reservationsEmptyBody,
-                  actionLabel: l10n.reservationsPlace,
-                  onAction: () => unawaited(_placeHold()),
+                  actionLabel: canWorkTheDesk ? l10n.reservationsPlace : null,
+                  onAction: canWorkTheDesk
+                      ? () => unawaited(_placeHold())
+                      : null,
                 ),
         );
       },

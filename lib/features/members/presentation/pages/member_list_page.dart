@@ -16,8 +16,10 @@ import 'package:khulla/features/members/presentation/member_labels.dart';
 import 'package:khulla/features/members/presentation/member_list_refresh.dart';
 import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/features/members/presentation/widgets/member_card.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
+import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -172,6 +174,8 @@ class _MemberListPageState extends State<MemberListPage> with DisposeBag {
     final muted = context.textTheme.bodyMedium?.copyWith(
       color: scheme.onSurfaceVariant,
     );
+    final canManage = context.canManage(StaffPermission.members);
+    final canWorkTheDesk = context.canManage(StaffPermission.circulation);
 
     return [
       AppTableColumn<Member>(
@@ -266,54 +270,63 @@ class _MemberListPageState extends State<MemberListPage> with DisposeBag {
           tone: member.status.tone,
         ),
       ),
-      AppTableColumn<Member>(
-        id: 'actions',
-        label: l10n.commonActions,
-        alignment: Alignment.centerRight,
-        cellBuilder: (context, member) => AppMenuButton(
-          tooltip: l10n.commonMoreActions,
-          actions: [
-            AppMenuAction(
-              label: l10n.memberDetailCheckOut,
-              icon: AppIcons.scan,
-              onSelected: () => context.go(
-                Routes.circulationCheckOutForMember(member.cardNumber),
-              ),
-            ),
-            AppMenuAction(
-              label: l10n.memberDetailEdit,
-              icon: AppIcons.edit,
-              onSelected: () => unawaited(_editMember(member)),
-            ),
-            AppMenuAction(
-              label: l10n.memberDetailRenewMembership,
-              icon: AppIcons.renew,
-              onSelected: () => unawaited(_renewMembership(context, member)),
-            ),
-            if (member.suspendedAt != null)
-              AppMenuAction(
-                label: l10n.memberDetailUnsuspend,
-                icon: AppIcons.restore,
-                onSelected: () =>
-                    unawaited(_unsuspendMembership(context, member)),
-              )
-            else
-              AppMenuAction(
-                label: l10n.memberDetailSuspend,
-                icon: AppIcons.blocked,
-                isDestructive: true,
-                onSelected: () =>
-                    unawaited(_suspendMembership(context, member)),
-              ),
-            AppMenuAction(
-              label: l10n.memberDetailArchive,
-              icon: AppIcons.delete,
-              isDestructive: true,
-              onSelected: () => unawaited(_archiveMember(context, member)),
-            ),
-          ],
+      // Two permissions meet in this menu. Editing, renewing, suspending and
+      // archiving a member are members work; sending the row to the checkout
+      // desk is circulation work, and a role can hold either without the
+      // other. With neither, the column itself is gone.
+      if (canManage || canWorkTheDesk)
+        AppTableColumn<Member>(
+          id: 'actions',
+          label: l10n.commonActions,
+          alignment: Alignment.centerRight,
+          cellBuilder: (context, member) => AppMenuButton(
+            tooltip: l10n.commonMoreActions,
+            actions: [
+              if (canWorkTheDesk)
+                AppMenuAction(
+                  label: l10n.memberDetailCheckOut,
+                  icon: AppIcons.scan,
+                  onSelected: () => context.go(
+                    Routes.circulationCheckOutForMember(member.cardNumber),
+                  ),
+                ),
+              if (canManage) ...[
+                AppMenuAction(
+                  label: l10n.memberDetailEdit,
+                  icon: AppIcons.edit,
+                  onSelected: () => unawaited(_editMember(member)),
+                ),
+                AppMenuAction(
+                  label: l10n.memberDetailRenewMembership,
+                  icon: AppIcons.renew,
+                  onSelected: () =>
+                      unawaited(_renewMembership(context, member)),
+                ),
+                if (member.suspendedAt != null)
+                  AppMenuAction(
+                    label: l10n.memberDetailUnsuspend,
+                    icon: AppIcons.restore,
+                    onSelected: () =>
+                        unawaited(_unsuspendMembership(context, member)),
+                  )
+                else
+                  AppMenuAction(
+                    label: l10n.memberDetailSuspend,
+                    icon: AppIcons.blocked,
+                    isDestructive: true,
+                    onSelected: () =>
+                        unawaited(_suspendMembership(context, member)),
+                  ),
+                AppMenuAction(
+                  label: l10n.memberDetailArchive,
+                  icon: AppIcons.delete,
+                  isDestructive: true,
+                  onSelected: () => unawaited(_archiveMember(context, member)),
+                ),
+              ],
+            ],
+          ),
         ),
-      ),
     ];
   }
 
@@ -423,8 +436,12 @@ class _MemberListPageState extends State<MemberListPage> with DisposeBag {
                   icon: AppIcons.people,
                   title: l10n.membersEmptyTitle,
                   message: l10n.membersEmptyBody,
-                  actionLabel: l10n.membersAdd,
-                  onAction: () => unawaited(_addMember()),
+                  actionLabel: context.canManage(StaffPermission.members)
+                      ? l10n.membersAdd
+                      : null,
+                  onAction: context.canManage(StaffPermission.members)
+                      ? () => unawaited(_addMember())
+                      : null,
                 ),
           footer: AppPagination(
             rangeLabel: l10n.commonShowingRange(

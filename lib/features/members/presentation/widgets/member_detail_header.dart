@@ -8,13 +8,16 @@ import 'package:khulla_ui/khulla_ui.dart';
 class MemberDetailHeader extends StatelessWidget {
   const MemberDetailHeader({
     required this.member,
-    required this.onCheckOut,
     required this.menuActions,
+    this.onCheckOut,
     super.key,
   });
 
   final Member member;
-  final VoidCallback onCheckOut;
+
+  /// Sends the member to the checkout desk. Null for a role that may read
+  /// the register without working the counter.
+  final VoidCallback? onCheckOut;
   final List<AppMenuAction> menuActions;
 
   @override
@@ -39,13 +42,16 @@ class MemberDetailHeader extends StatelessWidget {
       ],
       note: member.notes,
       actions: [
-        AppMenuButton(actions: menuActions, tooltip: l10n.commonMoreActions),
-        SizedBox(width: spacing.xs),
-        AppButton(
-          size: AppButtonSize.medium,
-          onPressed: onCheckOut,
-          child: Text(l10n.circulationCheckOut),
-        ),
+        if (menuActions.isNotEmpty) ...[
+          AppMenuButton(actions: menuActions, tooltip: l10n.commonMoreActions),
+          SizedBox(width: spacing.xs),
+        ],
+        if (onCheckOut != null)
+          AppButton(
+            size: AppButtonSize.medium,
+            onPressed: onCheckOut,
+            child: Text(l10n.circulationCheckOut),
+          ),
       ],
     );
   }

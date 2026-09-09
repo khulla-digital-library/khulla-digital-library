@@ -15,8 +15,10 @@ import 'package:khulla/features/catalog/copy/presentation/widgets/copy_card.dart
 import 'package:khulla/features/catalog/copy/presentation/widgets/copy_status_badge.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
+import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -123,6 +125,7 @@ class _CopyListPageState extends State<CopyListPage> {
   }
 
   List<AppTableColumn<Copy>> _columns(AppLocalizations l10n) {
+    final canManage = context.canManage(StaffPermission.catalog);
     final scheme = context.colorScheme;
     final muted = context.textTheme.bodyMedium?.copyWith(
       color: scheme.onSurfaceVariant,
@@ -178,32 +181,36 @@ class _CopyListPageState extends State<CopyListPage> {
           overflow: TextOverflow.ellipsis,
         ),
       ),
-      AppTableColumn<Copy>(
-        id: 'actions',
-        label: l10n.commonActions,
-        alignment: Alignment.centerRight,
-        cellBuilder: (context, copy) => AppMenuButton(
-          tooltip: l10n.commonMoreActions,
-          actions: [
-            AppMenuAction(
-              label: l10n.copiesMarkLost,
-              icon: AppIcons.help,
-              onSelected: () => unawaited(_markLost(copy)),
-            ),
-            AppMenuAction(
-              label: l10n.copiesMarkDamaged,
-              icon: AppIcons.damage,
-              onSelected: () => unawaited(_markDamaged(copy)),
-            ),
-            AppMenuAction(
-              label: l10n.copiesWithdraw,
-              icon: AppIcons.delete,
-              isDestructive: true,
-              onSelected: () => unawaited(_withdraw(copy)),
-            ),
-          ],
+      // Every action in this column writes, so the column itself is gone for
+      // a role that may read the catalogue but not change it — rather than a
+      // menu button that opens onto nothing.
+      if (canManage)
+        AppTableColumn<Copy>(
+          id: 'actions',
+          label: l10n.commonActions,
+          alignment: Alignment.centerRight,
+          cellBuilder: (context, copy) => AppMenuButton(
+            tooltip: l10n.commonMoreActions,
+            actions: [
+              AppMenuAction(
+                label: l10n.copiesMarkLost,
+                icon: AppIcons.help,
+                onSelected: () => unawaited(_markLost(copy)),
+              ),
+              AppMenuAction(
+                label: l10n.copiesMarkDamaged,
+                icon: AppIcons.damage,
+                onSelected: () => unawaited(_markDamaged(copy)),
+              ),
+              AppMenuAction(
+                label: l10n.copiesWithdraw,
+                icon: AppIcons.delete,
+                isDestructive: true,
+                onSelected: () => unawaited(_withdraw(copy)),
+              ),
+            ],
+          ),
         ),
-      ),
     ];
   }
 
@@ -289,8 +296,12 @@ class _CopyListPageState extends State<CopyListPage> {
                   icon: AppIcons.inventory,
                   title: l10n.copiesEmptyTitle,
                   message: l10n.copiesEmptyBody,
-                  actionLabel: l10n.copiesAdd,
-                  onAction: () => unawaited(_addCopy()),
+                  actionLabel: context.canManage(StaffPermission.catalog)
+                      ? l10n.copiesAdd
+                      : null,
+                  onAction: context.canManage(StaffPermission.catalog)
+                      ? () => unawaited(_addCopy())
+                      : null,
                 ),
           footer: AppPagination(
             rangeLabel: l10n.commonShowingRange(

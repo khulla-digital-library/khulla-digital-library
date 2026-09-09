@@ -34,12 +34,20 @@ class StaffFormCubit extends Cubit<StaffFormState> {
           ? null
           : await _staff.findStaffById(staffId);
       if (isClosed) return;
+      // A new account starts pure so the form opens quiet — dirtying an
+      // empty input would fail validation immediately and paint errors
+      // before the desk has typed anything. `save()` re-dirties every
+      // field, so submit-time validation is unaffected.
       emit(
         state.copyWith(
           status: LoadStatus.loaded,
           existing: existing,
-          name: FullName.dirty(existing?.name ?? ''),
-          email: Email.dirty(existing?.email ?? ''),
+          name: existing == null
+              ? const FullName.pure()
+              : FullName.dirty(existing.name),
+          email: existing == null
+              ? const Email.pure()
+              : Email.dirty(existing.email),
           role: existing?.role ?? UserRole.librarian,
         ),
       );

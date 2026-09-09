@@ -44,9 +44,12 @@ class ShellDestination {
   /// *More*.
   final bool primary;
 
-  /// The permission a signed-in role needs to see this section at all. Null
-  /// means every role sees it — the operational sections every shift needs,
-  /// as opposed to the administrative ones a role can be built without.
+  /// The permission a signed-in role must be able to *view* for this section
+  /// to appear at all. Null means every role sees it — the dashboard, and
+  /// settings, which holds this device's own theme.
+  ///
+  /// Seeing a section is not being able to change it: the controls inside ask
+  /// `canManage` for themselves through `PermissionContext`.
   final StaffPermission? permission;
 
   /// Whether this group starts expanded in the extended rail. Only one
@@ -93,16 +96,18 @@ bool isSelectedShellRoute(
 /// then the people. Reports, staff and settings are the things you open once
 /// a week, so they sit under the daily work rather than above it.
 ///
-/// [role] only decides which children of *Settings* are listed — filtering a
-/// branch itself out of this list would desync it from the router's branch
-/// indices (see [ShellDestination]), so a branch a role cannot open still
-/// appears here with its [ShellDestination.permission] set, and it is
-/// `AppShell`'s job to skip it without breaking that index.
+/// [role] decides which *children* are listed, because a child is only ever
+/// a link. A branch is different: filtering one out of this list would desync
+/// it from the router's branch indices (see [ShellDestination]), so a branch
+/// a role cannot open still appears here with its
+/// [ShellDestination.permission] set, and it is `AppShell`'s job to skip it
+/// without breaking that index.
 List<ShellDestination> shellDestinations(
   AppLocalizations l10n,
   UserRole role,
 ) {
-  final granted = rolePermissions[role] ?? const <StaffPermission>{};
+  final canSeeSettings = role.canView(StaffPermission.settings);
+  final canWorkTheDesk = role.canManage(StaffPermission.circulation);
 
   return [
     ShellDestination(
@@ -116,6 +121,7 @@ List<ShellDestination> shellDestinations(
       icon: AppIcons.book,
       route: Routes.catalog,
       primary: true,
+      permission: StaffPermission.catalog,
       expandedByDefault: true,
       children: [
         ShellChild(label: l10n.navCatalogTitles, route: Routes.catalogTitles),
@@ -128,28 +134,35 @@ List<ShellDestination> shellDestinations(
       icon: AppIcons.transfer,
       route: Routes.circulation,
       primary: true,
+      permission: StaffPermission.circulation,
       expandedByDefault: true,
       children: [
         ShellChild(
           label: l10n.navCirculationLoans,
           route: Routes.circulationLoans,
         ),
-        ShellChild(
-          label: l10n.navCirculationCheckOut,
-          route: Routes.circulationCheckOut,
-        ),
-        ShellChild(
-          label: l10n.navCirculationReturn,
-          route: Routes.circulationReturn,
-        ),
+        // The two desks exist only to write a loan. A role that may read
+        // circulation but not work it gets the loan list and the hold queue,
+        // not a checkout form with nothing that submits.
+        if (canWorkTheDesk) ...[
+          ShellChild(
+            label: l10n.navCirculationCheckOut,
+            route: Routes.circulationCheckOut,
+          ),
+          ShellChild(
+            label: l10n.navCirculationReturn,
+            route: Routes.circulationReturn,
+          ),
+        ],
         ShellChild(
           label: l10n.navCirculationReservations,
           route: Routes.circulationReservations,
         ),
-        ShellChild(
-          label: l10n.navCirculationFines,
-          route: Routes.circulationFines,
-        ),
+        if (role.canView(StaffPermission.fines))
+          ShellChild(
+            label: l10n.navCirculationFines,
+            route: Routes.circulationFines,
+          ),
       ],
     ),
     ShellDestination(
@@ -157,6 +170,7 @@ List<ShellDestination> shellDestinations(
       icon: AppIcons.people,
       route: Routes.members,
       primary: true,
+      permission: StaffPermission.members,
     ),
     // ShellDestination(
     //   label: l10n.navOpac,
@@ -184,24 +198,30 @@ List<ShellDestination> shellDestinations(
       icon: AppIcons.settings,
       route: Routes.settings,
       children: [
-        ShellChild(
-          label: l10n.navSettingsLibrary,
-          route: Routes.settingsLibrary,
-        ),
-        ShellChild(
-          label: l10n.navSettingsLoanRules,
-          route: Routes.settingsLoanRules,
-        ),
+        if (canSeeSettings) ...[
+          ShellChild(
+            label: l10n.navSettingsLibrary,
+            route: Routes.settingsLibrary,
+          ),
+          ShellChild(
+            label: l10n.navSettingsLoanRules,
+            route: Routes.settingsLoanRules,
+          ),
+        ],
+        // The theme is this device's preference rather than the library's
+        // record, so it stays with every role — including the one that may
+        // change nothing else.
         ShellChild(
           label: l10n.navSettingsAppearance,
           route: Routes.settingsAppearance,
         ),
-        if (granted.contains(StaffPermission.backup))
+        if (role.canView(StaffPermission.backup))
           ShellChild(
             label: l10n.navSettingsBackup,
             route: Routes.settingsBackup,
           ),
-        ShellChild(label: l10n.navSettingsSync, route: Routes.settingsSync),
+        if (canSeeSettings)
+          ShellChild(label: l10n.navSettingsSync, route: Routes.settingsSync),
       ],
     ),
   ];

@@ -53,7 +53,7 @@ class RoleListPage extends StatelessWidget {
                     SizedBox(height: spacing.lg),
                     SectionCard(
                       title: l10n.rolesMatrixTitle,
-                      subtitle: l10n.rolesMatrixSubtitle,
+                      subtitle: l10n.rolesLegend,
                       child: const PermissionMatrix(),
                     ),
                   ],
@@ -79,7 +79,9 @@ class _RoleCard extends StatelessWidget {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
     final colors = context.appColors;
-    final granted = rolePermissions[role] ?? const <StaffPermission>{};
+    // Anything the role can open counts, at either level — the card is a
+    // reach-at-a-glance, and the matrix below it says how far.
+    final granted = StaffPermission.values.where(role.canView).length;
 
     return AppCard(
       child: Column(
@@ -127,7 +129,7 @@ class _RoleCard extends StatelessWidget {
               Flexible(
                 child: Text(
                   l10n.rolesPermissionCount(
-                    '${granted.length}',
+                    '$granted',
                     '${StaffPermission.values.length}',
                   ),
                   maxLines: 1,
