@@ -16,18 +16,27 @@ import 'package:khulla_ui/src/theme/app_palette.dart';
 /// (replaced by [AppShadows]) and the input decorator's focus behaviour
 /// (replaced by a padding nudge — see `AppTextField`).
 abstract final class AppTheme {
-  /// The light theme at [density]. This is the shipped theme.
-  static ThemeData light([AppDensity density = AppDensity.comfortable]) =>
-      _themeFrom(Brightness.light, density);
+  /// The light theme at [density], colored by [brand]. This is the shipped
+  /// theme.
+  static ThemeData light([
+    AppDensity density = AppDensity.comfortable,
+    AppBrand brand = AppBrand.teal,
+  ]) => _themeFrom(Brightness.light, density, brand);
 
-  /// The dark theme at [density].
-  static ThemeData dark([AppDensity density = AppDensity.comfortable]) =>
-      _themeFrom(Brightness.dark, density);
+  /// The dark theme at [density], colored by [brand].
+  static ThemeData dark([
+    AppDensity density = AppDensity.comfortable,
+    AppBrand brand = AppBrand.teal,
+  ]) => _themeFrom(Brightness.dark, density, brand);
 
-  static ThemeData _themeFrom(Brightness brightness, AppDensity density) {
+  static ThemeData _themeFrom(
+    Brightness brightness,
+    AppDensity density,
+    AppBrand brand,
+  ) {
     final isLight = brightness == Brightness.light;
-    final colorScheme = _brandColorScheme(brightness);
-    final appColors = isLight ? AppColors.light() : AppColors.dark();
+    final colorScheme = _brandColorScheme(brightness, brand);
+    final appColors = isLight ? AppColors.light(brand) : AppColors.dark(brand);
     final shadows = isLight ? AppShadows.light() : AppShadows.dark();
     final metrics = AppMetrics.of(density);
     final typography = AppTextStyles(density: density);
@@ -357,27 +366,27 @@ abstract final class AppTheme {
     );
   }
 
-  static ColorScheme _brandColorScheme(Brightness brightness) {
+  static ColorScheme _brandColorScheme(Brightness brightness, AppBrand brand) {
     final seeded = ColorScheme.fromSeed(
-      seedColor: AppPalette.brand,
+      seedColor: brand.seed,
       brightness: brightness,
       dynamicSchemeVariant: DynamicSchemeVariant.neutral,
     );
 
     if (brightness == Brightness.light) {
       return seeded.copyWith(
-        primary: AppPalette.brand,
-        onPrimary: AppPalette.onBrand,
-        primaryContainer: AppPalette.brandTint,
-        onPrimaryContainer: AppPalette.brand,
+        primary: brand.seed,
+        onPrimary: brand.onBrand,
+        primaryContainer: brand.tint,
+        onPrimaryContainer: brand.seed,
         secondary: AppPalette.secondaryLight,
         onSecondary: AppPalette.ink100Light,
         secondaryContainer: AppPalette.secondaryLight,
         onSecondaryContainer: AppPalette.ink100Light,
-        tertiary: AppPalette.brandDeep,
+        tertiary: brand.deep,
         onTertiary: AppPalette.white100,
-        tertiaryContainer: AppPalette.brandTintFaint,
-        onTertiaryContainer: AppPalette.brandDeep,
+        tertiaryContainer: brand.tintFaint,
+        onTertiaryContainer: brand.deep,
         error: AppPalette.danger,
         onError: AppPalette.white100,
         errorContainer: AppPalette.dangerTint,
@@ -400,18 +409,18 @@ abstract final class AppTheme {
     }
 
     return seeded.copyWith(
-      primary: AppPalette.brand,
-      onPrimary: AppPalette.onBrand,
+      primary: brand.seed,
+      onPrimary: brand.onBrand,
       primaryContainer: AppPalette.surfaceDark,
       onPrimaryContainer: AppPalette.ink100Dark,
       secondary: AppPalette.surfaceDark,
       onSecondary: AppPalette.ink100Dark,
       secondaryContainer: AppPalette.surfaceDark,
       onSecondaryContainer: AppPalette.ink100Dark,
-      tertiary: AppPalette.accent,
+      tertiary: brand.accent,
       onTertiary: AppPalette.ink100Light,
       tertiaryContainer: AppPalette.surfaceDark,
-      onTertiaryContainer: AppPalette.accent,
+      onTertiaryContainer: brand.accent,
       error: AppPalette.danger,
       onError: AppPalette.white100,
       errorContainer: AppPalette.surfaceDark,
