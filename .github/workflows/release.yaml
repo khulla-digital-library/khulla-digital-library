@@ -1,0 +1,275 @@
+name: Release
+
+# Landing on `prod` is what ships. Every push to it builds all four targets and
+# publishes them as a release at the version in pubspec.yaml — no tag to push by
+# hand, no second step to forget. The workflow creates the `v<version>` tag.
+#
+# So bumping `version:` in pubspec.yaml is part of the pull request, not an
+# afterthought. A push whose version was already released publishes nothing and
+# says so, rather than overwriting the release people already downloaded.
+#
+# Run it by hand ("Run workflow" in the Actions tab) on any branch to get the
+# same four builds as downloadable artifacts with nothing published — that is
+# how a tester gets a build of unreleased work.
+on:
+  push:
+    branches: [prod]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    name: Resolve version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      tag: ${{ steps.resolve.outputs.tag }}
+      build: ${{ steps.resolve.outputs.build }}
+      release: ${{ steps.resolve.outputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # tools/version.dart imports nothing but dart:io, so this job needs a
+      # bare SDK — no Flutter, no pub get, no code generation.
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Resolve the version being built
+        id: resolve
+        shell: bash
+        run: |
+          # The same script the app reads its version from, so the number in
+          # the release, the tag and the About line cannot disagree.
+          version="$(dart tools/version.dart)"
+          tag="v$version"
+
+          # A manual run is for handing someone a build, never for publishing:
+          # it can be fired from any branch, at any state of the version.
+          if [ "$GITHUB_EVENT_NAME" != "push" ]; then
+            {
+              echo "version=$version-dev.${GITHUB_SHA::7}"
+              echo "build=true"
+              echo "release=false"
+            } >> "$GITHUB_OUTPUT"
+            echo "Manual run — building \`$version-dev.${GITHUB_SHA::7}\` as artifacts. Nothing is published." \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # The tag is the record of what has already shipped. Re-releasing over
+          # it would change what a download at that version contains, which is
+          # exactly what a version number is supposed to rule out.
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+            {
+              echo "version=$version"
+              echo "build=false"
+              echo "release=false"
+            } >> "$GITHUB_OUTPUT"
+            echo "::warning::$tag is already released, so this push shipped nothing." \
+                 "Bump version: in pubspec.yaml to release these changes."
+            {
+              echo "### No release"
+              echo
+              echo "\`$tag\` already exists, so this push published nothing."
+              echo "Bump \`version:\` in \`pubspec.yaml\` and merge again to ship these changes."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          {
+            echo "version=$version"
+            echo "tag=$tag"
+            echo "build=true"
+            echo "release=true"
+          } >> "$GITHUB_OUTPUT"
+          echo "Releasing **$tag** from \`pubspec.yaml\`." >> "$GITHUB_STEP_SUMMARY"
+
+  windows:
+    name: Windows
+    needs: version
+    if: needs.version.outputs.build == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          bootstrap: pub
+
+      - name: Build
+        run: flutter build windows --release -t lib/main_prod.dart
+
+      # A portable folder, not an installer: unzip anywhere and run khulla.exe.
+      # The catalogue lives in the user's application-support directory, so
+      # moving or replacing this folder never touches library data.
+      - name: Package
+        shell: pwsh
+        run: |
+          $name = "khulla-${{ needs.version.outputs.version }}-windows-x64"
+          New-Item -ItemType Directory -Path dist | Out-Null
+          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "dist/$name.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/*
+          if-no-files-found: error
+
+  linux:
+    name: Linux
+    needs: version
+    if: needs.version.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the Linux desktop toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev libcups2-dev
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          bootstrap: pub
+
+      - name: Build
+        run: flutter build linux --release -t lib/main_prod.dart
+
+      - name: Package
+        run: |
+          name="khulla-${{ needs.version.outputs.version }}-linux-x64"
+          mkdir -p dist
+          tar -czf "dist/$name.tar.gz" -C build/linux/x64/release/bundle .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: dist/*
+          if-no-files-found: error
+
+  android:
+    name: Android
+    needs: version
+    if: needs.version.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          bootstrap: pub
+
+      # One universal APK rather than per-ABI splits: a tester sideloading from
+      # a release page should not have to know what a CPU architecture is.
+      # Signed with debug keys (see android/app/build.gradle.kts) — fine for
+      # sideloading, not for Play. docs/contributing/releasing.md says how to
+      # add a real signing key when that day comes.
+      - name: Build
+        run: flutter build apk --release -t lib/main_prod.dart
+
+      - name: Package
+        run: |
+          name="khulla-${{ needs.version.outputs.version }}-android"
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk "dist/$name.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: dist/*
+          if-no-files-found: error
+
+  web:
+    name: Web
+    needs: version
+    if: needs.version.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          bootstrap: pub
+
+      # Built at the site root, for a library serving it from its own host. The
+      # GitHub Pages demo is built separately by deploy-web.yaml, which needs a
+      # different base href.
+      - name: Build
+        run: flutter build web --release -t lib/main_prod.dart
+
+      - name: Package
+        run: |
+          name="khulla-${{ needs.version.outputs.version }}-web"
+          mkdir -p dist
+          tar -czf "dist/$name.tar.gz" -C build/web .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish release
+    if: needs.version.outputs.release == 'true'
+    needs: [version, windows, linux, android, web]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Collect and checksum
+        run: |
+          mkdir -p dist
+          find artifacts -type f -exec mv {} dist/ \;
+          cd dist
+          sha256sum * > SHA256SUMS.txt
+          ls -lh
+
+      # Creates the tag as well as the release — nobody tags by hand, and the
+      # tag is what tells the next push to prod that this version has shipped.
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Khulla ${{ needs.version.outputs.version }}
+          tag_name: ${{ needs.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          files: dist/*
+          body: |
+            ## Downloads
+
+            | Platform | File | How to run it |
+            | --- | --- | --- |
+            | Windows | `khulla-${{ needs.version.outputs.version }}-windows-x64.zip` | Unzip anywhere, run `khulla.exe`. Windows SmartScreen will warn about an unknown publisher — *More info* → *Run anyway*. |
+            | Android | `khulla-${{ needs.version.outputs.version }}-android.apk` | Sideload it; allow installs from your browser or file manager. |
+            | Web | `khulla-${{ needs.version.outputs.version }}-web.tar.gz` | Serve the extracted folder from any static host. |
+            | Linux | `khulla-${{ needs.version.outputs.version }}-linux-x64.tar.gz` | Extract and run `./khulla`. |
+
+            Verify a download against `SHA256SUMS.txt`.
+
+            Khulla is local-first: your catalogue is a SQLite file on your own
+            machine, and nothing is sent anywhere. Uninstalling the app does not
+            delete it — take a backup from **Settings → Backup** before moving
+            between machines.

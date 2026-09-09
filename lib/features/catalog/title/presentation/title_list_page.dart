@@ -1,22 +1,38 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/core/di/injection.dart';
 import 'package:khulla/core/router/routes.dart';
-import 'package:khulla/features/catalog/shared/domain/catalog_format.dart';
 import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
-import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_placeholder.dart';
-import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_title.dart';
+import 'package:khulla/features/catalog/title/domain/models/title.dart'
+    as catalog;
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_cubit.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_state.dart';
 import 'package:khulla/features/catalog/title/presentation/title_form_dialog.dart';
+import 'package:khulla/features/catalog/title/presentation/title_list_refresh.dart';
 import 'package:khulla/features/catalog/title/presentation/widgets/title_card.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/presentation/cubit/reference_data_cubit.dart';
+import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
+import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
+
+String _displayOrDash(String? value) =>
+    value == null || value.isEmpty ? '-' : value;
 
 /// Every work the library holds.
 ///
-/// The screen is interface-only: the search, the filters, the ordering and
-/// the paging all run over `placeholderTitles` in memory. When
-/// `TitleCubit` lands it owns exactly these four pieces of state and turns
-/// them into one query — the sort becomes an `ORDER BY`, the page becomes a
-/// `LIMIT`, and nothing above this comment changes.
+/// [TitleCubit] owns search, format and availability filters, sort and paging —
+/// the same four knobs the placeholder ran in memory, now one SQLite query.
+/// Format chips read [ReferenceDataCubit] because formats are reference data,
+/// not part of the title query. The [CollectionPageView] shape is unchanged:
+/// row tap opens the detail route, the empty state opens [TitleFormDialog].
 class TitleListPage extends StatefulWidget {
   const TitleListPage({super.key});
 
@@ -25,139 +41,117 @@ class TitleListPage extends StatefulWidget {
 }
 
 class _TitleListPageState extends State<TitleListPage> {
-  static const int _pageSize = 8;
-
-  String _query = '';
-  CatalogFormat? _format;
-  bool _availableOnly = false;
-  AppTableSort _sort = const AppTableSort(columnId: 'title');
-  int _page = 0;
-
-  bool get _isFiltered =>
-      _query.isNotEmpty || _format != null || _availableOnly;
-
-  void _clearFilters() => setState(() {
-    _query = '';
-    _format = null;
-    _availableOnly = false;
-    _page = 0;
-  });
-
-  /// The rows the current search, filters and ordering select.
-  ///
-  /// In memory only because there is no table yet. A catalogue of ten
-  /// thousand titles sorts in SQLite, not here.
-  List<CatalogTitle> get _matches {
-    final needle = _query.trim().toLowerCase();
-    final matches = [
-      for (final title in placeholderTitles)
-        if ((needle.isEmpty ||
-                title.title.toLowerCase().contains(needle) ||
-                title.author.toLowerCase().contains(needle) ||
-                title.isbn.toLowerCase().contains(needle)) &&
-            (_format == null || title.format == _format) &&
-            (!_availableOnly || title.available > 0))
-          title,
-    ];
-
-    return matches..sort((a, b) {
-      final order = switch (_sort.columnId) {
-        'author' => a.author.compareTo(b.author),
-        'year' => a.year.compareTo(b.year),
-        'shelf' => a.shelf.compareTo(b.shelf),
-        'copies' => a.copies.compareTo(b.copies),
-        'available' => a.available.compareTo(b.available),
-        _ => a.title.compareTo(b.title),
-      };
-      return _sort.ascending ? order : -order;
-    });
+  @override
+  void initState() {
+    super.initState();
+    getIt<TitleListRefresh>().reload = _reload;
   }
 
-  List<AppTableColumn<CatalogTitle>> _columns(AppLocalizations l10n) {
+  @override
+  void dispose() {
+    getIt<TitleListRefresh>().reload = null;
+    super.dispose();
+  }
+
+  void _reload() {
+    if (!mounted) return;
+    unawaited(context.read<TitleCubit>().loadTitles());
+  }
+
+  Future<void> _addTitle() async {
+    final saved = await TitleFormDialog.show(context);
+    if (saved == true && mounted) {
+      await context.read<TitleCubit>().loadTitles();
+    }
+  }
+
+  bool _isFiltered(TitleState state) =>
+      state.query.search.isNotEmpty ||
+      state.query.formatId != null ||
+      state.query.availableOnly;
+
+  List<AppTableColumn<catalog.Title>> _columns(AppLocalizations l10n) {
     final scheme = context.colorScheme;
+    final muted = context.textTheme.bodyMedium?.copyWith(
+      color: scheme.onSurfaceVariant,
+    );
+    final smallMuted = context.textTheme.bodySmall?.copyWith(
+      color: scheme.onSurfaceVariant,
+    );
+    final isbnStyle = context.appTextStyles.numeric.copyWith(
+      color: scheme.onSurfaceVariant,
+    );
 
     return [
-      AppTableColumn<CatalogTitle>(
+      AppTableColumn<catalog.Title>(
         id: 'title',
         label: l10n.titlesColumnTitle,
         flex: 4,
         sortable: true,
         cellBuilder: (context, title) => Row(
           children: [
-            AppIcon(
-              title.format.icon,
-              size: context.appSpacing.md,
-              color: scheme.onSurfaceVariant,
+            Expanded(
+              child: Text(
+                title.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            SizedBox(width: context.appSpacing.xs),
-            Flexible(child: Text(title.title)),
           ],
         ),
       ),
-      AppTableColumn<CatalogTitle>(
+      AppTableColumn<catalog.Title>(
         id: 'author',
         label: l10n.titlesColumnAuthor,
-        flex: 3,
+        flex: 2,
         sortable: true,
-        showFrom: FormFactor.medium,
-        cellBuilder: (context, title) => Text(
-          title.author,
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: scheme.onSurfaceVariant,
-          ),
-        ),
+        cellBuilder: (context, title) =>
+            Text(_displayOrDash(title.author), style: muted),
       ),
-      AppTableColumn<CatalogTitle>(
+      AppTableColumn<catalog.Title>(
         id: 'isbn',
         label: l10n.titlesColumnIsbn,
         flex: 2,
-        showFrom: FormFactor.large,
-        cellBuilder: (context, title) => Text(
-          title.isbn,
-          style: context.textTheme.bodySmall?.copyWith(
-            color: scheme.onSurfaceVariant,
-          ),
-        ),
+        cellBuilder: (context, title) =>
+            Text(_displayOrDash(title.isbn), style: isbnStyle),
       ),
-      AppTableColumn<CatalogTitle>(
-        id: 'shelf',
-        label: l10n.titlesColumnShelf,
+      AppTableColumn<catalog.Title>(
+        id: 'publisher',
+        label: l10n.titlesColumnPublisher,
         flex: 2,
         sortable: true,
-        showFrom: FormFactor.expanded,
-        cellBuilder: (context, title) => Text(title.shelf),
+        cellBuilder: (context, title) =>
+            Text(_displayOrDash(title.publisher), style: muted),
       ),
-      AppTableColumn<CatalogTitle>(
+      AppTableColumn<catalog.Title>(
         id: 'year',
         label: l10n.titlesColumnYear,
-        width: 80,
         sortable: true,
-        alignment: Alignment.centerRight,
-        showFrom: FormFactor.large,
-        cellBuilder: (context, title) => Text(title.year),
+        cellBuilder: (context, title) => Text(_displayOrDash(title.year)),
       ),
-      AppTableColumn<CatalogTitle>(
+      AppTableColumn<catalog.Title>(
         id: 'available',
+        flex: 2,
         label: l10n.titlesColumnAvailable,
-        width: 110,
         sortable: true,
-        alignment: Alignment.centerRight,
-        showFrom: FormFactor.medium,
         cellBuilder: (context, title) => Text(
-          l10n.titlesCopiesOf('${title.available}', '${title.copies}'),
-          style: context.textTheme.bodySmall?.copyWith(
-            color: scheme.onSurfaceVariant,
+          l10n.titlesCopiesOf(
+            '${title.availableCount}',
+            '${title.copyCount}',
           ),
+          style: smallMuted,
         ),
       ),
-      AppTableColumn<CatalogTitle>(
+      AppTableColumn<catalog.Title>(
         id: 'status',
         label: l10n.commonStatus,
-        width: 120,
+        alignment: Alignment.centerRight,
         cellBuilder: (context, title) => AppStatusBadge(
           dense: true,
-          label: title.available > 0 ? l10n.statusAvailable : l10n.statusOnLoan,
-          tone: title.available > 0
+          label: title.availableCount > 0
+              ? l10n.statusAvailable
+              : l10n.statusOnLoan,
+          tone: title.availableCount > 0
               ? AppStatusTone.success
               : AppStatusTone.brand,
         ),
@@ -168,97 +162,125 @@ class _TitleListPageState extends State<TitleListPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final matches = _matches;
-    final pageCount = (matches.length / _pageSize).ceil();
-    final page = _page.clamp(0, pageCount == 0 ? 0 : pageCount - 1);
-    final start = page * _pageSize;
-    final end = (start + _pageSize).clamp(0, matches.length);
-    final rows = matches.sublist(start, end);
+    final cubit = context.read<TitleCubit>();
+    final formats = context.watch<ReferenceDataCubit>().state.formats;
 
-    return CollectionPageView<CatalogTitle>(
-      summary: l10n.titlesSubtitle('${placeholderTitles.length}'),
-      toolbar: AppToolbar(
-        search: AppSearchField(
-          hintText: l10n.titlesSearchHint,
-          clearTooltip: l10n.commonClearSearch,
-          onChanged: (value) => setState(() {
-            _query = value;
-            _page = 0;
-          }),
-        ),
-        filters: [
-          AppFilterChip(
-            label: l10n.statusAvailable,
-            icon: AppIcons.success,
-            tone: AppStatusTone.success,
-            selected: _availableOnly,
-            onSelected: (selected) => setState(() {
-              _availableOnly = selected;
-              _page = 0;
-            }),
+    return BlocBuilder<TitleCubit, TitleState>(
+      builder: (context, state) {
+        if (state.hasError) {
+          return ErrorRetryView(
+            error: state.error,
+            onRetry: cubit.loadTitles,
+          );
+        }
+
+        final bootstrapping = state.isLoading && state.titles.isEmpty;
+        final pageSize = state.query.limit;
+        final pageCount = (state.totalCount / pageSize).ceil();
+        final page = (state.query.offset / pageSize).floor().clamp(
+          0,
+          pageCount == 0 ? 0 : pageCount - 1,
+        );
+        final start = state.totalCount == 0 ? 0 : page * pageSize;
+        final end = (start + state.titles.length).clamp(0, state.totalCount);
+        final sort = AppTableSort(
+          columnId: state.query.sortColumn,
+          ascending: state.query.sortAscending,
+        );
+
+        return CollectionPageView<catalog.Title>(
+          onPageSizeChanged: cubit.limitChanged,
+          summary: l10n.titlesSubtitle('${state.totalCount}'),
+          toolbar: AppToolbar(
+            search: AppSearchField(
+              hintText: l10n.titlesSearchHint,
+              clearTooltip: l10n.commonClearSearch,
+              onChanged: cubit.searchChanged,
+            ),
+            filters: [
+              AppFilterChip(
+                label: l10n.statusAvailable,
+                icon: AppIcons.success,
+                selected: state.query.availableOnly,
+                onSelected: cubit.availableOnlyChanged,
+              ),
+              if (formats.isNotEmpty)
+                SizedBox(
+                  height: context.appSpacing.lg,
+                  child: VerticalDivider(
+                    width: context.appSpacing.md,
+                    thickness: context.appBorders.hairline,
+                    color: context.appColors.hairline,
+                  ),
+                ),
+              for (final format in formats)
+                AppFilterChip(
+                  label: format.label(l10n),
+                  icon: format.icon,
+                  selected: state.query.formatId == format.id,
+                  onSelected: (selected) => cubit.formatFilterChanged(
+                    selected ? format.id : null,
+                  ),
+                ),
+            ],
+            actions: [
+              if (_isFiltered(state))
+                AppTextButton(
+                  onPressed: cubit.clearFilters,
+                  child: Text(l10n.commonClearFilters),
+                ),
+            ],
           ),
-          for (final format in CatalogFormat.values)
-            AppFilterChip(
-              label: format.label(l10n),
-              icon: format.icon,
-              selected: _format == format,
-              onSelected: (selected) => setState(() {
-                _format = selected ? format : null;
-                _page = 0;
-              }),
+          items: state.titles,
+          columns: _columns(l10n),
+          sort: sort,
+          onSort: (next) => cubit.sortChanged(next.columnId, next.ascending),
+          onRowTap: (title) => context.go(Routes.catalogTitle(title.id)),
+          compactBuilder: (context, title) => TitleCard(
+            title: title,
+            onTap: () => context.go(Routes.catalogTitle(title.id)),
+          ),
+          emptyState: bootstrapping
+              ? const Center(child: AppSpinner())
+              : _isFiltered(state)
+              ? AppEmptyView(
+                  icon: AppIcons.noResults,
+                  title: l10n.commonNoMatchesTitle,
+                  message: l10n.commonNoMatchesBody,
+                  actionLabel: l10n.commonClearFilters,
+                  onAction: cubit.clearFilters,
+                )
+              : AppEmptyView(
+                  icon: AppIcons.book,
+                  title: l10n.titlesEmptyTitle,
+                  message: l10n.titlesEmptyBody,
+                  // An empty catalogue still reads as empty to a role that
+                  // cannot fill it; what it must not do is offer the way in.
+                  actionLabel: context.canManage(StaffPermission.catalog)
+                      ? l10n.titlesAdd
+                      : null,
+                  onAction: context.canManage(StaffPermission.catalog)
+                      ? () => unawaited(_addTitle())
+                      : null,
+                ),
+          footer: AppPagination(
+            rangeLabel: l10n.commonShowingRange(
+              state.totalCount == 0 ? '0' : '${start + 1}',
+              '$end',
+              '${state.totalCount}',
             ),
-        ],
-        actions: [
-          if (_isFiltered)
-            AppTextButton(
-              onPressed: _clearFilters,
-              child: Text(l10n.commonClearFilters),
-            ),
-        ],
-      ),
-      items: rows,
-      columns: _columns(l10n),
-      sort: _sort,
-      onSort: (next) => setState(() {
-        _sort = next;
-        _page = 0;
-      }),
-      onRowTap: (title) => context.go(Routes.catalogTitle(title.id)),
-      compactBuilder: (context, title) => TitleCard(
-        title: title,
-        onTap: () => context.go(Routes.catalogTitle(title.id)),
-      ),
-      emptyState: _isFiltered
-          ? AppEmptyView(
-              icon: AppIcons.noResults,
-              title: l10n.commonNoMatchesTitle,
-              message: l10n.commonNoMatchesBody,
-              actionLabel: l10n.commonClearFilters,
-              onAction: _clearFilters,
-            )
-          : AppEmptyView(
-              icon: AppIcons.book,
-              title: l10n.titlesEmptyTitle,
-              message: l10n.titlesEmptyBody,
-              actionLabel: l10n.titlesAdd,
-              onAction: () => TitleFormDialog.show(context),
-            ),
-      footer: AppPagination(
-        rangeLabel: l10n.commonShowingRange(
-          '${start + 1}',
-          '$end',
-          '${matches.length}',
-        ),
-        previousTooltip: l10n.commonPreviousPage,
-        nextTooltip: l10n.commonNextPage,
-        pageCount: pageCount,
-        currentPage: page,
-        onPageSelected: (next) => setState(() => _page = next),
-        onPrevious: page == 0 ? null : () => setState(() => _page = page - 1),
-        onNext: page >= pageCount - 1
-            ? null
-            : () => setState(() => _page = page + 1),
-      ),
+            previousTooltip: l10n.commonPreviousPage,
+            nextTooltip: l10n.commonNextPage,
+            pageCount: pageCount,
+            currentPage: page,
+            onPageSelected: cubit.pageChanged,
+            onPrevious: page == 0 ? null : () => cubit.pageChanged(page - 1),
+            onNext: page >= pageCount - 1
+                ? null
+                : () => cubit.pageChanged(page + 1),
+          ),
+        );
+      },
     );
   }
 }

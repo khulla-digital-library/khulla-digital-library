@@ -1,12 +1,12 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// One data operation: what it does, what it costs, and the control that
-/// starts it.
+/// One routine data operation: what it does, and the control that starts it.
 ///
-/// [isDestructive] switches the button to the error role rather than moving
-/// it somewhere different — the danger-zone card around it is what separates
-/// it from the routine actions, and its own confirmation dialog is what stops
-/// an accident.
+/// Routine only — the erase entry has its own card with the danger carried
+/// by its button rather than a wash around it.
 class SettingsActionCard extends StatelessWidget {
   const SettingsActionCard({
     required this.title,
@@ -14,7 +14,7 @@ class SettingsActionCard extends StatelessWidget {
     required this.actionLabel,
     required this.onAction,
     required this.icon,
-    this.isDestructive = false,
+    this.isLoading = false,
     super.key,
   });
 
@@ -23,20 +23,25 @@ class SettingsActionCard extends StatelessWidget {
   final String actionLabel;
   final VoidCallback onAction;
   final AppIconSpec icon;
-  final bool isDestructive;
+
+  /// Shows the action button's spinner and disables it — a card whose
+  /// action restarts the app on success has nowhere else to put that state.
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
-    final tone = isDestructive ? AppStatusTone.danger : AppStatusTone.brand;
 
     return AppCard(
-      tone: isDestructive ? AppStatusTone.danger : null,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppIcon(icon, size: spacing.lg - 2, color: tone.foreground(context)),
+          AppIcon(
+            icon,
+            size: spacing.lg - 2,
+            color: AppStatusTone.brand.foreground(context),
+          ),
           SizedBox(width: spacing.sm),
           Expanded(
             child: Column(
@@ -63,6 +68,7 @@ class SettingsActionCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: AppButton(
                     variant: AppButtonVariant.outline,
+                    isLoading: isLoading,
                     onPressed: onAction,
                     child: Text(actionLabel),
                   ),

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 import 'package:khulla_ui/src/theme/app_palette.dart';
 
@@ -54,9 +57,12 @@ class AppColors extends ThemeExtension<AppColors> {
   });
 
   /// The light palette — the shipped theme.
-  factory AppColors.light() => AppColors(
-    brand: AppPalette.brand,
-    accent: AppPalette.accent,
+  ///
+  /// [brand] is the only variable: everything else is fixed, so an operator
+  /// picking a different brand moves the five brand roles and nothing else.
+  factory AppColors.light([AppBrand brand = AppBrand.teal]) => AppColors(
+    brand: brand.seed,
+    accent: brand.accent,
     ink100: AppPalette.ink100Light,
     ink200: AppPalette.ink200Light,
     ink300: AppPalette.ink300Light,
@@ -74,15 +80,15 @@ class AppColors extends ThemeExtension<AppColors> {
     onWarning: AppPalette.white100,
     warningSoft: _wash(AppPalette.warning),
     info: AppPalette.info,
-    onInfo: AppPalette.ink100Light,
+    onInfo: AppPalette.white100,
     infoSoft: _wash(AppPalette.info),
     danger: AppPalette.danger,
     onDanger: AppPalette.white100,
     dangerSoft: _wash(AppPalette.danger),
     neutralSoft: AppPalette.secondaryLight,
-    brandSoft: _tint(AppPalette.accent, 0.2),
-    brandStrong: AppPalette.brandButtonBorder,
-    brandDeep: AppPalette.brandDeep,
+    brandSoft: _tint(brand.accent, 0.2),
+    brandStrong: brand.strong,
+    brandDeep: brand.deep,
     textHigh: AppPalette.ink100Light,
     textMuted: AppPalette.ink500Light,
     hairline: AppPalette.borderLight,
@@ -94,8 +100,8 @@ class AppColors extends ThemeExtension<AppColors> {
 
   /// The dark palette. Complete, so enabling dark is a data change rather
   /// than a rewrite.
-  factory AppColors.dark() => AppColors(
-    brand: AppPalette.brand,
+  factory AppColors.dark([AppBrand brand = AppBrand.teal]) => AppColors(
+    brand: brand.seed,
     accent: AppPalette.white400,
     ink100: AppPalette.ink100Dark,
     ink200: AppPalette.ink200Dark,
@@ -114,15 +120,15 @@ class AppColors extends ThemeExtension<AppColors> {
     onWarning: AppPalette.white100,
     warningSoft: _wash(AppPalette.warning, 0.14, AppPalette.surfaceDark),
     info: AppPalette.info,
-    onInfo: AppPalette.ink100Light,
+    onInfo: AppPalette.white100,
     infoSoft: _wash(AppPalette.info, 0.14, AppPalette.surfaceDark),
     danger: AppPalette.danger,
     onDanger: AppPalette.white100,
     dangerSoft: _wash(AppPalette.danger, 0.18, AppPalette.surfaceDark),
     neutralSoft: AppPalette.surfaceDark,
-    brandSoft: _tint(AppPalette.accent, 0.16),
-    brandStrong: AppPalette.brandButtonBorder,
-    brandDeep: AppPalette.brandDeep,
+    brandSoft: _tint(brand.accent, 0.16),
+    brandStrong: brand.strong,
+    brandDeep: brand.deep,
     textHigh: AppPalette.ink100Dark,
     textMuted: AppPalette.ink500Dark,
     hairline: AppPalette.borderDark,
@@ -411,6 +417,9 @@ extension type AppTints(AppColors _c) {
 
   /// The hover fill under a destructive action.
   Color get destructiveHover => _c.danger.withValues(alpha: 0.1);
+
+  /// The hover fill under a positive outlined action.
+  Color get successHover => _c.success.withValues(alpha: 0.1);
 
   /// The switch track when on.
   Color get switchTrackOn => _c.accent.withValues(alpha: 0.3);

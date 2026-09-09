@@ -1,0 +1,93 @@
+name: Set up Flutter
+description: >
+  Install the Flutter SDK pinned in .fvmrc, resolve dependencies, and run the
+  code generation a fresh checkout needs before anything will analyze or build.
+
+inputs:
+  bootstrap:
+    description: >
+      How to resolve dependencies. "melos" links every workspace package (needed
+      to analyze or test packages/); "pub" resolves the app alone, which is
+      enough to build it. "none" skips resolution entirely.
+    required: false
+    default: melos
+  codegen:
+    description: Run build_runner and gen-l10n after resolving dependencies.
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    # .fvmrc is the single source of truth for the SDK version — CI must not
+    # carry a second copy of it that can drift from what developers run.
+    - name: Read the pinned Flutter version
+      id: pinned
+      shell: bash
+      run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ steps.pinned.outputs.version }}
+        channel: stable
+        cache: true
+
+    # melos.yaml points sdkPath at .fvm/flutter_sdk, where FVM would have put
+    # the SDK. The runner already has one, so link it rather than downloading a
+    # second copy. Skipped on Windows, where Git Bash copies instead of linking
+    # — the Windows job builds with `flutter` directly and never calls melos.
+    - name: Point melos at the runner's SDK
+      if: runner.os != 'Windows'
+      shell: bash
+      run: |
+        mkdir -p .fvm
+        ln -sfn "$FLUTTER_ROOT" .fvm/flutter_sdk
+
+    # The Makefile drives Flutter through FVM locally. On a runner the SDK is
+    # already on PATH and there is no `fvm` binary, so override the two
+    # variables rather than installing FVM to shell out to the same SDK.
+    - name: Point the Makefile at the runner's SDK
+      shell: bash
+      run: |
+        {
+          echo "FLUTTER=flutter"
+          echo "DART=dart"
+        } >> "$GITHUB_ENV"
+
+    - name: Cache pub packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.pub-cache
+          ~/AppData/Local/Pub/Cache
+        key: pub-${{ runner.os }}-${{ steps.pinned.outputs.version }}-${{ hashFiles('pubspec.yaml', 'packages/**/pubspec.yaml') }}
+        restore-keys: |
+          pub-${{ runner.os }}-${{ steps.pinned.outputs.version }}-
+
+    # `dart run melos` needs the root package resolved before melos itself can
+    # resolve the rest, so this is two steps rather than one.
+    - name: Bootstrap the workspace
+      if: inputs.bootstrap == 'melos'
+      shell: bash
+      run: |
+        flutter pub get
+        dart run melos bootstrap
+
+    - name: Resolve app dependencies
+      if: inputs.bootstrap == 'pub'
+      shell: bash
+      run: flutter pub get
+
+    # Generated sources are not committed, so this is not optional — see the
+    # "Generated code" section of .gitignore. Same two commands as `make build`.
+    - name: Generate code
+      if: inputs.codegen == 'true'
+      shell: bash
+      run: |
+        dart run build_runner build --delete-conflicting-outputs
+        dart tools/version.dart --write
+
+    - name: Generate localizations
+      if: inputs.codegen == 'true'
+      shell: bash
+      run: flutter gen-l10n

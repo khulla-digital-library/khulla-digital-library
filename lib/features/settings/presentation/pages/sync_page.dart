@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/features/settings/presentation/placeholder/sync_placeholder.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
@@ -171,7 +174,6 @@ class _SyncPageState extends State<SyncPage> {
                         )
                       : AppTable<SyncSnapshot>(
                           items: placeholderSnapshots,
-                          rowHeight: 48,
                           columns: [
                             AppTableColumn<SyncSnapshot>(
                               id: 'when',

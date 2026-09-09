@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/core/config/app_config.dart';
 
 /// No-op on web and mobile, where the app does not own its window.

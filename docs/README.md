@@ -39,6 +39,7 @@ docs/
 | Run code generation | [Code generation guide](architecture/guides/code-generation-pipeline.md) |
 | Understand the monorepo setup | [Melos guide](architecture/guides/melos-monorepo.md) |
 | Open a pull request | [Contributing](contributing/README.md) |
+| Cut a release, or send someone a test build | [Releasing](contributing/releasing.md) |
 
 ---
 
@@ -57,7 +58,9 @@ See [`architecture/README.md`](architecture/README.md) for the full index and in
 
 - [`overview.md`](database/overview.md) — a walkthrough of every database file: what it does, why it's there, how it connects
 - [`guide.md`](database/guide.md) — how to add tables, write queries, run migrations, and remove things safely
+- [`schema.md`](database/schema.md) — the visual schema: generated Mermaid ER diagram (`make db-diagram`)
 
 ### `contributing/`
 
 - [`README.md`](contributing/README.md) — setup, code conventions, branch and commit rules, how to open a PR
+- [`releasing.md`](contributing/releasing.md) — the CI workflows, cutting a tagged release, sending someone a test build

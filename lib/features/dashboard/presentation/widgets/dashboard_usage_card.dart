@@ -1,21 +1,26 @@
-import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_placeholder.dart';
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_section_card.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Visits against loans, day by day.
+/// Checkouts against returns, day by day.
 ///
 /// Two grouped series rather than one stacked bar: the question this card
-/// answers is whether the people who walked in borrowed anything, and a
-/// stacked bar hides exactly that comparison inside its own total.
+/// answers is whether the copies checked out on a given day are the ones
+/// coming back, and a stacked bar hides exactly that comparison inside its
+/// own total.
 class DashboardUsageCard extends StatelessWidget {
-  const DashboardUsageCard({super.key});
+  const DashboardUsageCard({required this.series, super.key});
+
+  /// Checkouts and returns by weekday, in that order.
+  final List<AppChartSeries> series;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
-    final series = dashboardUsageSeries(l10n);
 
     return DashboardSectionCard(
       title: l10n.dashboardUsageTitle,

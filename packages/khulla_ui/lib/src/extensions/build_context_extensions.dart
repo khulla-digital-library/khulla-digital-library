@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/material.dart';
 import 'package:khulla_ui/src/theme/app_borders.dart';
 import 'package:khulla_ui/src/theme/app_breakpoints.dart';

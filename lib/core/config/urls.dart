@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// External URLs used across the app.
 abstract final class AppUrls {
   /// Public source repository.

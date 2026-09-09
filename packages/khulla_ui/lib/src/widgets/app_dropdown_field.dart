@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// {@template app_dropdown_field}
@@ -7,6 +10,16 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// Generic over the value so a caller keeps its own enum or domain type all
 /// the way to `onChanged` — no string round trip, no parsing back. [itemLabel]
 /// is how a value becomes text, which keeps localization on the app side.
+///
+/// Long lists open in a capped panel: a fixed search header when
+/// [searchable] is true or once [items] exceeds [searchThreshold], then a
+/// scrollable list underneath. Short lists skip search and still cap height
+/// when they would overflow [menuMaxHeight]. Overflowing lists keep a
+/// scrollbar thumb visible so the extra rows are obvious without dragging.
+///
+/// [footerActionLabel] pins a create action under the list — the caller
+/// supplies the copy and what happens; this widget only closes the menu and
+/// fires [onFooterAction].
 /// {@endtemplate}
 class AppDropdownField<T> extends StatelessWidget {
   /// {@macro app_dropdown_field}
@@ -21,8 +34,25 @@ class AppDropdownField<T> extends StatelessWidget {
     this.required = false,
     this.enabled = true,
     this.itemIcon,
+    this.searchable,
+    this.searchHint,
+    this.clearSearchTooltip,
+    this.emptySearchMessage,
+    this.searchThreshold = kAppDropdownSearchThreshold,
+    this.itemMatchesSearch,
+    this.menuMaxHeight,
+    this.footerActionLabel,
+    this.onFooterAction,
+    this.footerActionIcon,
     super.key,
-  });
+  }) : assert(
+         searchable != true || searchHint != null,
+         'searchHint is required when searchable is true',
+       ),
+       assert(
+         (footerActionLabel == null) == (onFooterAction == null),
+         'footerActionLabel and onFooterAction must be set together',
+       );
 
   /// The current selection. Null shows [hintText].
   final T? value;
@@ -40,6 +70,8 @@ class AppDropdownField<T> extends StatelessWidget {
   final String? label;
 
   /// Placeholder while nothing is selected.
+  ///
+  /// Defaults to [label] when omitted so labelled fields always show a hint.
   final String? hintText;
 
   /// Validation message shown under the control.
@@ -54,14 +86,44 @@ class AppDropdownField<T> extends StatelessWidget {
   /// Optional per-choice glyph — a status dot, a format icon.
   final AppIconSpec? Function(T value)? itemIcon;
 
+  /// Whether the menu carries a fixed search header. Defaults to true once
+  /// [items] exceeds [searchThreshold].
+  final bool? searchable;
+
+  /// Placeholder in the menu search field. Required when [searchable] is true.
+  final String? searchHint;
+
+  /// Tooltip on the search clear button.
+  final String? clearSearchTooltip;
+
+  /// Shown when search filters every item out.
+  final String? emptySearchMessage;
+
+  /// Item count above which search is offered automatically.
+  final int searchThreshold;
+
+  /// Custom filter for search. `query` is lowercased and trimmed.
+  ///
+  /// Defaults to a case-insensitive match on the label callback.
+  final bool Function(T item, String query)? itemMatchesSearch;
+
+  /// Cap on the scrollable list height inside the menu.
+  final double? menuMaxHeight;
+
+  /// Label on the pinned action under the list, e.g. "Add format".
+  final String? footerActionLabel;
+
+  /// Called after the menu closes when the footer action is pressed.
+  final VoidCallback? onFooterAction;
+
+  /// Glyph on the footer action. Defaults to [AppIcons.add].
+  final AppIconSpec? footerActionIcon;
+
   @override
   Widget build(BuildContext context) {
-    final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
-    final colors = context.appColors;
     final metrics = context.appMetrics;
     final fieldLabel = label;
-    final iconFor = itemIcon;
+    final hint = hintText ?? fieldLabel;
     final error = errorText;
 
     return Column(
@@ -75,51 +137,27 @@ class AppDropdownField<T> extends StatelessWidget {
           ),
           SizedBox(height: metrics.labelToControlGap),
         ],
-        ConstrainedBox(
-          constraints: BoxConstraints(minHeight: metrics.fieldHeight),
-          child: DropdownButtonFormField<T>(
-            initialValue: value,
-            onChanged: enabled ? onChanged : null,
-            isExpanded: true,
-            borderRadius: BorderRadius.circular(context.appRadius.container),
-            icon: AppIcon(
-              AppIcons.chevronDown,
-              color: colors.ink500,
-              size: metrics.icon,
-            ),
-            style: context.appTextStyles.body.copyWith(
-              color: scheme.onSurface,
-            ),
-            decoration: InputDecoration(hintText: hintText, enabled: enabled),
-            items: [
-              for (final item in items)
-                DropdownMenuItem<T>(
-                  value: item,
-                  child: Row(
-                    children: [
-                      if (iconFor?.call(item) case final glyph?) ...[
-                        AppIcon(
-                          glyph,
-                          size: metrics.icon,
-                          color: colors.ink500,
-                        ),
-                        SizedBox(width: spacing.menuIconGap),
-                      ],
-                      Expanded(
-                        child: Text(
-                          itemLabel(item),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
+        AppDropdownFieldControl<T>(
+          value: value,
+          items: items,
+          itemLabel: itemLabel,
+          onChanged: onChanged,
+          hintText: hint,
+          enabled: enabled,
+          itemIcon: itemIcon,
+          searchable: searchable,
+          searchHint: searchHint,
+          clearSearchTooltip: clearSearchTooltip,
+          emptySearchMessage: emptySearchMessage,
+          searchThreshold: searchThreshold,
+          itemMatchesSearch: itemMatchesSearch,
+          menuMaxHeight: menuMaxHeight,
+          footerActionLabel: footerActionLabel,
+          onFooterAction: onFooterAction,
+          footerActionIcon: footerActionIcon,
         ),
         if (error != null) ...[
-          SizedBox(height: spacing.xxs + 2),
+          SizedBox(height: context.appSpacing.xxs + 2),
           AppFieldError(message: error),
         ],
       ],

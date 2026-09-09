@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// Desktop window chrome.
 ///
 /// Native desktop is the only target with an OS window to size, title, and

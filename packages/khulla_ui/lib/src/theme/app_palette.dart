@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/material.dart';
 
 /// Raw color literals for the design system.
@@ -10,7 +13,8 @@ import 'package:flutter/material.dart';
 /// reverse-engineered from the SaaS the product shares a design language
 /// with. Three ramps carry the whole system:
 ///
-/// * **brand** — one deep teal, taken from `assets/icons/app_icon.png`. It is
+/// * **brand** — one deep teal, taken from `assets/images/logos/submark_logo.png`.
+///   It is
 ///   the *only* saturated hue in the chrome. Destructive actions use the
 ///   separate [danger] red so an alarm never reads as brand.
 /// * **ink** — a text ramp that inverts in dark mode. `ink100` is the
@@ -46,6 +50,52 @@ abstract final class AppPalette {
 
   /// The brand darkened, for emphasis ink and the deep end of a gradient.
   static const Color brandDeep = Color(0xFF04403D);
+
+  // ── Brand seeds ───────────────────────────────────────────────────────────
+  //
+  // The alternative brands the operator can pick in Appearance. Each is only
+  // the solid fill — `AppBrand.fromSeed` derives the rest of the ramp — so a
+  // seed is the one hex a new choice needs. [brand] is the shipped default and
+  // is the seed of `AppBrand.teal`, whose ramp is hand-tuned rather than
+  // derived.
+
+  /// Seed: indigo.
+  static const Color brandSeedIndigo = Color(0xFF4338CA);
+
+  /// Seed: a mid blue.
+  static const Color brandSeedBlue = Color(0xFF1D4ED8);
+
+  /// Seed: violet.
+  static const Color brandSeedViolet = Color(0xFF6D28D9);
+
+  /// Seed: a deep rose.
+  static const Color brandSeedRose = Color(0xFFA61E4D);
+
+  /// Seed: burnt amber.
+  static const Color brandSeedAmber = Color(0xFFB45309);
+
+  /// Seed: forest green.
+  static const Color brandSeedForest = Color(0xFF15803D);
+
+  /// Seed: graphite, for a library that wants no hue at all.
+  static const Color brandSeedGraphite = Color(0xFF334155);
+
+  // ── Spectrum ──────────────────────────────────────────────────────────────
+
+  /// The six hue turns, as the gradient stops of a hue slider.
+  ///
+  /// Not brand colors and never painted as one: this is the raw spectrum a
+  /// color picker's track is drawn from, and it lives here so the rule that
+  /// hex literals stay in this file holds for the picker too.
+  static const List<Color> hueStops = [
+    Color(0xFFFF0000),
+    Color(0xFFFFFF00),
+    Color(0xFF00FF00),
+    Color(0xFF00FFFF),
+    Color(0xFF0000FF),
+    Color(0xFFFF00FF),
+    Color(0xFFFF0000),
+  ];
 
   // ── Ink ramp, light ───────────────────────────────────────────────────────
 
@@ -151,11 +201,11 @@ abstract final class AppPalette {
   /// The palest danger wash, for a surface that must be opaque.
   static const Color dangerTint = Color(0xFFFEE4E2);
 
-  /// Success ink — returned, available, active.
-  static const Color success = Color(0xFF11B650);
+  /// Success ink — returned, available, active. Forest, not a lime pill.
+  static const Color success = Color(0xFF2F6B4A);
 
   /// Success, one step deeper, for a border or a pressed fill.
-  static const Color successStrong = Color(0xFF0F993D);
+  static const Color successStrong = Color(0xFF24573C);
 
   /// Warning ink — due soon, expiring.
   static const Color warning = Color(0xFFE08A00);
@@ -163,8 +213,8 @@ abstract final class AppPalette {
   /// Warning, one step lighter.
   static const Color warningSoftInk = Color(0xFFE68F3D);
 
-  /// Info ink — reserved, on hold, queued.
-  static const Color info = Color(0xFF00C4FF);
+  /// Info ink — reserved, on hold, queued. Slate, not electric cyan.
+  static const Color info = Color(0xFF4A7388);
 
   /// Premium / highlight accent.
   static const Color premium = Color(0xFFFDB021);

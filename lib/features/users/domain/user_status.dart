@@ -1,6 +1,8 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// Whether a staff account can sign in today.
 ///
-/// [invited] is its own state rather than an inactive [active]: an invitation
-/// that was never accepted is a job for the desk — resend it — while a
-/// disabled account is a decision somebody already made.
-enum UserStatus { active, invited, disabled }
+/// Disabling is preferred to deleting: the record is referenced by everything
+/// the person did at the desk.
+enum UserStatus { active, disabled }

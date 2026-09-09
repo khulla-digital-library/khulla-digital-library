@@ -1,24 +1,26 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
+import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
-import 'package:khulla/features/members/presentation/placeholder/member_record.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/record_header.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// A borrower's identity block: who they are, how their card stands, and the
-/// action the desk came here for.
-///
-/// Checking out to this member is the primary action rather than *Edit*: the
-/// register is opened at a counter far more often than it is corrected.
+/// A borrower's identity block at the top of their detail screen.
 class MemberDetailHeader extends StatelessWidget {
   const MemberDetailHeader({
     required this.member,
-    required this.onCheckOut,
     required this.menuActions,
+    this.onCheckOut,
     super.key,
   });
 
-  final MemberRecord member;
-  final VoidCallback onCheckOut;
+  final Member member;
+
+  /// Sends the member to the checkout desk. Null for a role that may read
+  /// the register without working the counter.
+  final VoidCallback? onCheckOut;
   final List<AppMenuAction> menuActions;
 
   @override
@@ -29,7 +31,7 @@ class MemberDetailHeader extends StatelessWidget {
     return RecordHeader(
       title: member.name,
       initials: member.initials,
-      facts: [member.cardNumber, member.category.label(l10n)],
+      facts: [member.cardNumber, member.memberTypeName],
       badges: [
         AppStatusBadge(
           label: member.status.label(l10n),
@@ -43,13 +45,16 @@ class MemberDetailHeader extends StatelessWidget {
       ],
       note: member.notes,
       actions: [
-        AppMenuButton(actions: menuActions, tooltip: l10n.commonMoreActions),
-        SizedBox(width: spacing.xs),
-        AppButton(
-          size: AppButtonSize.medium,
-          onPressed: onCheckOut,
-          child: Text(l10n.circulationCheckOut),
-        ),
+        if (menuActions.isNotEmpty) ...[
+          AppMenuButton(actions: menuActions, tooltip: l10n.commonMoreActions),
+          SizedBox(width: spacing.xs),
+        ],
+        if (onCheckOut != null)
+          AppButton(
+            size: AppButtonSize.medium,
+            onPressed: onCheckOut,
+            child: Text(l10n.circulationCheckOut),
+          ),
       ],
     );
   }

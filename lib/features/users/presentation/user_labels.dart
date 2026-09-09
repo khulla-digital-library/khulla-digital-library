@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/features/users/domain/user_status.dart';
 import 'package:khulla/l10n/l10n.dart';
@@ -37,13 +40,11 @@ extension UserRoleX on UserRole {
 extension UserStatusX on UserStatus {
   String label(AppLocalizations l10n) => switch (this) {
     UserStatus.active => l10n.usersStatusActive,
-    UserStatus.invited => l10n.usersStatusInvited,
     UserStatus.disabled => l10n.usersStatusDisabled,
   };
 
   AppStatusTone get tone => switch (this) {
     UserStatus.active => AppStatusTone.success,
-    UserStatus.invited => AppStatusTone.warning,
     UserStatus.disabled => AppStatusTone.neutral,
   };
 }

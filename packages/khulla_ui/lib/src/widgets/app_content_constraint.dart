@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// {@template app_content_constraint}
@@ -10,7 +13,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// [AppBreakpoints.wideContentMaxWidth] via [AppContentConstraint.wide].
 ///
 /// Neither stretches to the window: a form spread across a 2560px monitor is
-/// a bug, not a feature.
+/// a bug, not a feature. The wide variant does stretch vertically so a table
+/// page can hand an [Expanded] slot the full viewport height.
 /// {@endtemplate}
 class AppContentConstraint extends StatelessWidget {
   /// {@macro app_content_constraint}
@@ -50,6 +54,8 @@ class AppContentConstraint extends StatelessWidget {
 
     return Align(
       alignment: Alignment.topCenter,
+      widthFactor: wide ? 1 : null,
+      heightFactor: wide ? 1 : null,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: cap),
         child: child,

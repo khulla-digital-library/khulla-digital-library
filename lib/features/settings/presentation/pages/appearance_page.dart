@@ -1,5 +1,11 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:khulla/core/theme/app_language.dart';
 import 'package:khulla/core/theme/cubit/theme_cubit.dart';
+import 'package:khulla/core/theme/cubit/theme_state.dart';
+import 'package:khulla/features/settings/presentation/widgets/settings_brand_color_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -9,22 +15,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// [ThemeCubit] is an app-wide `@lazySingleton` with real storage behind it,
 /// so the choice made here survives a restart. It is a device setting, not a
 /// library one — nothing about it reaches the catalogue file.
-/// The language the interface is drawn in.
-enum AppLanguage { english, nepali }
-
-/// How much room a table row takes.
-enum RowDensity { comfortable, compact }
-
-class AppearancePage extends StatefulWidget {
+class AppearancePage extends StatelessWidget {
   const AppearancePage({super.key});
-
-  @override
-  State<AppearancePage> createState() => _AppearancePageState();
-}
-
-class _AppearancePageState extends State<AppearancePage> {
-  AppLanguage _language = AppLanguage.english;
-  RowDensity _density = RowDensity.comfortable;
 
   String _label(AppLocalizations l10n, ThemeMode mode) => switch (mode) {
     ThemeMode.system => l10n.themeModeSystem,
@@ -37,6 +29,31 @@ class _AppearancePageState extends State<AppearancePage> {
     ThemeMode.light => AppIcons.lightMode,
     ThemeMode.dark => AppIcons.darkMode,
   };
+
+  Future<void> _pickCustomBrand(
+    BuildContext context,
+    ThemeState appearance,
+  ) async {
+    final cubit = context.read<ThemeCubit>();
+    final picked = await SettingsBrandColorDialog.show(
+      context,
+      initial: appearance.brandSeed,
+    );
+    if (picked == null) return;
+    await cubit.setCustomBrand(picked);
+  }
+
+  String _brandLabel(AppLocalizations l10n, AppBrandTheme brand) =>
+      switch (brand) {
+        AppBrandTheme.teal => l10n.brandThemeTeal,
+        AppBrandTheme.indigo => l10n.brandThemeIndigo,
+        AppBrandTheme.blue => l10n.brandThemeBlue,
+        AppBrandTheme.violet => l10n.brandThemeViolet,
+        AppBrandTheme.rose => l10n.brandThemeRose,
+        AppBrandTheme.amber => l10n.brandThemeAmber,
+        AppBrandTheme.forest => l10n.brandThemeForest,
+        AppBrandTheme.graphite => l10n.brandThemeGraphite,
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -55,55 +72,66 @@ class _AppearancePageState extends State<AppearancePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SectionCard(
-              title: l10n.settingsAppearanceTheme,
-              subtitle: l10n.settingsAppearanceThemeDescription,
-              child: BlocBuilder<ThemeCubit, ThemeMode>(
-                builder: (context, mode) => Align(
-                  alignment: Alignment.centerLeft,
-                  child: AppSegmentedControl<ThemeMode>(
-                    value: mode,
-                    items: ThemeMode.values,
-                    itemLabel: (value) => _label(l10n, value),
-                    itemIcon: _icon,
-                    onChanged: (value) =>
-                        context.read<ThemeCubit>().setThemeMode(value),
+            BlocBuilder<ThemeCubit, ThemeState>(
+              builder: (context, appearance) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SectionCard(
+                    title: l10n.settingsAppearanceTheme,
+                    subtitle: l10n.settingsAppearanceThemeDescription,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: AppSegmentedControl<ThemeMode>(
+                        value: appearance.mode,
+                        items: ThemeMode.values,
+                        itemLabel: (value) => _label(l10n, value),
+                        itemIcon: _icon,
+                        onChanged: (value) =>
+                            context.read<ThemeCubit>().setThemeMode(value),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-            SizedBox(height: spacing.md),
-            SectionCard(
-              title: l10n.settingsAppearanceLanguage,
-              subtitle: l10n.settingsAppearanceLanguageDescription,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: AppSegmentedControl<AppLanguage>(
-                  value: _language,
-                  items: AppLanguage.values,
-                  itemLabel: (value) => switch (value) {
-                    AppLanguage.english => l10n.settingsLanguageEnglish,
-                    AppLanguage.nepali => l10n.settingsLanguageNepali,
-                  },
-                  onChanged: (value) => setState(() => _language = value),
-                ),
-              ),
-            ),
-            SizedBox(height: spacing.md),
-            SectionCard(
-              title: l10n.settingsAppearanceDensity,
-              subtitle: l10n.settingsAppearanceDensityDescription,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: AppSegmentedControl<RowDensity>(
-                  value: _density,
-                  items: RowDensity.values,
-                  itemLabel: (value) => switch (value) {
-                    RowDensity.comfortable => l10n.settingsDensityComfortable,
-                    RowDensity.compact => l10n.settingsDensityCompact,
-                  },
-                  onChanged: (value) => setState(() => _density = value),
-                ),
+                  SizedBox(height: spacing.md),
+                  SectionCard(
+                    title: l10n.settingsAppearanceBrand,
+                    subtitle: l10n.settingsAppearanceBrandDescription,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: AppSwatchPicker<AppBrandTheme>(
+                        value: appearance.customSeed == null
+                            ? appearance.brandTheme
+                            : null,
+                        items: AppBrandTheme.values,
+                        itemColor: (value) => value.seed,
+                        itemLabel: (value) => _brandLabel(l10n, value),
+                        onChanged: (value) =>
+                            context.read<ThemeCubit>().setBrandTheme(value),
+                        customColor: appearance.customSeed,
+                        customLabel: l10n.settingsAppearanceBrandCustom,
+                        onCustomTap: () =>
+                            _pickCustomBrand(context, appearance),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: spacing.md),
+                  SectionCard(
+                    title: l10n.settingsAppearanceLanguage,
+                    subtitle: l10n.settingsAppearanceLanguageDescription,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: AppSegmentedControl<AppLanguage>(
+                        value: appearance.language,
+                        items: AppLanguage.values,
+                        itemLabel: (value) => switch (value) {
+                          AppLanguage.english => l10n.settingsLanguageEnglish,
+                          AppLanguage.nepali => l10n.settingsLanguageNepali,
+                        },
+                        onChanged: (value) =>
+                            context.read<ThemeCubit>().setLanguage(value),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
