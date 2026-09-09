@@ -1,4 +1,4 @@
-.PHONY: bootstrap install-sdk build migrate db-diagram localize analyze format format-check fix test check ci clean \
+.PHONY: bootstrap install-sdk build version migrate db-diagram localize analyze format format-check fix test check ci clean \
         copyright copyright-check \
         db-web run-web run-windows run-linux build-web build-windows build-linux build-apk pr seed-mock
 
@@ -31,9 +31,15 @@ db-web:
 
 # ── Code generation ─────────────────────────────────────────────────────────
 
-## freezed, injectable, json_serializable, flutter_gen.
+## freezed, injectable, json_serializable, flutter_gen, and the app version.
 build:
 	$(DART) run build_runner build
+	$(DART) tools/version.dart --write
+
+## Regenerate lib/gen/app_version.dart from `version:` in pubspec.yaml.
+## Folded into `make build`; run it alone after bumping the version.
+version:
+	$(DART) tools/version.dart --write
 
 ## Record the current schema, regenerate step-by-step migrations and their
 ## tests. Run after changing a table and bumping schemaVersion, before `build`.
@@ -73,12 +79,14 @@ analyze:
 format:
 	$(DART) run melos run format
 
-## Fail if any committed Dart source is unformatted, without rewriting it.
-## Runs over `git ls-files` rather than the tree: that is what keeps it out of
-## the gitignored generated sources, whose formatting is build_runner's
-## business, and out of sizzbe-app/.
+## Fail if any handwritten Dart source is unformatted, without rewriting it.
+## Asks git for the file list rather than walking the tree: tracked plus new,
+## minus everything gitignored. That is what keeps it out of the generated
+## sources, whose formatting is build_runner's business, and out of sizzbe-app/.
+## Files git still lists but that are deleted on disk are filtered out.
 format-check:
-	@files=$$(git ls-files '*.dart'); \
+	@files=$$(git ls-files --cached --others --exclude-standard '*.dart' \
+	  | while IFS= read -r f; do [ -f "$$f" ] && echo "$$f"; done); \
 	  if [ -n "$$files" ]; then \
 	    $(DART) format --output=none --set-exit-if-changed $$files; \
 	  fi

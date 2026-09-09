@@ -79,11 +79,13 @@ runs:
       run: flutter pub get
 
     # Generated sources are not committed, so this is not optional — see the
-    # "Generated code" section of .gitignore.
+    # "Generated code" section of .gitignore. Same two commands as `make build`.
     - name: Generate code
       if: inputs.codegen == 'true'
       shell: bash
-      run: dart run build_runner build --delete-conflicting-outputs
+      run: |
+        dart run build_runner build --delete-conflicting-outputs
+        dart tools/version.dart --write
 
     - name: Generate localizations
       if: inputs.codegen == 'true'

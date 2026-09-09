@@ -62,7 +62,11 @@ Open pull requests against `dev`. `make pr` pushes and opens one for you.
 
 ## Releasing
 
-`dev` is where work lands; `prod` is what gets released. Tagging a commit on `prod` builds Windows, Linux, Android and web and publishes them to the releases page, and pushing to `prod` redeploys the web demo. See [releasing.md](./releasing.md) — it also covers how to hand someone a test build without cutting a release.
+`dev` is where work lands; `prod` is what ships. Merging into `prod` builds Windows, Linux, Android and web, publishes them to the releases page at the version in `pubspec.yaml`, and redeploys the web demo — no tag to push afterwards.
+
+That makes bumping `version:` in `pubspec.yaml` part of any pull request into `prod`. CI fails the PR if that version has already been released, because merging it as it stands would publish nothing.
+
+See [releasing.md](./releasing.md), which also covers how to hand someone a test build without releasing.
 
 ## Reporting bugs
 
