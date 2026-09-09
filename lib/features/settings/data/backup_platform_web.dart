@@ -10,12 +10,16 @@ import 'package:khulla/core/error/app_exception.dart';
 /// export goes through that connection instead of the filesystem.
 Future<Uint8List> exportBackupBytes(AppDatabase db, AppConfig config) async {
   final tables = <String, List<Map<String, Object?>>>{};
-  for (final table in db.allTables) {
-    final rows = await db
-        .customSelect('SELECT * FROM ${table.actualTableName}')
-        .get();
-    tables[table.actualTableName] = [for (final row in rows) row.data];
-  }
+  // One consistent snapshot: without the transaction a concurrent write
+  // between two tables' SELECTs could export a torn state.
+  await db.transaction(() async {
+    for (final table in db.allTables) {
+      final rows = await db
+          .customSelect('SELECT * FROM ${table.actualTableName}')
+          .get();
+      tables[table.actualTableName] = [for (final row in rows) row.data];
+    }
+  });
 
   final dump = <String, Object?>{
     'schemaVersion': db.schemaVersion,
@@ -36,7 +40,11 @@ Future<void> importBackupBytes(
 ) async {
   final Map<String, Object?> decoded;
   try {
-    decoded = jsonDecode(utf8.decode(bytes)) as Map<String, Object?>;
+    final parsed = jsonDecode(utf8.decode(bytes));
+    if (parsed is! Map<String, Object?>) {
+      throw const InvalidInputException('That file is not a Khulla backup.');
+    }
+    decoded = parsed;
   } on FormatException {
     throw const InvalidInputException('That file is not a Khulla backup.');
   }
@@ -49,6 +57,59 @@ Future<void> importBackupBytes(
     throw const InvalidInputException(
       'That backup does not match this app version.',
     );
+  }
+
+  // The backup file controls these identifiers, so allowlist them against
+  // the schema before interpolating into SQL — otherwise a crafted file
+  // injects arbitrary statements through table/column names.
+  final expectedTables = {
+    for (final table in db.allTables) table.actualTableName,
+  };
+  final backupKeys = <String>{};
+  for (final key in tables.keys) {
+    if (key is! String) {
+      throw const InvalidInputException(
+        'That file is not a Khulla backup.',
+      );
+    }
+    backupKeys.add(key);
+  }
+  if (backupKeys.length != expectedTables.length ||
+      !backupKeys.containsAll(expectedTables)) {
+    throw const InvalidInputException(
+      'That backup does not match this app version.',
+    );
+  }
+  final identifier = RegExp(r'^[a-z_][a-z0-9_]*$');
+  for (final entry in tables.entries) {
+    final key = entry.key;
+    if (key is! String ||
+        !expectedTables.contains(key) ||
+        !identifier.hasMatch(key)) {
+      throw const InvalidInputException(
+        'That file is not a Khulla backup.',
+      );
+    }
+    final value = entry.value;
+    if (value is! List) {
+      throw const InvalidInputException(
+        'That file is not a Khulla backup.',
+      );
+    }
+    for (final element in value) {
+      if (element is! Map) {
+        throw const InvalidInputException(
+          'That file is not a Khulla backup.',
+        );
+      }
+      for (final column in element.keys) {
+        if (column is! String || !identifier.hasMatch(column)) {
+          throw const InvalidInputException(
+            'That file is not a Khulla backup.',
+          );
+        }
+      }
+    }
   }
 
   await db.customStatement('PRAGMA foreign_keys = OFF');

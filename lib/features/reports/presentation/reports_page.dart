@@ -8,12 +8,13 @@ import 'package:khulla/features/reports/presentation/cubit/reports_cubit.dart';
 import 'package:khulla/features/reports/presentation/cubit/reports_state.dart';
 import 'package:khulla/features/reports/presentation/reports_summary_x.dart';
 import 'package:khulla/features/reports/presentation/saved_reports.dart';
+import 'package:khulla/features/reports/presentation/widgets/reports_board_cards.dart';
 import 'package:khulla/features/reports/presentation/widgets/reports_fines_card.dart';
-import 'package:khulla/features/reports/presentation/widgets/reports_ranked_table.dart';
+import 'package:khulla/features/reports/presentation/widgets/reports_header.dart';
+import 'package:khulla/features/reports/presentation/widgets/reports_stat_strip.dart';
+import 'package:khulla/features/reports/presentation/widgets/saved_report_tile.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/components/collection_header.dart';
 import 'package:khulla/shared/components/navigation_group.dart';
-import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/models/load_status.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -93,25 +94,6 @@ class _ReportsBoard extends StatelessWidget {
       (sum, slice) => sum + slice.value,
     );
 
-    final ranked = [
-      SectionCard(
-        title: l10n.reportsTopTitlesTitle,
-        subtitle: l10n.reportsTopTitlesSubtitle,
-        child: ReportsRankedTable(
-          rows: summary.topTitleRows(),
-          nameLabel: l10n.reportsColumnTitle,
-        ),
-      ),
-      SectionCard(
-        title: l10n.reportsTopMembersTitle,
-        subtitle: l10n.reportsTopMembersSubtitle,
-        child: ReportsRankedTable(
-          rows: summary.topMemberRows(),
-          nameLabel: l10n.reportsColumnMember,
-        ),
-      ),
-    ];
-
     return AppPageBody(
       wide: true,
       child: CustomScrollView(
@@ -125,111 +107,11 @@ class _ReportsBoard extends StatelessWidget {
             ),
             sliver: SliverList.list(
               children: [
-                CollectionHeader(
-                  title: l10n.reportsHeading,
-                  subtitle: l10n.reportsSubtitle,
-                  trailing: AppSegmentedControl<ReportPeriod>(
-                    value: state.period,
-                    items: ReportPeriod.values,
-                    itemLabel: (item) => switch (item) {
-                      ReportPeriod.month => l10n.commonThisMonth,
-                      ReportPeriod.quarter => l10n.commonThisQuarter,
-                      ReportPeriod.year => l10n.commonThisYear,
-                    },
-                    onChanged: (period) =>
-                        context.read<ReportsCubit>().changePeriod(period),
-                  ),
-                ),
+                ReportsHeader(period: state.period),
                 SizedBox(height: spacing.lg),
-                AppStatStrip(
-                  tiles: [
-                    AppStatTile(
-                      label: l10n.reportsStatBorrowed,
-                      value: '${summary.borrowedCount}',
-                      icon: AppIcons.checkOut,
-                      tone: AppStatusTone.brand,
-                      trend: _trendText(
-                        summary.borrowedCount,
-                        summary.borrowedPreviousCount,
-                      ),
-                      trendValue: _trendValue(
-                        summary.borrowedCount,
-                        summary.borrowedPreviousCount,
-                      ),
-                      caption: l10n.commonLastMonth,
-                    ),
-                    AppStatTile(
-                      label: l10n.reportsStatReturned,
-                      value: '${summary.returnedCount}',
-                      icon: AppIcons.returned,
-                      tone: AppStatusTone.success,
-                      trend: _trendText(
-                        summary.returnedCount,
-                        summary.returnedPreviousCount,
-                      ),
-                      trendValue: _trendValue(
-                        summary.returnedCount,
-                        summary.returnedPreviousCount,
-                      ),
-                      caption: l10n.commonLastMonth,
-                    ),
-                    AppStatTile(
-                      label: l10n.reportsStatNewMembers,
-                      value: '${summary.newMembersCount}',
-                      icon: AppIcons.addPerson,
-                      tone: AppStatusTone.info,
-                      trend: _trendText(
-                        summary.newMembersCount,
-                        summary.newMembersPreviousCount,
-                      ),
-                      trendValue: _trendValue(
-                        summary.newMembersCount,
-                        summary.newMembersPreviousCount,
-                      ),
-                      caption: l10n.commonLastMonth,
-                    ),
-                    AppStatTile(
-                      label: l10n.reportsStatFines,
-                      value: summary.finesRaised.display(),
-                      icon: AppIcons.payment,
-                      tone: AppStatusTone.warning,
-                      trend: _trendText(
-                        summary.finesRaised.minorUnits,
-                        summary.finesRaisedPrevious.minorUnits,
-                      ),
-                      trendValue: _trendValue(
-                        summary.finesRaised.minorUnits,
-                        summary.finesRaisedPrevious.minorUnits,
-                      ),
-                      trendInverted: true,
-                      caption: l10n.commonLastMonth,
-                    ),
-                  ],
-                ),
+                ReportsStatStrip(summary: summary),
                 SizedBox(height: spacing.lg),
-                SectionCard(
-                  title: l10n.reportsCirculationTitle,
-                  subtitle: l10n.reportsCirculationSubtitle,
-                  trailing: Wrap(
-                    spacing: spacing.sm,
-                    children: [
-                      AppLegendDot(
-                        label: l10n.reportsStatBorrowed,
-                        tone: AppStatusTone.brand,
-                        dense: true,
-                      ),
-                      AppLegendDot(
-                        label: l10n.reportsStatReturned,
-                        tone: AppStatusTone.success,
-                        dense: true,
-                      ),
-                    ],
-                  ),
-                  child: AppBarChart(
-                    series: summary.circulationSeries(l10n),
-                    height: 240,
-                  ),
-                ),
+                ReportsCirculationCard(summary: summary),
                 SizedBox(height: spacing.md),
                 if (sideBySide)
                   IntrinsicHeight(
@@ -237,18 +119,11 @@ class _ReportsBoard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Expanded(
-                          child: SectionCard(
-                            title: l10n.reportsMembersTitle,
-                            subtitle: l10n.reportsMembersSubtitle,
-                            child: AppLineChart(
-                              series: summary.membershipSeries(l10n),
-                              showDots: true,
-                            ),
-                          ),
+                          child: ReportsMembershipCard(summary: summary),
                         ),
                         SizedBox(width: spacing.md),
                         Expanded(
-                          child: _CollectionMixCard(
+                          child: ReportsCollectionMixCard(
                             slices: collection,
                             total: collectionTotal,
                           ),
@@ -257,16 +132,9 @@ class _ReportsBoard extends StatelessWidget {
                     ),
                   )
                 else ...[
-                  SectionCard(
-                    title: l10n.reportsMembersTitle,
-                    subtitle: l10n.reportsMembersSubtitle,
-                    child: AppLineChart(
-                      series: summary.membershipSeries(l10n),
-                      showDots: true,
-                    ),
-                  ),
+                  ReportsMembershipCard(summary: summary),
                   SizedBox(height: spacing.md),
-                  _CollectionMixCard(
+                  ReportsCollectionMixCard(
                     slices: collection,
                     total: collectionTotal,
                   ),
@@ -274,20 +142,10 @@ class _ReportsBoard extends StatelessWidget {
                 SizedBox(height: spacing.md),
                 ReportsFinesCard(totals: summary.fineTotals(l10n)),
                 SizedBox(height: spacing.md),
-                if (sideBySide)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: ranked.first),
-                      SizedBox(width: spacing.md),
-                      Expanded(child: ranked.last),
-                    ],
-                  )
-                else ...[
-                  ranked.first,
-                  SizedBox(height: spacing.md),
-                  ranked.last,
-                ],
+                ReportsRankedSection(
+                  summary: summary,
+                  sideBySide: sideBySide,
+                ),
                 SizedBox(height: spacing.lg),
                 AppSectionHeader(
                   title: l10n.reportsSavedTitle,
@@ -296,15 +154,11 @@ class _ReportsBoard extends StatelessWidget {
                 SizedBox(height: spacing.md),
                 NavigationGroup(
                   children: [
-                    for (final (index, report) in reportsSaved(l10n).indexed)
-                      _SavedReportTile(
+                    for (final report in reportsSaved(l10n))
+                      SavedReportTile(
                         report: report,
                         onExport: () => unawaited(
-                          _export(
-                            context,
-                            reportsExportKinds[index],
-                            report.title,
-                          ),
+                          _export(context, report.kind, report.title),
                         ),
                       ),
                   ],
@@ -314,160 +168,6 @@ class _ReportsBoard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-String? _trendText(int current, int previous) {
-  if (previous == 0) return current == 0 ? null : '+100%';
-  final change = ((current - previous) / previous) * 100;
-  final sign = change >= 0 ? '+' : '';
-  return '$sign${change.toStringAsFixed(1)}%';
-}
-
-num _trendValue(int current, int previous) {
-  if (previous == 0) return current == 0 ? 0 : 100;
-  return ((current - previous) / previous) * 100;
-}
-
-/// Every catalogued copy by format, as a donut and its legend.
-class _CollectionMixCard extends StatelessWidget {
-  const _CollectionMixCard({required this.slices, required this.total});
-
-  final List<AppChartPoint> slices;
-  final double total;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final spacing = context.appSpacing;
-
-    return SectionCard(
-      title: l10n.reportsCollectionTitle,
-      subtitle: l10n.reportsCollectionSubtitle,
-      child: Row(
-        children: [
-          AppDonutChart(
-            slices: slices,
-            size: 150,
-            thickness: 20,
-            centerValue: total.toStringAsFixed(0),
-            centerLabel: l10n.dashboardCollectionTotal,
-          ),
-          SizedBox(width: spacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (final slice in slices)
-                  Padding(
-                    padding: EdgeInsets.only(bottom: spacing.xs),
-                    child: AppLegendDot(
-                      label: slice.label,
-                      tone: slice.tone ?? AppStatusTone.brand,
-                      value: slice.value.toStringAsFixed(0),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// One saved report, as a row with its export action.
-///
-/// A row rather than a card in a grid. Six identical rectangles said the six
-/// reports were six different kinds of thing, and putting a tap on the card
-/// while also putting a button inside it left no honest answer to what
-/// clicking the middle of it should do. A report is a document you export, so
-/// the row names it and the verb sits at the end of the line.
-class _SavedReportTile extends StatelessWidget {
-  const _SavedReportTile({required this.report, required this.onExport});
-
-  final SavedReport report;
-  final VoidCallback onExport;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final spacing = context.appSpacing;
-    final colors = context.appColors;
-    final stacked = context.formFactor.isCompact;
-
-    final identity = Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: spacing.xxs / 2),
-          child: AppIcon(
-            report.icon,
-            size: spacing.lg - 4,
-            color: report.tone.foreground(context),
-          ),
-        ),
-        SizedBox(width: spacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                report.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: colors.textHigh,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                report.body,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: colors.textMuted,
-                  height: 1.4,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-
-    final export = AppButton(
-      variant: AppButtonVariant.outline,
-      icon: AppIcons.tableView,
-      onPressed: onExport,
-      child: Text(l10n.commonExportCsv),
-    );
-
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: spacing.md,
-        vertical: spacing.sm,
-      ),
-      child: stacked
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                identity,
-                SizedBox(height: spacing.sm),
-                export,
-              ],
-            )
-          : Row(
-              children: [
-                Expanded(child: identity),
-                SizedBox(width: spacing.md),
-                export,
-              ],
-            ),
     );
   }
 }

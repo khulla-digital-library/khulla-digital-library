@@ -10,6 +10,7 @@ import 'package:khulla/features/staff_auth/presentation/widgets/auth_password_fi
 import 'package:khulla/features/users/presentation/cubit/staff_form_cubit.dart';
 import 'package:khulla/features/users/presentation/cubit/staff_form_state.dart';
 import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/models/load_status.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -51,12 +52,29 @@ class StaffResetPasswordDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<StaffFormCubit, StaffFormState>(
       builder: (context, state) {
+        final l10n = context.l10n;
         if (state.isLoading) {
           return AppFormModal(
-            title: context.l10n.usersResetPasswordHeading,
+            title: l10n.usersResetPasswordHeading,
             width: AppDialogWidth.lg,
             actions: const [],
             children: const [Center(child: AppSpinner())],
+          );
+        }
+        if (state.status.hasError) {
+          return AppFormModal(
+            title: l10n.usersResetPasswordHeading,
+            width: AppDialogWidth.lg,
+            actions: [
+              AppDialog.secondaryAction(
+                context: context,
+                label: l10n.commonClose,
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+            children: [
+              Text(state.error?.localizedMessage(l10n) ?? ''),
+            ],
           );
         }
         return _ResetPasswordBody(staffName: staffName);

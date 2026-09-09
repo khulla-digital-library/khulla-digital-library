@@ -10,7 +10,9 @@ import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/domain/models/member_type.dart';
 import 'package:khulla/features/members/presentation/cubit/member_form_cubit.dart';
 import 'package:khulla/features/members/presentation/cubit/member_form_state.dart';
-import 'package:khulla/features/members/presentation/member_labels.dart';
+import 'package:khulla/features/members/presentation/widgets/create_category_form.dart';
+import 'package:khulla/features/members/presentation/widgets/member_form_membership_section.dart';
+import 'package:khulla/features/members/presentation/widgets/member_form_sections.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/presentation/cubit/reference_data_cubit.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
@@ -149,7 +151,7 @@ class _MemberFormBodyState extends State<_MemberFormBody> with DisposeBag {
   Future<String?> _askCategoryName() {
     return AppFormModal.show<String>(
       context: context,
-      builder: (modalContext) => const _CreateCategoryForm(),
+      builder: (modalContext) => const CreateCategoryForm(),
     );
   }
 
@@ -222,221 +224,34 @@ class _MemberFormBodyState extends State<_MemberFormBody> with DisposeBag {
         ),
       ],
       children: [
-        AppFormSection(
-          title: l10n.memberFormIdentity,
-          children: [
-            AppFormRow(
-              flexes: const [3, 2],
-              children: [
-                AppTextField(
-                  label: l10n.fieldFullName,
-                  required: true,
-                  controller: _name,
-                  textCapitalization: TextCapitalization.words,
-                  onChanged: (_) {},
-                ),
-                AppTextField(
-                  label: l10n.fieldCardNumber,
-                  required: true,
-                  controller: _cardNumber,
-                  onChanged: (_) {},
-                ),
-              ],
-            ),
-            AppFormRow(
-              flexes: const [2, 3],
-              children: [
-                AppPickerField(
-                  label: l10n.fieldDateOfBirth,
-                  value: _dateOfBirth == null
-                      ? null
-                      : AppDateFormat.format(_dateOfBirth!),
-                  icon: AppIcons.calendar,
-                  onTap: () => unawaited(_pickDateOfBirth()),
-                  onClear: _dateOfBirth == null
-                      ? null
-                      : () => setState(() => _dateOfBirth = null),
-                  clearTooltip: l10n.commonClear,
-                ),
-                AppTextField(
-                  label: l10n.fieldGuardian,
-                  controller: _guardian,
-                  textCapitalization: TextCapitalization.words,
-                  onChanged: (_) {},
-                ),
-              ],
-            ),
-          ],
+        MemberFormIdentitySection(
+          name: _name,
+          cardNumber: _cardNumber,
+          dateOfBirth: _dateOfBirth == null
+              ? null
+              : AppDateFormat.format(_dateOfBirth!),
+          guardian: _guardian,
+          onPickDateOfBirth: () => unawaited(_pickDateOfBirth()),
+          onClearDateOfBirth: _dateOfBirth == null
+              ? null
+              : () => setState(() => _dateOfBirth = null),
         ),
-        AppFormSection(
-          title: l10n.memberDetailContact,
-          children: [
-            AppFormRow(
-              children: [
-                AppTextField(
-                  label: l10n.fieldEmail,
-                  controller: _email,
-                  keyboardType: TextInputType.emailAddress,
-                  onChanged: (_) {},
-                ),
-                AppTextField(
-                  label: l10n.fieldPhone,
-                  controller: _phone,
-                  keyboardType: TextInputType.phone,
-                  onChanged: (_) {},
-                ),
-              ],
-            ),
-            AppTextField(
-              label: l10n.fieldAddress,
-              controller: _address,
-              maxLines: 2,
-              textCapitalization: TextCapitalization.sentences,
-              onChanged: (_) {},
-            ),
-          ],
+        MemberFormContactSection(
+          email: _email,
+          phone: _phone,
+          address: _address,
         ),
-        AppFormSection(
-          title: l10n.memberDetailMembership,
-          children: [
-            AppFormRow(
-              children: [
-                AppDropdownField<MemberType>(
-                  label: l10n.fieldCategory,
-                  required: true,
-                  value: _selectedType,
-                  items: widget.memberTypes,
-                  itemLabel: (type) => type.name,
-                  itemIcon: (type) => type.code.memberTypeIcon,
-                  footerActionLabel: l10n.memberTypeAddCategory,
-                  onFooterAction: () => unawaited(_addCategory()),
-                  onChanged: (type) => setState(
-                    () => _memberTypeId = type?.id ?? _memberTypeId,
-                  ),
-                ),
-                AppPickerField(
-                  label: l10n.fieldExpires,
-                  value: _expires.isEmpty ? l10n.commonNotSet : _expires,
-                  icon: AppIcons.calendar,
-                  enabled: false,
-                  onTap: null,
-                ),
-              ],
-            ),
-            _ExpiresHint(message: l10n.memberFormExpiresHint),
-            AppTextField(
-              label: l10n.fieldNotes,
-              controller: _notes,
-              maxLines: 3,
-              minLines: 2,
-              textCapitalization: TextCapitalization.sentences,
-              onChanged: (_) {},
-            ),
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: FractionallySizedBox(
-                widthFactor: 0.4,
-                child: AppSwitchField(
-                  value: _sendNotices,
-                  label: l10n.memberFormNotifications,
-                  description: l10n.memberFormNotificationsDescription,
-                  stacked: true,
-                  onChanged: (value) => setState(() => _sendNotices = value),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-/// Fine print under the read-only expiry field: an info glyph plus one
-/// line saying the date comes from the category, so the disabled picker
-/// reads as information rather than a control that failed to open.
-class _ExpiresHint extends StatelessWidget {
-  const _ExpiresHint({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final spacing = context.appSpacing;
-    final colors = context.appColors;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppIcon(
-          AppIcons.info,
-          size: context.appMetrics.icon,
-          color: colors.mutedForeground,
-        ),
-        SizedBox(width: spacing.xs),
-        Expanded(
-          child: Text(
-            message,
-            style: context.appTextStyles.micro.copyWith(
-              color: colors.mutedForeground,
-            ),
+        MemberFormMembershipSection(
+          memberTypes: widget.memberTypes,
+          selectedType: _selectedType,
+          expires: _expires,
+          notes: _notes,
+          sendNotices: _sendNotices,
+          onTypeChanged: (type) => setState(
+            () => _memberTypeId = type?.id ?? _memberTypeId,
           ),
-        ),
-      ],
-    );
-  }
-}
-
-class _CreateCategoryForm extends StatefulWidget {
-  const _CreateCategoryForm();
-
-  @override
-  State<_CreateCategoryForm> createState() => _CreateCategoryFormState();
-}
-
-class _CreateCategoryFormState extends State<_CreateCategoryForm>
-    with DisposeBag {
-  late final TextEditingController _name = textController();
-  String? _error;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-
-    return AppFormModal(
-      title: l10n.memberTypeCreateHeading,
-      width: AppDialogWidth.sm,
-      actions: [
-        AppDialog.secondaryAction(
-          context: context,
-          label: l10n.commonCancel,
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        AppDialog.primaryAction(
-          context: context,
-          label: l10n.memberTypeAddCategory,
-          onPressed: () {
-            final name = _name.text.trim();
-            if (name.isEmpty) {
-              setState(() => _error = l10n.validationFieldRequired);
-              return;
-            }
-            Navigator.of(context).pop(name);
-          },
-        ),
-      ],
-      children: [
-        AppTextField(
-          label: l10n.fieldCategory,
-          required: true,
-          controller: _name,
-          errorText: _error,
-          autofocus: true,
-          maxLength: 60,
-          textCapitalization: TextCapitalization.words,
-          onChanged: (_) {
-            if (_error != null) setState(() => _error = null);
-          },
+          onAddCategory: () => unawaited(_addCategory()),
+          onSendNoticesChanged: (value) => setState(() => _sendNotices = value),
         ),
       ],
     );

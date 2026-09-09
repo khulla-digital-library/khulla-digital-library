@@ -20,7 +20,11 @@ const List<int> _sqliteHeader = [
 Future<Uint8List> exportBackupBytes(AppDatabase db, AppConfig config) async {
   await db.customStatement('PRAGMA wal_checkpoint(TRUNCATE)');
   final path = await resolveDatabasePath(config.databaseName);
-  return File(path).readAsBytes();
+  try {
+    return await File(path).readAsBytes();
+  } on FileSystemException {
+    throw const StorageException('Could not read the catalogue file.');
+  }
 }
 
 /// Validates [bytes] look like a Khulla backup, closes the live connection,
@@ -94,8 +98,13 @@ Future<void> _validateBackupBytes(Uint8List bytes) async {
   } on SqliteException {
     throw const InvalidInputException('That file is not a Khulla backup.');
   } finally {
-    if (tempFile.existsSync()) {
-      await tempFile.delete();
+    for (final suffix in ['', '-wal', '-shm', '-journal']) {
+      final sidecar = suffix.isEmpty
+          ? tempFile
+          : File('${tempFile.path}$suffix');
+      if (sidecar.existsSync()) {
+        await sidecar.delete();
+      }
     }
   }
 }

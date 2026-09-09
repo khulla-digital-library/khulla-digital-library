@@ -3,13 +3,13 @@ import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/circulation/fine/data/local_fine_data_source.dart';
+import 'package:khulla/features/circulation/loan/data/local_loan_data_source.dart';
 import 'package:khulla/features/circulation/reservation/data/local_reservation_data_source.dart';
 import 'package:khulla/features/circulation/shared/data/circulation_repository_impl.dart';
 import 'package:khulla/features/circulation/shared/domain/fine_reason.dart';
 import 'package:khulla/features/dashboard/data/dashboard_repository_impl.dart';
 
 import '../helpers/catalog_fixtures.dart';
-import '../helpers/stub_loan_data_source.dart';
 import '../helpers/test_database.dart';
 
 /// [DashboardRepositoryImpl] against a real database, seeded through
@@ -24,7 +24,7 @@ void main() {
     db = await openTestDatabase();
     circulation = CirculationRepositoryImpl(
       db,
-      StubLoanLocalDataSource(),
+      LocalLoanDataSource(db),
       LocalFineDataSource(db),
       LocalReservationDataSource(db),
     );

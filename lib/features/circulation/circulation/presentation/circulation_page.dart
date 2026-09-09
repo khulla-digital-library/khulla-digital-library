@@ -7,13 +7,13 @@ import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/circulation/circulation/presentation/cubit/loan_list_cubit.dart';
 import 'package:khulla/features/circulation/circulation/presentation/cubit/loan_list_state.dart';
+import 'package:khulla/features/circulation/circulation/presentation/widgets/loan_list_columns.dart';
+import 'package:khulla/features/circulation/circulation/presentation/widgets/loan_list_widgets.dart';
 import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/features/circulation/shared/domain/loan_status.dart';
-import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
 import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
@@ -26,6 +26,9 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// counts, the open-loan query and the holds figure for the stat strip — tapping
 /// *Overdue* selects the same rows the chip does. Renew and mark lost in the row
 /// menu still toast as not wired for mark lost; return routes to the returns desk.
+///
+/// Stats, toolbar, columns and card live in `presentation/widgets/`; renew
+/// toasts at its call site here.
 class CirculationPage extends StatelessWidget {
   const CirculationPage({super.key});
 
@@ -42,130 +45,6 @@ class CirculationPage extends StatelessWidget {
       if (!context.mounted) return;
       AppToast.error(context, message: error.localizedMessage(l10n));
     }
-  }
-
-  List<AppTableColumn<Loan>> _columns(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
-    final scheme = context.colorScheme;
-    final muted = context.textTheme.bodyMedium?.copyWith(
-      color: scheme.onSurfaceVariant,
-    );
-    final canWorkTheDesk = context.canManage(StaffPermission.circulation);
-    final canSeeMembers = context.canView(StaffPermission.members);
-
-    return [
-      AppTableColumn<Loan>(
-        id: 'title',
-        label: l10n.loansColumnTitle,
-        flex: 4,
-        sortable: true,
-        cellBuilder: (context, loan) =>
-            Text(loan.titleName ?? l10n.commonNotSet),
-      ),
-      AppTableColumn<Loan>(
-        id: 'member',
-        label: l10n.loansColumnMember,
-        flex: 3,
-        sortable: true,
-        showFrom: FormFactor.medium,
-        cellBuilder: (context, loan) =>
-            Text(loan.memberName ?? l10n.commonNotSet),
-      ),
-      AppTableColumn<Loan>(
-        id: 'barcode',
-        label: l10n.loansColumnBarcode,
-        flex: 2,
-        showFrom: FormFactor.large,
-        cellBuilder: (context, loan) =>
-            Text(loan.barcode ?? l10n.commonNotSet, style: muted),
-      ),
-      AppTableColumn<Loan>(
-        id: 'issued',
-        label: l10n.loansColumnIssued,
-        flex: 2,
-        sortable: true,
-        showFrom: FormFactor.large,
-        cellBuilder: (context, loan) => Text(loan.issuedOn, style: muted),
-      ),
-      AppTableColumn<Loan>(
-        id: 'due',
-        label: l10n.loansColumnDue,
-        flex: 2,
-        sortable: true,
-        showFrom: FormFactor.expanded,
-        cellBuilder: (context, loan) => Text(loan.dueOn),
-      ),
-      AppTableColumn<Loan>(
-        id: 'fine',
-        label: l10n.loansColumnFine,
-        flex: 2,
-        sortable: true,
-        alignment: Alignment.centerRight,
-        showFrom: FormFactor.expanded,
-        cellBuilder: (context, loan) => Text(
-          loan.accruedFine.isZero
-              ? l10n.commonNotSet
-              : loan.accruedFine.display(),
-          style: loan.accruedFine.isZero
-              ? muted
-              : context.textTheme.bodyMedium?.copyWith(
-                  color: scheme.error,
-                  fontWeight: FontWeight.w500,
-                ),
-        ),
-      ),
-      AppTableColumn<Loan>(
-        id: 'status',
-        label: l10n.commonStatus,
-        flex: 2,
-        cellBuilder: (context, loan) => AppStatusBadge(
-          dense: true,
-          label: loan.status.label(l10n),
-          tone: loan.status.tone,
-        ),
-      ),
-      // Opening the borrower's record is a read, and belongs to the members
-      // permission; returning, renewing and writing a copy off are the desk's
-      // work. A role holding neither gets the list without the column.
-      if (canWorkTheDesk || canSeeMembers)
-        AppTableColumn<Loan>(
-          id: 'actions',
-          label: l10n.commonActions,
-          alignment: Alignment.centerRight,
-          cellBuilder: (context, loan) => AppMenuButton(
-            tooltip: l10n.commonMoreActions,
-            actions: [
-              if (canWorkTheDesk) ...[
-                AppMenuAction(
-                  label: l10n.loansReturn,
-                  icon: AppIcons.checkIn,
-                  onSelected: () => context.go(Routes.circulationReturn),
-                ),
-                AppMenuAction(
-                  label: l10n.loansRenew,
-                  icon: AppIcons.refresh,
-                  onSelected: () => unawaited(_renewLoan(context, loan)),
-                ),
-              ],
-              if (canSeeMembers)
-                AppMenuAction(
-                  label: l10n.loansViewMember,
-                  icon: AppIcons.person,
-                  onSelected: () => context.go(Routes.member(loan.memberId)),
-                ),
-              if (canWorkTheDesk)
-                AppMenuAction(
-                  label: l10n.loansMarkLost,
-                  icon: AppIcons.help,
-                  isDestructive: true,
-                  onSelected: () => showNotWiredToast(context),
-                ),
-            ],
-          ),
-        ),
-    ];
   }
 
   @override
@@ -191,86 +70,35 @@ class CirculationPage extends StatelessWidget {
 
         return CollectionPageView<Loan>(
           onPageSizeChanged: cubit.limitChanged,
-          intro: AppStatStrip(
-            tiles: [
-              AppStatTile(
-                label: l10n.circulationStatOnLoan,
-                value: '${state.onLoanCount}',
-                icon: AppIcons.transfer,
-                tone: AppStatusTone.brand,
-                onTap: () => cubit.statusFilterChanged(null),
-              ),
-              AppStatTile(
-                label: l10n.circulationStatDueToday,
-                value: '${state.dueTodayCount}',
-                icon: AppIcons.event,
-                tone: AppStatusTone.warning,
-                onTap: () => cubit.statusFilterChanged(LoanStatus.dueToday),
-              ),
-              AppStatTile(
-                label: l10n.circulationStatOverdue,
-                value: '${state.overdueCount}',
-                icon: AppIcons.error,
-                tone: AppStatusTone.danger,
-                onTap: () => cubit.statusFilterChanged(LoanStatus.overdue),
-              ),
-              AppStatTile(
-                label: l10n.circulationStatHolds,
-                value: '${state.holdsCount}',
-                icon: AppIcons.bookmark,
-                tone: AppStatusTone.info,
-                onTap: () => context.go(Routes.circulationReservations),
-              ),
-            ],
+          intro: LoanListStats(
+            onLoanCount: state.onLoanCount,
+            dueTodayCount: state.dueTodayCount,
+            overdueCount: state.overdueCount,
+            holdsCount: state.holdsCount,
+            onAllTap: () => cubit.statusFilterChanged(null),
+            onDueTodayTap: () => cubit.statusFilterChanged(LoanStatus.dueToday),
+            onOverdueTap: () => cubit.statusFilterChanged(LoanStatus.overdue),
+            onHoldsTap: () => context.go(Routes.circulationReservations),
           ),
-          toolbar: AppToolbar(
-            search: AppSearchField(
-              hintText: l10n.circulationSearchHint,
-              clearTooltip: l10n.commonClearSearch,
-              onChanged: cubit.searchChanged,
-            ),
-            filters: [
-              AppFilterChip(
-                label: l10n.circulationFilterOnLoan,
-                icon: AppIcons.transfer,
-                selected: state.query.status == LoanStatus.onLoan,
-                onSelected: (selected) => cubit.statusFilterChanged(
-                  selected ? LoanStatus.onLoan : null,
-                ),
-              ),
-              AppFilterChip(
-                label: l10n.circulationFilterDueToday,
-                icon: AppIcons.event,
-                tone: AppStatusTone.warning,
-                selected: state.query.status == LoanStatus.dueToday,
-                onSelected: (selected) => cubit.statusFilterChanged(
-                  selected ? LoanStatus.dueToday : null,
-                ),
-              ),
-              AppFilterChip(
-                label: l10n.circulationFilterOverdue,
-                icon: AppIcons.error,
-                tone: AppStatusTone.danger,
-                selected: state.query.status == LoanStatus.overdue,
-                onSelected: (selected) => cubit.statusFilterChanged(
-                  selected ? LoanStatus.overdue : null,
-                ),
-              ),
-            ],
-            actions: [
-              if (isFiltered)
-                AppTextButton(
-                  onPressed: cubit.clearFilters,
-                  child: Text(l10n.commonClearFilters),
-                ),
-            ],
+          toolbar: LoanListToolbar(
+            status: state.query.status,
+            isFiltered: isFiltered,
+            onSearchChanged: cubit.searchChanged,
+            onStatusFilterChanged: cubit.statusFilterChanged,
+            onClearFilters: cubit.clearFilters,
           ),
           items: state.loans,
-          columns: _columns(context, l10n),
+          columns: loanListColumns(
+            context,
+            onRenew: (loan) => unawaited(_renewLoan(context, loan)),
+          ),
           sort: sort,
           onSort: (next) => cubit.sortChanged(next.columnId, next.ascending),
           onRowTap: (loan) => context.go(Routes.member(loan.memberId)),
-          compactBuilder: (context, loan) => _LoanCard(loan: loan),
+          compactBuilder: (context, loan) => LoanCard(
+            loan: loan,
+            onTap: () => context.go(Routes.member(loan.memberId)),
+          ),
           emptyState: bootstrapping
               ? const Center(child: AppSpinner())
               : isFiltered
@@ -304,72 +132,4 @@ class CirculationPage extends StatelessWidget {
     'barcode' => 'barcode',
     _ => 'due',
   };
-}
-
-class _LoanCard extends StatelessWidget {
-  const _LoanCard({required this.loan});
-
-  final Loan loan;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: spacing.sm),
-      child: AppCard(
-        onTap: () => context.go(Routes.member(loan.memberId)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    loan.titleName ?? l10n.commonNotSet,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: scheme.onSurface,
-                    ),
-                  ),
-                ),
-                AppStatusBadge(
-                  dense: true,
-                  label: loan.status.label(l10n),
-                  tone: loan.status.tone,
-                ),
-              ],
-            ),
-            SizedBox(height: spacing.xxs),
-            Text(
-              loan.memberName ?? l10n.commonNotSet,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: scheme.onSurfaceVariant,
-              ),
-            ),
-            SizedBox(height: spacing.xs),
-            Text(
-              loan.accruedFine.isZero
-                  ? '${l10n.loansColumnDue} ${loan.dueOn}'
-                  : '${l10n.loansColumnDue} ${loan.dueOn} · ${loan.accruedFine.display()}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: loan.accruedFine.isZero
-                    ? scheme.onSurfaceVariant
-                    : scheme.error,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

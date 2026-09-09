@@ -12,6 +12,7 @@ import 'package:khulla/features/users/presentation/cubit/staff_form_cubit.dart';
 import 'package:khulla/features/users/presentation/cubit/staff_form_state.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/models/load_status.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -60,6 +61,22 @@ class StaffFormDialog extends StatelessWidget {
             width: AppDialogWidth.xxxl,
             actions: const [],
             children: const [Center(child: AppSpinner())],
+          );
+        }
+        if (state.status.hasError) {
+          return AppFormModal(
+            title: isEditing ? l10n.usersEditHeading : l10n.usersAddHeading,
+            width: AppDialogWidth.xxxl,
+            actions: [
+              AppDialog.secondaryAction(
+                context: context,
+                label: l10n.commonClose,
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+            children: [
+              Text(state.error?.localizedMessage(l10n) ?? ''),
+            ],
           );
         }
         return _StaffFormBody(
