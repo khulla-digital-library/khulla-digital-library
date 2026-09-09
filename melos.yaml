@@ -18,24 +18,24 @@ command:
 scripts:
   analyze:
     description: Static analysis across all packages
-    run: melos exec --concurrency=1 -- dart analyze --fatal-infos
+    run: dart run melos exec --concurrency=1 -- dart analyze --fatal-infos
 
   format:
     description: Format Dart sources in all packages
-    run: melos exec --concurrency=1 -- dart format .
+    run: dart run melos exec --concurrency=1 -- dart format .
 
   fix:
     description: Apply dart fix across all packages
-    run: melos exec --concurrency=1 -- dart fix --apply
+    run: dart run melos exec --concurrency=1 -- dart fix --apply
 
   test:
     description: Run tests in every package that has a test/ directory
-    run: melos exec --concurrency=1 --dir-exists=test -- flutter test
+    run: dart run melos exec --concurrency=1 --dir-exists=test -- flutter test
 
   codegen:
     description: Run build_runner in packages that depend on it
-    run: melos exec --concurrency=1 --order-dependents --depends-on=build_runner -- dart run build_runner build --delete-conflicting-outputs
+    run: dart run melos exec --concurrency=1 --order-dependents --depends-on=build_runner -- dart run build_runner build --delete-conflicting-outputs
 
   clean-codegen:
     description: Remove build_runner caches in all packages
-    run: melos exec -- rm -rf .dart_tool/build
+    run: dart run melos exec -- rm -rf .dart_tool/build
