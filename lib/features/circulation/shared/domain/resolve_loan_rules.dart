@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/features/circulation/shared/domain/models/effective_loan_rules.dart';
 import 'package:khulla/features/members/domain/models/member_type.dart';
 import 'package:khulla/features/settings/domain/models/loan_rules.dart';

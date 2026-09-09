@@ -1,4 +1,5 @@
 .PHONY: bootstrap install-sdk build migrate db-diagram localize analyze format fix test check clean \
+        copyright copyright-check \
         db-web run-web run-windows run-linux build-web build-windows build-apk pr seed-mock
 
 FLUTTER := fvm flutter
@@ -76,8 +77,17 @@ fix:
 test:
 	$(DART) run melos run test
 
+## Check that handwritten Dart files carry the Khulla copyright header.
+## Generated files are skipped (see tools/copyright.dart).
+copyright-check:
+	$(DART) tools/copyright.dart
+
+## Stamp the Khulla copyright header onto files missing it.
+copyright:
+	$(DART) tools/copyright.dart --fix
+
 ## What CI runs. Do this before opening a pull request.
-check: format analyze test
+check: format copyright-check analyze test
 
 # ── Run ─────────────────────────────────────────────────────────────────────
 
@@ -107,4 +117,8 @@ build-apk:
 # ── Git ─────────────────────────────────────────────────────────────────────
 
 pr:
-	git push && gh pr create --fill-first --body "" --base dev
+	git push
+	gh pr create \
+		--base dev \
+		--title "$$(branch=$$(git branch --show-current); prefix="$${branch%%/*}"; name="$${branch#*/}"; printf '%s: ' "$$prefix"; echo "$$name" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $$i=toupper(substr($$i,1,1)) substr($$i,2)}1')" \
+		--body ""

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 // dart format width=80
 import 'package:drift/drift.dart';
 import 'package:drift_dev/api/migrations_native.dart';

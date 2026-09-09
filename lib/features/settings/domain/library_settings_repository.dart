@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/features/settings/domain/models/library_profile.dart';
 
 /// The library's own record: its name and the currency it charges in.

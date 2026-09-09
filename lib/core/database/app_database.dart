@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:country_phone_kit/country_phone_kit.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';

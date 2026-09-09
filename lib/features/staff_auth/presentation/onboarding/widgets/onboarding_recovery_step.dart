@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/services.dart';
 import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/files/save_text_file.dart';

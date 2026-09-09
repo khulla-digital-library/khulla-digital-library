@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/theme/theme_storage.dart' show ThemeStorage;
 import 'package:shared_preferences/shared_preferences.dart';

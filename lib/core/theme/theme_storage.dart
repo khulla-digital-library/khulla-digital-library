@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:injectable/injectable.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +19,7 @@ class ThemeStorage {
 
   static const String _themeModeKey = 'khulla.theme_mode';
   static const String _brandThemeKey = 'khulla.brand_theme';
+  static const String _customBrandKey = 'khulla.brand_custom';
 
   /// The persisted choice, or [ThemeMode.light] when none was saved yet.
   ThemeMode readThemeMode() {
@@ -38,6 +42,23 @@ class ThemeStorage {
     );
   }
 
-  Future<void> saveBrandTheme(AppBrandTheme brand) =>
-      _prefs.setString(_brandThemeKey, brand.name);
+  /// The mixed color in use, or null when the brand is one of the presets.
+  ///
+  /// Stored as a packed ARGB int — a color has no name to key it by, and a
+  /// hex string would need parsing and a rule for what a corrupt one means.
+  Color? readCustomBrand() {
+    final value = _prefs.getInt(_customBrandKey);
+    return value == null ? null : Color(value);
+  }
+
+  /// Writes both halves of the brand choice together, so a preset can never
+  /// be left with a stale custom color sitting on top of it.
+  Future<void> saveBrand(AppBrandTheme brand, Color? customSeed) async {
+    await _prefs.setString(_brandThemeKey, brand.name);
+    if (customSeed == null) {
+      await _prefs.remove(_customBrandKey);
+    } else {
+      await _prefs.setInt(_customBrandKey, customSeed.toARGB32());
+    }
+  }
 }

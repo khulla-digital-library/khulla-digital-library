@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// Fetch lifecycle for a screen backed by a database read.
 ///
 /// One enum for the whole app. Per-feature copies start out byte-identical and

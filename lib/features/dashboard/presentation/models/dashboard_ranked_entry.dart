@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// One row of a "most borrowed" or "most active" list.
 ///
 /// The figure is a string because the two lists count different things — a

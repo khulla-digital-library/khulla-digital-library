@@ -1,6 +1,10 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:khulla/core/theme/cubit/theme_cubit.dart';
 import 'package:khulla/core/theme/cubit/theme_state.dart';
+import 'package:khulla/features/settings/presentation/widgets/settings_brand_color_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -34,6 +38,16 @@ class _AppearancePageState extends State<AppearancePage> {
     ThemeMode.light => AppIcons.lightMode,
     ThemeMode.dark => AppIcons.darkMode,
   };
+
+  Future<void> _pickCustomBrand(ThemeState appearance) async {
+    final cubit = context.read<ThemeCubit>();
+    final picked = await SettingsBrandColorDialog.show(
+      context,
+      initial: appearance.brandSeed,
+    );
+    if (picked == null) return;
+    await cubit.setCustomBrand(picked);
+  }
 
   String _brandLabel(AppLocalizations l10n, AppBrandTheme brand) =>
       switch (brand) {
@@ -90,12 +104,17 @@ class _AppearancePageState extends State<AppearancePage> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: AppSwatchPicker<AppBrandTheme>(
-                        value: appearance.brandTheme,
+                        value: appearance.customSeed == null
+                            ? appearance.brandTheme
+                            : null,
                         items: AppBrandTheme.values,
                         itemColor: (value) => value.seed,
                         itemLabel: (value) => _brandLabel(l10n, value),
                         onChanged: (value) =>
                             context.read<ThemeCubit>().setBrandTheme(value),
+                        customColor: appearance.customSeed,
+                        customLabel: l10n.settingsAppearanceBrandCustom,
+                        onCustomTap: () => _pickCustomBrand(appearance),
                       ),
                     ),
                   ),

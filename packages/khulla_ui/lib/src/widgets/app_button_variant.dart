@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// What a button *means*, which decides all of its color.
 ///
 /// The set is deliberately small and each entry has one job. If a screen

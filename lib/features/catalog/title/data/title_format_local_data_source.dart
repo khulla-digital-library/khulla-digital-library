@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/features/catalog/title/domain/models/title_format.dart';
 
 /// Reference rows for catalogue format pickers and bootstrap seeding.

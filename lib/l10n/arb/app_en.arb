@@ -1338,6 +1338,15 @@
     "@settingsAppearanceBrandDescription": {
         "description": "Settings - appearance page"
     },
+    "settingsAppearanceBrandCustom": "Custom",
+    "settingsAppearanceBrandCustomTitle": "Custom brand color",
+    "settingsAppearanceBrandCustomDescription": "Drag to mix a color, or paste the hex your library already uses.",
+    "settingsAppearanceBrandPreviewAction": "Issue",
+    "settingsAppearanceBrandPreviewSelected": "Selected row",
+    "@settingsAppearanceBrandPreviewSelected": {
+        "description": "Settings - appearance page, sample chips in the color picker preview"
+    },
+    "fieldColorHex": "Hex",
     "brandThemeTeal": "Teal",
     "brandThemeIndigo": "Indigo",
     "brandThemeBlue": "Blue",

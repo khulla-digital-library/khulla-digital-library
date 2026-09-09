@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/features/reports/domain/models/reports_summary.dart';
 
 /// The library's figures over a period, for the reports screen and its

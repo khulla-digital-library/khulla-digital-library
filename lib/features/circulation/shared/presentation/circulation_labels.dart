@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/features/circulation/shared/domain/fine_reason.dart';
 import 'package:khulla/features/circulation/shared/domain/fine_status.dart';
 import 'package:khulla/features/circulation/shared/domain/loan_status.dart';

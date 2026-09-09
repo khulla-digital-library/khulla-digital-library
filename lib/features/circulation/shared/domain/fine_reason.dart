@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// Why a fine was raised.
 ///
 /// The reason is stored rather than inferred, because the rate that produced

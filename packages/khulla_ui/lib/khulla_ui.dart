@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// Khulla design system: tokens, theme, and primitives.
 ///
 /// `app_palette.dart` is intentionally not exported. Colors reach widgets
@@ -45,6 +48,7 @@ export 'src/widgets/app_button_variant.dart';
 export 'src/widgets/app_card.dart';
 export 'src/widgets/app_chart_data.dart';
 export 'src/widgets/app_checkbox_field.dart';
+export 'src/widgets/app_color_picker.dart';
 export 'src/widgets/app_compact_quantity_control.dart';
 export 'src/widgets/app_content_constraint.dart';
 export 'src/widgets/app_dashed_border.dart';

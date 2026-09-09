@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/material.dart';
 
 /// Raw color literals for the design system.
@@ -76,6 +79,23 @@ abstract final class AppPalette {
 
   /// Seed: graphite, for a library that wants no hue at all.
   static const Color brandSeedGraphite = Color(0xFF334155);
+
+  // ── Spectrum ──────────────────────────────────────────────────────────────
+
+  /// The six hue turns, as the gradient stops of a hue slider.
+  ///
+  /// Not brand colors and never painted as one: this is the raw spectrum a
+  /// color picker's track is drawn from, and it lives here so the rule that
+  /// hex literals stay in this file holds for the picker too.
+  static const List<Color> hueStops = [
+    Color(0xFFFF0000),
+    Color(0xFFFFFF00),
+    Color(0xFF00FF00),
+    Color(0xFF00FFFF),
+    Color(0xFF0000FF),
+    Color(0xFFFF00FF),
+    Color(0xFFFF0000),
+  ];
 
   // ── Ink ramp, light ───────────────────────────────────────────────────────
 

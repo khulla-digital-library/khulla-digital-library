@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// Ends the running app so its next launch reopens the catalogue clean.
 ///
 /// A backup restore or an erase replaces the file or store underneath a live

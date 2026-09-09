@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// The one place backup export/restore is allowed to branch on platform.
 ///
 /// Native has a real `.sqlite` file on disk — export checkpoints WAL and

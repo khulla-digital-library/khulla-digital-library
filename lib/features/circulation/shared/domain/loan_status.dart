@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// Where one loan stands right now.
 ///
 /// [dueToday] is its own value rather than a date comparison in the UI: the
