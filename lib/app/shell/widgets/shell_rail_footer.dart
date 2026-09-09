@@ -37,12 +37,14 @@ class ShellRailFooter extends StatelessWidget {
             // text, and the brand tooltip already carries the name there.
             if (extended) ...[
               SizedBox(height: spacing.xs),
+              Divider(height: 1, thickness: 1, color: colors.hairline),
+              SizedBox(height: spacing.xs),
               Padding(
                 padding: EdgeInsets.fromLTRB(
                   spacing.sm,
                   0,
                   spacing.sm,
-                  spacing.xxs,
+                  0,
                 ),
                 child: const ShellCopyrightNotice(
                   textAlign: TextAlign.start,
