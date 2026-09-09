@@ -175,11 +175,6 @@ List<ShellDestination> shellDestinations(
       primary: true,
       permission: StaffPermission.members,
     ),
-    // ShellDestination(
-    //   label: l10n.navOpac,
-    //   icon: AppIcons.discover,
-    //   route: Routes.opac,
-    // ),
     ShellDestination(
       label: l10n.navReports,
       icon: AppIcons.insights,
