@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -14,7 +17,7 @@ Finder _icon(AppIconSpec spec) => find.byWidgetPredicate(
 Widget _host(Widget child, {Size size = const Size(1400, 900)}) => MediaQuery(
   data: MediaQueryData(size: size),
   child: MaterialApp(
-    theme: AppTheme.light(AppDensity.comfortable),
+    theme: AppTheme.light(),
     home: Scaffold(
       body: Row(
         children: [

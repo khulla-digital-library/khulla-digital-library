@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// {@template app_text_styles}
@@ -20,13 +23,18 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// {@endtemplate}
 class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// {@macro app_text_styles}
-  const AppTextStyles({this.density = AppDensity.compact});
+  const AppTextStyles({this.density = AppDensity.comfortable});
 
   /// The rung these styles were resolved at.
   final AppDensity density;
 
   /// Body copy, table cells, field text — the default everything falls to.
   TextStyle get body => _style(density.pick(12, 14), FontWeight.w400);
+
+  /// Counts, money, and other figures that must not jitter as digits change.
+  TextStyle get numeric => body.copyWith(
+    fontFeatures: const [FontFeature.tabularFigures()],
+  );
 
   /// Secondary body: navigation labels, section prose, tooltips.
   TextStyle get bodyLarge => _style(density.pick(14, 16), FontWeight.w400);
@@ -58,9 +66,10 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   TextStyle get pageHeader =>
       _style(density.pick(18, 22), FontWeight.w500, tight: true);
 
-  /// A form dialog's title.
+  /// A form dialog's title — the same rung as [title], one step heavier so it
+  /// reads above section headings without jumping to [displaySmall].
   TextStyle get formTitle =>
-      _style(density.pick(20, 24), FontWeight.w500, tight: true);
+      _style(density.pick(18, 20), FontWeight.w600, tight: true);
 
   /// A card primitive's title, and a stat tile's figure.
   TextStyle get displaySmall => _style(24, FontWeight.w600, tight: true);

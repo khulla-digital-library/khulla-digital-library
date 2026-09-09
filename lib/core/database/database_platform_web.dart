@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:sqlite3/common.dart';
 
 /// Unreachable on web: the browser build has no file system to resolve a path

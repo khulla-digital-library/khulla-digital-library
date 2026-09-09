@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// A borrower's standing with the library.
 ///
 /// [expiring] is separate from [active] because it is the state the desk can

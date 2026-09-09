@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/core/money/money.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
@@ -16,6 +19,7 @@ class CheckOutSummaryCard extends StatelessWidget {
     required this.borrowingLimit,
     required this.outstandingFines,
     required this.onConfirm,
+    this.currentLoansOut = 0,
     super.key,
   });
 
@@ -26,6 +30,7 @@ class CheckOutSummaryCard extends StatelessWidget {
   final String dueDate;
 
   final int borrowingLimit;
+  final int currentLoansOut;
   final Money outstandingFines;
 
   /// Commits the checkout. Null while the desk has not chosen a member or
@@ -37,7 +42,7 @@ class CheckOutSummaryCard extends StatelessWidget {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
-    final overLimit = copyCount > borrowingLimit;
+    final overLimit = currentLoansOut + copyCount > borrowingLimit;
 
     return SectionCard(
       title: l10n.checkOutSummarySection,

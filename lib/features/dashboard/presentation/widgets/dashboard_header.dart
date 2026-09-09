@@ -1,9 +1,14 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The board's controls: which period its figures cover, and the one action
+/// The board's controls: which period its figures cover, and the two actions
 /// a shift starts with.
 ///
 /// No greeting and no page title. The shell's top bar already names the page
@@ -30,6 +35,10 @@ class DashboardHeader extends StatelessWidget {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
     final stacked = context.formFactor.isCompact;
+    // The board is the one section every role opens, so its two shortcuts
+    // are the desks a role may not be able to work. Without them the header
+    // is the period control alone.
+    final canWorkTheDesk = context.canManage(StaffPermission.circulation);
 
     final periods = AppSegmentedControl<DashboardPeriod>(
       value: period,
@@ -49,14 +58,26 @@ class DashboardHeader extends StatelessWidget {
       child: Text(l10n.dashboardCheckOut),
     );
 
+    final returnCopy = AppButton(
+      size: AppButtonSize.medium,
+      variant: AppButtonVariant.outline,
+      icon: AppIcons.checkIn,
+      onPressed: () => context.go(Routes.circulationReturn),
+      child: Text(l10n.dashboardReturnCopy),
+    );
+
     if (stacked) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
           periods,
-          SizedBox(height: spacing.xs),
-          checkOut,
+          if (canWorkTheDesk) ...[
+            SizedBox(height: spacing.xs),
+            checkOut,
+            SizedBox(height: spacing.xs),
+            returnCopy,
+          ],
         ],
       );
     }
@@ -65,7 +86,11 @@ class DashboardHeader extends StatelessWidget {
       children: [
         periods,
         const Spacer(),
-        checkOut,
+        if (canWorkTheDesk) ...[
+          returnCopy,
+          SizedBox(width: spacing.xs),
+          checkOut,
+        ],
       ],
     );
   }

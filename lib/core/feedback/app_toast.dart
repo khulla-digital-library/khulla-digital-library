@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 import 'package:toastification/toastification.dart';
 
@@ -61,7 +64,7 @@ abstract final class AppToast {
     BuildContext context, {
     required String message,
     String? description,
-    ToastificationStyle style = ToastificationStyle.minimal,
+    ToastificationStyle style = ToastificationStyle.flat,
     Duration? autoCloseDuration,
   }) => show(
     context,
@@ -76,7 +79,7 @@ abstract final class AppToast {
     BuildContext context, {
     required String message,
     String? description,
-    ToastificationStyle style = ToastificationStyle.flatColored,
+    ToastificationStyle style = ToastificationStyle.flat,
     Duration? autoCloseDuration,
   }) => show(
     context,
@@ -92,7 +95,7 @@ abstract final class AppToast {
     BuildContext context, {
     required String message,
     String? description,
-    ToastificationStyle style = ToastificationStyle.flatColored,
+    ToastificationStyle style = ToastificationStyle.flat,
     Duration? autoCloseDuration,
   }) => show(
     context,
@@ -108,7 +111,7 @@ abstract final class AppToast {
     BuildContext context, {
     required String message,
     String? description,
-    ToastificationStyle style = ToastificationStyle.flatColored,
+    ToastificationStyle style = ToastificationStyle.flat,
     Duration? autoCloseDuration,
   }) => show(
     context,

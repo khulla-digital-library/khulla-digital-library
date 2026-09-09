@@ -1,4 +1,7 @@
-import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_copy.dart';
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
+import 'package:khulla/features/catalog/copy/domain/models/copy.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -17,14 +20,14 @@ class CheckOutBasket extends StatelessWidget {
     super.key,
   });
 
-  final List<CatalogCopy> copies;
+  final List<Copy> copies;
 
   /// The scan field's controller, owned by the page so it can be cleared
   /// after every submission.
   final TextEditingController scanController;
 
   final ValueChanged<String> onScanSubmitted;
-  final void Function(CatalogCopy copy) onRemove;
+  final void Function(Copy copy) onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -58,23 +61,23 @@ class CheckOutBasket extends StatelessWidget {
               message: l10n.checkOutCopiesEmptyBody,
             )
           else
-            AppTable<CatalogCopy>(
+            AppTable<Copy>(
               items: copies,
               columns: [
-                AppTableColumn<CatalogCopy>(
+                AppTableColumn<Copy>(
                   id: 'barcode',
                   label: l10n.fieldBarcode,
                   flex: 2,
                   cellBuilder: (context, copy) => Text(copy.barcode),
                 ),
-                AppTableColumn<CatalogCopy>(
+                AppTableColumn<Copy>(
                   id: 'title',
                   label: l10n.loansColumnTitle,
                   flex: 4,
                   showFrom: FormFactor.medium,
                   cellBuilder: (context, copy) => Text(copy.titleName),
                 ),
-                AppTableColumn<CatalogCopy>(
+                AppTableColumn<Copy>(
                   id: 'shelf',
                   label: l10n.copiesColumnShelf,
                   flex: 2,
@@ -86,10 +89,9 @@ class CheckOutBasket extends StatelessWidget {
                     ),
                   ),
                 ),
-                AppTableColumn<CatalogCopy>(
+                AppTableColumn<Copy>(
                   id: 'remove',
                   label: l10n.commonActions,
-                  width: 56,
                   alignment: Alignment.centerRight,
                   cellBuilder: (context, copy) => AppIconButton(
                     icon: AppIcons.close,

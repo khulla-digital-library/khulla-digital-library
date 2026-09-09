@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [dev, prod]
+  pull_request:
+    branches: [dev, prod]
+  workflow_dispatch:
+
+# A new push to a pull request makes the previous run's answer irrelevant.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: Format, analyze, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          bootstrap: melos
+
+      - name: Format, copyright, analysis, tests
+        run: make ci
+
+  # Merging into prod publishes a release at whatever pubspec.yaml says, so a
+  # pull request that forgets to bump the version would ship nothing and say so
+  # only after the merge. Catch it here, while it is still one commit to fix.
+  version-bumped:
+    name: Version bumped for release
+    if: github.event_name == 'pull_request' && github.base_ref == 'prod'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Check this version has not already been released
+        run: |
+          version="$(dart tools/version.dart)"
+          tag="v$version"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+            echo "::error file=pubspec.yaml::$tag is already released." \
+                 "Bump version: in pubspec.yaml — merging this as it stands publishes nothing."
+            exit 1
+          fi
+
+          echo "Merging this releases **$tag**." >> "$GITHUB_STEP_SUMMARY"
+
+  build-web:
+    name: Build web
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          bootstrap: pub
+
+      # Analysis does not compile — this is what catches a change that passes
+      # `dart analyze` but breaks the release build.
+      - name: Build web (prod flavor)
+        run: flutter build web --release -t lib/main_prod.dart

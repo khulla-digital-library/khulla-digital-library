@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// How much room the UI gives itself.
 ///
 /// This is the *only* density axis in the design system, and it is not a

@@ -1,4 +1,7 @@
-import 'package:khulla/features/reports/presentation/placeholder/reports_placeholder.dart';
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
+import 'package:khulla/core/money/money.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -9,13 +12,15 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// what proportion of what was charged actually came in, and that is a
 /// comparison, not three separate figures.
 class ReportsFinesCard extends StatelessWidget {
-  const ReportsFinesCard({super.key});
+  const ReportsFinesCard({required this.totals, super.key});
+
+  final List<({String label, Money amount, AppStatusTone tone, double share})>
+  totals;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
-    final totals = reportsFineTotals(l10n);
 
     return SectionCard(
       title: l10n.reportsFinesTitle,

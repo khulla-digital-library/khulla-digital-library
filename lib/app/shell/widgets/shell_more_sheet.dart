@@ -1,6 +1,12 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
+import 'dart:async';
+
 import 'package:go_router/go_router.dart';
+import 'package:khulla/app/shell/help/help_dialog.dart';
+import 'package:khulla/app/shell/widgets/shell_copyright_notice.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
-import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -43,8 +49,17 @@ class _MoreList extends StatelessWidget {
           _MoreRow(
             label: destination.label,
             icon: destination.icon,
-            selected: Routes.isUnder(current, destination.route),
-            route: destination.route,
+            selected: isSelectedShellRoute(
+              current,
+              destination.route,
+              [
+                for (final d in destinations) ...[
+                  d.route,
+                  for (final child in d.children) child.route,
+                ],
+              ],
+            ),
+            onTap: () => context.go(destination.route),
           ),
           for (final child in destination.children)
             Padding(
@@ -52,12 +67,27 @@ class _MoreList extends StatelessWidget {
               child: _MoreRow(
                 label: child.label,
                 icon: AppIcons.subEntry,
-                selected: Routes.isUnder(current, child.route),
-                route: child.route,
+                selected: isSelectedShellRoute(
+                  current,
+                  child.route,
+                  [for (final c in destination.children) c.route],
+                ),
+                onTap: () => context.go(child.route),
               ),
             ),
           SizedBox(height: spacing.xxs),
         ],
+        // Phones never see the rail footer, and the account menu that carries
+        // help on a window lives in it — so the manual hangs here instead,
+        // below the sections and above the copyright line.
+        _MoreRow(
+          label: context.l10n.shellHelp,
+          icon: AppIcons.help,
+          selected: false,
+          onTap: () => unawaited(HelpDialog.show(context)),
+        ),
+        SizedBox(height: spacing.xxs),
+        const ShellCopyrightNotice(showDivider: true),
       ],
     );
   }
@@ -68,13 +98,16 @@ class _MoreRow extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.selected,
-    required this.route,
+    required this.onTap,
   });
 
   final String label;
   final AppIconSpec icon;
   final bool selected;
-  final String route;
+
+  /// Run after the sheet closes — the sheet is always dismissed first, so a
+  /// row never leaves the panel sitting over what it just opened.
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +122,7 @@ class _MoreRow extends StatelessWidget {
       child: InkWell(
         onTap: () {
           Navigator.of(context).pop();
-          context.go(route);
+          onTap();
         },
         borderRadius: radius,
         child: Padding(

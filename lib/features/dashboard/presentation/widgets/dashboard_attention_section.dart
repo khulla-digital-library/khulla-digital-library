@@ -1,6 +1,8 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:go_router/go_router.dart';
-import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_attention_item.dart';
-import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_placeholder.dart';
+import 'package:khulla/features/dashboard/presentation/models/dashboard_attention_item.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_section_card.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/navigation_group.dart';
@@ -12,12 +14,13 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// is what somebody still has to do. Every row opens the screen that clears
 /// it, so the panel is a worklist rather than a worry list.
 class DashboardAttentionSection extends StatelessWidget {
-  const DashboardAttentionSection({super.key});
+  const DashboardAttentionSection({required this.items, super.key});
+
+  final List<DashboardAttentionItem> items;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final items = dashboardAttentionItems(l10n);
 
     return DashboardSectionCard(
       framed: false,

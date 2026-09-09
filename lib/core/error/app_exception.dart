@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:equatable/equatable.dart';
 import 'package:sqlite3/common.dart';
 

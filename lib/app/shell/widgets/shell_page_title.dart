@@ -1,5 +1,9 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -29,9 +33,10 @@ ShellPageTitle shellPageTitle(
   BuildContext context,
   String location,
   AppLocalizations l10n, {
+  required UserRole role,
   required void Function(String route) onNavigate,
 }) {
-  final destinations = shellDestinations(l10n);
+  final destinations = shellDestinations(l10n, role);
 
   for (final destination in destinations) {
     if (!Routes.isUnder(location, destination.route)) continue;

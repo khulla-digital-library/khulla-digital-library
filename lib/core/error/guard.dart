@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:drift/drift.dart';
 // `drift/remote.dart` is marked experimental, but it is the only public home
 // of DriftRemoteException — the wrapper every failure on the database isolate

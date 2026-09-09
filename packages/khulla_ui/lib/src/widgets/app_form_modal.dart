@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The chrome every create/edit form is shown in.
@@ -61,7 +64,6 @@ class AppFormModal extends StatelessWidget {
     }
     return showDialog<T>(
       context: context,
-      barrierDismissible: false,
       builder: builder,
     );
   }
@@ -73,22 +75,9 @@ class AppFormModal extends StatelessWidget {
     final scheme = context.colorScheme;
     final typography = context.appTextStyles;
 
-    final heading = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          title,
-          style: typography.formTitle.copyWith(color: colors.ink100),
-        ),
-        if (description case final line?) ...[
-          SizedBox(height: spacing.xxs),
-          Text(
-            line,
-            style: typography.body.copyWith(color: colors.mutedForeground),
-          ),
-        ],
-      ],
+    final heading = Text(
+      title,
+      style: typography.displaySmall.copyWith(color: colors.ink200),
     );
 
     final body = Column(
@@ -102,14 +91,12 @@ class AppFormModal extends StatelessWidget {
       ],
     );
 
-    final footer = Container(
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        border: Border(top: BorderSide(color: colors.hairline)),
-      ),
-      padding: EdgeInsets.symmetric(
-        horizontal: spacing.dialog,
-        vertical: spacing.sm,
+    final footer = Padding(
+      padding: EdgeInsets.fromLTRB(
+        spacing.lg,
+        spacing.sm,
+        spacing.lg,
+        spacing.lg,
       ),
       child: AppDialogActions(children: actions),
     );
@@ -123,7 +110,7 @@ class AppFormModal extends StatelessWidget {
             tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
             onPressed: () => Navigator.of(context).maybePop(),
           ),
-          title: Text(title, style: typography.sectionTitle),
+          title: Text(title, style: typography.displaySmall),
         ),
         body: SafeArea(
           child: Column(
@@ -160,54 +147,49 @@ class AppFormModal extends StatelessWidget {
       );
     }
 
-    return Dialog(
-      backgroundColor: scheme.surface,
-      insetPadding: EdgeInsets.all(spacing.lg),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(context.appRadius.control),
-        side: BorderSide(color: colors.hairline),
-      ),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: width.value,
-          maxHeight: MediaQuery.sizeOf(context).height * 0.9,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
+    return AppDialogShell(
+      maxWidth: width.value,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              spacing.lg,
+              spacing.lg,
+              spacing.lg,
+              spacing.sm,
+            ),
+            child: heading,
+          ),
+          Flexible(
+            child: SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(
-                spacing.dialog,
-                spacing.dialog,
-                spacing.sm,
-                spacing.sm,
+                spacing.lg,
+                0,
+                spacing.lg,
+                spacing.lg,
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(child: heading),
-                  SizedBox(width: spacing.sm),
-                  AppIconButton(
-                    icon: AppIcons.close,
-                    tooltip: MaterialLocalizations.of(
-                      context,
-                    ).closeButtonTooltip,
-                    onPressed: () => Navigator.of(context).maybePop(),
-                  ),
+                  if (description case final line?) ...[
+                    Text(
+                      line,
+                      style: typography.body.copyWith(
+                        color: colors.mutedForeground,
+                      ),
+                    ),
+                    SizedBox(height: spacing.sm),
+                  ],
+                  body,
                 ],
               ),
             ),
-            Divider(height: 1, color: colors.hairline),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(spacing.dialog),
-                child: body,
-              ),
-            ),
-            footer,
-          ],
-        ),
+          ),
+          footer,
+        ],
       ),
     );
   }

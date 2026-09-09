@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// Where one physical copy currently is.
 ///
 /// This is the copy's own standing, not the title's: a title with four copies
@@ -7,8 +10,6 @@ enum CopyStatus {
   available,
   onLoan,
   reserved,
-  overdue,
   lost,
   damaged,
-  withdrawn,
 }

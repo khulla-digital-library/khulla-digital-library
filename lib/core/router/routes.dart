@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// Centralized route paths for the app router.
 ///
 /// Navigate with `context.go(Routes.catalog)` — never a hard-coded string, so
@@ -16,15 +19,30 @@
 abstract final class Routes {
   static const String root = '/';
 
+  /// First-run setup. Reached only when the catalogue holds no staff account,
+  /// and outside the shell — there is no library to navigate yet.
+  static const String onboarding = '/onboarding';
+
+  /// Staff sign-in. Outside the shell, for the same reason.
+  static const String signIn = '/sign-in';
+
+  /// Reset the first administrator password with a recovery code.
+  static const String recoverPassword = '/recover-password';
+
+  /// Whether [location] is one of the screens that live outside the shell.
+  static bool isAuthLocation(String location) =>
+      location == onboarding ||
+      location == signIn ||
+      location == recoverPassword;
+
   /// Dashboard: the shift's starting point — counts, activity, quick actions.
   static const String dashboard = '/dashboard';
 
-  /// Catalogue: titles, copies, authors, subjects.
+  /// Catalogue: titles, copies, labels.
   static const String catalog = '/catalog';
 
   static const String titlesSegment = 'titles';
   static const String copiesSegment = 'copies';
-  static const String authorsSegment = 'authors';
   static const String idSegment = ':id';
 
   /// Every work the library holds.
@@ -36,28 +54,31 @@ abstract final class Routes {
   /// Every physical item, across every title.
   static const String catalogCopies = '$catalog/$copiesSegment';
 
-  /// The people and organisations credited on a title.
-  static const String catalogAuthors = '$catalog/$authorsSegment';
-
   /// The label and barcode desk.
   static const String catalogLabels = '$catalog/$labelsSegment';
 
   /// One title's record.
   static String catalogTitle(String id) => '$catalogTitles/$id';
 
-  /// One author's record.
-  static String catalogAuthor(String id) => '$catalogAuthors/$id';
-
   /// Circulation: checkouts, returns, reservations, overdues.
   static const String circulation = '/circulation';
 
+  static const String loansSegment = 'loans';
   static const String checkOutSegment = 'check-out';
   static const String returnsSegment = 'return';
   static const String reservationsSegment = 'reservations';
   static const String finesSegment = 'fines';
 
+  /// The circulation desk's landing page: open loans, headline counts,
+  /// and links into the rest of the section.
+  static const String circulationLoans = '$circulation/$loansSegment';
+
   /// The checkout desk.
   static const String circulationCheckOut = '$circulation/$checkOutSegment';
+
+  /// The checkout desk with a member already looked up by card number.
+  static String circulationCheckOutForMember(String cardNumber) =>
+      '$circulationCheckOut?card=${Uri.encodeComponent(cardNumber)}';
 
   /// The returns desk.
   static const String circulationReturn = '$circulation/$returnsSegment';
@@ -70,8 +91,6 @@ abstract final class Routes {
   static const String circulationFines = '$circulation/$finesSegment';
 
   /// Members: borrower records and their standing.
-  /// The reader-facing catalogue search.
-  static const String opac = '/opac';
 
   /// Reports and statistics.
   static const String reports = '/reports';

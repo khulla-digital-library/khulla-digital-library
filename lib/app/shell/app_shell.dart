@@ -1,13 +1,18 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'dart:async';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:khulla/app/shell/widgets/shell_brand_mark.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
 import 'package:khulla/app/shell/widgets/shell_more_sheet.dart';
 import 'package:khulla/app/shell/widgets/shell_page_actions.dart';
 import 'package:khulla/app/shell/widgets/shell_page_title.dart';
 import 'package:khulla/app/shell/widgets/shell_rail_footer.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -24,11 +29,9 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// the section's actions have to stay put while a catalogue of ten thousand
 /// titles scrolls, and no arrangement inside a page achieves that as simply.
 ///
-/// The chrome is split by *scope*, not by convenience. The top bar carries
-/// only what changes with the page — its name, its trail, what you can do to
-/// it. Search, notifications, the theme switch and the account control are
-/// the same everywhere, so they sit at the foot of the rail with the rest of
-/// the app-wide furniture.
+/// The chrome is split by *scope*, not by convenience. The brand header sits
+/// above the rail in the left column; the top bar tops the page column beside
+/// it. Theme lives under Settings → Appearance.
 class AppShell extends StatelessWidget {
   const AppShell({required this.navigationShell, super.key});
 
@@ -40,12 +43,21 @@ class AppShell extends StatelessWidget {
   /// How many sections the compact bottom bar shows before *More*.
   static const int _compactSlots = 4;
 
-  void _goBranch(int index) => navigationShell.goBranch(
-    index,
-    // Tapping the active destination returns to the top of that branch, the
-    // behaviour every tabbed app has trained people to expect.
-    initialLocation: index == navigationShell.currentIndex,
-  );
+  void _goBranch(BuildContext context, int index, UserRole role) {
+    final destinations = shellDestinations(context.l10n, role);
+    final target = index < destinations.length
+        ? destinations[index].route
+        : null;
+    navigationShell.goBranch(
+      index,
+      // Tapping the active destination returns to the top of that branch, the
+      // behaviour every tabbed app has trained people to expect. The members
+      // section always re-enters at the register: a profile left open on its
+      // stack would otherwise greet the next visit instead of the list.
+      initialLocation:
+          index == navigationShell.currentIndex || target == Routes.members,
+    );
+  }
 
   void _goRoute(BuildContext context, String route) => context.go(route);
 
@@ -53,13 +65,30 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final formFactor = context.formFactor;
-    final destinations = shellDestinations(l10n);
+    final auth = context.watch<AuthCubit>().state;
+    final role = auth.staff?.role ?? UserRole.readOnly;
+    final destinations = shellDestinations(l10n, role);
+    // Every branch stays in `destinations` at its router index — dropping an
+    // entry here instead would desync the rail's `onDestinationSelected`
+    // from `navigationShell.goBranch`. `visibleIndices` is the list of
+    // original indices a role may actually see; the rail below maps through
+    // it in both directions instead of indexing `destinations` directly.
+    final visibleIndices = [
+      for (var i = 0; i < destinations.length; i++)
+        if (destinations[i].permission == null ||
+            auth.canView(destinations[i].permission!))
+          i,
+    ];
+    final visibleDestinations = [
+      for (final i in visibleIndices) destinations[i],
+    ];
     final location = GoRouterState.of(context).uri.path;
 
     final page = shellPageTitle(
       context,
       location,
       l10n,
+      role: role,
       onNavigate: (route) => _goRoute(context, route),
     );
 
@@ -69,6 +98,7 @@ class AppShell extends StatelessWidget {
           ? null
           : AppBreadcrumbs(crumbs: page.crumbs),
       actions: shellPageActions(context, location, l10n),
+      wrapSafeArea: !formFactor.usesNavigationRail,
       leading: formFactor.usesNavigationRail
           ? null
           : AppIconButton(
@@ -77,7 +107,7 @@ class AppShell extends StatelessWidget {
               onPressed: () => unawaited(
                 showShellMoreSheet(
                   context,
-                  destinations: destinations,
+                  destinations: visibleDestinations,
                   current: location,
                 ),
               ),
@@ -85,8 +115,17 @@ class AppShell extends StatelessWidget {
     );
 
     if (!formFactor.usesNavigationRail) {
-      final compact = destinations.where((d) => d.primary).toList();
-      final index = navigationShell.currentIndex;
+      // A primary destination can be hidden like any other — a role that
+      // cannot open the catalogue does not get a catalogue tab — so the bar's
+      // slots are numbered over what this role actually sees. `compactSlots`
+      // maps a slot back to its branch index; anything past the four slots,
+      // and any section that is not showing, lives behind *More*.
+      final compactSlots = [
+        for (final i in visibleIndices)
+          if (destinations[i].primary) i,
+      ].take(_compactSlots).toList();
+      final compact = [for (final i in compactSlots) destinations[i]];
+      final slot = compactSlots.indexOf(navigationShell.currentIndex);
 
       return Scaffold(
         body: Column(
@@ -96,16 +135,18 @@ class AppShell extends StatelessWidget {
           ],
         ),
         bottomNavigationBar: AppNavBar(
-          selectedIndex: index < _compactSlots ? index : _compactSlots,
+          // The current section may have no slot of its own — a role reading
+          // reports is inside *More* — and the bar then highlights *More*.
+          selectedIndex: slot >= 0 ? slot : compactSlots.length,
           onDestinationSelected: (selected) {
-            if (selected < _compactSlots) {
-              _goBranch(selected);
+            if (selected < compactSlots.length) {
+              _goBranch(context, compactSlots[selected], role);
               return;
             }
             unawaited(
               showShellMoreSheet(
                 context,
-                destinations: destinations,
+                destinations: visibleDestinations,
                 current: location,
               ),
             );
@@ -126,41 +167,74 @@ class AppShell extends StatelessWidget {
     }
 
     final extended = formFactor.usesExtendedRail;
+    final railWidth = extended
+        ? AppNavRail.extendedWidth
+        : AppNavRail.collapsedWidth;
 
     return Scaffold(
-      body: Row(
-        children: [
-          AppNavRail(
-            selectedIndex: navigationShell.currentIndex,
-            onDestinationSelected: _goBranch,
-            extended: extended,
-            leading: ShellBrandMark(extended: extended),
-            footer: ShellRailFooter(extended: extended),
-            destinations: [
-              for (final destination in destinations)
-                AppNavDestination(
-                  icon: AppIcon(destination.icon),
-                  label: destination.label,
-                  children: [
-                    for (final child in destination.children)
-                      AppNavChild(
-                        label: child.label,
-                        selected: Routes.isUnder(location, child.route),
-                        onSelected: () => _goRoute(context, child.route),
+      body: SafeArea(
+        bottom: false,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              width: railWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // TODO(sawongam): Add brand header
+                  // ShellBrandHeader(extended: extended),
+                  Expanded(
+                    child: AppNavRail(
+                      selectedIndex: visibleIndices.indexOf(
+                        navigationShell.currentIndex,
                       ),
-                  ],
-                ),
-            ],
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                topBar,
-                Expanded(child: navigationShell),
-              ],
+                      onDestinationSelected: (i) =>
+                          _goBranch(context, visibleIndices[i], role),
+                      extended: extended,
+                      wrapSafeArea: false,
+                      footer: ShellRailFooter(extended: extended),
+                      destinations: [
+                        for (final destination in visibleDestinations)
+                          AppNavDestination(
+                            icon: AppIcon(destination.icon),
+                            label: destination.label,
+                            expandedByDefault: destination.expandedByDefault,
+                            children: [
+                              for (final child in destination.children)
+                                AppNavChild(
+                                  label: child.label,
+                                  selected: isSelectedShellRoute(
+                                    location,
+                                    child.route,
+                                    [
+                                      for (final sibling
+                                          in destination.children)
+                                        sibling.route,
+                                    ],
+                                  ),
+                                  onSelected: () =>
+                                      _goRoute(context, child.route),
+                                ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  topBar,
+                  Expanded(child: navigationShell),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

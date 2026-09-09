@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 /// The one place a platform difference is allowed in the data layer.
 ///
 /// `drift_flutter` already reconciles the three SQLite backends — a background

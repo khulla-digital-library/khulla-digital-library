@@ -1,12 +1,14 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// {@template app_filter_chip}
 /// One toggleable filter in a toolbar's chip row, with an optional count.
 ///
-/// A **dashed** outline at rest that turns solid-tinted brand when the filter
-/// is applied. The dash is what separates a filter — something you set and
-/// clear — from a button, at a glance and without reading it; a filter row of
-/// solid-outlined chips reads as a row of actions.
+/// A plain card — 1px hairline, small corners, no fill — that stays neutral
+/// at rest and, once applied, takes the brand wash. Hue is not the selected
+/// state: a row of green, cyan and orange chips reads as tags, not filters.
 ///
 /// Chips are additive filters that can all be off at once; when exactly one
 /// choice must always be active, that is [AppSegmentedControl] instead.
@@ -40,9 +42,9 @@ class AppFilterChip extends StatelessWidget {
   /// Optional leading glyph.
   final AppIconSpec? icon;
 
-  /// Which semantic family the selected state draws from. Use
-  /// [AppStatusTone.danger] for an *Overdue* chip so the row reads at a
-  /// glance.
+  /// Kept for call sites that used to tint the selected wash. Fill is always
+  /// brand (or [AppStatusTone.danger] for an alarm filter); this no longer
+  /// paints the chip as a rainbow tag.
   final AppStatusTone tone;
 
   @override
@@ -50,26 +52,38 @@ class AppFilterChip extends StatelessWidget {
     final spacing = context.appSpacing;
     final colors = context.appColors;
     final metrics = context.appMetrics;
-    final accent = tone.foreground(context);
+    final selectedTone = tone == AppStatusTone.danger
+        ? AppStatusTone.danger
+        : AppStatusTone.brand;
     final glyph = icon;
     final total = count;
     final enabled = onSelected != null;
-    final foreground = selected ? accent : colors.ink400;
+    final foreground = selected
+        ? selectedTone.foreground(context)
+        : colors.ink500;
     final radius = BorderRadius.circular(context.appRadius.container);
 
     final body = Container(
       height: metrics.buttonHeightSmall,
       padding: EdgeInsets.symmetric(horizontal: spacing.sm),
       decoration: BoxDecoration(
-        color: selected
-            ? tone.background(context)
-            : accent.withValues(alpha: 0.06),
+        color: selected ? selectedTone.background(context) : Colors.transparent,
         borderRadius: radius,
+        border: Border.all(
+          color: selected ? selectedTone.border(context) : colors.hairline,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (glyph != null) ...[
+          if (selected) ...[
+            AppIcon(
+              AppIcons.check,
+              size: metrics.iconInButton,
+              color: foreground,
+            ),
+            SizedBox(width: spacing.xs - 2),
+          ] else if (glyph != null) ...[
             AppIcon(glyph, size: metrics.iconInButton, color: foreground),
             SizedBox(width: spacing.xs - 2),
           ],
@@ -94,10 +108,7 @@ class AppFilterChip extends StatelessWidget {
       onTap: enabled ? () => onSelected!(!selected) : null,
       borderRadius: radius,
       pressScale: 1,
-      child: AppDashedBorder(
-        color: selected ? accent : accent.withValues(alpha: 0.35),
-        child: body,
-      ),
+      child: body,
     );
   }
 }

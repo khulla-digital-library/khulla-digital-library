@@ -1,10 +1,14 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:khulla/features/users/domain/user_role.dart';
-import 'package:khulla/features/users/presentation/placeholder/users_placeholder.dart';
+import 'package:khulla/features/users/presentation/cubit/staff_list_cubit.dart';
+import 'package:khulla/features/users/presentation/cubit/staff_list_state.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
 import 'package:khulla/features/users/presentation/widgets/permission_matrix.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// What each role is allowed to do.
@@ -13,7 +17,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// and a screen that lets an administrator invent a fifth mostly produces a
 /// role called "Librarian 2" whose permissions nobody can remember. The
 /// matrix below is the whole model, on one screen, with no scrolling between
-/// a role and the permission being read.
+/// a role and the permission being read — there is no "add role" action for
+/// the same reason: a custom role is a feature request, not a default.
 class RoleListPage extends StatelessWidget {
   const RoleListPage({super.key});
 
@@ -22,47 +27,45 @@ class RoleListPage extends StatelessWidget {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
 
-    final counts = <UserRole, int>{
-      for (final role in UserRole.values)
-        role: placeholderStaff.where((staff) => staff.role == role).length,
-    };
+    return BlocBuilder<StaffListCubit, StaffListState>(
+      builder: (context, state) {
+        final counts = <UserRole, int>{
+          for (final role in UserRole.values)
+            role: state.staff.where((staff) => staff.role == role).length,
+        };
 
-    return AppPageBody(
-      wide: true,
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              spacing.page,
-              spacing.lg,
-              spacing.page,
-              spacing.xlg,
-            ),
-            sliver: SliverList.list(
-              children: [
-                AppResponsiveGrid(
+        return AppPageBody(
+          wide: true,
+          child: CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  spacing.page,
+                  spacing.lg,
+                  spacing.page,
+                  spacing.xlg,
+                ),
+                sliver: SliverList.list(
                   children: [
-                    for (final role in UserRole.values)
-                      _RoleCard(role: role, people: counts[role] ?? 0),
+                    AppResponsiveGrid(
+                      children: [
+                        for (final role in UserRole.values)
+                          _RoleCard(role: role, people: counts[role] ?? 0),
+                      ],
+                    ),
+                    SizedBox(height: spacing.lg),
+                    SectionCard(
+                      title: l10n.rolesMatrixTitle,
+                      subtitle: l10n.rolesLegend,
+                      child: const PermissionMatrix(),
+                    ),
                   ],
                 ),
-                SizedBox(height: spacing.lg),
-                SectionCard(
-                  title: l10n.rolesMatrixTitle,
-                  subtitle: l10n.rolesMatrixSubtitle,
-                  trailing: AppButton(
-                    variant: AppButtonVariant.outline,
-                    icon: AppIcons.add,
-                    onPressed: () => showNotWiredToast(context),
-                    child: Text(l10n.rolesAdd),
-                  ),
-                  child: const PermissionMatrix(),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -79,7 +82,9 @@ class _RoleCard extends StatelessWidget {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
     final colors = context.appColors;
-    final granted = rolePermissions[role] ?? const <StaffPermission>{};
+    // Anything the role can open counts, at either level — the card is a
+    // reach-at-a-glance, and the matrix below it says how far.
+    final granted = StaffPermission.values.where(role.canView).length;
 
     return AppCard(
       child: Column(
@@ -127,7 +132,7 @@ class _RoleCard extends StatelessWidget {
               Flexible(
                 child: Text(
                   l10n.rolesPermissionCount(
-                    '${granted.length}',
+                    '$granted',
                     '${StaffPermission.values.length}',
                   ),
                   maxLines: 1,

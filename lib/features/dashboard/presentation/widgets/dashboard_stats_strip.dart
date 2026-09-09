@@ -1,5 +1,8 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:go_router/go_router.dart';
-import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_stat.dart';
+import 'package:khulla/features/dashboard/presentation/models/dashboard_stat.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The row of figures at the top of the dashboard, as one instrument panel.

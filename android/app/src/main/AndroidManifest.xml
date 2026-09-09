@@ -41,5 +41,13 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- The about panel opens the project and author links in a browser.
+             Android 11 and up hides other apps from the package manager
+             unless they are declared here, and url_launcher's resolve would
+             otherwise fail on a device that does have a browser. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
     </queries>
 </manifest>

@@ -4,7 +4,20 @@ An open-source library management system, built as a **local-first Flutter app**
 
 *Khulla* (खुल्ला) is Nepali for "open".
 
-> **Status: early scaffold.** The architecture, design system, database layer and navigation shell are in place and building. No library features exist yet.
+## Download
+
+Ready-to-run builds are attached to every release: **[latest release](https://github.com/khulla-digital-library/khulla-digital-library/releases/latest)**.
+
+| Platform | File | How to run it |
+| --- | --- | --- |
+| Windows | `khulla-<version>-windows-x64.zip` | Unzip anywhere and run `khulla.exe`. It is a portable folder, not an installer. Windows warns about an unknown publisher because the build is unsigned — *More info* → *Run anyway*. |
+| Android | `khulla-<version>-android.apk` | Sideload it, allowing installs from your browser or file manager. |
+| Web | `khulla-<version>-web.tar.gz` | Serve the extracted folder from any static host. |
+| Linux | `khulla-<version>-linux-x64.tar.gz` | Extract and run `./khulla`. |
+
+You can also **[try it in a browser](https://khulla-digital-library.github.io/khulla-digital-library/)** — a demo with no server behind it, where the catalogue lives in that browser's storage and clearing site data wipes it.
+
+Your catalogue is a SQLite file on your own machine, so uninstalling does not delete it and nothing is uploaded anywhere. Take a backup from **Settings → Backup** before moving between machines.
 
 ## Why local-first
 
@@ -16,25 +29,32 @@ The same codebase compiles to a Windows executable and to a web app, so a librar
 
 | Target | Status | SQLite backend |
 | --- | --- | --- |
-| Windows | Primary | `sqflite_common_ffi` (bundled SQLite over `dart:ffi`) |
-| Web | Primary | `sqflite_common_ffi_web` (SQLite in WebAssembly, stored in IndexedDB) |
-| Linux, macOS | Builds | `sqflite_common_ffi` |
-| Android, iOS | Builds | `sqflite` (system SQLite) |
+| Windows | Primary, released | drift on a background isolate, over bundled SQLite |
+| Web | Primary, released | drift over SQLite in WebAssembly, in a worker |
+| Android | Released | drift on a background isolate |
+| Linux | Released | drift on a background isolate |
+| macOS, iOS | Builds, not released | drift on a background isolate |
+
+Releases are built by CI for the four released targets. macOS and iOS compile from the same source but are not published — both need an Apple Developer account to produce anything a user can open. See [docs/contributing/releasing.md](./docs/contributing/releasing.md).
 
 ## Getting started
 
-**Prerequisites** — [Flutter](https://docs.flutter.dev/get-started/install) 3.47 or newer (Dart 3.13+). For Windows builds you also need Visual Studio with the *Desktop development with C++* workload; for Linux, `clang`, `cmake`, `ninja-build`, `libgtk-3-dev`.
+**Prerequisites** — [FVM](https://fvm.app) to pin the Flutter SDK, plus platform toolchains: Visual Studio with the *Desktop development with C++* workload for Windows; `clang`, `cmake`, `ninja-build`, `libgtk-3-dev` for Linux.
 
 ```sh
 git clone https://github.com/khulla-digital-library/khulla-digital-library.git
 cd khulla-digital-library
 
-dart run melos bootstrap   # resolve dependencies, link local packages
-make build                 # generate code (freezed, injectable, assets)
-make localize              # generate localizations
+dart pub global activate fvm   # once, if you do not have FVM yet
+fvm install                    # downloads the SDK pinned in .fvmrc
+make bootstrap                 # resolve deps and link local packages
+make build                     # generate code (freezed, injectable, assets)
+make localize                  # generate localizations
 
-make run-windows           # or: make run-web, make run-linux
+make run-windows               # or: make run-web, make run-linux
 ```
+
+The Flutter version is pinned in `.fvmrc` (currently 3.47.0). After pulling a change that bumps it, run `fvm install`.
 
 Generated sources are not committed, so `make build` and `make localize` are required on a fresh clone before anything will analyze or run.
 
@@ -65,11 +85,13 @@ khulla-digital-library/
 | Command | What it does |
 | --- | --- |
 | `make bootstrap` | Resolve dependencies across the workspace |
-| `make build` | Run code generation |
+| `make build` | Run code generation, including the app version |
+| `make version` | Regenerate `lib/gen/app_version.dart` from `pubspec.yaml` after a bump |
 | `make localize` | Regenerate localizations from `lib/l10n/arb/` |
-| `make check` | Format, analyze and test — run this before a PR |
+| `make check` | Format, copyright, analyze and test — run this before a PR |
+| `make ci` | The same gates CI runs, failing on unformatted code instead of rewriting it |
 | `make run-web` / `run-windows` / `run-linux` | Run the dev flavor |
-| `make build-web` / `build-windows` / `build-apk` | Release builds |
+| `make build-web` / `build-windows` / `build-linux` / `build-apk` | Release builds |
 
 ## Architecture
 
@@ -86,6 +108,8 @@ The full guide lives in [CLAUDE.md](./CLAUDE.md) — folder conventions, the dat
 Contributions are welcome. See [docs/contributing](./docs/contributing/) for setup, conventions and the pull-request flow.
 
 Commits follow a conventional format — `feat:`, `fix:`, `chore:`, `refactor:`, `sync:`, `ci:` — enforced by a git hook. Branch off `dev`; direct commits to `dev` and `prod` are blocked.
+
+Merging into `prod` publishes a release at the version in `pubspec.yaml` and redeploys the web demo — see [releasing](./docs/contributing/releasing.md).
 
 ## License
 

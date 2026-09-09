@@ -40,6 +40,21 @@ dependencies:
   path_provider: ^2.1.6
   shared_preferences: ^2.5.5
 
+  # Password hashing for local accounts. Pure Dart (a jBCrypt port), so
+  # it runs identically on desktop, mobile and web — no FFI, no native build.
+  bcrypt: ^1.2.0
+  crypto: ^3.0.7
+  file_selector: ^1.0.3
+
+  # A backup restore replaces the catalogue file/store underneath a live
+  # connection — the app has to restart cleanly, and on web that means
+  # reloading the page. Already resolved transitively; declared directly
+  # because lib/core/lifecycle/restart_app_web.dart imports it.
+  web: ^1.1.1
+
+  # Stable record identifiers, generated on the device.
+  uuid: ^4.5.1
+
   # Serialization
   freezed_annotation: ^3.1.0
   json_annotation: ^4.12.0
@@ -55,8 +70,21 @@ dependencies:
     path: packages/khulla_ui
 
   # UI
-  cupertino_icons: ^1.0.9
   toastification: ^3.2.0
+
+  # Opening the project and author links in the operator's browser. The about
+  # panel is the only caller; everything else in the app is local.
+  url_launcher: ^6.3.2
+
+
+  # Phone, Currency and Country code
+  country_phone_kit:
+    git:
+      url: https://github.com/sawongam/country_phone_kit
+
+  # Printing and PDF
+  printing: ^5.15.0
+  pdf: ^3.13.0
 
 dev_dependencies:
   # Code generation
@@ -78,7 +106,6 @@ dev_dependencies:
 
   # Monorepo tooling (config in melos.yaml — not pub workspaces)
   melos: ^6.3.2
-  icons_launcher: ^3.1.0
 
 # FlutterGen code generation for assets, fonts and colors.
 # Generated output lives in lib/gen/ and is regenerated via:
@@ -96,5 +123,5 @@ flutter:
 
   # Assets
   assets:
-    - assets/icons/
     - assets/images/
+    - assets/images/logos/

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:flutter/services.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -30,6 +33,8 @@ class AppTextField extends StatefulWidget {
     this.prefixIcon,
     this.prefixIconConstraints,
     this.suffixIcon,
+    this.suffixIconConstraints,
+    this.textAlign = TextAlign.start,
     this.textInputAction,
     this.initialValue,
     this.controller,
@@ -55,6 +60,8 @@ class AppTextField extends StatefulWidget {
   final String? label;
 
   /// Placeholder shown inside the field while empty.
+  ///
+  /// Defaults to [label] when omitted so labelled fields always show a hint.
   final String? hintText;
 
   /// Called on every keystroke.
@@ -80,6 +87,12 @@ class AppTextField extends StatefulWidget {
 
   /// Trailing adornment.
   final Widget? suffixIcon;
+
+  /// Size constraints for [suffixIcon]. Tighten when the suffix is a control.
+  final BoxConstraints? suffixIconConstraints;
+
+  /// Alignment of the value inside the field.
+  final TextAlign textAlign;
 
   /// Keyboard action button.
   final TextInputAction? textInputAction;
@@ -174,6 +187,7 @@ class _AppTextFieldState extends State<AppTextField> {
     final metrics = context.appMetrics;
     final typography = context.appTextStyles;
     final fieldLabel = widget.label;
+    final hint = widget.hintText ?? fieldLabel;
     final error = widget.errorText;
     final multiline = widget.maxLines == null || widget.maxLines! > 1;
 
@@ -191,6 +205,7 @@ class _AppTextFieldState extends State<AppTextField> {
         ConstrainedBox(
           constraints: BoxConstraints(
             minHeight: multiline ? 0 : metrics.fieldHeight,
+            maxHeight: multiline ? double.infinity : metrics.fieldHeight,
           ),
           child: TextFormField(
             initialValue: widget.initialValue,
@@ -215,9 +230,10 @@ class _AppTextFieldState extends State<AppTextField> {
             maxLines: widget.maxLines,
             minLines: widget.minLines,
             inputFormatters: widget.inputFormatters,
+            textAlign: widget.textAlign,
             style: typography.body.copyWith(color: colors.ink100),
             decoration: InputDecoration(
-              hintText: widget.hintText,
+              hintText: hint,
               prefixIcon: switch (widget.prefixIcon) {
                 final prefix? => AppFieldAffix(child: prefix),
                 _ => null,
@@ -227,6 +243,7 @@ class _AppTextFieldState extends State<AppTextField> {
                 final suffix? => AppFieldAffix(child: suffix),
                 _ => null,
               },
+              suffixIconConstraints: widget.suffixIconConstraints,
               counterText: '',
               // The signature interaction: focus moves the text 2px right
               // rather than lighting up a ring.

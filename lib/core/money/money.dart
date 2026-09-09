@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Khulla Digital Library contributors.
+// SPDX-License-Identifier: MIT
+
 import 'package:khulla/core/money/money_format.dart';
 
 /// Minor units in one major unit — paisa in a rupee, cents in a dollar.
@@ -37,7 +40,7 @@ const int kMinorUnitsPerMajor = 100;
 ///
 /// **Never interpolate a [Money] directly.** `'$owed'` prints the raw minor
 /// units (`4500`), because an extension type inherits `int.toString`. Every
-/// user-facing string goes through [display], [formatted] or [editable].
+/// user-facing string goes through [display] or [editable].
 extension type const Money(int minorUnits) {
   /// Builds [Money] from a major-unit amount — user input, or a literal.
   ///
@@ -138,12 +141,6 @@ extension type const Money(int minorUnits) {
   /// `0` when [other] is [zero], so a fresh ledger cannot divide by zero.
   double ratioTo(Money other) =>
       other.isZero ? 0 : minorUnits / other.minorUnits;
-
-  /// Grouped amount with no symbol: `250`, `1,23,456.78`.
-  ///
-  /// Whole amounts drop the decimals — most library fines are whole rupees and
-  /// a column of `.00` is noise; anything with minor units shows both places.
-  String get formatted => MoneyFormat.current.grouped(major, isWhole: isWhole);
 
   /// Amount with the currency symbol, the default for anything a user reads:
   /// `Rs 1,23,456.78`.
