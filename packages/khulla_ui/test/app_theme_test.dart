@@ -39,8 +39,12 @@ void main() {
       expect(comfortable.textTheme.bodyMedium?.fontSize, 14);
       expect(compact.extension<AppMetrics>()!.fieldHeight, 40);
       expect(comfortable.extension<AppMetrics>()!.fieldHeight, 44);
-      expect(compact.extension<AppMetrics>()!.tableRowHeight, 52);
-      expect(comfortable.extension<AppMetrics>()!.tableRowHeight, 52);
+      // Row height is global rather than a density rung, so the claim is that
+      // the two agree — not what the number is, which design tunes.
+      expect(
+        compact.extension<AppMetrics>()!.tableRowHeight,
+        comfortable.extension<AppMetrics>()!.tableRowHeight,
+      );
       expect(compact.extension<AppMetrics>()!.tableHeaderHeight, 36);
       expect(comfortable.extension<AppMetrics>()!.tableHeaderHeight, 40);
     });

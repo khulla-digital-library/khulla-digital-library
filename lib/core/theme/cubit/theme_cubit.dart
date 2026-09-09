@@ -3,13 +3,15 @@
 
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:khulla/core/theme/app_language.dart';
 import 'package:khulla/core/theme/cubit/theme_state.dart';
 import 'package:khulla/core/theme/theme_storage.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// App-wide appearance: [ThemeMode] and the brand the product is painted in.
+/// App-wide appearance and language: [ThemeMode], the brand the product is
+/// painted in, and the [AppLanguage] the interface is drawn in.
 ///
-/// Both are read from [ThemeStorage] on startup and persisted on every change,
+/// All are read from [ThemeStorage] on startup and persisted on every change,
 /// so the choice survives a restart. They are device settings, not library
 /// ones — nothing here reaches the catalogue file.
 @lazySingleton
@@ -20,6 +22,7 @@ class ThemeCubit extends Cubit<ThemeState> {
           mode: _storage.readThemeMode(),
           brandTheme: _storage.readBrandTheme(),
           customSeed: _storage.readCustomBrand(),
+          language: _storage.readAppLanguage(),
         ),
       );
 
@@ -59,5 +62,11 @@ class ThemeCubit extends Cubit<ThemeState> {
     if (state.customSeed == seed) return;
     emit(state.copyWith(customSeed: seed));
     await _storage.saveBrand(state.brandTheme, seed);
+  }
+
+  Future<void> setLanguage(AppLanguage language) async {
+    if (state.language == language) return;
+    emit(state.copyWith(language: language));
+    await _storage.saveAppLanguage(language);
   }
 }
