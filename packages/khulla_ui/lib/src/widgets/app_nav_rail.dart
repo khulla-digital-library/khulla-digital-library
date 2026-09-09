@@ -82,6 +82,19 @@ class _AppNavRailState extends State<AppNavRail> {
     }
   }
 
+  @override
+  void didUpdateWidget(AppNavRail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A route change can select a child of a collapsed group (deep link,
+    // back/forward). Keep the active sub-section visible without touching
+    // user-controlled toggles.
+    for (final (index, destination) in widget.destinations.indexed) {
+      if (destination.children.any((child) => child.selected)) {
+        _expanded.add(index);
+      }
+    }
+  }
+
   void _toggle(int index) => setState(() {
     if (!_expanded.remove(index)) _expanded.add(index);
   });

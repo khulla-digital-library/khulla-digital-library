@@ -193,15 +193,21 @@ class LocalStaffDataSource implements StaffLocalDataSource {
   Future<StaffMember> updateStaff(StaffMember staff) => guardDatabase(
     () async {
       final normalized = staff.copyWith(email: normalizeEmail(staff.email));
-      await (_db.update(
-        _db.staff,
-      )..where((row) => row.id.equals(normalized.id))).write(
-        StaffCompanion(
-          name: Value(normalized.name),
-          email: Value(normalized.email),
-          role: Value(normalized.role),
-        ),
-      );
+      final updated =
+          await (_db.update(
+            _db.staff,
+          )..where((row) => row.id.equals(normalized.id))).write(
+            StaffCompanion(
+              name: Value(normalized.name),
+              email: Value(normalized.email),
+              role: Value(normalized.role),
+            ),
+          );
+      if (updated == 0) {
+        throw const NotFoundException(
+          'That staff account no longer exists.',
+        );
+      }
       return normalized;
     },
     source: '$_source.updateStaff',

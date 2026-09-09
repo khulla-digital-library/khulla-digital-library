@@ -118,6 +118,13 @@ class StaffRepositoryImpl implements StaffRepository {
     if (current == null) {
       throw const NotFoundException('That staff account no longer exists.');
     }
+    // Roles are granted by someone else: a signed-in account cannot change
+    // its own role (which would allow self-promotion to administrator or
+    // self-demotion away from the last-administrator guard). Name/email
+    // edits that keep the role are still allowed.
+    if (id == actingStaffId && role != current.role) {
+      throw const ConflictException('You cannot change your own role.');
+    }
     if (current.role == UserRole.administrator &&
         role != UserRole.administrator) {
       await _guardLastAdministrator();

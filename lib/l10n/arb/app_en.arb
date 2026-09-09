@@ -1120,15 +1120,6 @@
     "reportsSavedAcquisitionsBody": "Titles added over a period, with cost and supplier.",
     "reportsPlaceholderNote": "Figures are sample data until circulation is recording loans.",
     "usersHeading": "Staff accounts",
-    "@usersSubtitle": {
-        "description": "Staff - page subtitle",
-        "placeholders": {
-            "count": {
-                "type": "String",
-                "example": "6"
-            }
-        }
-    },
     "usersAdd": "Add staff",
     "usersSearchHint": "Search staff by name or email",
     "usersColumnName": "Name",

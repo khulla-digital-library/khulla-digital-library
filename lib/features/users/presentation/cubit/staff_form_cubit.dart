@@ -128,6 +128,14 @@ class StaffFormCubit extends Cubit<StaffFormState> {
         error: null,
       ),
     );
+    // The edit path needs a loaded record and a signed-in actor. The
+    // dialogs show the load error instead of the form when loading failed,
+    // but guard here too so a submit can never hit a null assertion.
+    final existing = state.existing;
+    final actingId = _auth.state.staff?.id;
+    if (!isCreating && (existing == null || actingId == null)) {
+      return null;
+    }
     try {
       final saved = isCreating
           ? await _staff.createStaff(
@@ -137,11 +145,11 @@ class StaffFormCubit extends Cubit<StaffFormState> {
               role: state.role,
             )
           : await _staff.updateStaff(
-              id: state.existing!.id,
+              id: existing!.id,
               name: name.value,
               email: email.value,
               role: state.role,
-              actingStaffId: _auth.state.staff!.id,
+              actingStaffId: actingId!,
             );
       if (isClosed) return saved;
       emit(
@@ -179,12 +187,17 @@ class StaffFormCubit extends Cubit<StaffFormState> {
       return false;
     }
 
+    final existing = state.existing;
+    if (existing == null) {
+      return false;
+    }
+
     emit(
       state.copyWith(submission: FormzSubmissionStatus.inProgress, error: null),
     );
     try {
       await _staff.adminResetPassword(
-        id: state.existing!.id,
+        id: existing.id,
         newPassword: password.value,
       );
       if (isClosed) return true;

@@ -38,7 +38,8 @@ class PermissionMatrix extends StatelessWidget {
     // available width when there is room to stretch into.
     return LayoutBuilder(
       builder: (context, constraints) {
-        final contentWidth = labelWidth + roleWidth * 4 + spacing.sm * 2;
+        final contentWidth =
+            labelWidth + roleWidth * UserRole.values.length + spacing.sm * 2;
         final width = constraints.maxWidth.isFinite
             ? max(contentWidth, constraints.maxWidth)
             : contentWidth;

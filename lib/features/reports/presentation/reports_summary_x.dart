@@ -12,29 +12,38 @@ final DateFormat _monthFormat = DateFormat('MMM');
 /// widgets draw — l10n and money formatting happen here, not in the
 /// repository, which returns facts.
 extension ReportsSummaryX on ReportsSummary {
-  List<AppChartSeries> circulationSeries(AppLocalizations l10n) => [
-    AppChartSeries(
-      name: l10n.reportsStatBorrowed,
-      points: [
-        for (final entry in circulationBorrowedByMonth)
-          AppChartPoint(
-            label: _monthFormat.format(entry.month),
-            value: entry.count.toDouble(),
-          ),
-      ],
-    ),
-    AppChartSeries(
-      name: l10n.reportsStatReturned,
-      tone: AppStatusTone.success,
-      points: [
-        for (final entry in circulationReturnedByMonth)
-          AppChartPoint(
-            label: _monthFormat.format(entry.month),
-            value: entry.count.toDouble(),
-          ),
-      ],
-    ),
-  ];
+  List<AppChartSeries> circulationSeries(AppLocalizations l10n) {
+    final months = _unionMonths([
+      circulationBorrowedByMonth,
+      circulationReturnedByMonth,
+    ]);
+    AppChartPoint pointFor(List<ReportsMonthCount> counts, DateTime month) {
+      final match = counts.where((c) => c.month == month);
+      final value = match.isEmpty ? 0 : match.first.count;
+      return AppChartPoint(
+        label: _monthFormat.format(month),
+        value: value.toDouble(),
+      );
+    }
+
+    return [
+      AppChartSeries(
+        name: l10n.reportsStatBorrowed,
+        points: [
+          for (final month in months)
+            pointFor(circulationBorrowedByMonth, month),
+        ],
+      ),
+      AppChartSeries(
+        name: l10n.reportsStatReturned,
+        tone: AppStatusTone.success,
+        points: [
+          for (final month in months)
+            pointFor(circulationReturnedByMonth, month),
+        ],
+      ),
+    ];
+  }
 
   List<AppChartSeries> membershipSeries(AppLocalizations l10n) => [
     AppChartSeries(
@@ -80,7 +89,7 @@ extension ReportsSummaryX on ReportsSummary {
         label: l10n.reportsFinesRaised,
         amount: finesRaised,
         tone: AppStatusTone.warning,
-        share: 1,
+        share: shareOf(finesRaised),
       ),
       (
         label: l10n.reportsFinesCollected,
@@ -119,14 +128,14 @@ extension ReportsSummaryX on ReportsSummary {
         l10n.reportsStatReturned,
       ],
       rows: [
-        for (var i = 0; i < circulationBorrowedByMonth.length; i++)
+        for (final month in _unionMonths([
+          circulationBorrowedByMonth,
+          circulationReturnedByMonth,
+        ]))
           [
-            _monthFormat.format(circulationBorrowedByMonth[i].month),
-            '${circulationBorrowedByMonth[i].count}',
-            if (i < circulationReturnedByMonth.length)
-              '${circulationReturnedByMonth[i].count}'
-            else
-              '0',
+            _monthFormat.format(month),
+            '${_countFor(circulationBorrowedByMonth, month)}',
+            '${_countFor(circulationReturnedByMonth, month)}',
           ],
       ],
     ),
@@ -176,4 +185,22 @@ extension ReportsSummaryX on ReportsSummary {
       ],
     ),
   };
+}
+
+/// Every month present in any of [series], earliest first — borrowed and
+/// returned queries can cover different months, so joining by index would
+/// misalign counts. Missing months read as zero via [_countFor].
+List<DateTime> _unionMonths(List<List<ReportsMonthCount>> series) {
+  final months = <DateTime>{
+    for (final list in series)
+      for (final entry in list) entry.month,
+  }.toList()..sort();
+  return months;
+}
+
+int _countFor(List<ReportsMonthCount> counts, DateTime month) {
+  for (final entry in counts) {
+    if (entry.month == month) return entry.count;
+  }
+  return 0;
 }

@@ -39,7 +39,10 @@ class StaffListCubit extends Cubit<StaffListState> {
   /// not here, so there is exactly one place that enforces them.
   Future<void> setStatus(String id, UserStatus status) async {
     final acting = actingStaffId;
-    if (acting == null) return;
+    if (acting == null) {
+      emit(state.copyWith(error: const UnknownException()));
+      throw const UnknownException();
+    }
     try {
       await _staff.setStaffStatus(
         id: id,

@@ -12,14 +12,14 @@ import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/domain/models/member_query.dart';
 import 'package:khulla/features/members/presentation/cubit/member_cubit.dart';
 import 'package:khulla/features/members/presentation/cubit/member_state.dart';
-import 'package:khulla/features/members/presentation/member_labels.dart';
 import 'package:khulla/features/members/presentation/member_list_refresh.dart';
 import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
 import 'package:khulla/features/members/presentation/widgets/member_card.dart';
+import 'package:khulla/features/members/presentation/widgets/member_list_toolbar.dart';
+import 'package:khulla/features/members/presentation/widgets/member_table_columns.dart';
 import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
-import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -30,6 +30,9 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// something, who owes something, whose card has stopped working — rather
 /// than one chip per enum value. [MemberCubit] turns search, those filters,
 /// sort and paging into one query. Check-out jumps to the circulation desk.
+///
+/// Orchestration only: the toolbar and columns live in
+/// `presentation/widgets/`; every write below toasts at its call site.
 class MemberListPage extends StatefulWidget {
   const MemberListPage({super.key});
 
@@ -165,171 +168,6 @@ class _MemberListPageState extends State<MemberListPage> with DisposeBag {
     }
   }
 
-  List<AppTableColumn<Member>> _columns(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
-    final spacing = context.appSpacing;
-    final scheme = context.colorScheme;
-    final muted = context.textTheme.bodyMedium?.copyWith(
-      color: scheme.onSurfaceVariant,
-    );
-    final canManage = context.canManage(StaffPermission.members);
-    final canWorkTheDesk = context.canManage(StaffPermission.circulation);
-
-    return [
-      AppTableColumn<Member>(
-        id: 'name',
-        label: l10n.membersColumnName,
-        flex: 3,
-        sortable: true,
-        cellBuilder: (context, member) => Row(
-          children: [
-            AppAvatar(initials: member.initials, size: 28),
-            SizedBox(width: spacing.xs),
-            Flexible(child: Text(member.name)),
-          ],
-        ),
-      ),
-      AppTableColumn<Member>(
-        id: 'card',
-        label: l10n.membersColumnCard,
-        flex: 2,
-        sortable: true,
-        showFrom: FormFactor.medium,
-        cellBuilder: (context, member) => Text(member.cardNumber, style: muted),
-      ),
-      AppTableColumn<Member>(
-        id: 'category',
-        label: l10n.membersColumnCategory,
-        flex: 2,
-        showFrom: FormFactor.expanded,
-        cellBuilder: (context, member) => Row(
-          children: [
-            AppIcon(
-              member.memberTypeCode.memberTypeIcon,
-              size: spacing.md,
-              color: scheme.onSurfaceVariant,
-            ),
-            SizedBox(width: spacing.xs),
-            Flexible(child: Text(member.memberTypeName)),
-          ],
-        ),
-      ),
-      AppTableColumn<Member>(
-        id: 'loans',
-        label: l10n.membersColumnLoans,
-        sortable: true,
-        showFrom: FormFactor.medium,
-        cellBuilder: (context, member) => Text(
-          '${member.loansOut}',
-          style: member.overdueLoans > 0
-              ? context.textTheme.bodyMedium?.copyWith(
-                  color: scheme.error,
-                  fontWeight: FontWeight.w500,
-                )
-              : null,
-        ),
-      ),
-      AppTableColumn<Member>(
-        id: 'fines',
-        label: l10n.membersColumnFines,
-        flex: 2,
-        sortable: true,
-        showFrom: FormFactor.expanded,
-        cellBuilder: (context, member) => Text(
-          member.finesOwed.isZero
-              ? l10n.commonNotSet
-              : member.finesOwed.display(),
-          style: member.finesOwed.isZero
-              ? muted
-              : context.textTheme.bodyMedium?.copyWith(
-                  color: scheme.error,
-                  fontWeight: FontWeight.w500,
-                ),
-        ),
-      ),
-      AppTableColumn<Member>(
-        id: 'expires',
-
-        label: l10n.membersColumnExpires,
-        sortable: true,
-        showFrom: FormFactor.large,
-        cellBuilder: (context, member) => Text(
-          member.expires.isEmpty ? l10n.commonNotSet : member.expires,
-          style: muted,
-        ),
-      ),
-      AppTableColumn<Member>(
-        id: 'status',
-        label: l10n.commonStatus,
-        flex: 2,
-        cellBuilder: (context, member) => AppStatusBadge(
-          dense: true,
-          label: member.status.label(l10n),
-          tone: member.status.tone,
-        ),
-      ),
-      // Two permissions meet in this menu. Editing, renewing, suspending and
-      // archiving a member are members work; sending the row to the checkout
-      // desk is circulation work, and a role can hold either without the
-      // other. With neither, the column itself is gone.
-      if (canManage || canWorkTheDesk)
-        AppTableColumn<Member>(
-          id: 'actions',
-          label: l10n.commonActions,
-          alignment: Alignment.centerRight,
-          cellBuilder: (context, member) => AppMenuButton(
-            tooltip: l10n.commonMoreActions,
-            actions: [
-              if (canWorkTheDesk)
-                AppMenuAction(
-                  label: l10n.memberDetailCheckOut,
-                  icon: AppIcons.scan,
-                  onSelected: () => context.go(
-                    Routes.circulationCheckOutForMember(member.cardNumber),
-                  ),
-                ),
-              if (canManage) ...[
-                AppMenuAction(
-                  label: l10n.memberDetailEdit,
-                  icon: AppIcons.edit,
-                  onSelected: () => unawaited(_editMember(member)),
-                ),
-                AppMenuAction(
-                  label: l10n.memberDetailRenewMembership,
-                  icon: AppIcons.renew,
-                  onSelected: () =>
-                      unawaited(_renewMembership(context, member)),
-                ),
-                if (member.suspendedAt != null)
-                  AppMenuAction(
-                    label: l10n.memberDetailUnsuspend,
-                    icon: AppIcons.restore,
-                    onSelected: () =>
-                        unawaited(_unsuspendMembership(context, member)),
-                  )
-                else
-                  AppMenuAction(
-                    label: l10n.memberDetailSuspend,
-                    icon: AppIcons.blocked,
-                    isDestructive: true,
-                    onSelected: () =>
-                        unawaited(_suspendMembership(context, member)),
-                  ),
-                AppMenuAction(
-                  label: l10n.memberDetailArchive,
-                  icon: AppIcons.delete,
-                  isDestructive: true,
-                  onSelected: () => unawaited(_archiveMember(context, member)),
-                ),
-              ],
-            ],
-          ),
-        ),
-    ];
-  }
-
   bool _isFiltered(MemberState state) =>
       state.query.search.isNotEmpty ||
       state.query.withLoans ||
@@ -369,52 +207,29 @@ class _MemberListPageState extends State<MemberListPage> with DisposeBag {
         return CollectionPageView<Member>(
           onPageSizeChanged: cubit.limitChanged,
           summary: l10n.membersSubtitle('${state.totalCount}'),
-          toolbar: AppToolbar(
-            search: AppSearchField(
-              hintText: l10n.membersSearchHint,
-              clearTooltip: l10n.commonClearSearch,
-              controller: _search,
-              onChanged: cubit.searchChanged,
-            ),
-            filters: [
-              AppFilterChip(
-                label: l10n.membersFilterWithLoans,
-                icon: AppIcons.transfer,
-                selected: state.query.withLoans,
-                onSelected: cubit.withLoansChanged,
-              ),
-              AppFilterChip(
-                label: l10n.membersFilterOwesFines,
-                icon: AppIcons.wallet,
-                tone: AppStatusTone.danger,
-                selected: state.query.owesFines,
-                onSelected: cubit.owesFinesChanged,
-              ),
-              AppFilterChip(
-                label: l10n.membersFilterExpiring,
-                icon: AppIcons.clock,
-                tone: AppStatusTone.warning,
-                selected: state.query.expiring,
-                onSelected: cubit.expiringChanged,
-              ),
-              AppFilterChip(
-                label: l10n.membersFilterSuspended,
-                icon: AppIcons.blocked,
-                tone: AppStatusTone.danger,
-                selected: state.query.suspended,
-                onSelected: cubit.suspendedChanged,
-              ),
-            ],
-            actions: [
-              if (_isFiltered(state))
-                AppTextButton(
-                  onPressed: cubit.clearFilters,
-                  child: Text(l10n.commonClearFilters),
-                ),
-            ],
+          toolbar: MemberListToolbar(
+            searchController: _search,
+            query: state.query,
+            isFiltered: _isFiltered(state),
+            onSearchChanged: cubit.searchChanged,
+            onWithLoansChanged: cubit.withLoansChanged,
+            onOwesFinesChanged: cubit.owesFinesChanged,
+            onExpiringChanged: cubit.expiringChanged,
+            onSuspendedChanged: cubit.suspendedChanged,
+            onClearFilters: cubit.clearFilters,
           ),
           items: state.members,
-          columns: _columns(context, l10n),
+          columns: memberTableColumns(
+            context,
+            onCheckOut: (member) => goToMemberCheckOut(context, member),
+            onEdit: (member) => unawaited(_editMember(member)),
+            onRenew: (member) => unawaited(_renewMembership(context, member)),
+            onSuspend: (member) =>
+                unawaited(_suspendMembership(context, member)),
+            onUnsuspend: (member) =>
+                unawaited(_unsuspendMembership(context, member)),
+            onArchive: (member) => unawaited(_archiveMember(context, member)),
+          ),
           sort: sort,
           onSort: (next) => cubit.sortChanged(next.columnId, next.ascending),
           onRowTap: _openMember,
