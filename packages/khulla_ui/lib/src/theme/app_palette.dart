@@ -48,6 +48,35 @@ abstract final class AppPalette {
   /// The brand darkened, for emphasis ink and the deep end of a gradient.
   static const Color brandDeep = Color(0xFF04403D);
 
+  // ── Brand seeds ───────────────────────────────────────────────────────────
+  //
+  // The alternative brands the operator can pick in Appearance. Each is only
+  // the solid fill — `AppBrand.fromSeed` derives the rest of the ramp — so a
+  // seed is the one hex a new choice needs. [brand] is the shipped default and
+  // is the seed of `AppBrand.teal`, whose ramp is hand-tuned rather than
+  // derived.
+
+  /// Seed: indigo.
+  static const Color brandSeedIndigo = Color(0xFF4338CA);
+
+  /// Seed: a mid blue.
+  static const Color brandSeedBlue = Color(0xFF1D4ED8);
+
+  /// Seed: violet.
+  static const Color brandSeedViolet = Color(0xFF6D28D9);
+
+  /// Seed: a deep rose.
+  static const Color brandSeedRose = Color(0xFFA61E4D);
+
+  /// Seed: burnt amber.
+  static const Color brandSeedAmber = Color(0xFFB45309);
+
+  /// Seed: forest green.
+  static const Color brandSeedForest = Color(0xFF15803D);
+
+  /// Seed: graphite, for a library that wants no hue at all.
+  static const Color brandSeedGraphite = Color(0xFF334155);
+
   // ── Ink ramp, light ───────────────────────────────────────────────────────
 
   /// Primary text.

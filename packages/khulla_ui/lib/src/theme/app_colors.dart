@@ -54,9 +54,12 @@ class AppColors extends ThemeExtension<AppColors> {
   });
 
   /// The light palette — the shipped theme.
-  factory AppColors.light() => AppColors(
-    brand: AppPalette.brand,
-    accent: AppPalette.accent,
+  ///
+  /// [brand] is the only variable: everything else is fixed, so an operator
+  /// picking a different brand moves the five brand roles and nothing else.
+  factory AppColors.light([AppBrand brand = AppBrand.teal]) => AppColors(
+    brand: brand.seed,
+    accent: brand.accent,
     ink100: AppPalette.ink100Light,
     ink200: AppPalette.ink200Light,
     ink300: AppPalette.ink300Light,
@@ -80,9 +83,9 @@ class AppColors extends ThemeExtension<AppColors> {
     onDanger: AppPalette.white100,
     dangerSoft: _wash(AppPalette.danger),
     neutralSoft: AppPalette.secondaryLight,
-    brandSoft: _tint(AppPalette.accent, 0.2),
-    brandStrong: AppPalette.brandButtonBorder,
-    brandDeep: AppPalette.brandDeep,
+    brandSoft: _tint(brand.accent, 0.2),
+    brandStrong: brand.strong,
+    brandDeep: brand.deep,
     textHigh: AppPalette.ink100Light,
     textMuted: AppPalette.ink500Light,
     hairline: AppPalette.borderLight,
@@ -94,8 +97,8 @@ class AppColors extends ThemeExtension<AppColors> {
 
   /// The dark palette. Complete, so enabling dark is a data change rather
   /// than a rewrite.
-  factory AppColors.dark() => AppColors(
-    brand: AppPalette.brand,
+  factory AppColors.dark([AppBrand brand = AppBrand.teal]) => AppColors(
+    brand: brand.seed,
     accent: AppPalette.white400,
     ink100: AppPalette.ink100Dark,
     ink200: AppPalette.ink200Dark,
@@ -120,9 +123,9 @@ class AppColors extends ThemeExtension<AppColors> {
     onDanger: AppPalette.white100,
     dangerSoft: _wash(AppPalette.danger, 0.18, AppPalette.surfaceDark),
     neutralSoft: AppPalette.surfaceDark,
-    brandSoft: _tint(AppPalette.accent, 0.16),
-    brandStrong: AppPalette.brandButtonBorder,
-    brandDeep: AppPalette.brandDeep,
+    brandSoft: _tint(brand.accent, 0.16),
+    brandStrong: brand.strong,
+    brandDeep: brand.deep,
     textHigh: AppPalette.ink100Dark,
     textMuted: AppPalette.ink500Dark,
     hairline: AppPalette.borderDark,
