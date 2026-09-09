@@ -11,11 +11,12 @@ import 'package:khulla_ui/khulla_ui.dart';
 
 /// The index of everything configurable about this installation.
 ///
-/// Five doors and one card. The doors are one list, not a grid of tiles: they
+/// Four doors and one card. The doors are one list, not a grid of tiles: they
 /// are alternatives to each other, and a shared frame with a hairline between
-/// rows says that where five equal rectangles said the opposite. The card is
+/// rows says that where four equal rectangles said the opposite. The card is
 /// *About*, which has nowhere to go — three read-only facts, and a page
 /// holding only those would be a click for nothing.
+/// (Online sync stays out of the list until it has a data layer behind it.)
 ///
 /// It takes the reading width rather than the wide cap. A settings index is
 /// prose with links in it; stretched across a maximised window every row
@@ -72,12 +73,8 @@ class SettingsPage extends StatelessWidget {
                       icon: AppIcons.backup,
                       route: Routes.settingsBackup,
                     ),
-                    NavigationTile(
-                      label: l10n.settingsSyncTitle,
-                      description: l10n.settingsSyncBody,
-                      icon: AppIcons.cloudSync,
-                      route: Routes.settingsSync,
-                    ),
+                    // Online sync hidden: the route stays registered so a
+                    // typed URL still lands, but there is no door to it.
                     if (showDesignSystem)
                       NavigationTile(
                         label: l10n.settingsDesignSystemTitle,

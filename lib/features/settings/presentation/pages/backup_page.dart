@@ -10,6 +10,7 @@ import 'package:khulla/core/format/app_date_format.dart';
 import 'package:khulla/features/settings/presentation/cubit/backup_cubit.dart';
 import 'package:khulla/features/settings/presentation/cubit/backup_state.dart';
 import 'package:khulla/features/settings/presentation/widgets/settings_action_card.dart';
+import 'package:khulla/features/settings/presentation/widgets/settings_erase_card.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
@@ -18,9 +19,9 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// Export, restore — and the one irreversible action in the app.
 ///
 /// Khulla is local-first: there is no server holding a second copy of any of
-/// this. That is why the erase action is fenced into its own card with its
-/// own copy, and confirms through [AppDialog] with a button that names the
-/// act rather than saying *OK*.
+/// this. The erase entry sits below the routine actions as one more quiet
+/// row rather than an alarm panel — the danger lives in its button, and the
+/// confirmation dialog behind it is what stops an accident.
 class BackupPage extends StatelessWidget {
   const BackupPage({super.key});
 
@@ -187,18 +188,10 @@ class _BackupBody extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: spacing.lg),
-                AppSectionHeader(
-                  title: l10n.settingsBackupDangerTitle,
-                  subtitle: l10n.settingsBackupDangerDescription,
-                  icon: AppIcons.warning,
-                ),
-                SizedBox(height: spacing.md),
-                SettingsActionCard(
+                SettingsEraseCard(
                   title: l10n.settingsBackupEraseTitle,
                   description: l10n.settingsBackupEraseBody,
                   actionLabel: l10n.settingsBackupEraseAction,
-                  icon: AppIcons.deleteForever,
-                  isDestructive: true,
                   isLoading: state.isWorking,
                   onAction: onErase,
                 ),

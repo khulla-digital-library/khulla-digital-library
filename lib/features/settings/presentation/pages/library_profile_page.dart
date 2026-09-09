@@ -256,12 +256,6 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
                   if (!viewOnly)
                     Row(
                       children: [
-                        AppButton(
-                          variant: AppButtonVariant.outline,
-                          size: AppButtonSize.medium,
-                          onPressed: () => context.go(Routes.settings),
-                          child: Text(l10n.commonCancel),
-                        ),
                         const Spacer(),
                         AppButton(
                           size: AppButtonSize.medium,
