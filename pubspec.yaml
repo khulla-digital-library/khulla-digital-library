@@ -31,7 +31,7 @@ dependencies:
   # Local database — drift over sqlite3. One typed API across every target:
   # a background isolate on native, sqlite3-in-WebAssembly on web.
   # See docs/architecture/0002-drift-for-persistence.md.
-  drift: ^2.34.3
+  drift: ^2.34.4
   drift_flutter: ^0.3.1
   sqlite3: ^3.5.2
 
