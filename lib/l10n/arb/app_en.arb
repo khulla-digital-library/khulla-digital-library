@@ -767,7 +767,7 @@
     "settingsAppearanceTitle": "Appearance",
     "settingsAppearanceBody": "Theme for this device. Nothing here leaves the machine.",
     "settingsBackupTitle": "Backup and data",
-    "settingsBackupBody": "Export the catalogue, restore a backup, import records.",
+    "settingsBackupBody": "Export the catalogue or restore a backup.",
     "settingsAboutTitle": "About Khulla Digital Library",
     "settingsAboutBody": "Version, licence and where the source lives.",
     "@settingsAboutBody": {
@@ -829,9 +829,6 @@
     "settingsBackupRestoreConfirmTitle": "Restore from a backup?",
     "settingsBackupRestoreConfirmBody": "Everything currently in this library is replaced with the contents of the file you choose next. The app restarts when it finishes.",
     "settingsBackupExported": "Backup exported.",
-    "settingsBackupImportTitle": "Import records",
-    "settingsBackupImportBody": "Bring titles or members in from a CSV file, matching on ISBN or card number.",
-    "settingsBackupImportAction": "Import",
     "settingsBackupLastBackup": "Last backup",
     "settingsBackupNever": "Never",
     "settingsBackupDatabaseSize": "Database size",
