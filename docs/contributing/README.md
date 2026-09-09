@@ -21,8 +21,10 @@ Verify your setup with `make check`.
 ## Before you open a pull request
 
 ```sh
-make check      # format + copyright-check + analyze + test, the same steps CI runs
+make check      # format + copyright-check + analyze + test
 ```
+
+CI runs `make ci`, which is the same set of gates with one difference: unformatted code fails the build instead of being rewritten. Run `make check` locally and the formatting is already done.
 
 Analysis runs with `--fatal-infos`, so an info-level lint fails the build. Run `make fix` first — it resolves most of them automatically.
 
@@ -57,6 +59,10 @@ fix(circulation): stop a return from clearing the loan history
 ```
 
 Open pull requests against `dev`. `make pr` pushes and opens one for you.
+
+## Releasing
+
+`dev` is where work lands; `prod` is what gets released. Tagging a commit on `prod` builds Windows, Linux, Android and web and publishes them to the releases page, and pushing to `prod` redeploys the web demo. See [releasing.md](./releasing.md) — it also covers how to hand someone a test build without cutting a release.
 
 ## Reporting bugs
 

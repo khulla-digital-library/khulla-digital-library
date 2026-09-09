@@ -1,9 +1,11 @@
-.PHONY: bootstrap install-sdk build migrate db-diagram localize analyze format fix test check clean \
+.PHONY: bootstrap install-sdk build migrate db-diagram localize analyze format format-check fix test check ci clean \
         copyright copyright-check \
-        db-web run-web run-windows run-linux build-web build-windows build-apk pr seed-mock
+        db-web run-web run-windows run-linux build-web build-windows build-linux build-apk pr seed-mock
 
-FLUTTER := fvm flutter
-DART := fvm dart
+# Overridable so CI can use the SDK already on PATH instead of installing FVM
+# to shell out to the same SDK. Locally these stay on FVM, which pins .fvmrc.
+FLUTTER ?= fvm flutter
+DART ?= fvm dart
 
 # ── Setup ───────────────────────────────────────────────────────────────────
 
@@ -71,6 +73,16 @@ analyze:
 format:
 	$(DART) run melos run format
 
+## Fail if any committed Dart source is unformatted, without rewriting it.
+## Runs over `git ls-files` rather than the tree: that is what keeps it out of
+## the gitignored generated sources, whose formatting is build_runner's
+## business, and out of sizzbe-app/.
+format-check:
+	@files=$$(git ls-files '*.dart'); \
+	  if [ -n "$$files" ]; then \
+	    $(DART) format --output=none --set-exit-if-changed $$files; \
+	  fi
+
 fix:
 	$(DART) run melos run fix
 
@@ -86,8 +98,12 @@ copyright-check:
 copyright:
 	$(DART) tools/copyright.dart --fix
 
-## What CI runs. Do this before opening a pull request.
+## Do this before opening a pull request. Formats in place, then checks.
 check: format copyright-check analyze test
+
+## What CI runs. Same gates as `check`, except that unformatted code fails the
+## build instead of being quietly rewritten on a runner nobody will commit from.
+ci: format-check copyright-check analyze test
 
 # ── Run ─────────────────────────────────────────────────────────────────────
 
@@ -106,13 +122,16 @@ run-linux:
 # on every platform, so these all target lib/main_prod.dart directly.
 
 build-web:
-	$(FLUTTER) build web -t lib/main_prod.dart
+	$(FLUTTER) build web --release -t lib/main_prod.dart
 
 build-windows:
-	$(FLUTTER) build windows -t lib/main_prod.dart
+	$(FLUTTER) build windows --release -t lib/main_prod.dart
+
+build-linux:
+	$(FLUTTER) build linux --release -t lib/main_prod.dart
 
 build-apk:
-	$(FLUTTER) build apk -t lib/main_prod.dart
+	$(FLUTTER) build apk --release -t lib/main_prod.dart
 
 # ── Git ─────────────────────────────────────────────────────────────────────
 
