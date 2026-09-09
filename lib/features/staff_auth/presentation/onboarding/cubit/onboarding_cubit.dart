@@ -12,6 +12,7 @@ import 'package:khulla/core/form/inputs/password.dart';
 import 'package:khulla/core/form/inputs/required_text.dart';
 import 'package:khulla/core/money/currency.dart';
 import 'package:khulla/core/security/recovery_code.dart';
+import 'package:khulla/features/settings/domain/backup_repository.dart';
 import 'package:khulla/features/settings/domain/library_settings_repository.dart';
 import 'package:khulla/features/settings/domain/models/library_profile.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
@@ -21,14 +22,19 @@ import 'package:khulla/features/users/domain/user_role.dart';
 
 /// First-run setup: name the library, pick its currency, create the
 /// administrator who will run it, and issue recovery codes for that account.
+///
+/// Also the one place a backup can be adopted before any of that exists: a
+/// fresh device takes on the backup's catalogue and staff instead of
+/// creating its own, through [restoreFromBackup].
 @injectable
 class OnboardingCubit extends Cubit<OnboardingState> {
-  OnboardingCubit(this._library, this._staff, this._auth)
+  OnboardingCubit(this._library, this._staff, this._auth, this._backups)
     : super(const OnboardingState());
 
   final LibrarySettingsRepository _library;
   final StaffRepository _staff;
   final AuthCubit _auth;
+  final BackupRepository _backups;
 
   void libraryNameChanged(String value) =>
       emit(state.copyWith(libraryName: RequiredText.dirty(value)));
@@ -139,6 +145,44 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       error: null,
     ),
   );
+
+  /// Adopts a backup file instead of setting up a new library.
+  ///
+  /// Anything typed on the wizard is discarded: the catalogue, the staff
+  /// accounts and the loan records all come from the file, and the operator
+  /// signs in with one of that backup's accounts afterwards. Restarts the
+  /// app on success and never returns to this screen.
+  ///
+  /// Returns false when the operator cancelled the file picker. Emits the
+  /// failure into state *and* rethrows: a gesture asked for this, so the
+  /// page answers it with a toast as well as the inline message.
+  Future<bool> restoreFromBackup() async {
+    if (state.isSubmitting) return false;
+
+    emit(
+      state.copyWith(
+        status: FormzSubmissionStatus.inProgress,
+        error: null,
+      ),
+    );
+    try {
+      final restored = await _backups.restoreBackup();
+      if (isClosed) return restored;
+      if (!restored) {
+        emit(state.copyWith(status: FormzSubmissionStatus.initial));
+      }
+      return restored;
+    } on AppException catch (error) {
+      if (isClosed) rethrow;
+      emit(
+        state.copyWith(
+          status: FormzSubmissionStatus.failure,
+          error: error,
+        ),
+      );
+      rethrow;
+    }
+  }
 
   /// Writes the library profile, the administrator, and the hashed recovery
   /// codes, then opens the session.

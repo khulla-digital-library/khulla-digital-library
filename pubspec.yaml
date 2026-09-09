@@ -70,7 +70,6 @@ dependencies:
     path: packages/khulla_ui
 
   # UI
-  cupertino_icons: ^1.0.9
   toastification: ^3.2.0
 
 

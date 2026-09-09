@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Khulla Digital Library contributors.
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/feedback/app_toast.dart';
@@ -13,6 +15,7 @@ import 'package:khulla/features/staff_auth/presentation/onboarding/widgets/onboa
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_error_notice.dart';
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_header.dart';
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_scaffold.dart';
+import 'package:khulla/features/staff_auth/presentation/widgets/auth_secondary_action.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -21,7 +24,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 ///
 /// The router sends the operator here whenever the catalogue holds no staff
 /// account, and nowhere else — there is no route out of this page except
-/// finishing it, because a library with no administrator has nothing to show.
+/// finishing it or adopting a backup, because a library with no
+/// administrator has nothing to show.
 ///
 /// The last step writes the administrator and signs them in: making someone
 /// type the password they just chose, on the next screen, to reach the app
@@ -41,6 +45,28 @@ class OnboardingPage extends StatelessWidget {
         message: l10n.onboardingSetupFailed,
         description: error.localizedMessage(l10n),
       );
+    }
+  }
+
+  Future<void> _restore(BuildContext context) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.onboardingRestoreConfirmTitle,
+      message: l10n.onboardingRestoreConfirmBody,
+      confirmLabel: l10n.settingsBackupRestoreAction,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!context.mounted || !confirmed) return;
+
+    try {
+      // On success this never returns to a running screen — `restartApp()`
+      // ends the process (or reloads the page on web) before the wizard
+      // could draw another frame over a catalogue that was replaced under it.
+      await context.read<OnboardingCubit>().restoreFromBackup();
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
     }
   }
 
@@ -96,15 +122,25 @@ class OnboardingPage extends StatelessWidget {
                 AuthErrorNotice.exception(error),
               ],
               SizedBox(height: spacing.lg),
-              if (state.step.isFirst)
+              if (state.step.isFirst) ...[
                 AppButton(
                   size: AppButtonSize.large,
                   expand: true,
                   trailingIcon: AppIcons.arrowRight,
                   onPressed: cubit.goToNextStep,
                   child: Text(l10n.onboardingContinue),
-                )
-              else
+                ),
+                // The fork: adopt an existing library's backup instead of
+                // creating a new one. Later steps have typed input worth
+                // keeping, so the offer lives only on the first step.
+                if (!state.isSubmitting) ...[
+                  SizedBox(height: spacing.md),
+                  AuthSecondaryAction(
+                    label: l10n.onboardingRestoreAction,
+                    onTap: () => unawaited(_restore(context)),
+                  ),
+                ],
+              ] else
                 Row(
                   children: [
                     AppButton(
