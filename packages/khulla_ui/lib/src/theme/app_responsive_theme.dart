@@ -12,10 +12,19 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// {@endtemplate}
 class AppResponsiveTheme extends StatelessWidget {
   /// {@macro app_responsive_theme}
-  const AppResponsiveTheme({required this.child, super.key});
+  const AppResponsiveTheme({
+    required this.child,
+    this.brand = AppBrand.teal,
+    super.key,
+  });
 
   /// The subtree that inherits the resolved theme.
   final Widget child;
+
+  /// The brand ramp to rebuild with. Must be the same one `MaterialApp` was
+  /// given, or this rebuild would quietly repaint the app in the default
+  /// brand.
+  final AppBrand brand;
 
   /// The largest text scale the dense layouts survive.
   static const double maxTextScale = 1.3;
@@ -24,8 +33,8 @@ class AppResponsiveTheme extends StatelessWidget {
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
     final theme = context.theme.brightness == Brightness.dark
-        ? AppTheme.dark()
-        : AppTheme.light();
+        ? AppTheme.dark(AppDensity.comfortable, brand)
+        : AppTheme.light(AppDensity.comfortable, brand);
 
     return MediaQuery(
       data: media.copyWith(

@@ -4,6 +4,7 @@ import 'package:khulla/app/router/app_router.dart';
 import 'package:khulla/core/di/injection.dart';
 import 'package:khulla/core/feedback/app_toast_wrapper.dart';
 import 'package:khulla/core/theme/cubit/theme_cubit.dart';
+import 'package:khulla/core/theme/cubit/theme_state.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/widgets/dismiss_keyboard.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -15,13 +16,13 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AppBlocProviders(
     child: AppToastWrapper(
-      child: BlocBuilder<ThemeCubit, ThemeMode>(
-        builder: (context, themeMode) => MaterialApp.router(
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, appearance) => MaterialApp.router(
           debugShowCheckedModeBanner: false,
           onGenerateTitle: (context) => context.l10n.appName,
-          theme: AppTheme.light(),
-          darkTheme: AppTheme.dark(),
-          themeMode: themeMode,
+          theme: AppTheme.light(AppDensity.comfortable, appearance.brand),
+          darkTheme: AppTheme.dark(AppDensity.comfortable, appearance.brand),
+          themeMode: appearance.mode,
           // Lets a mouse drag a list, which Flutter disallows by default.
           scrollBehavior: const AppScrollBehavior(),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -31,6 +32,7 @@ class App extends StatelessWidget {
           // class and caps text scaling.
           builder: (context, child) => DismissKeyboard(
             child: AppResponsiveTheme(
+              brand: appearance.brand,
               child: child ?? const SizedBox.shrink(),
             ),
           ),
