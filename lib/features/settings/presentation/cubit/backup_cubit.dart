@@ -43,6 +43,10 @@ class BackupCubit extends Cubit<BackupState> {
       if (isClosed) rethrow;
       emit(state.copyWith(isWorking: false, error: error));
       rethrow;
+    } finally {
+      if (!isClosed && state.isWorking) {
+        emit(state.copyWith(isWorking: false));
+      }
     }
   }
 
@@ -56,6 +60,10 @@ class BackupCubit extends Cubit<BackupState> {
       if (isClosed) rethrow;
       emit(state.copyWith(isWorking: false, error: error));
       rethrow;
+    } finally {
+      if (!isClosed && state.isWorking) {
+        emit(state.copyWith(isWorking: false));
+      }
     }
   }
 
@@ -68,6 +76,10 @@ class BackupCubit extends Cubit<BackupState> {
       if (isClosed) rethrow;
       emit(state.copyWith(isWorking: false, error: error));
       rethrow;
+    } finally {
+      if (!isClosed && state.isWorking) {
+        emit(state.copyWith(isWorking: false));
+      }
     }
   }
 }

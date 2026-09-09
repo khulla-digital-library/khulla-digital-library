@@ -17,6 +17,10 @@ const String _source = 'ReportsRepositoryImpl';
 /// fixed eight-month or current-snapshot window regardless of the selected
 /// period — only the stat tiles, fine totals and rankings are scoped to
 /// `[start, end)`. See [ReportsRepository.loadSummary].
+///
+/// The overdue snapshot is capped at the 100 most overdue loans
+/// (`ORDER BY due_at ASC LIMIT 100`): the CSV export writes exactly what
+/// this snapshot holds, so a larger overdue backlog is silently truncated.
 @LazySingleton(as: ReportsRepository)
 class ReportsRepositoryImpl implements ReportsRepository {
   ReportsRepositoryImpl(this._db);

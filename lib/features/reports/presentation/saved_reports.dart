@@ -8,6 +8,7 @@ class SavedReport {
     required this.body,
     required this.icon,
     required this.tone,
+    required this.kind,
   });
 
   /// What the report is called.
@@ -21,6 +22,10 @@ class SavedReport {
 
   /// The tile's tone.
   final AppStatusTone tone;
+
+  /// What a tap on this report exports — carried on the entry itself so the
+  /// list and its export kinds cannot become index-misaligned.
+  final ReportsExportKind kind;
 }
 
 /// The reports that can be exported as CSV, in the order the page lists
@@ -44,46 +49,41 @@ List<SavedReport> reportsSaved(AppLocalizations l10n) => [
     body: l10n.reportsSavedCirculationBody,
     icon: AppIcons.transfer,
     tone: AppStatusTone.brand,
+    kind: ReportsExportKind.circulation,
   ),
   SavedReport(
     title: l10n.reportsSavedCollection,
     body: l10n.reportsSavedCollectionBody,
     icon: AppIcons.inventory,
     tone: AppStatusTone.info,
+    kind: ReportsExportKind.collection,
   ),
   SavedReport(
     title: l10n.reportsSavedMembers,
     body: l10n.reportsSavedMembersBody,
     icon: AppIcons.people,
     tone: AppStatusTone.success,
+    kind: ReportsExportKind.members,
   ),
   SavedReport(
     title: l10n.reportsSavedFines,
     body: l10n.reportsSavedFinesBody,
     icon: AppIcons.wallet,
     tone: AppStatusTone.warning,
+    kind: ReportsExportKind.fines,
   ),
   SavedReport(
     title: l10n.reportsSavedOverdue,
     body: l10n.reportsSavedOverdueBody,
     icon: AppIcons.error,
     tone: AppStatusTone.danger,
+    kind: ReportsExportKind.overdue,
   ),
   SavedReport(
     title: l10n.reportsSavedAcquisitions,
     body: l10n.reportsSavedAcquisitionsBody,
     icon: AppIcons.delivery,
     tone: AppStatusTone.neutral,
+    kind: ReportsExportKind.acquisitions,
   ),
-];
-
-/// [ReportsExportKind] in the same order [reportsSaved] lists them, so a
-/// tile's index maps directly to what it exports.
-const List<ReportsExportKind> reportsExportKinds = [
-  ReportsExportKind.circulation,
-  ReportsExportKind.collection,
-  ReportsExportKind.members,
-  ReportsExportKind.fines,
-  ReportsExportKind.overdue,
-  ReportsExportKind.acquisitions,
 ];

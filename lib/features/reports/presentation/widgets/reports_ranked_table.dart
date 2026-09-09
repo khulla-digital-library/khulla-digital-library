@@ -113,13 +113,7 @@ class ReportsRankedTable extends StatelessWidget {
         id: 'rank',
         label: l10n.reportsColumnRank,
         width: 40,
-        cellBuilder: (context, row) => Text(
-          '${rows.indexOf(row) + 1}',
-          style: context.textTheme.bodySmall?.copyWith(
-            color: colors.textMuted,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        cellBuilder: (context, row) => const SizedBox.shrink(),
       ),
       AppTableColumn<ReportsRankedRow>(
         id: 'name',
@@ -147,13 +141,20 @@ class ReportsRankedTable extends StatelessWidget {
     Widget cellFor(
       AppTableColumn<ReportsRankedRow> column,
       ReportsRankedRow row,
+      int index,
     ) {
-      final body = switch (column.id) {
-        'name' => nameCell(context, row),
-        'share' => shareCell(context, row),
-        'loans' => loansCell(context, row),
-        _ => column.cellBuilder(context, row),
-      };
+      // Rank is positional, not data: indexOf would collapse structurally
+      // equal rows to the same rank. Every other column already carries its
+      // builder, so delegate directly.
+      final body = column.id == 'rank'
+          ? Text(
+              '${index + 1}',
+              style: context.textTheme.bodySmall?.copyWith(
+                color: colors.textMuted,
+                fontWeight: FontWeight.w600,
+              ),
+            )
+          : column.cellBuilder(context, row);
       return column.sized(
         Padding(
           padding: EdgeInsets.symmetric(
@@ -179,7 +180,7 @@ class ReportsRankedTable extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  for (final column in visible) cellFor(column, row),
+                  for (final column in visible) cellFor(column, row, index),
                 ],
               ),
             ),

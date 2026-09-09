@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/features/circulation/fine/data/local_fine_data_source.dart';
+import 'package:khulla/features/circulation/loan/data/local_loan_data_source.dart';
 import 'package:khulla/features/circulation/reservation/data/local_reservation_data_source.dart';
 import 'package:khulla/features/circulation/reservation/data/reservation_expiry_scheduler.dart';
 import 'package:khulla/features/circulation/reservation/presentation/reservation_list_refresh.dart';
@@ -9,7 +10,6 @@ import 'package:khulla/features/circulation/shared/data/circulation_repository_i
 import 'package:khulla/features/circulation/shared/domain/reservation_status.dart';
 
 import '../helpers/catalog_fixtures.dart';
-import '../helpers/stub_loan_data_source.dart';
 import '../helpers/test_database.dart';
 
 /// [ReservationExpiryScheduler] against a real database — the periodic timer
@@ -25,7 +25,7 @@ void main() {
     db = await openTestDatabase();
     repository = CirculationRepositoryImpl(
       db,
-      StubLoanLocalDataSource(),
+      LocalLoanDataSource(db),
       LocalFineDataSource(db),
       LocalReservationDataSource(db),
     );

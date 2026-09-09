@@ -1,8 +1,8 @@
 # Database schema
 
-> DO NOT HAND-EDIT. Generated from `drift_schemas/app_database/drift_schema_v7.json` by `tools/db_diagram.dart`. Regenerate with `make db-diagram`.
+> DO NOT HAND-EDIT. Generated from `drift_schemas/app_database/drift_schema_v11.json` by `tools/db_diagram.dart`. Regenerate with `make db-diagram`.
 
-## ER diagram — schema v7
+## ER diagram — schema v11
 
 Renders on GitHub and in VS Code Markdown preview.
 
@@ -13,7 +13,6 @@ erDiagram
     TEXT title_id "required"
     TEXT barcode UK "required"
     TEXT shelf "nullable, max 60"
-    TEXT condition "required, CopyCondition"
     TEXT status "required, CopyStatus"
     DATETIME acquired_at "required"
     TEXT notes "nullable"
@@ -38,8 +37,9 @@ erDiagram
   library_settings {
     INTEGER id PK "required"
     TEXT name "required, max 160"
-    TEXT currency "required, AppCurrency"
-    TEXT branch "nullable, max 120"
+    TEXT currency "required, max 3"
+    TEXT currency_name "required, max 80"
+    TEXT currency_symbol "required, max 16"
     TEXT email "nullable, max 254"
     TEXT phone "nullable, max 40"
     TEXT address "nullable, max 400"
@@ -164,7 +164,6 @@ erDiagram
   titles {
     TEXT id PK "required"
     TEXT title "required, max 300"
-    TEXT subtitle "nullable, max 300"
     TEXT author "required, max 200"
     TEXT isbn "nullable, max 20"
     TEXT publisher "nullable, max 200"
@@ -173,7 +172,6 @@ erDiagram
     INTEGER pages "nullable"
     TEXT format_id "required"
     TEXT language "required"
-    TEXT subjects "required"
     TEXT description "nullable"
     TEXT shelf "nullable, max 60"
     BOOLEAN lendable "required"

@@ -2,12 +2,12 @@ import 'package:drift/drift.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/features/circulation/fine/data/local_fine_data_source.dart';
+import 'package:khulla/features/circulation/loan/data/local_loan_data_source.dart';
 import 'package:khulla/features/circulation/reservation/data/local_reservation_data_source.dart';
 import 'package:khulla/features/circulation/shared/data/circulation_repository_impl.dart';
 import 'package:khulla/features/reports/data/reports_repository_impl.dart';
 
 import '../helpers/catalog_fixtures.dart';
-import '../helpers/stub_loan_data_source.dart';
 import '../helpers/test_database.dart';
 
 /// [ReportsRepositoryImpl] against a real database, seeded through
@@ -21,7 +21,7 @@ void main() {
     db = await openTestDatabase();
     circulation = CirculationRepositoryImpl(
       db,
-      StubLoanLocalDataSource(),
+      LocalLoanDataSource(db),
       LocalFineDataSource(db),
       LocalReservationDataSource(db),
     );

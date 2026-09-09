@@ -27,6 +27,7 @@ const List<String> _weekdayLabels = [
 ];
 
 final DateFormat _activityWhenFormat = DateFormat('d MMM, h:mm a');
+final DateFormat _dueFormat = DateFormat('d MMM');
 final DateFormat _monthFormat = DateFormat('MMM');
 
 /// Maps a raw [DashboardSummary] to the formatted view models the board's
@@ -177,7 +178,7 @@ extension DashboardSummaryX on DashboardSummary {
         member: event.member,
         memberCode: event.memberCode,
         when: _activityWhenFormat.format(event.when),
-        due: event.due == null ? null : _monthFormat.format(event.due!),
+        due: event.due == null ? null : _dueFormat.format(event.due!),
         tone: switch (event.kind) {
           domain.DashboardActivityKind.borrow => AppStatusTone.brand,
           domain.DashboardActivityKind.returned => AppStatusTone.success,

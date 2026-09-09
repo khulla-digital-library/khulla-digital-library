@@ -45,7 +45,12 @@ class _MoreList extends StatelessWidget {
             selected: isSelectedShellRoute(
               current,
               destination.route,
-              [for (final d in destinations) d.route],
+              [
+                for (final d in destinations) ...[
+                  d.route,
+                  for (final child in d.children) child.route,
+                ],
+              ],
             ),
             route: destination.route,
           ),

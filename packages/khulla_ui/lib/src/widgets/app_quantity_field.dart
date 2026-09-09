@@ -3,37 +3,6 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Digits-only whole numbers, capped at [max], with leading zeros stripped.
-///
-/// Empty is allowed so the field can be cleared and retyped. A lone `0` is
-/// kept so the caller can show a validation error instead of silently
-/// rewriting the value.
-class AppPositiveIntFormatter extends TextInputFormatter {
-  /// Creates a formatter that accepts `''` or an integer in `0…max`.
-  const AppPositiveIntFormatter({this.max = 999});
-
-  /// Inclusive upper bound. Edits that would exceed it are rejected.
-  final int max;
-
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    final raw = newValue.text;
-    if (raw.isEmpty) return newValue;
-    if (!RegExp(r'^\d+$').hasMatch(raw)) return oldValue;
-    final parsed = int.parse(raw);
-    if (parsed > max) return oldValue;
-    final normalized = parsed.toString();
-    if (normalized == raw) return newValue;
-    return TextEditingValue(
-      text: normalized,
-      selection: TextSelection.collapsed(offset: normalized.length),
-    );
-  }
-}
-
 /// How tall the minus/plus control is relative to a text field.
 enum AppQuantityFieldSize {
   /// Matches [AppMetrics.fieldHeight] — sits beside a text field in a form row.
@@ -159,11 +128,6 @@ class _AppQuantityFieldState extends State<AppQuantityField> {
     final width = isSmall
         ? metrics.iconButtonSmall * 2.75
         : metrics.fieldHeight * 3;
-    final iconSlot = BoxConstraints(
-      minWidth: metrics.iconButtonSmall,
-      maxWidth: metrics.iconButtonSmall,
-      maxHeight: controlHeight,
-    );
     final focused = _focus.hasFocus;
 
     return Column(
@@ -191,7 +155,7 @@ class _AppQuantityFieldState extends State<AppQuantityField> {
               final showSlide = !focused && parsed != null;
 
               if (isSmall) {
-                return _CompactQuantityControl(
+                return AppCompactQuantityControl(
                   controlHeight: controlHeight,
                   canDecrease: canDecrease,
                   canIncrease: canIncrease,
@@ -211,70 +175,21 @@ class _AppQuantityFieldState extends State<AppQuantityField> {
                 );
               }
 
-              return ConstrainedBox(
-                key: const ValueKey('app_quantity_control'),
-                constraints: BoxConstraints(
-                  minHeight: controlHeight,
-                  maxHeight: controlHeight,
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    TextFormField(
-                      controller: widget.controller,
-                      focusNode: _focus,
-                      enabled: widget.enabled,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      inputFormatters: [
-                        AppPositiveIntFormatter(max: widget.max),
-                      ],
-                      style: numeric.copyWith(
-                        color: showSlide ? Colors.transparent : colors.ink100,
-                      ),
-                      decoration: InputDecoration(
-                        prefixIcon: AppFieldAffix(
-                          child: AppIconButton(
-                            icon: AppIcons.remove,
-                            tooltip: widget.decreaseTooltip,
-                            size: AppIconButtonSize.small,
-                            onPressed: canDecrease ? () => _step(-1) : null,
-                          ),
-                        ),
-                        suffixIcon: AppFieldAffix(
-                          child: AppIconButton(
-                            icon: AppIcons.add,
-                            tooltip: widget.increaseTooltip,
-                            size: AppIconButtonSize.small,
-                            onPressed: canIncrease ? () => _step(1) : null,
-                          ),
-                        ),
-                        prefixIconConstraints: iconSlot,
-                        suffixIconConstraints: iconSlot,
-                        counterText: '',
-                        contentPadding: EdgeInsetsDirectional.only(
-                          start: spacing.sm,
-                          end: spacing.sm,
-                          top: spacing.xs,
-                          bottom: spacing.xs,
-                        ),
-                      ),
-                      onChanged: widget.onChanged,
-                    ),
-                    if (showSlide)
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: metrics.iconButtonSmall,
-                        ),
-                        child: IgnorePointer(
-                          child: AppSlidingNumber(
-                            value: parsed,
-                            style: numeric,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+              return AppRegularQuantityControl(
+                controller: widget.controller,
+                focusNode: _focus,
+                enabled: widget.enabled,
+                max: widget.max,
+                numeric: numeric,
+                canDecrease: canDecrease,
+                canIncrease: canIncrease,
+                showSlide: showSlide,
+                parsed: parsed,
+                decreaseTooltip: widget.decreaseTooltip,
+                increaseTooltip: widget.increaseTooltip,
+                onChanged: widget.onChanged,
+                onDecrease: () => _step(-1),
+                onIncrease: () => _step(1),
               );
             },
           ),
@@ -284,111 +199,6 @@ class _AppQuantityFieldState extends State<AppQuantityField> {
           AppFieldError(message: error),
         ],
       ],
-    );
-  }
-}
-
-class _CompactQuantityControl extends StatelessWidget {
-  const _CompactQuantityControl({
-    required this.controlHeight,
-    required this.canDecrease,
-    required this.canIncrease,
-    required this.showSlide,
-    required this.parsed,
-    required this.numeric,
-    required this.colors,
-    required this.controller,
-    required this.focusNode,
-    required this.enabled,
-    required this.max,
-    required this.decreaseTooltip,
-    required this.increaseTooltip,
-    required this.onChanged,
-    required this.onDecrease,
-    required this.onIncrease,
-  });
-
-  final double controlHeight;
-  final bool canDecrease;
-  final bool canIncrease;
-  final bool showSlide;
-  final int? parsed;
-  final TextStyle numeric;
-  final AppColors colors;
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool enabled;
-  final int max;
-  final String decreaseTooltip;
-  final String increaseTooltip;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onDecrease;
-  final VoidCallback onIncrease;
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints.tightFor(height: controlHeight),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(context.appRadius.container),
-          border: Border.all(
-            color: colors.hairline,
-            width: context.appBorders.hairline,
-          ),
-        ),
-        child: Row(
-          children: [
-            AppIconButton(
-              icon: AppIcons.remove,
-              tooltip: decreaseTooltip,
-              size: AppIconButtonSize.small,
-              onPressed: canDecrease ? onDecrease : null,
-            ),
-            Expanded(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    enabled: enabled,
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    inputFormatters: [AppPositiveIntFormatter(max: max)],
-                    style: numeric.copyWith(
-                      color: showSlide ? Colors.transparent : colors.ink100,
-                    ),
-                    cursorColor: colors.ink100,
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                      counterText: '',
-                    ),
-                    onChanged: onChanged,
-                  ),
-                  if (showSlide)
-                    IgnorePointer(
-                      child: AppSlidingNumber(
-                        value: parsed!,
-                        style: numeric,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            AppIconButton(
-              icon: AppIcons.add,
-              tooltip: increaseTooltip,
-              size: AppIconButtonSize.small,
-              onPressed: canIncrease ? onIncrease : null,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

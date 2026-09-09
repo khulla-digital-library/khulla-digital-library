@@ -296,6 +296,7 @@ class CirculationHoldQueue {
                   hold.closedAt.isNull() &
                   hold.status.equalsValue(ReservationStatus.waiting),
             )
-            ..orderBy([(hold) => OrderingTerm(expression: hold.placedAt)]))
+            ..orderBy([(hold) => OrderingTerm(expression: hold.placedAt)])
+            ..limit(1))
           .getSingleOrNull();
 }

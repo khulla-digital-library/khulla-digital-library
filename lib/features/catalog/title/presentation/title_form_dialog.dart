@@ -6,12 +6,13 @@ import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/lifecycle/dispose_bag.dart';
 import 'package:khulla/core/money/money.dart';
-import 'package:khulla/features/catalog/shared/presentation/catalog_labels.dart';
 import 'package:khulla/features/catalog/title/domain/models/title.dart'
     as catalog;
 import 'package:khulla/features/catalog/title/domain/models/title_format.dart';
 import 'package:khulla/features/catalog/title/presentation/cubit/title/title_form_cubit.dart';
 import 'package:khulla/features/catalog/title/presentation/cubit/title/title_form_state.dart';
+import 'package:khulla/features/catalog/title/presentation/widgets/create_format_form.dart';
+import 'package:khulla/features/catalog/title/presentation/widgets/title_form_sections.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/presentation/cubit/reference_data_cubit.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
@@ -152,7 +153,7 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
   Future<String?> _askFormatName() {
     return AppFormModal.show<String>(
       context: context,
-      builder: (modalContext) => const _CreateFormatForm(),
+      builder: (modalContext) => const CreateFormatForm(),
     );
   }
 
@@ -254,220 +255,48 @@ class _TitleFormBodyState extends State<_TitleFormBody> with DisposeBag {
         ),
       ],
       children: [
-        AppFormSection(
-          title: l10n.titleFormBibliographic,
-          children: [
-            AppFormRow(
-              flexes: const [3, 2],
-              children: [
-                AppTextField(
-                  label: l10n.fieldTitle,
-                  required: true,
-                  controller: _title,
-                  errorText: _titleError,
-                  textCapitalization: TextCapitalization.words,
-                  onChanged: (_) {
-                    if (_titleError != null) {
-                      setState(() => _titleError = null);
-                    }
-                  },
-                ),
-                AppTextField(
-                  label: l10n.fieldAuthor,
-                  required: true,
-                  controller: _author,
-                  errorText: _authorError,
-                  textCapitalization: TextCapitalization.words,
-                  onChanged: (_) {
-                    if (_authorError != null) {
-                      setState(() => _authorError = null);
-                    }
-                  },
-                ),
-              ],
-            ),
-            AppFormRow(
-              children: [
-                AppTextField(
-                  label: l10n.fieldIsbn,
-                  controller: _isbn,
-                  onChanged: (_) {},
-                ),
-                AppTextField(
-                  label: l10n.fieldPublisher,
-                  controller: _publisher,
-                  textCapitalization: TextCapitalization.words,
-                  onChanged: (_) {},
-                ),
-                AppTextField(
-                  label: l10n.fieldPublishedYear,
-                  controller: _year,
-                  keyboardType: TextInputType.number,
-                  onChanged: (_) {},
-                ),
-              ],
-            ),
-            AppFormRow(
-              children: [
-                AppTextField(
-                  label: l10n.fieldEdition,
-                  controller: _edition,
-                  onChanged: (_) {},
-                ),
-                AppTextField(
-                  label: l10n.fieldPages,
-                  controller: _pages,
-                  keyboardType: TextInputType.number,
-                  onChanged: (_) {},
-                ),
-                AppDropdownField<TitleFormat>(
-                  label: l10n.fieldFormat,
-                  required: true,
-                  value: _selectedFormat,
-                  items: widget.formats,
-                  itemLabel: (format) => format.label(l10n),
-                  itemIcon: (format) => format.icon,
-                  errorText: _formatError,
-                  footerActionLabel: l10n.titleFormAddFormat,
-                  onFooterAction: () => unawaited(_addFormat()),
-                  onChanged: (format) => setState(() {
-                    _formatId = format?.id ?? _formatId;
-                    _formatError = null;
-                  }),
-                ),
-                AppTextField(
-                  label: l10n.fieldLanguage,
-                  controller: _language,
-                  textCapitalization: TextCapitalization.words,
-                  onChanged: (_) {},
-                ),
-              ],
-            ),
-            AppTextField(
-              label: l10n.fieldDescription,
-              controller: _description,
-              maxLines: 3,
-              minLines: 2,
-              textCapitalization: TextCapitalization.sentences,
-              onChanged: (_) {},
-            ),
-          ],
-        ),
-        AppFormSection(
-          title: l10n.titleFormShelving,
-          description: l10n.titleFormShelvingDescription,
-          children: [
-            AppFormRow(
-              // The stepper keeps its compact width while its control stays
-              // fieldHeight tall like the text fields: flex 0 stops the row
-              // stretching it full-width. Stacks below 480px so the labels
-              // still fit when side by side.
-              flexes: _isEditing ? null : const [2, 2, 0],
-              stackBelow: _isEditing ? null : 480,
-              children: [
-                AppTextField(
-                  label: l10n.fieldShelf,
-                  controller: _shelf,
-                  onChanged: (_) {},
-                ),
-                AppTextField(
-                  label: l10n.fieldReplacementCost,
-                  controller: _replacementCost,
-                  errorText: _costError,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  onChanged: (_) {
-                    if (_costError != null) {
-                      setState(() => _costError = null);
-                    }
-                  },
-                ),
-                if (!_isEditing)
-                  AppQuantityField(
-                    label: l10n.titleFormInitialCopies,
-                    required: true,
-                    controller: _initialCopies,
-                    errorText: _copiesError,
-                    decreaseTooltip: l10n.commonDecrease,
-                    increaseTooltip: l10n.commonIncrease,
-                    onChanged: (_) {
-                      if (_copiesError != null) {
-                        setState(() => _copiesError = null);
-                      }
-                    },
-                  ),
-              ],
-            ),
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: FractionallySizedBox(
-                widthFactor: 0.4,
-                child: AppSwitchField(
-                  value: _lendable,
-                  label: l10n.titleFormLendable,
-                  description: l10n.titleFormLendableDescription,
-                  stacked: true,
-                  onChanged: (value) => setState(() => _lendable = value),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _CreateFormatForm extends StatefulWidget {
-  const _CreateFormatForm();
-
-  @override
-  State<_CreateFormatForm> createState() => _CreateFormatFormState();
-}
-
-class _CreateFormatFormState extends State<_CreateFormatForm> with DisposeBag {
-  late final TextEditingController _name = textController();
-  String? _error;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-
-    return AppFormModal(
-      title: l10n.titleFormCreateFormatHeading,
-      width: AppDialogWidth.sm,
-      actions: [
-        AppDialog.secondaryAction(
-          context: context,
-          label: l10n.commonCancel,
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        AppDialog.primaryAction(
-          context: context,
-          label: l10n.titleFormAddFormat,
-          onPressed: () {
-            final name = _name.text.trim();
-            if (name.isEmpty) {
-              setState(() => _error = l10n.validationFieldRequired);
-              return;
-            }
-            Navigator.of(context).pop(name);
+        TitleFormBibliographicSection(
+          title: _title,
+          author: _author,
+          isbn: _isbn,
+          publisher: _publisher,
+          year: _year,
+          edition: _edition,
+          pages: _pages,
+          language: _language,
+          description: _description,
+          formats: widget.formats,
+          selectedFormat: _selectedFormat,
+          titleError: _titleError,
+          authorError: _authorError,
+          formatError: _formatError,
+          onTitleChanged: () {
+            if (_titleError != null) setState(() => _titleError = null);
           },
-        ),
-      ],
-      children: [
-        AppTextField(
-          label: l10n.fieldFormat,
-          required: true,
-          controller: _name,
-          errorText: _error,
-          autofocus: true,
-          maxLength: 60,
-          textCapitalization: TextCapitalization.words,
-          onChanged: (_) {
-            if (_error != null) setState(() => _error = null);
+          onAuthorChanged: () {
+            if (_authorError != null) setState(() => _authorError = null);
           },
+          onFormatChanged: (format) => setState(() {
+            _formatId = format?.id ?? _formatId;
+            _formatError = null;
+          }),
+          onAddFormat: () => unawaited(_addFormat()),
+        ),
+        TitleFormShelvingSection(
+          shelf: _shelf,
+          replacementCost: _replacementCost,
+          initialCopies: _initialCopies,
+          isEditing: _isEditing,
+          costError: _costError,
+          copiesError: _copiesError,
+          lendable: _lendable,
+          onCostChanged: () {
+            if (_costError != null) setState(() => _costError = null);
+          },
+          onCopiesChanged: () {
+            if (_copiesError != null) setState(() => _copiesError = null);
+          },
+          onLendableChanged: (value) => setState(() => _lendable = value),
         ),
       ],
     );
