@@ -1,6 +1,5 @@
 import 'package:go_router/go_router.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
-import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -43,7 +42,11 @@ class _MoreList extends StatelessWidget {
           _MoreRow(
             label: destination.label,
             icon: destination.icon,
-            selected: Routes.isUnder(current, destination.route),
+            selected: isSelectedShellRoute(
+              current,
+              destination.route,
+              [for (final d in destinations) d.route],
+            ),
             route: destination.route,
           ),
           for (final child in destination.children)
@@ -52,7 +55,11 @@ class _MoreList extends StatelessWidget {
               child: _MoreRow(
                 label: child.label,
                 icon: AppIcons.subEntry,
-                selected: Routes.isUnder(current, child.route),
+                selected: isSelectedShellRoute(
+                  current,
+                  child.route,
+                  [for (final c in destination.children) c.route],
+                ),
                 route: child.route,
               ),
             ),

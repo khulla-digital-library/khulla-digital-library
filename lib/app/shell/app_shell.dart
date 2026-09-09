@@ -193,9 +193,14 @@ class AppShell extends StatelessWidget {
                               for (final child in destination.children)
                                 AppNavChild(
                                   label: child.label,
-                                  selected: Routes.isUnder(
+                                  selected: isSelectedShellRoute(
                                     location,
                                     child.route,
+                                    [
+                                      for (final sibling
+                                          in destination.children)
+                                        sibling.route,
+                                    ],
                                   ),
                                   onSelected: () =>
                                       _goRoute(context, child.route),

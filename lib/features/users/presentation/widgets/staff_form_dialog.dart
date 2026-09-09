@@ -57,6 +57,7 @@ class StaffFormDialog extends StatelessWidget {
         if (state.isLoading) {
           return AppFormModal(
             title: isEditing ? l10n.usersEditHeading : l10n.usersAddHeading,
+            width: AppDialogWidth.xxxl,
             actions: const [],
             children: const [Center(child: AppSpinner())],
           );
@@ -116,6 +117,7 @@ class _StaffFormBodyState extends State<_StaffFormBody> with DisposeBag {
 
     return AppFormModal(
       title: _isEditing ? l10n.usersEditHeading : l10n.usersAddHeading,
+      width: AppDialogWidth.xxxl,
       actions: [
         AppDialog.secondaryAction(
           context: context,

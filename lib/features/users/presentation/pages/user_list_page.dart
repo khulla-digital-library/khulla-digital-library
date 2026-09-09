@@ -158,52 +158,50 @@ class _UserListPageState extends State<UserListPage> {
   List<AppTableColumn<StaffMember>> _columns(AppLocalizations l10n) {
     final spacing = context.appSpacing;
     final colors = context.appColors;
-    final muted = context.textTheme.bodyMedium?.copyWith(
-      color: colors.textMuted,
-    );
 
     return [
       AppTableColumn<StaffMember>(
         id: 'name',
         label: l10n.usersColumnName,
-        flex: 4,
+        flex: 3,
         sortable: true,
         cellBuilder: (context, staff) => Row(
           children: [
-            AppAvatar(initials: staff.initials, size: 32),
-            SizedBox(width: spacing.xs + 2),
+            AppAvatar(initials: staff.initials, size: 24),
+            SizedBox(width: spacing.xs),
             Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    staff.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      color: colors.textHigh,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    staff.email,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: colors.textMuted,
-                    ),
-                  ),
-                ],
+              child: Text(
+                staff.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: colors.textHigh,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
         ),
       ),
       AppTableColumn<StaffMember>(
+        id: 'email',
+        label: l10n.usersColumnEmail,
+        flex: 3,
+        sortable: true,
+        showFrom: FormFactor.medium,
+        cellBuilder: (context, staff) => Text(
+          staff.email,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.textTheme.bodySmall?.copyWith(
+            color: colors.textMuted,
+          ),
+        ),
+      ),
+      AppTableColumn<StaffMember>(
         id: 'role',
         label: l10n.usersColumnRole,
-        flex: 3,
+        flex: 2,
         sortable: true,
         showFrom: FormFactor.medium,
         cellBuilder: (context, staff) => Row(
@@ -219,19 +217,8 @@ class _UserListPageState extends State<UserListPage> {
         ),
       ),
       AppTableColumn<StaffMember>(
-        id: 'lastActive',
-        label: l10n.usersColumnLastActive,
-        flex: 3,
-        showFrom: FormFactor.expanded,
-        // Sign-in history is not recorded anywhere in the catalogue — this
-        // column stays honest about that rather than inventing a value.
-        cellBuilder: (context, staff) =>
-            Text(l10n.usersNeverSignedIn, style: muted),
-      ),
-      AppTableColumn<StaffMember>(
         id: 'status',
         label: l10n.commonStatus,
-        width: 130,
         sortable: true,
         cellBuilder: (context, staff) => AppStatusBadge(
           dense: true,
@@ -242,7 +229,6 @@ class _UserListPageState extends State<UserListPage> {
       AppTableColumn<StaffMember>(
         id: 'actions',
         label: l10n.commonActions,
-        width: 56,
         alignment: Alignment.centerRight,
         cellBuilder: (context, staff) => AppMenuButton(
           tooltip: l10n.commonMoreActions,
@@ -297,7 +283,6 @@ class _UserListPageState extends State<UserListPage> {
 
         return CollectionPageView<StaffMember>(
           onPageSizeChanged: _pageSizeChanged,
-          summary: l10n.usersSubtitle('${listState.staff.length}'),
           toolbar: AppToolbar(
             search: AppSearchField(
               hintText: l10n.usersSearchHint,
@@ -315,13 +300,6 @@ class _UserListPageState extends State<UserListPage> {
                 tone: AppStatusTone.success,
                 onSelected: (selected) =>
                     _toggleStatus(UserStatus.active, selected),
-              ),
-              AppFilterChip(
-                label: l10n.usersFilterInvited,
-                selected: _statuses.contains(UserStatus.invited),
-                tone: AppStatusTone.warning,
-                onSelected: (selected) =>
-                    _toggleStatus(UserStatus.invited, selected),
               ),
               AppFilterChip(
                 label: l10n.usersFilterDisabled,

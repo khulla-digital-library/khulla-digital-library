@@ -65,6 +65,27 @@ class ShellChild {
   final String route;
 }
 
+/// Whether [route] is the selected entry for [location] among
+/// [siblingRoutes].
+///
+/// Routes nest — `/users` contains `/users/roles` — so a plain prefix test
+/// marks every ancestor as selected and two rows light up at once. Only the
+/// longest, most specific match reads as selected; the ancestors stay visible
+/// through the expanded group itself.
+bool isSelectedShellRoute(
+  String location,
+  String route,
+  List<String> siblingRoutes,
+) {
+  if (!Routes.isUnder(location, route)) return false;
+  for (final sibling in siblingRoutes) {
+    if (sibling.length > route.length && Routes.isUnder(location, sibling)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /// The shell's destinations, in display order.
 ///
 /// The order is a shift's order, not an alphabet: a desk shift starts by

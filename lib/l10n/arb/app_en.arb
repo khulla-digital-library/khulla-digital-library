@@ -32,7 +32,7 @@
         "description": "Common - action labels reused across every screen"
     },
     "themeToggleTooltip": "Change theme",
-    "themeModeSystem": "Match system",
+    "themeModeSystem": "System",
     "themeModeLight": "Light",
     "themeModeDark": "Dark",
     "@themeModeDark": {
@@ -891,7 +891,7 @@
     "navReportsMembers": "Membership",
     "navReportsFines": "Fines",
     "navUsersAccounts": "Staff accounts",
-    "navUsersRoles": "Roles and permissions",
+    "navUsersRoles": "Roles",
     "navSettingsLibrary": "Library profile",
     "navSettingsLoanRules": "Loan rules",
     "navSettingsAppearance": "Appearance",
@@ -1120,7 +1120,6 @@
     "reportsSavedAcquisitionsBody": "Titles added over a period, with cost and supplier.",
     "reportsPlaceholderNote": "Figures are sample data until circulation is recording loans.",
     "usersHeading": "Staff accounts",
-    "usersSubtitle": "{count} people can sign in to this library",
     "@usersSubtitle": {
         "description": "Staff - page subtitle",
         "placeholders": {
@@ -1135,12 +1134,9 @@
     "usersColumnName": "Name",
     "usersColumnEmail": "Email",
     "usersColumnRole": "Role",
-    "usersColumnLastActive": "Last active",
     "usersStatusActive": "Active",
-    "usersStatusInvited": "Invited",
     "usersStatusDisabled": "Disabled",
     "usersFilterActive": "Active",
-    "usersFilterInvited": "Invited",
     "usersFilterDisabled": "Disabled",
     "usersEditRole": "Edit account",
     "usersResetPassword": "Reset password",
@@ -1148,7 +1144,6 @@
     "usersEnable": "Enable account",
     "usersEmptyTitle": "No staff accounts yet",
     "usersEmptyBody": "Add the people who work the desk. Each one signs in with their own account, so the ledger says who did what.",
-    "usersNeverSignedIn": "Never signed in",
     "usersAddHeading": "Add staff account",
     "usersEditHeading": "Edit staff account",
     "usersFormIdentity": "Identity",

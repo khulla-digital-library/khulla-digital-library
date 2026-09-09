@@ -54,6 +54,7 @@ class StaffResetPasswordDialog extends StatelessWidget {
         if (state.isLoading) {
           return AppFormModal(
             title: context.l10n.usersResetPasswordHeading,
+            width: AppDialogWidth.lg,
             actions: const [],
             children: const [Center(child: AppSpinner())],
           );
@@ -101,7 +102,7 @@ class _ResetPasswordBodyState extends State<_ResetPasswordBody>
     return AppFormModal(
       title: l10n.usersResetPasswordHeading,
       description: l10n.usersResetPasswordDescription(widget.staffName),
-      width: AppDialogWidth.sm,
+      width: AppDialogWidth.lg,
       actions: [
         AppDialog.secondaryAction(
           context: context,
