@@ -74,7 +74,7 @@ class AppColors extends ThemeExtension<AppColors> {
     onWarning: AppPalette.white100,
     warningSoft: _wash(AppPalette.warning),
     info: AppPalette.info,
-    onInfo: AppPalette.ink100Light,
+    onInfo: AppPalette.white100,
     infoSoft: _wash(AppPalette.info),
     danger: AppPalette.danger,
     onDanger: AppPalette.white100,
@@ -114,7 +114,7 @@ class AppColors extends ThemeExtension<AppColors> {
     onWarning: AppPalette.white100,
     warningSoft: _wash(AppPalette.warning, 0.14, AppPalette.surfaceDark),
     info: AppPalette.info,
-    onInfo: AppPalette.ink100Light,
+    onInfo: AppPalette.white100,
     infoSoft: _wash(AppPalette.info, 0.14, AppPalette.surfaceDark),
     danger: AppPalette.danger,
     onDanger: AppPalette.white100,
@@ -411,6 +411,9 @@ extension type AppTints(AppColors _c) {
 
   /// The hover fill under a destructive action.
   Color get destructiveHover => _c.danger.withValues(alpha: 0.1);
+
+  /// The hover fill under a positive outlined action.
+  Color get successHover => _c.success.withValues(alpha: 0.1);
 
   /// The switch track when on.
   Color get switchTrackOn => _c.accent.withValues(alpha: 0.3);

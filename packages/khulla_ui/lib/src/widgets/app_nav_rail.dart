@@ -70,21 +70,8 @@ class _AppNavRailState extends State<AppNavRail> {
   @override
   void initState() {
     super.initState();
-    _expandSelected();
-  }
-
-  @override
-  void didUpdateWidget(covariant AppNavRail oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedIndex != widget.selectedIndex) _expandSelected();
-  }
-
-  void _expandSelected() {
-    final index = widget.selectedIndex;
-    if (index >= 0 &&
-        index < widget.destinations.length &&
-        widget.destinations[index].children.isNotEmpty) {
-      _expanded.add(index);
+    for (final (index, destination) in widget.destinations.indexed) {
+      if (destination.children.isNotEmpty) _expanded.add(index);
     }
   }
 
@@ -132,13 +119,16 @@ class _AppNavRailState extends State<AppNavRail> {
                   _RailItem(
                     destination: destination,
                     extended: extended,
-                    selected: index == widget.selectedIndex,
+                    selected:
+                        index == widget.selectedIndex &&
+                        !destination.children.any((child) => child.selected),
                     expanded: _expanded.contains(index),
                     onTap: () {
-                      widget.onDestinationSelected(index);
                       if (extended && destination.children.isNotEmpty) {
                         _toggle(index);
+                        return;
                       }
+                      widget.onDestinationSelected(index);
                     },
                     onToggle: destination.children.isEmpty || !extended
                         ? null

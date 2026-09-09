@@ -14,7 +14,7 @@ Finder _icon(AppIconSpec spec) => find.byWidgetPredicate(
 Widget _host(Widget child, {Size size = const Size(1400, 900)}) => MediaQuery(
   data: MediaQueryData(size: size),
   child: MaterialApp(
-    theme: AppTheme.light(AppDensity.comfortable),
+    theme: AppTheme.light(),
     home: Scaffold(
       body: Row(
         children: [

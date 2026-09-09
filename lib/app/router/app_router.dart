@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
@@ -6,37 +8,44 @@ import 'package:khulla/core/config/app_config.dart';
 import 'package:khulla/core/di/injection.dart';
 import 'package:khulla/core/router/go_router_refresh_stream.dart';
 import 'package:khulla/core/router/routes.dart';
-import 'package:khulla/features/catalog/author/presentation/author_detail_page.dart';
-import 'package:khulla/features/catalog/author/presentation/author_list_page.dart';
-import 'package:khulla/features/catalog/catalog/presentation/catalog_page.dart';
 import 'package:khulla/features/catalog/copy/presentation/copy_list_page.dart';
-import 'package:khulla/features/catalog/copy/presentation/label_print_page.dart';
+import 'package:khulla/features/catalog/copy/presentation/cubit/copy_cubit.dart';
+import 'package:khulla/features/catalog/label/presentation/cubit/label_cubit.dart';
+import 'package:khulla/features/catalog/label/presentation/label_print_page.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_cubit.dart';
+import 'package:khulla/features/catalog/title/presentation/cubit/title/title_detail_cubit.dart';
 import 'package:khulla/features/catalog/title/presentation/title_detail_page.dart';
 import 'package:khulla/features/catalog/title/presentation/title_list_page.dart';
 import 'package:khulla/features/circulation/check_out/presentation/check_out_page.dart';
+import 'package:khulla/features/circulation/check_out/presentation/cubit/check_out_cubit.dart';
 import 'package:khulla/features/circulation/circulation/presentation/circulation_page.dart';
+import 'package:khulla/features/circulation/circulation/presentation/cubit/loan_list_cubit.dart';
+import 'package:khulla/features/circulation/fine/presentation/cubit/fine_list_cubit.dart';
 import 'package:khulla/features/circulation/fine/presentation/fine_list_page.dart';
+import 'package:khulla/features/circulation/reservation/presentation/cubit/reservation_list_cubit.dart';
 import 'package:khulla/features/circulation/reservation/presentation/reservation_list_page.dart';
+import 'package:khulla/features/circulation/return_copy/presentation/cubit/return_cubit.dart';
 import 'package:khulla/features/circulation/return_copy/presentation/return_page.dart';
 import 'package:khulla/features/dashboard/presentation/dashboard_page.dart';
+import 'package:khulla/features/members/presentation/cubit/member_cubit.dart';
+import 'package:khulla/features/members/presentation/cubit/member_detail_cubit.dart';
 import 'package:khulla/features/members/presentation/pages/member_detail_page.dart';
 import 'package:khulla/features/members/presentation/pages/member_list_page.dart';
-import 'package:khulla/features/opac/presentation/opac_page.dart';
-import 'package:khulla/features/reports/presentation/reports_page.dart';
+import 'package:khulla/features/settings/presentation/cubit/library_profile_cubit.dart';
+import 'package:khulla/features/settings/presentation/cubit/loan_rules_cubit.dart';
 import 'package:khulla/features/settings/presentation/pages/appearance_page.dart';
 import 'package:khulla/features/settings/presentation/pages/backup_page.dart';
 import 'package:khulla/features/settings/presentation/pages/library_profile_page.dart';
 import 'package:khulla/features/settings/presentation/pages/loan_rules_page.dart';
-import 'package:khulla/features/settings/presentation/pages/settings_page.dart';
 import 'package:khulla/features/settings/presentation/pages/sync_page.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_state.dart';
 import 'package:khulla/features/staff_auth/presentation/onboarding/cubit/onboarding_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/onboarding/onboarding_page.dart';
+import 'package:khulla/features/staff_auth/presentation/recover_password/cubit/recover_password_cubit.dart';
+import 'package:khulla/features/staff_auth/presentation/recover_password/recover_password_page.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/cubit/sign_in_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/sign_in_page.dart';
-import 'package:khulla/features/users/presentation/pages/role_list_page.dart';
-import 'package:khulla/features/users/presentation/pages/user_list_page.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Owns the single [GoRouter] instance.
@@ -65,7 +74,7 @@ class AppRouter {
   AppRouter(this._config, this._auth) {
     router = GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: Routes.dashboard,
+      initialLocation: Routes.catalogTitles,
       refreshListenable: GoRouterRefreshStream(_auth.stream),
       redirect: _redirect,
       routes: [
@@ -81,8 +90,20 @@ class AppRouter {
           path: Routes.signIn,
           parentNavigatorKey: _rootNavigatorKey,
           builder: (context, _) => BlocProvider<SignInCubit>(
-            create: (_) => getIt<SignInCubit>(),
+            create: (_) {
+              final cubit = getIt<SignInCubit>();
+              unawaited(cubit.loadRecoveryAvailability());
+              return cubit;
+            },
             child: const SignInPage(),
+          ),
+        ),
+        GoRoute(
+          path: Routes.recoverPassword,
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (context, _) => BlocProvider<RecoverPasswordCubit>(
+            create: (_) => getIt<RecoverPasswordCubit>(),
+            child: const RecoverPasswordPage(),
           ),
         ),
         GoRoute(
@@ -105,80 +126,57 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: Routes.catalog,
-                  builder: (context, _) => const CatalogPage(),
+                  redirect: (_, state) => state.uri.path == Routes.catalog
+                      ? Routes.catalogTitles
+                      : null,
                   routes: [
                     GoRoute(
                       path: Routes.titlesSegment,
-                      builder: (context, _) => const TitleListPage(),
+                      builder: (context, _) => BlocProvider<TitleCubit>(
+                        create: (_) {
+                          final cubit = getIt<TitleCubit>();
+                          unawaited(cubit.loadTitles());
+                          return cubit;
+                        },
+                        child: const TitleListPage(),
+                      ),
                       routes: [
                         GoRoute(
                           path: Routes.idSegment,
-                          builder: (context, state) => TitleDetailPage(
-                            titleId: state.pathParameters['id'] ?? '',
-                          ),
+                          builder: (context, state) {
+                            final id = state.pathParameters['id'] ?? '';
+                            return BlocProvider<TitleDetailCubit>(
+                              create: (_) {
+                                final cubit = getIt<TitleDetailCubit>();
+                                unawaited(cubit.loadTitle(id));
+                                return cubit;
+                              },
+                              child: TitleDetailPage(titleId: id),
+                            );
+                          },
                         ),
                       ],
                     ),
                     GoRoute(
                       path: Routes.copiesSegment,
-                      builder: (context, _) => const CopyListPage(),
+                      builder: (context, _) => BlocProvider<CopyCubit>(
+                        create: (_) {
+                          final cubit = getIt<CopyCubit>();
+                          unawaited(cubit.loadCopies());
+                          return cubit;
+                        },
+                        child: const CopyListPage(),
+                      ),
                     ),
                     GoRoute(
                       path: Routes.labelsSegment,
-                      builder: (context, _) => const LabelPrintPage(),
-                    ),
-                    GoRoute(
-                      path: Routes.authorsSegment,
-                      builder: (context, _) => const AuthorListPage(),
-                      routes: [
-                        GoRoute(
-                          path: Routes.idSegment,
-                          builder: (context, state) => AuthorDetailPage(
-                            authorId: state.pathParameters['id'] ?? '',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: Routes.circulation,
-                  builder: (context, _) => const CirculationPage(),
-                  routes: [
-                    GoRoute(
-                      path: Routes.checkOutSegment,
-                      builder: (context, _) => const CheckOutPage(),
-                    ),
-                    GoRoute(
-                      path: Routes.returnsSegment,
-                      builder: (context, _) => const ReturnPage(),
-                    ),
-                    GoRoute(
-                      path: Routes.reservationsSegment,
-                      builder: (context, _) => const ReservationListPage(),
-                    ),
-                    GoRoute(
-                      path: Routes.finesSegment,
-                      builder: (context, _) => const FineListPage(),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: Routes.members,
-                  builder: (context, _) => const MemberListPage(),
-                  routes: [
-                    GoRoute(
-                      path: Routes.idSegment,
-                      builder: (context, state) => MemberDetailPage(
-                        memberId: state.pathParameters['id'] ?? '',
+                      builder: (context, _) => BlocProvider<LabelCubit>(
+                        create: (_) {
+                          final cubit = getIt<LabelCubit>();
+                          unawaited(cubit.loadLabelDesk());
+                          return cubit;
+                        },
+                        child: const LabelPrintPage(),
                       ),
                     ),
                   ],
@@ -188,28 +186,67 @@ class AppRouter {
             StatefulShellBranch(
               routes: [
                 GoRoute(
-                  path: Routes.opac,
-                  builder: (context, _) => const OpacPage(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: Routes.reports,
-                  builder: (context, _) => const ReportsPage(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: Routes.users,
-                  builder: (context, _) => const UserListPage(),
+                  path: Routes.circulation,
+                  redirect: (_, state) => state.uri.path == Routes.circulation
+                      ? Routes.circulationLoans
+                      : null,
                   routes: [
                     GoRoute(
-                      path: Routes.rolesSegment,
-                      builder: (context, _) => const RoleListPage(),
+                      path: Routes.loansSegment,
+                      builder: (context, _) => BlocProvider<LoanListCubit>(
+                        create: (_) {
+                          final cubit = getIt<LoanListCubit>();
+                          unawaited(cubit.loadOpenLoans());
+                          return cubit;
+                        },
+                        child: const CirculationPage(),
+                      ),
+                    ),
+                    GoRoute(
+                      path: Routes.checkOutSegment,
+                      builder: (context, state) {
+                        final card = state.uri.queryParameters['card'];
+                        return BlocProvider<CheckOutCubit>(
+                          create: (_) {
+                            final cubit = getIt<CheckOutCubit>();
+                            if (card != null && card.isNotEmpty) {
+                              unawaited(cubit.lookupMember(card));
+                            }
+                            return cubit;
+                          },
+                          child: const CheckOutPage(),
+                        );
+                      },
+                    ),
+                    GoRoute(
+                      path: Routes.returnsSegment,
+                      builder: (context, _) => BlocProvider<ReturnCubit>(
+                        create: (_) => getIt<ReturnCubit>(),
+                        child: const ReturnPage(),
+                      ),
+                    ),
+                    GoRoute(
+                      path: Routes.reservationsSegment,
+                      builder: (context, _) =>
+                          BlocProvider<ReservationListCubit>(
+                            create: (_) {
+                              final cubit = getIt<ReservationListCubit>();
+                              unawaited(cubit.loadReservations());
+                              return cubit;
+                            },
+                            child: const ReservationListPage(),
+                          ),
+                    ),
+                    GoRoute(
+                      path: Routes.finesSegment,
+                      builder: (context, _) => BlocProvider<FineListCubit>(
+                        create: (_) {
+                          final cubit = getIt<FineListCubit>();
+                          unawaited(cubit.loadFines());
+                          return cubit;
+                        },
+                        child: const FineListPage(),
+                      ),
                     ),
                   ],
                 ),
@@ -218,17 +255,94 @@ class AppRouter {
             StatefulShellBranch(
               routes: [
                 GoRoute(
+                  path: Routes.members,
+                  builder: (context, _) => BlocProvider<MemberCubit>(
+                    create: (_) {
+                      final cubit = getIt<MemberCubit>();
+                      unawaited(cubit.loadMembers());
+                      return cubit;
+                    },
+                    child: const MemberListPage(),
+                  ),
+                  routes: [
+                    GoRoute(
+                      path: Routes.idSegment,
+                      builder: (context, state) {
+                        final id = state.pathParameters['id'] ?? '';
+                        return BlocProvider<MemberDetailCubit>(
+                          create: (_) {
+                            final cubit = getIt<MemberDetailCubit>();
+                            unawaited(cubit.loadMember(id));
+                            return cubit;
+                          },
+                          child: MemberDetailPage(memberId: id),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            // StatefulShellBranch(
+            //   routes: [
+            //     GoRoute(
+            //       path: Routes.opac,
+            //       builder: (context, _) => const OpacPage(),
+            //     ),
+            //   ],
+            // ),
+            // StatefulShellBranch(
+            //   routes: [
+            //     GoRoute(
+            //       path: Routes.reports,
+            //       builder: (context, _) => const ReportsPage(),
+            //     ),
+            //   ],
+            // ),
+            // StatefulShellBranch(
+            //   routes: [
+            //     GoRoute(
+            //       path: Routes.users,
+            //       builder: (context, _) => const UserListPage(),
+            //       routes: [
+            //         GoRoute(
+            //           path: Routes.rolesSegment,
+            //           builder: (context, _) => const RoleListPage(),
+            //         ),
+            //       ],
+            //     ),
+            //   ],
+            // ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
                   path: Routes.settings,
-                  builder: (context, _) =>
-                      SettingsPage(showDesignSystem: !_config.isProduction),
+                  redirect: (_, state) => state.uri.path == Routes.settings
+                      ? Routes.settingsLibrary
+                      : null,
                   routes: [
                     GoRoute(
                       path: Routes.librarySegment,
-                      builder: (context, _) => const LibraryProfilePage(),
+                      builder: (context, _) =>
+                          BlocProvider<LibraryProfileCubit>(
+                            create: (_) {
+                              final cubit = getIt<LibraryProfileCubit>();
+                              unawaited(cubit.loadProfile());
+                              return cubit;
+                            },
+                            child: const LibraryProfilePage(),
+                          ),
                     ),
                     GoRoute(
                       path: Routes.loanRulesSegment,
-                      builder: (context, _) => const LoanRulesPage(),
+                      builder: (context, _) => BlocProvider<LoanRulesCubit>(
+                        create: (_) {
+                          final cubit = getIt<LoanRulesCubit>();
+                          unawaited(cubit.loadRules());
+                          return cubit;
+                        },
+                        child: const LoanRulesPage(),
+                      ),
                     ),
                     GoRoute(
                       path: Routes.appearanceSegment,
@@ -283,7 +397,10 @@ class AppRouter {
       AuthStatus.unknown => null,
       AuthStatus.needsSetup =>
         location == Routes.onboarding ? null : Routes.onboarding,
-      AuthStatus.signedOut => location == Routes.signIn ? null : Routes.signIn,
+      AuthStatus.signedOut =>
+        location == Routes.signIn || location == Routes.recoverPassword
+            ? null
+            : Routes.signIn,
       AuthStatus.signedIn =>
         Routes.isAuthLocation(location) ? Routes.dashboard : null,
     };

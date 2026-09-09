@@ -171,7 +171,6 @@ class _SyncPageState extends State<SyncPage> {
                         )
                       : AppTable<SyncSnapshot>(
                           items: placeholderSnapshots,
-                          rowHeight: 48,
                           columns: [
                             AppTableColumn<SyncSnapshot>(
                               id: 'when',

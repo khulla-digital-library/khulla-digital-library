@@ -55,59 +55,62 @@ class AppEmptyView extends StatelessWidget {
     final label = actionLabel;
     final action = onAction;
 
-    return Padding(
-      padding:
-          padding ??
-          (isCentered
-              ? EdgeInsets.symmetric(
-                  horizontal: spacing.page,
-                  vertical: spacing.emptyStateVertical,
-                )
-              : EdgeInsets.zero),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: isCentered
-            ? CrossAxisAlignment.center
-            : CrossAxisAlignment.start,
-        children: [
-          if (isCentered && glyph != null) ...[
-            AppIcon(
-              glyph,
-              size: spacing.xxlg,
-              color: context.appColors.hairlineStrong,
-            ),
-            SizedBox(height: spacing.lg),
-          ],
-          Text(
-            title,
-            textAlign: isCentered ? TextAlign.center : TextAlign.start,
-            style: isCentered
-                ? context.appTextStyles.title.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: scheme.onSurface,
+    return wrapFeedbackVariant(
+      variant: variant,
+      child: Padding(
+        padding:
+            padding ??
+            (isCentered
+                ? EdgeInsets.symmetric(
+                    horizontal: spacing.page,
+                    vertical: spacing.emptyStateVertical,
                   )
-                : context.appTextStyles.sectionTitle.copyWith(
-                    color: scheme.onSurface,
-                  ),
-          ),
-          SizedBox(height: spacing.xs),
-          Text(
-            message,
-            textAlign: isCentered ? TextAlign.center : TextAlign.start,
-            style: context.appTextStyles.body.copyWith(
-              color: context.appColors.mutedForeground,
+                : EdgeInsets.zero),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: isCentered
+              ? CrossAxisAlignment.center
+              : CrossAxisAlignment.start,
+          children: [
+            if (isCentered && glyph != null) ...[
+              AppIcon(
+                glyph,
+                size: spacing.xxlg,
+                color: context.appColors.hairlineStrong,
+              ),
+              SizedBox(height: spacing.lg),
+            ],
+            Text(
+              title,
+              textAlign: isCentered ? TextAlign.center : TextAlign.start,
+              style: isCentered
+                  ? context.appTextStyles.title.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: scheme.onSurface,
+                    )
+                  : context.appTextStyles.sectionTitle.copyWith(
+                      color: scheme.onSurface,
+                    ),
             ),
-          ),
-          if (label != null && action != null) ...[
-            SizedBox(height: isCentered ? spacing.lg : spacing.sm),
-            AppButton(
-              size: isCentered ? AppButtonSize.medium : AppButtonSize.small,
-              icon: AppIcons.add,
-              onPressed: action,
-              child: Text(label),
+            SizedBox(height: spacing.xs),
+            Text(
+              message,
+              textAlign: isCentered ? TextAlign.center : TextAlign.start,
+              style: context.appTextStyles.body.copyWith(
+                color: context.appColors.mutedForeground,
+              ),
             ),
+            if (label != null && action != null) ...[
+              SizedBox(height: isCentered ? spacing.lg : spacing.sm),
+              AppButton(
+                size: isCentered ? AppButtonSize.medium : AppButtonSize.small,
+                icon: AppIcons.add,
+                onPressed: action,
+                child: Text(label),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

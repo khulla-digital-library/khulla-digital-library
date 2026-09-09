@@ -17,11 +17,11 @@ import 'package:khulla_ui/src/theme/app_palette.dart';
 /// (replaced by a padding nudge — see `AppTextField`).
 abstract final class AppTheme {
   /// The light theme at [density]. This is the shipped theme.
-  static ThemeData light([AppDensity density = AppDensity.compact]) =>
+  static ThemeData light([AppDensity density = AppDensity.comfortable]) =>
       _themeFrom(Brightness.light, density);
 
   /// The dark theme at [density].
-  static ThemeData dark([AppDensity density = AppDensity.compact]) =>
+  static ThemeData dark([AppDensity density = AppDensity.comfortable]) =>
       _themeFrom(Brightness.dark, density);
 
   static ThemeData _themeFrom(Brightness brightness, AppDensity density) {

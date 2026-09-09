@@ -1,8 +1,5 @@
 import 'package:khulla/core/money/money.dart';
-import 'package:khulla/features/catalog/shared/domain/catalog_format.dart';
-import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
-import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_author.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_copy.dart';
 import 'package:khulla/features/catalog/shared/presentation/placeholder/catalog_title.dart';
 
@@ -24,7 +21,7 @@ final List<CatalogTitle> placeholderTitles = [
     isbn: '978-9937-2-1234-5',
     publisher: 'Nepalaya',
     year: '2005',
-    format: CatalogFormat.book,
+    formatCode: 'book',
     shelf: 'NEP 891.5',
     copies: 4,
     available: 2,
@@ -44,7 +41,7 @@ final List<CatalogTitle> placeholderTitles = [
     isbn: '978-0-385-47454-2',
     publisher: 'Anchor Books',
     year: '1958',
-    format: CatalogFormat.book,
+    formatCode: 'book',
     shelf: 'FIC ACH',
     copies: 3,
     available: 0,
@@ -65,7 +62,7 @@ final List<CatalogTitle> placeholderTitles = [
     isbn: '978-0-262-04630-5',
     publisher: 'MIT Press',
     year: '2022',
-    format: CatalogFormat.book,
+    formatCode: 'book',
     shelf: 'CS 005.1',
     copies: 6,
     available: 5,
@@ -85,7 +82,7 @@ final List<CatalogTitle> placeholderTitles = [
     isbn: '0018-1439',
     publisher: 'Himalayan Club',
     year: '2024',
-    format: CatalogFormat.journal,
+    formatCode: 'journal',
     shelf: 'PER 796.5',
     copies: 2,
     available: 2,
@@ -103,7 +100,7 @@ final List<CatalogTitle> placeholderTitles = [
     isbn: '978-0-06-231609-7',
     publisher: 'Harper',
     year: '2015',
-    format: CatalogFormat.book,
+    formatCode: 'book',
     shelf: 'HIS 909',
     copies: 5,
     available: 1,
@@ -119,7 +116,7 @@ final List<CatalogTitle> placeholderTitles = [
     isbn: '978-9937-8-5566-1',
     publisher: 'Sajha Prakashan',
     year: '1936',
-    format: CatalogFormat.book,
+    formatCode: 'book',
     shelf: 'NEP 891.4',
     copies: 8,
     available: 6,
@@ -136,7 +133,7 @@ final List<CatalogTitle> placeholderTitles = [
     isbn: '2091-0091',
     publisher: 'Kantipur',
     year: '2023',
-    format: CatalogFormat.magazine,
+    formatCode: 'magazine',
     shelf: 'PER 070',
     copies: 1,
     available: 0,
@@ -152,7 +149,7 @@ final List<CatalogTitle> placeholderTitles = [
     isbn: 'DVD-0091',
     publisher: 'Discovery',
     year: '2007',
-    format: CatalogFormat.video,
+    formatCode: 'video',
     shelf: 'AV 796.522',
     copies: 2,
     available: 1,
@@ -167,7 +164,7 @@ final List<CatalogTitle> placeholderTitles = [
     isbn: '978-0-553-38016-3',
     publisher: 'Bantam',
     year: '1998',
-    format: CatalogFormat.book,
+    formatCode: 'book',
     shelf: 'SCI 523.1',
     copies: 3,
     available: 2,
@@ -184,7 +181,7 @@ final List<CatalogTitle> placeholderTitles = [
     isbn: '978-9937-0-0111-2',
     publisher: 'Ratna Pustak',
     year: '2019',
-    format: CatalogFormat.audio,
+    formatCode: 'audiobook',
     shelf: 'LAN 491.49',
     copies: 4,
     available: 4,
@@ -203,7 +200,6 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-1',
     titleName: 'Palpasa Café',
     shelf: 'NEP 891.5',
-    condition: CopyCondition.good,
     status: CopyStatus.available,
     acquired: '12 Mar 2024',
   ),
@@ -213,7 +209,6 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-1',
     titleName: 'Palpasa Café',
     shelf: 'NEP 891.5',
-    condition: CopyCondition.fair,
     status: CopyStatus.onLoan,
     acquired: '12 Mar 2024',
     borrower: 'Anita Rai',
@@ -225,8 +220,7 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-1',
     titleName: 'Palpasa Café',
     shelf: 'NEP 891.5',
-    condition: CopyCondition.good,
-    status: CopyStatus.overdue,
+    status: CopyStatus.onLoan,
     acquired: '12 Mar 2024',
     borrower: 'Bikash Thapa',
     dueDate: '18 Aug 2026',
@@ -237,7 +231,6 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-1',
     titleName: 'Palpasa Café',
     shelf: 'NEP 891.5',
-    condition: CopyCondition.asNew,
     status: CopyStatus.reserved,
     acquired: '20 Jul 2025',
   ),
@@ -247,7 +240,6 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-2',
     titleName: 'Things Fall Apart',
     shelf: 'FIC ACH',
-    condition: CopyCondition.poor,
     status: CopyStatus.damaged,
     acquired: '02 Feb 2024',
   ),
@@ -257,7 +249,6 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-2',
     titleName: 'Things Fall Apart',
     shelf: 'FIC ACH',
-    condition: CopyCondition.good,
     status: CopyStatus.onLoan,
     acquired: '02 Feb 2024',
     borrower: 'Sunita Gurung',
@@ -269,7 +260,6 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-2',
     titleName: 'Things Fall Apart',
     shelf: 'FIC ACH',
-    condition: CopyCondition.good,
     status: CopyStatus.lost,
     acquired: '02 Feb 2024',
     borrower: 'Ramesh Shrestha',
@@ -280,7 +270,6 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-3',
     titleName: 'Introduction to Algorithms',
     shelf: 'CS 005.1',
-    condition: CopyCondition.asNew,
     status: CopyStatus.available,
     acquired: '18 Jan 2025',
   ),
@@ -290,7 +279,6 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-3',
     titleName: 'Introduction to Algorithms',
     shelf: 'CS 005.1',
-    condition: CopyCondition.asNew,
     status: CopyStatus.onLoan,
     acquired: '18 Jan 2025',
     borrower: 'Prakash Adhikari',
@@ -302,7 +290,6 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-5',
     titleName: 'Sapiens',
     shelf: 'HIS 909',
-    condition: CopyCondition.good,
     status: CopyStatus.available,
     acquired: '21 Sep 2024',
   ),
@@ -312,8 +299,7 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-5',
     titleName: 'Sapiens',
     shelf: 'HIS 909',
-    condition: CopyCondition.fair,
-    status: CopyStatus.overdue,
+    status: CopyStatus.onLoan,
     acquired: '21 Sep 2024',
     borrower: 'Nisha Karki',
     dueDate: '25 Aug 2026',
@@ -324,69 +310,8 @@ const List<CatalogCopy> placeholderCopies = [
     titleId: 't-8',
     titleName: 'Everest: Beyond the Limit',
     shelf: 'AV 796.522',
-    condition: CopyCondition.good,
-    status: CopyStatus.withdrawn,
+    status: CopyStatus.available,
     acquired: '19 Jun 2024',
-  ),
-];
-
-/// The authors credited across [placeholderTitles].
-const List<CatalogAuthor> placeholderAuthors = [
-  CatalogAuthor(
-    id: 'a-1',
-    name: 'Narayan Wagle',
-    titleCount: 3,
-    lifespan: 'b. 1968',
-    nationality: 'Nepali',
-    biography:
-        'Journalist and novelist, long-time editor of a Kathmandu daily, whose '
-        'first novel became one of the best-selling Nepali books of its decade.',
-  ),
-  CatalogAuthor(
-    id: 'a-2',
-    name: 'Chinua Achebe',
-    titleCount: 5,
-    lifespan: '1930 – 2013',
-    nationality: 'Nigerian',
-    biography:
-        'Novelist, poet and critic, whose first novel is among the most widely '
-        'read works of African literature.',
-  ),
-  CatalogAuthor(
-    id: 'a-3',
-    name: 'Laxmi Prasad Devkota',
-    titleCount: 12,
-    lifespan: '1909 – 1959',
-    nationality: 'Nepali',
-    biography:
-        'Poet, essayist and playwright, known in Nepal as Mahakavi — the great '
-        'poet — for a body of work written largely in the last decade of his life.',
-  ),
-  CatalogAuthor(
-    id: 'a-4',
-    name: 'Thomas H. Cormen',
-    titleCount: 2,
-    lifespan: 'b. 1956',
-    nationality: 'American',
-    biography:
-        'Computer scientist and co-author of a standard algorithms text.',
-  ),
-  CatalogAuthor(
-    id: 'a-5',
-    name: 'Yuval Noah Harari',
-    titleCount: 4,
-    lifespan: 'b. 1976',
-    nationality: 'Israeli',
-  ),
-  CatalogAuthor(
-    id: 'a-6',
-    name: 'Stephen Hawking',
-    titleCount: 6,
-    lifespan: '1942 – 2018',
-    nationality: 'British',
-    biography:
-        'Theoretical physicist and cosmologist whose popular science writing '
-        'reached an audience far beyond the field.',
   ),
 ];
 
@@ -402,10 +327,4 @@ List<CatalogCopy> placeholderCopiesOf(String titleId) => [
 CatalogTitle placeholderTitleById(String id) => placeholderTitles.firstWhere(
   (title) => title.id == id,
   orElse: () => placeholderTitles.first,
-);
-
-/// The author behind an id, with the same fallback as [placeholderTitleById].
-CatalogAuthor placeholderAuthorById(String id) => placeholderAuthors.firstWhere(
-  (author) => author.id == id,
-  orElse: () => placeholderAuthors.first,
 );

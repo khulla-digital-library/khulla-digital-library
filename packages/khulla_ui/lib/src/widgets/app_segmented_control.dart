@@ -23,6 +23,7 @@ class AppSegmentedControl<T> extends StatelessWidget {
     required this.onChanged,
     this.itemIcon,
     this.showSelectedIcon = false,
+    this.expand = false,
     super.key,
   });
 
@@ -45,6 +46,10 @@ class AppSegmentedControl<T> extends StatelessWidget {
   /// fill already says which one is active, and the tick costs width.
   final bool showSelectedIcon;
 
+  /// Whether each segment shares the track width equally. Use in a form column
+  /// so the control lines up with a neighbouring field.
+  final bool expand;
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
@@ -59,16 +64,28 @@ class AppSegmentedControl<T> extends StatelessWidget {
         border: Border.all(color: colors.hairline),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
         children: [
           for (final item in items)
-            _Segment(
-              label: itemLabel(item),
-              icon: itemIcon?.call(item),
-              selected: item == value,
-              showSelectedIcon: showSelectedIcon,
-              onTap: () => onChanged(item),
-            ),
+            if (expand)
+              Expanded(
+                child: _Segment(
+                  label: itemLabel(item),
+                  icon: itemIcon?.call(item),
+                  selected: item == value,
+                  showSelectedIcon: showSelectedIcon,
+                  expand: true,
+                  onTap: () => onChanged(item),
+                ),
+              )
+            else
+              _Segment(
+                label: itemLabel(item),
+                icon: itemIcon?.call(item),
+                selected: item == value,
+                showSelectedIcon: showSelectedIcon,
+                onTap: () => onChanged(item),
+              ),
         ],
       ),
     );
@@ -82,12 +99,14 @@ class _Segment extends StatelessWidget {
     required this.selected,
     required this.showSelectedIcon,
     required this.onTap,
+    this.expand = false,
   });
 
   final String label;
   final AppIconSpec? icon;
   final bool selected;
   final bool showSelectedIcon;
+  final bool expand;
   final VoidCallback onTap;
 
   @override
@@ -116,6 +135,9 @@ class _Segment extends StatelessWidget {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: expand
+              ? MainAxisAlignment.center
+              : MainAxisAlignment.start,
           children: [
             if (glyph != null) ...[
               AppIcon(

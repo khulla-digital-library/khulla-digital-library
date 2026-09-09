@@ -61,30 +61,15 @@ class ShellBrandMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final colors = context.appColors;
-    final metrics = context.appMetrics;
     final l10n = context.l10n;
 
     if (!extended) {
       return Tooltip(
         message: l10n.appName,
-        child: AppLogo.submark(size: spacing.xlg),
+        child: AppLogo.submark(size: spacing.lg),
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AppLogo.primary(height: spacing.xlg),
-        SizedBox(height: spacing.xxs),
-        Text(
-          l10n.appTagline,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: context.appTextStyles.micro.copyWith(color: colors.ink500),
-        ),
-      ],
-    );
+    return AppLogo.primaryFull(height: spacing.xlg + spacing.md);
   }
 }

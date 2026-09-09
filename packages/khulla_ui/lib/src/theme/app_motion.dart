@@ -13,8 +13,10 @@ class AppMotion extends ThemeExtension<AppMotion> {
   /// {@macro app_motion}
   const AppMotion({
     this.color = const Duration(milliseconds: 150),
+    this.short = const Duration(milliseconds: 120),
     this.overlay = const Duration(milliseconds: 200),
     this.layout = const Duration(milliseconds: 300),
+    this.long = const Duration(milliseconds: 320),
     this.sheetOpen = const Duration(milliseconds: 500),
     this.sheetClose = const Duration(milliseconds: 300),
     this.ripple = const Duration(milliseconds: 600),
@@ -27,12 +29,20 @@ class AppMotion extends ThemeExtension<AppMotion> {
   /// A hover, a selection, a tint swap.
   final Duration color;
 
+  /// Direct manipulation — a press, a drag, a value ticking under the finger.
+  final Duration short;
+
   /// A menu, popover or dialog appearing.
   final Duration overlay;
 
   /// Anything that changes size or position: a rail expanding, a field's
   /// focus nudge, an accordion.
   final Duration layout;
+
+  /// Substituting one piece of content for another — a count sliding, a
+  /// total swapping. Slightly longer than [layout] so the incoming glyph
+  /// can settle.
+  final Duration long;
 
   /// A side sheet sliding in. The one deliberately slow move in the app.
   final Duration sheetOpen;
@@ -68,8 +78,10 @@ class AppMotion extends ThemeExtension<AppMotion> {
   @override
   AppMotion copyWith({
     Duration? color,
+    Duration? short,
     Duration? overlay,
     Duration? layout,
+    Duration? long,
     Duration? sheetOpen,
     Duration? sheetClose,
     Duration? ripple,
@@ -80,8 +92,10 @@ class AppMotion extends ThemeExtension<AppMotion> {
   }) {
     return AppMotion(
       color: color ?? this.color,
+      short: short ?? this.short,
       overlay: overlay ?? this.overlay,
       layout: layout ?? this.layout,
+      long: long ?? this.long,
       sheetOpen: sheetOpen ?? this.sheetOpen,
       sheetClose: sheetClose ?? this.sheetClose,
       ripple: ripple ?? this.ripple,

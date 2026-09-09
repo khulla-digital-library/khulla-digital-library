@@ -10,23 +10,25 @@ import 'package:khulla/core/money/currency.dart';
 
 part 'onboarding_state.freezed.dart';
 
-/// The two things first-run setup has to ask for.
+/// What first-run setup has to ask for, in order.
 ///
-/// Two, and no more: a branch, an address, opening hours and loan rules all
-/// have defaults a library can live with on day one, and every one of them
-/// added here is a screen between someone downloading Khulla and cataloguing
-/// their first book. They are edited later under Settings.
+/// Library details and the administrator, then the recovery codes that are
+/// the only way back in if that administrator forgets the password. Branch,
+/// opening hours and loan rules have defaults and are edited under Settings.
 enum OnboardingStep {
   /// What the library is called, and what it charges in.
   library,
 
   /// The administrator account that will run it.
-  account;
+  account,
+
+  /// One-time codes to reset the administrator password offline.
+  recovery;
 
   bool get isFirst => this == OnboardingStep.library;
-  bool get isLast => this == OnboardingStep.account;
+  bool get isLast => this == OnboardingStep.recovery;
 
-  /// One-based position, for "Step 1 of 2".
+  /// One-based position, for "Step 1 of 3".
   int get position => index + 1;
 }
 
@@ -40,6 +42,8 @@ abstract class OnboardingState with _$OnboardingState {
     @Default(Email.pure()) Email email,
     @Default(Password.pure()) Password password,
     @Default(ConfirmedPassword.pure()) ConfirmedPassword confirmPassword,
+    @Default(<String>[]) List<String> recoveryCodes,
+    @Default(false) bool codesSaved,
     @Default(FormzSubmissionStatus.initial) FormzSubmissionStatus status,
 
     /// Set when the address is already held by an account. On a fresh
@@ -51,7 +55,7 @@ abstract class OnboardingState with _$OnboardingState {
   const OnboardingState._();
 
   /// How many steps the wizard has. Read by the progress line so adding a
-  /// step does not mean editing a hard-coded "of 2".
+  /// step does not mean editing a hard-coded "of 3".
   static int get stepCount => OnboardingStep.values.length;
 
   bool get isLibraryStepValid => libraryName.isValid;
@@ -60,7 +64,11 @@ abstract class OnboardingState with _$OnboardingState {
       Formz.validate([adminName, email, password, confirmPassword]);
 
   /// Whether the button at the foot of the current step is enabled.
-  bool get canAdvance => step.isFirst ? isLibraryStepValid : isAccountStepValid;
+  bool get canAdvance => switch (step) {
+    OnboardingStep.library => isLibraryStepValid,
+    OnboardingStep.account => isAccountStepValid,
+    OnboardingStep.recovery => codesSaved && recoveryCodes.isNotEmpty,
+  };
 
   bool get isSubmitting => status.isInProgress;
 }

@@ -7,8 +7,6 @@ enum CopyStatus {
   available,
   onLoan,
   reserved,
-  overdue,
   lost,
   damaged,
-  withdrawn,
 }

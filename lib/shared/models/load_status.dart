@@ -21,4 +21,14 @@ extension LoadStatusX on LoadStatus {
 
   /// True once a read has completed successfully.
   bool get isLoaded => this == LoadStatus.loaded;
+
+  /// Status to emit when a filtered collection starts a fetch.
+  ///
+  /// Keeps [loaded] during refetches so the table does not flash to a spinner
+  /// when search, filters, sort or page change. Only the first fetch and a
+  /// retry after failure move to [loading].
+  LoadStatus forCollectionFetch() => switch (this) {
+    LoadStatus.initial || LoadStatus.failure => LoadStatus.loading,
+    LoadStatus.loading || LoadStatus.loaded => this,
+  };
 }

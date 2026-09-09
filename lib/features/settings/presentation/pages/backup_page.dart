@@ -24,7 +24,6 @@ class BackupPage extends StatelessWidget {
       message: l10n.settingsBackupEraseBody,
       confirmLabel: l10n.settingsBackupEraseAction,
       cancelLabel: l10n.commonCancel,
-      icon: AppIcons.warning,
     );
     if (!context.mounted || !confirmed) return;
     showNotWiredToast(context);
