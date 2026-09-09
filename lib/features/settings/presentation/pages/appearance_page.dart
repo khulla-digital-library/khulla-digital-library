@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:khulla/core/theme/app_language.dart';
 import 'package:khulla/core/theme/cubit/theme_cubit.dart';
 import 'package:khulla/core/theme/cubit/theme_state.dart';
 import 'package:khulla/features/settings/presentation/widgets/settings_brand_color_dialog.dart';
@@ -14,18 +15,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// [ThemeCubit] is an app-wide `@lazySingleton` with real storage behind it,
 /// so the choice made here survives a restart. It is a device setting, not a
 /// library one — nothing about it reaches the catalogue file.
-/// The language the interface is drawn in.
-enum AppLanguage { english, nepali }
-
-class AppearancePage extends StatefulWidget {
+class AppearancePage extends StatelessWidget {
   const AppearancePage({super.key});
-
-  @override
-  State<AppearancePage> createState() => _AppearancePageState();
-}
-
-class _AppearancePageState extends State<AppearancePage> {
-  AppLanguage _language = AppLanguage.english;
 
   String _label(AppLocalizations l10n, ThemeMode mode) => switch (mode) {
     ThemeMode.system => l10n.themeModeSystem,
@@ -39,7 +30,10 @@ class _AppearancePageState extends State<AppearancePage> {
     ThemeMode.dark => AppIcons.darkMode,
   };
 
-  Future<void> _pickCustomBrand(ThemeState appearance) async {
+  Future<void> _pickCustomBrand(
+    BuildContext context,
+    ThemeState appearance,
+  ) async {
     final cubit = context.read<ThemeCubit>();
     final picked = await SettingsBrandColorDialog.show(
       context,
@@ -114,28 +108,30 @@ class _AppearancePageState extends State<AppearancePage> {
                             context.read<ThemeCubit>().setBrandTheme(value),
                         customColor: appearance.customSeed,
                         customLabel: l10n.settingsAppearanceBrandCustom,
-                        onCustomTap: () => _pickCustomBrand(appearance),
+                        onCustomTap: () =>
+                            _pickCustomBrand(context, appearance),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: spacing.md),
+                  SectionCard(
+                    title: l10n.settingsAppearanceLanguage,
+                    subtitle: l10n.settingsAppearanceLanguageDescription,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: AppSegmentedControl<AppLanguage>(
+                        value: appearance.language,
+                        items: AppLanguage.values,
+                        itemLabel: (value) => switch (value) {
+                          AppLanguage.english => l10n.settingsLanguageEnglish,
+                          AppLanguage.nepali => l10n.settingsLanguageNepali,
+                        },
+                        onChanged: (value) =>
+                            context.read<ThemeCubit>().setLanguage(value),
                       ),
                     ),
                   ),
                 ],
-              ),
-            ),
-            SizedBox(height: spacing.md),
-            SectionCard(
-              title: l10n.settingsAppearanceLanguage,
-              subtitle: l10n.settingsAppearanceLanguageDescription,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: AppSegmentedControl<AppLanguage>(
-                  value: _language,
-                  items: AppLanguage.values,
-                  itemLabel: (value) => switch (value) {
-                    AppLanguage.english => l10n.settingsLanguageEnglish,
-                    AppLanguage.nepali => l10n.settingsLanguageNepali,
-                  },
-                  onChanged: (value) => setState(() => _language = value),
-                ),
               ),
             ),
           ],

@@ -1,0 +1,1194 @@
+{
+  "@@locale": "ne",
+  "appName": "Khulla Digital Library",
+  "@appName": {
+    "description": "मुख्य - अनुप्रयोगको प्रदर्शन नाम"
+  },
+  "navDashboard": "ड्यासबोर्ड",
+  "navCatalog": "क्याटलग",
+  "navCirculation": "पुस्तक लेनदेन",
+  "navMembers": "सदस्यहरू",
+  "navSettings": "सेटिङहरू",
+  "@navSettings": {
+    "description": "नेभिगेसन - मुख्य गन्तव्यका नामहरू"
+  },
+  "commonRetry": "पुनः प्रयास गर्नुहोस्",
+  "commonCancel": "रद्द गर्नुहोस्",
+  "commonSave": "सुरक्षित गर्नुहोस्",
+  "commonDelete": "मेट्नुहोस्",
+  "commonArchive": "अभिलेखीकरण गर्नुहोस्",
+  "commonClose": "बन्द गर्नुहोस्",
+  "commonClear": "खाली गर्नुहोस्",
+  "commonClearSearch": "खोजी खाली गर्नुहोस्",
+  "commonMoreActions": "थप कार्यहरू",
+  "commonPreviousPage": "अघिल्लो पृष्ठ",
+  "commonNextPage": "अर्को पृष्ठ",
+  "@commonNextPage": {
+    "description": "साझा - सबै स्क्रिनमा पुनः प्रयोग हुने कार्यका नामहरू"
+  },
+  "themeModeSystem": "प्रणालीअनुसार",
+  "themeModeLight": "उज्यालो",
+  "themeModeDark": "गाढा",
+  "@themeModeDark": {
+    "description": "सेटिङहरू - देखावटका विकल्पहरू"
+  },
+  "dashboardCheckOut": "प्रतिलिपि जारी गर्नुहोस्",
+  "dashboardReturnCopy": "प्रतिलिपि फिर्ता गर्नुहोस्",
+  "dashboardStatOverdue": "म्याद नाघेको",
+  "dashboardStatFines": "बाँकी जरिवाना",
+  "@dashboardStatFines": {
+    "description": "ड्यासबोर्ड - तथ्याङ्क टायलका नामहरू"
+  },
+  "dashboardActivityTitle": "हालैका गतिविधि",
+  "dashboardActivitySubtitle": "पछिल्ला सात दिनका जारी र फिर्ता गतिविधिहरू",
+  "dashboardActivityEmptyTitle": "अहिलेसम्म कुनै गतिविधि छैन",
+  "dashboardActivityEmptyBody": "काउन्टरमा कर्मचारीले जारी वा फिर्ता अभिलेख गरेपछि गतिविधि यहाँ देखिन्छ।",
+  "@dashboardActivityEmptyBody": {
+    "description": "ड्यासबोर्ड - गतिविधि खण्डको खाली अवस्थाको विवरण"
+  },
+  "dashboardAttentionTitle": "ध्यान दिनुपर्ने",
+  "dashboardAttentionSubtitle": "म्याद नाघेका सापटी, भर्न बाँकी आरक्षण, हराएको भनेर रिपोर्ट गरिएका प्रतिलिपिहरू",
+  "dashboardAttentionEmptyTitle": "ध्यान दिनुपर्ने केही छैन",
+  "dashboardAttentionEmptyBody": "म्याद नाघेका सापटी र पूरा नभएका आरक्षणहरू यहाँ देखिन्छन्, ताकि काउन्टरले क्रमशः समाधान गर्न सकोस्।",
+  "@dashboardAttentionEmptyBody": {
+    "description": "ड्यासबोर्ड - ध्यान खण्डको खाली अवस्थाको विवरण"
+  },
+  "commonEdit": "सम्पादन गर्नुहोस्",
+  "commonAdd": "थप्नुहोस्",
+  "commonStatus": "स्थिति",
+  "commonActions": "कार्यहरू",
+  "commonDecrease": "एक घटाउनुहोस्",
+  "commonIncrease": "एक बढाउनुहोस्",
+  "commonClearFilters": "फिल्टरहरू खाली गर्नुहोस्",
+  "commonNotSet": "सेट गरिएको छैन",
+  "commonNoMatchesTitle": "मिल्दो परिणाम छैन",
+  "commonNoMatchesBody": "हालको खोजी वा फिल्टरसँग कुनै पनि कुरा मेल खाँदैन। सबै कुरा फेरि हेर्न फिल्टरहरू खाली गर्नुहोस्।",
+  "@commonNoMatchesBody": {
+    "description": "साझा - हरेक संग्रहअन्तर्गत देखाइने फिल्टर गरिएको खाली अवस्था"
+  },
+  "commonNotWiredYet": "यो संस्करणमा इन्टरफेस मात्र छ - यो कार्य अझै जोडिएको छैन।",
+  "@commonNotWiredYet": {
+    "description": "साझा - डाटा तह उपलब्ध नभएको कार्यका लागि देखाइने टोस्ट"
+  },
+  "statusAvailable": "उपलब्ध",
+  "statusOnLoan": "सापटीमा",
+  "statusReserved": "आरक्षित",
+  "statusOverdue": "म्याद नाघेको",
+  "statusDueToday": "आज फिर्ता गर्नुपर्ने",
+  "statusLost": "हराएको",
+  "statusDamaged": "क्षतिग्रस्त",
+  "statusReturned": "फिर्ता गरिएको",
+  "@statusReturned": {
+    "description": "डोमेन - प्रतिलिपि, सापटी र आरक्षणमा साझा हुने अवस्थाहरू"
+  },
+  "conditionNew": "नयाँ",
+  "conditionGood": "राम्रो",
+  "conditionFair": "ठीकठाक",
+  "conditionPoor": "खराब",
+  "@conditionPoor": {
+    "description": "डोमेन - प्रतिलिपिको भौतिक अवस्था"
+  },
+  "formatBook": "पुस्तक",
+  "formatJournal": "जर्नल",
+  "formatMagazine": "पत्रिका",
+  "formatAudio": "अडियोबुक",
+  "formatVideo": "भिडियो",
+  "formatDigital": "ई-पुस्तक",
+  "formatOther": "अन्य",
+  "titlesSubtitle": "{count} कृतिहरू क्याटलग गरिएको",
+  "@titlesSubtitle": {
+    "description": "क्याटलग - शीर्षकअन्तर्गत देखाइने संख्या",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "1,204"
+      }
+    }
+  },
+  "titlesSearchHint": "शीर्षक, लेखक, ISBN खोज्नुहोस्",
+  "titlesAdd": "शीर्षक थप्नुहोस्",
+  "titlesManageFormats": "शीर्षकका ढाँचाहरू व्यवस्थापन गर्नुहोस्",
+  "titlesManageFormatsBody": "ढाँचाहरू शीर्षक फाराममा र यस सूचीका फिल्टरहरूमा देखिन्छन्।",
+  "titlesFormatEditHeading": "ढाँचा सम्पादन गर्नुहोस्",
+  "titlesFormatDeleteTitle": "यो ढाँचा मेट्ने?",
+  "titlesFormatDeleteBody": "यो नयाँ चयन सूचीबाट हट्नेछ। यसलाई पहिले नै प्रयोग गरेका शीर्षकहरूमा भने यो कायम रहनेछ।",
+  "titlesFormatLastBody": "नयाँ शीर्षकले एउटा ढाँचा चयन गर्न सकून् भनेर कम्तीमा एउटा ढाँचा राख्नुहोस्।",
+  "titlesFormatsEmptyTitle": "अहिलेसम्म कुनै ढाँचा छैन",
+  "titlesFormatsEmptyBody": "शीर्षक क्याटलग गर्नुअघि एउटा ढाँचा थप्नुहोस्।",
+  "@titlesManageFormats": {
+    "description": "क्याटलग - शीर्षकका ढाँचा सम्पादन गर्ने थप कार्य"
+  },
+  "titlesColumnTitle": "शीर्षक",
+  "titlesColumnAuthor": "लेखक",
+  "titlesColumnIsbn": "ISBN",
+  "titlesColumnPublisher": "प्रकाशक",
+  "titlesColumnYear": "वर्ष",
+  "titlesColumnAvailable": "उपलब्ध",
+  "titlesCopiesOf": "{total} मध्ये {available} उपलब्ध",
+  "@titlesCopiesOf": {
+    "description": "क्याटलग - शीर्षक कार्डमा उपलब्धताको सारांश",
+    "placeholders": {
+      "available": {
+        "type": "String",
+        "example": "2"
+      },
+      "total": {
+        "type": "String",
+        "example": "4"
+      }
+    }
+  },
+  "titlesReferenceOnly": "सन्दर्भका लागि मात्र",
+  "@titlesReferenceOnly": {
+    "description": "क्याटलग - भवनबाहिर लैजान नमिल्ने शीर्षकमा देखाइने ब्याज"
+  },
+  "titlesEmptyTitle": "अहिलेसम्म कुनै शीर्षक छैन",
+  "titlesEmptyBody": "पहिलो कृति र त्यसका प्रतिलिपिहरू क्याटलग गर्नुहोस्, त्यसपछि पुस्तकालयले सापटी दिन सुरु गर्न सक्छ।",
+  "@titlesEmptyBody": {
+    "description": "क्याटलग - शीर्षक सूचीको पहिलो पटक देखाइने खाली अवस्था"
+  },
+  "titleDetailOverview": "सारांश",
+  "titleDetailLendable": "सापटी",
+  "@titleDetailLendable": {
+    "description": "क्याटलग - शीर्षकका प्रतिलिपिहरू भवनबाहिर लैजान मिल्छ कि मिल्दैन"
+  },
+  "titleDetailLendableYes": "सापटी दिन मिल्ने",
+  "@titleDetailLendableYes": {
+    "description": "क्याटलग - प्रतिलिपिहरू सापटीमा जान सक्ने शीर्षक"
+  },
+  "titleDetailCopyCheckedOut": "{borrower} सँग छ · फिर्ता गर्ने मिति {due}",
+  "@titleDetailCopyCheckedOut": {
+    "description": "क्याटलग - शीर्षकको विवरण स्क्रिनमा प्रतिलिपि कससँग छ भन्ने जानकारी",
+    "placeholders": {
+      "borrower": {
+        "type": "String",
+        "example": "Anita Rai"
+      },
+      "due": {
+        "type": "String",
+        "example": "14 Sep 2026"
+      }
+    }
+  },
+  "titleDetailDescription": "विवरण",
+  "titleDetailCopiesTitle": "प्रतिलिपिहरू",
+  "titleDetailCopiesSubtitle": "पुस्तकालयमा रहेको यस कृतिको प्रत्येक भौतिक प्रतिलिपि",
+  "titleDetailCopiesEmptyTitle": "अहिलेसम्म कुनै प्रतिलिपि छैन",
+  "titleDetailCopiesEmptyBody": "यो शीर्षक सापटी दिनुअघि बारकोडसहित एउटा प्रतिलिपि थप्नुहोस्।",
+  "titleDetailHistoryTitle": "सापटी इतिहास",
+  "titleDetailHistorySubtitle": "यस कृति कसले सापटी लिएको छ, पछिल्लोबाट सुरु",
+  "titleDetailHistoryEmptyTitle": "कहिल्यै सापटी लगिएको छैन",
+  "titleDetailHistoryEmptyBody": "यस शीर्षकका जारी अभिलेखहरू यहाँ देखिनेछन्।",
+  "titleDetailEdit": "{title} सम्पादन गर्नुहोस्",
+  "@titleDetailEdit": {
+    "description": "क्याटलग - शीर्षक विवरण स्क्रिनको मुख्य कार्य",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "Pride and Prejudice"
+      }
+    }
+  },
+  "titleDetailAddCopyDialogTitle": "प्रतिलिपिहरू थप्नुहोस्",
+  "titleDetailAddCopyCount": "थपिने प्रतिलिपि संख्या",
+  "titleDetailDelete": "शीर्षक मेट्नुहोस्",
+  "titleDetailDeleteTitle": "यो शीर्षक मेट्ने?",
+  "titleDetailDeleteBody": "शीर्षक र त्यसअन्तर्गतका सबै प्रतिलिपिहरू क्याटलगबाट हटाइनेछन्। सापटी इतिहास भने सुरक्षित रहनेछ।",
+  "@titleDetailDeleteBody": {
+    "description": "क्याटलग - शीर्षक मेट्नुअघि देखाइने पुष्टि"
+  },
+  "fieldTitle": "शीर्षक",
+  "fieldAuthor": "लेखक",
+  "fieldIsbn": "ISBN",
+  "fieldPublisher": "प्रकाशक",
+  "fieldPublishedYear": "प्रकाशित वर्ष",
+  "fieldEdition": "संस्करण",
+  "fieldLanguage": "भाषा",
+  "fieldFormat": "ढाँचा",
+  "fieldPages": "पृष्ठहरू",
+  "fieldShelf": "र्‍याक स्थान",
+  "fieldDescription": "विवरण",
+  "fieldNotes": "टिप्पणीहरू",
+  "fieldReplacementCost": "प्रतिस्थापन लागत",
+  "fieldBarcode": "बारकोड",
+  "fieldBarcodePrefix": "बारकोड उपसर्ग",
+  "fieldBarcodeNextValue": "अर्को बारकोड नम्बर",
+  "fieldAddedOn": "थपिएको मिति",
+  "@fieldAddedOn": {
+    "description": "फारामहरू - क्याटलग स्क्रिनहरूमा साझा हुने फिल्ड नामहरू"
+  },
+  "titleFormNewHeading": "शीर्षक सिर्जना गर्नुहोस्",
+  "titleFormEditHeading": "शीर्षक सम्पादन गर्नुहोस्",
+  "titleFormBibliographic": "ग्रन्थसूची विवरण",
+  "titleFormShelving": "र्‍याक र मूल्य",
+  "titleFormShelvingDescription": "प्रतिलिपिहरू कहाँ राखिन्छन् र हराएमा एउटा प्रतिलिपि पुनःस्थापना गर्न कति लागत लाग्छ।",
+  "titleFormInitialCopies": "प्रारम्भिक प्रतिलिपिहरू",
+  "titleFormLendable": "सापटी दिन मिल्ने",
+  "titleFormLendableDescription": "भवनबाहिर कहिल्यै नजाने सन्दर्भ सामग्रीका लागि यसलाई बन्द गर्नुहोस्।",
+  "titleFormSave": "शीर्षक सुरक्षित गर्नुहोस्",
+  "@titleFormSave": {
+    "description": "क्याटलग - शीर्षक सम्पादक"
+  },
+  "titleFormAddFormat": "ढाँचा थप्नुहोस्",
+  "titleFormCreateFormatHeading": "ढाँचा सिर्जना गर्नुहोस्",
+  "copiesSubtitle": "र्‍याकमा {count} वस्तुहरू",
+  "@copiesSubtitle": {
+    "description": "क्याटलग - प्रतिलिपि शीर्षकअन्तर्गत देखाइने संख्या",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "3,120"
+      }
+    }
+  },
+  "copiesSearchHint": "बारकोड, शीर्षक, र्‍याक खोज्नुहोस्",
+  "copiesAdd": "प्रतिलिपि थप्नुहोस्",
+  "copiesColumnBarcode": "बारकोड",
+  "copiesColumnTitle": "शीर्षक",
+  "copiesColumnShelf": "र्‍याक",
+  "copiesColumnBorrower": "कससँग",
+  "copiesEmptyTitle": "अहिलेसम्म कुनै प्रतिलिपि छैन",
+  "copiesEmptyBody": "एउटा शीर्षक सापटी दिनुअघि कम्तीमा एउटा प्रतिलिपि चाहिन्छ।",
+  "copiesMarkLost": "हराएको भनेर चिन्ह लगाउनुहोस्",
+  "copiesMarkDamaged": "क्षतिग्रस्त भनेर चिन्ह लगाउनुहोस्",
+  "copiesWithdraw": "भण्डारबाट हटाउनुहोस्",
+  "@copiesWithdraw": {
+    "description": "क्याटलग - प्रतिलिपि सूची र त्यसका पङ्क्ति कार्यहरू"
+  },
+  "copiesMarkLostBody": "प्रतिलिपिलाई हराएको भनेर चिन्ह लगाइनेछ र सापटी दिन मिल्ने र्‍याकबाट हटाइनेछ।",
+  "copiesMarkLostSuccess": "प्रतिलिपि हराएको भनेर चिन्ह लगाइयो",
+  "copiesMarkDamagedBody": "प्रतिलिपि र्‍याकमै रहनेछ तर क्षतिग्रस्त भनेर चिन्ह लगाइनेछ।",
+  "copiesMarkDamagedSuccess": "प्रतिलिपि क्षतिग्रस्त भनेर चिन्ह लगाइयो",
+  "copiesWithdrawBody": "प्रतिलिपिलाई भण्डारबाट हटाइनेछ र क्याटलगमा देखाइने छैन।",
+  "copiesWithdrawSuccess": "प्रतिलिपि भण्डारबाट हटाइयो",
+  "copyFormHeading": "प्रतिलिपि थप्नुहोस्",
+  "copyFormSave": "प्रतिलिपि थप्नुहोस्",
+  "copyFormTitleSection": "शीर्षक",
+  "copyFormTitleDescription": "यो भौतिक प्रतिलिपि कुन कृतिसँग सम्बन्धित छ।",
+  "copyFormDetailsSection": "प्रतिलिपि विवरण",
+  "copyFormBarcodeHint": "अर्को नम्बर स्वतः दिन खाली छोड्नुहोस्",
+  "placeHoldHeading": "आरक्षण राख्नुहोस्",
+  "finesCollectSuccess": "भुक्तानी अभिलेख गरियो",
+  "finesWaiveSuccess": "जरिवाना माफ गरियो",
+  "loansRenewSuccess": "सापटी नवीकरण गरियो",
+  "reservationsCancelBody": "सदस्य यस शीर्षकका लागि रहेको प्रतीक्षा सूचीबाट हट्नेछ।",
+  "reservationsCancelSuccess": "आरक्षण रद्द गरियो",
+  "reservationsMarkReadySuccess": "आरक्षण उठाउन तयार भनेर चिन्ह लगाइयो",
+  "memberDetailSuspendBody": "निलम्बित सदस्यले सापटी लिन वा आरक्षण राख्न सक्दैन।",
+  "memberDetailSuspendSuccess": "सदस्यता निलम्बन गरियो",
+  "memberDetailRenewSuccess": "सदस्यता नवीकरण गरियो",
+  "circulationCheckOut": "जारी गर्नुहोस्",
+  "circulationStatOnLoan": "सापटीमा",
+  "circulationStatDueToday": "आज फिर्ता गर्नुपर्ने",
+  "circulationStatOverdue": "म्याद नाघेको",
+  "circulationStatHolds": "प्रतीक्षामा रहेका आरक्षण",
+  "circulationSearchHint": "सदस्य, शीर्षक, बारकोड खोज्नुहोस्",
+  "circulationFilterOnLoan": "सापटीमा",
+  "circulationFilterDueToday": "आज फिर्ता गर्नुपर्ने",
+  "circulationFilterOverdue": "म्याद नाघेको",
+  "circulationLoansEmptyTitle": "हाल कुनै प्रतिलिपि बाहिर छैन",
+  "circulationLoansEmptyBody": "काउन्टरबाट जारी गरिएका प्रतिलिपिहरू फिर्ता नआउँदासम्म यहाँ देखिन्छन्।",
+  "loansColumnTitle": "शीर्षक",
+  "loansColumnMember": "सदस्य",
+  "loansColumnBarcode": "बारकोड",
+  "loansColumnIssued": "जारी मिति",
+  "loansColumnDue": "फिर्ता गर्ने मिति",
+  "loansColumnFine": "जरिवाना",
+  "loansRenew": "सापटी नवीकरण गर्नुहोस्",
+  "loansReturn": "प्रतिलिपि फिर्ता गर्नुहोस्",
+  "loansMarkLost": "प्रतिलिपि हराएको भनेर चिन्ह लगाउनुहोस्",
+  "loansViewMember": "सदस्य खोल्नुहोस्",
+  "@loansViewMember": {
+    "description": "पुस्तक लेनदेन - सक्रिय सापटी तालिका र त्यसको पङ्क्ति मेनु"
+  },
+  "checkOutHeading": "जारी गर्नुहोस्",
+  "checkOutSubtitle": "पहिले सदस्य खोज्नुहोस्, त्यसपछि उनीसँग घर जाने प्रत्येक प्रतिलिपि थप्नुहोस्।",
+  "checkOutMemberSection": "सदस्य",
+  "checkOutMemberHint": "नाम, कार्ड नम्बर वा फोनबाट खोज्नुहोस्",
+  "checkOutChangeMember": "सदस्य परिवर्तन गर्नुहोस्",
+  "checkOutMemberEmptyTitle": "कुनै सदस्य चयन गरिएको छैन",
+  "checkOutMemberEmptyBody": "सापटी अवधि र सापटी सीमा सदस्यको वर्गबाट आउँछ, त्यसैले यहीँबाट सुरु गर्नुहोस्।",
+  "checkOutCopiesSection": "प्रतिलिपिहरू",
+  "checkOutScanHint": "बारकोड स्क्यान गर्नुहोस् वा टाइप गर्नुहोस्",
+  "checkOutCopiesEmptyTitle": "कुनै प्रतिलिपि थपिएको छैन",
+  "checkOutCopiesEmptyBody": "यस जारी प्रक्रियामा प्रतिलिपि थप्न पहिलो बारकोड स्क्यान गर्नुहोस्।",
+  "checkOutSummarySection": "सारांश",
+  "checkOutSummaryCopies": "प्रतिलिपिहरू",
+  "checkOutSummaryLoanPeriod": "सापटी अवधि",
+  "checkOutSummaryDueBack": "फिर्ता गर्ने मिति",
+  "checkOutSummaryLimit": "सापटी सीमा",
+  "checkOutSummaryOutstanding": "बाँकी जरिवाना",
+  "checkOutDays": "{days} दिन",
+  "@checkOutDays": {
+    "description": "पुस्तक लेनदेन - दिनमा देखाइएको सापटी अवधि",
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "14"
+      }
+    }
+  },
+  "checkOutConfirm": "जारी पुष्टि गर्नुहोस्",
+  "checkOutSuccess": "जारी प्रक्रिया पूरा भयो",
+  "@checkOutSuccess": {
+    "description": "पुस्तक लेनदेन - जारी काउन्टर"
+  },
+  "checkOutRemoveCopy": "प्रतिलिपि हटाउनुहोस्",
+  "@checkOutRemoveCopy": {
+    "description": "पुस्तक लेनदेन - जारी काउन्टर"
+  },
+  "returnsHeading": "प्रतिलिपिहरू फिर्ता गर्नुहोस्",
+  "returnsSubtitle": "फिर्ता आउने प्रत्येक प्रतिलिपि स्क्यान गर्नुहोस्। ढिला भएका प्रतिलिपिको जरिवाना थपिँदै जाँदा हिसाब हुन्छ।",
+  "returnsScanHint": "बारकोड स्क्यान गर्नुहोस् वा टाइप गर्नुहोस्",
+  "returnsListSection": "फिर्ता हुँदै",
+  "returnsEmptyTitle": "अहिलेसम्म केही स्क्यान गरिएको छैन",
+  "returnsEmptyBody": "फिर्ती सुरु गर्न पहिलो बारकोड स्क्यान गर्नुहोस्।",
+  "returnsColumnDaysLate": "ढिला भएका दिन",
+  "returnsColumnFine": "जरिवाना",
+  "returnsSummarySection": "सारांश",
+  "returnsSummaryCopies": "फिर्ता हुने प्रतिलिपिहरू",
+  "returnsSummaryLate": "ढिला भएका प्रतिलिपिहरू",
+  "returnsSummaryFines": "तिर्नुपर्ने जरिवाना",
+  "returnsWaiveFines": "यस फिर्तीका जरिवाना माफ गर्नुहोस्",
+  "returnsWaiveFinesDescription": "पुस्तकालयको कारणले ढिला भएको प्रतिलिपिका लागि प्रयोग गर्नुहोस् - जस्तै बन्द रहेको दिन वा कहिल्यै नउठाइएको आरक्षण।",
+  "returnsConditionSection": "अवस्था",
+  "returnsConditionDescription": "यस फिर्तीमा रहेका प्रत्येक प्रतिलिपिका लागि अभिलेख गरिन्छ।",
+  "returnsConfirm": "फिर्ता पुष्टि गर्नुहोस्",
+  "returnsSuccess": "फिर्ता अभिलेख गरियो",
+  "@returnsSuccess": {
+    "description": "पुस्तक लेनदेन - फिर्ती काउन्टर"
+  },
+  "returnsRemoveCopy": "यस फिर्तीबाट हटाउनुहोस्",
+  "@returnsRemoveCopy": {
+    "description": "पुस्तक लेनदेन - फिर्ती काउन्टर"
+  },
+  "reservationsSubtitle": "प्रतिलिपिको प्रतीक्षामा रहेका सदस्यहरू, उनीहरूले अनुरोध गरेको क्रममा।",
+  "reservationsSearchHint": "सदस्य वा शीर्षक खोज्नुहोस्",
+  "reservationsPlace": "आरक्षण राख्नुहोस्",
+  "reservationsColumnMember": "सदस्य",
+  "reservationsColumnTitle": "शीर्षक",
+  "reservationsColumnPlaced": "राखिएको मिति",
+  "reservationsColumnQueue": "क्रम",
+  "reservationsColumnExpires": "म्याद सकिने",
+  "reservationsStatusWaiting": "प्रतीक्षामा",
+  "reservationsStatusReady": "उठाउन तयार",
+  "reservationsStatusFulfilled": "बुझिलियो",
+  "reservationsStatusExpired": "म्याद सकिएको",
+  "reservationsStatusCancelled": "रद्द गरिएको",
+  "reservationsQueuePosition": "#{position}",
+  "@reservationsQueuePosition": {
+    "description": "पुस्तक लेनदेन - आरक्षण प्रतीक्षा सूचीमा सदस्यको स्थान",
+    "placeholders": {
+      "position": {
+        "type": "String",
+        "example": "2"
+      }
+    }
+  },
+  "reservationsMarkReady": "उठाउन तयार भनेर चिन्ह लगाउनुहोस्",
+  "reservationsCancel": "आरक्षण रद्द गर्नुहोस्",
+  "reservationsEmptyTitle": "कोही पनि प्रतीक्षामा छैन",
+  "reservationsEmptyBody": "बाहिर गएका शीर्षकमा सदस्यहरूले राखेका आरक्षणहरू यहाँ प्रतीक्षा सूचीमा राखिन्छन्।",
+  "@reservationsEmptyBody": {
+    "description": "पुस्तक लेनदेन - आरक्षण प्रतीक्षा सूची"
+  },
+  "finesSubtitle": "सदस्यले कति तिर्न बाँकी छ, कति उठाइएको छ र कति माफ गरिएको छ।",
+  "finesSearchHint": "सदस्य वा शीर्षक खोज्नुहोस्",
+  "finesStatOutstanding": "बाँकी",
+  "finesStatCollected": "यस महिना उठाइएको",
+  "finesStatWaived": "यस महिना माफ गरिएको",
+  "finesStatMembersOwing": "तिर्न बाँकी सदस्य",
+  "finesColumnMember": "सदस्य",
+  "finesColumnReason": "कारण",
+  "finesColumnTitle": "शीर्षक",
+  "finesColumnRaised": "लगाइएको मिति",
+  "finesColumnAmount": "रकम",
+  "finesReasonOverdue": "म्याद नाघेको प्रतिलिपि",
+  "finesReasonDamage": "क्षतिग्रस्त प्रतिलिपि",
+  "finesReasonLost": "हराएको प्रतिलिपि",
+  "finesReasonMembership": "सदस्यता शुल्क",
+  "finesStatusUnpaid": "भुक्तानी नभएको",
+  "finesStatusPaid": "भुक्तानी गरिएको",
+  "finesStatusWaived": "माफ गरिएको",
+  "finesCollect": "भुक्तानी उठाउनुहोस्",
+  "finesWaive": "जरिवाना माफ गर्नुहोस्",
+  "finesCollectTitle": "भुक्तानी अभिलेख गर्ने?",
+  "finesCollectBody": "{member} द्वारा {amount} भुक्तानी गरिएको भनेर अभिलेख हुन्छ। रसिदको विवरण सदस्यको अभिलेखमा राखिन्छ।",
+  "@finesCollectBody": {
+    "description": "पुस्तक लेनदेन - भुक्तानी पुष्टि; amount money.display() हो",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "Rs 45"
+      },
+      "member": {
+        "type": "String",
+        "example": "Anita Rai"
+      }
+    }
+  },
+  "finesWaiveTitle": "यो जरिवाना माफ गर्ने?",
+  "finesWaiveBody": "सदस्यको बाँकी रकमबाट यो हटाइनेछ र माफी तपाईंको खातामा अभिलेख गरिनेछ।",
+  "finesEmptyTitle": "बाँकी केही छैन",
+  "finesEmptyBody": "म्याद नाघेको, क्षतिग्रस्त वा हराएको प्रतिलिपिबाट लगाइएका जरिवानाहरू यहाँ देखिन्छन्।",
+  "@finesEmptyBody": {
+    "description": "पुस्तक लेनदेन - जरिवाना अभिलेख"
+  },
+  "finesChargeAction": "जरिवाना लगाउनुहोस्",
+  "finesChargeTitle": "जरिवाना लगाउनुहोस्",
+  "finesChargeDescription": "हराएको वा क्षतिग्रस्त प्रतिलिपि, वा सदस्यता शुल्कका लागि - म्याद नाघेको जरिवाना फिर्तीका बेला स्वतः लाग्छ।",
+  "finesChargeAmountInvalid": "शून्यभन्दा ठूलो रकम प्रविष्ट गर्नुहोस्।",
+  "finesChargeSuccess": "जरिवाना लगाइयो",
+  "fieldReason": "कारण",
+  "fieldAmount": "रकम",
+  "membersSubtitle": "दर्तामा {count} सापटी लिने सदस्य",
+  "@membersSubtitle": {
+    "description": "सदस्यहरू - शीर्षकअन्तर्गत देखाइने सदस्य संख्या",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "312"
+      }
+    }
+  },
+  "membersSearchHint": "नाम, कार्ड नम्बर, फोन खोज्नुहोस्",
+  "membersAdd": "सदस्य थप्नुहोस्",
+  "membersManageCategories": "वर्गहरू व्यवस्थापन गर्नुहोस्",
+  "membersManageCategoriesBody": "वर्गले कार्डअन्तर्गत लागू हुने सापटी अवधि, सापटी सीमा र जरिवाना दर तय गर्छ। कुनै नियम खाली छोड्दा पुस्तकालयको पूर्वनिर्धारित नियम प्रयोग हुन्छ।",
+  "memberTypeAddCategory": "वर्ग थप्नुहोस्",
+  "memberTypeCreateHeading": "नयाँ वर्ग",
+  "memberTypeEditHeading": "वर्ग सम्पादन गर्नुहोस्",
+  "memberTypeArchiveTitle": "यो वर्ग अभिलेखीकरण गर्ने?",
+  "memberTypeArchiveBody": "नयाँ र सम्पादन गरिएका सदस्यका लागि यो चयन सूचीबाट हट्नेछ। पहिले नै यस वर्गमा रहेका सदस्यहरूको कार्ड भने कायम रहनेछ।",
+  "memberTypeRestoreAction": "पुनर्स्थापना गर्नुहोस्",
+  "memberTypesEmptyTitle": "कुनै वर्ग छैन",
+  "memberTypesEmptyBody": "हरेक सदस्यलाई एउटा वर्ग चाहिन्छ। सुरु गर्न पहिलो वर्ग थप्नुहोस्।",
+  "memberTypeSystemBadge": "निर्मित",
+  "memberTypeArchivedBadge": "अभिलेखीकृत",
+  "membersColumnName": "नाम",
+  "membersColumnCard": "कार्ड",
+  "membersColumnCategory": "वर्ग",
+  "membersColumnLoans": "सापटीमा",
+  "membersColumnFines": "जरिवाना",
+  "membersColumnExpires": "म्याद सकिने",
+  "membersFilterWithLoans": "सापटी भएका",
+  "membersFilterOwesFines": "जरिवाना तिर्न बाँकी",
+  "membersFilterSuspended": "निलम्बित",
+  "membersFilterExpiring": "म्याद सकिँदै",
+  "membersStatusActive": "सक्रिय",
+  "membersStatusExpiring": "छिट्टै म्याद सकिने",
+  "membersStatusExpired": "म्याद सकिएको",
+  "membersStatusSuspended": "निलम्बित",
+  "membersEmptyTitle": "अहिलेसम्म कुनै सदस्य छैन",
+  "membersEmptyBody": "पहिलो सापटी लिने व्यक्तिलाई दर्ता गर्नुहोस्, त्यसपछि काउन्टरले उनलाई सापटी दिन सुरु गर्न सक्छ।",
+  "@membersEmptyBody": {
+    "description": "सदस्यहरू - सदस्य दर्ता सूची"
+  },
+  "memberDetailMembership": "सदस्यता",
+  "memberDetailContact": "सम्पर्क",
+  "memberDetailLoansTitle": "अहिले सापटीमा",
+  "memberDetailLoansSubtitle": "यस सदस्यसँग रहेका प्रतिलिपिहरू",
+  "memberDetailLoansEmptyTitle": "कुनै सापटी छैन",
+  "memberDetailLoansEmptyBody": "यस सदस्यलाई जारी गरिएका प्रतिलिपिहरू फिर्ता नआउँदासम्म यहाँ देखिन्छन्।",
+  "memberDetailFinesTitle": "जरिवाना",
+  "memberDetailFinesSubtitle": "यस सदस्यको नाममा लगाइएको",
+  "memberDetailFinesEmptyTitle": "कुनै जरिवाना छैन",
+  "memberDetailFinesEmptyBody": "यस सदस्यले पुस्तकालयलाई केही तिर्न बाँकी छैन।",
+  "memberDetailHistoryTitle": "सापटी इतिहास",
+  "memberDetailHistorySubtitle": "उनीहरूले सापटी लिएका सबै सामग्री, पछिल्लोबाट सुरु",
+  "memberDetailHistoryEmptyTitle": "अहिलेसम्म केही सापटी लिएको छैन",
+  "memberDetailHistoryEmptyBody": "प्रतिलिपि फिर्ता भएपछि पुराना सापटीहरू यहाँ देखिन्छन्।",
+  "memberDetailEdit": "सदस्य सम्पादन गर्नुहोस्",
+  "memberDetailCheckOut": "यस सदस्यलाई जारी गर्नुहोस्",
+  "memberDetailRenewMembership": "सदस्यता नवीकरण गर्नुहोस्",
+  "memberDetailSuspend": "सदस्यता निलम्बन गर्नुहोस्",
+  "memberDetailUnsuspend": "सदस्यता पुनःसक्रिय गर्नुहोस्",
+  "memberDetailUnsuspendSuccess": "सदस्यता पुनःसक्रिय गरियो",
+  "memberDetailArchive": "सदस्य अभिलेखीकरण गर्नुहोस्",
+  "memberDetailArchiveTitle": "यो सदस्य अभिलेखीकरण गर्ने?",
+  "memberDetailArchiveBody": "सदस्य दर्ताबाट हट्नेछ। पहिले नै अभिलेख गरिएका सापटी र जरिवाना भने सम्बन्धित प्रतिलिपिमा सुरक्षित रहनेछन्।",
+  "memberDetailArchiveSuccess": "सदस्य अभिलेखीकरण गरियो",
+  "memberDetailDelete": "सदस्य मेट्नुहोस्",
+  "memberDetailDeleteTitle": "यो सदस्य मेट्ने?",
+  "memberDetailDeleteBody": "सापटी लिने व्यक्तिको अभिलेख हटाइनेछ। पहिले नै अभिलेख गरिएका सापटी र जरिवाना भने सम्बन्धित प्रतिलिपिमा सुरक्षित रहनेछन्।",
+  "memberDetailStatLoans": "सापटीमा",
+  "memberDetailStatOverdue": "म्याद नाघेको",
+  "memberDetailStatFines": "तिर्न बाँकी जरिवाना",
+  "memberDetailOwes": "{amount} तिर्न बाँकी",
+  "@memberDetailOwes": {
+    "description": "सदस्यहरू - सदस्य विवरण हेडरमा देखाइने जरिवाना ब्याज",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "memberDetailStatBorrowed": "अहिलेसम्म सापटी लिएको",
+  "@memberDetailStatBorrowed": {
+    "description": "सदस्यहरू - सापटी लिने व्यक्तिको विवरण पृष्ठ"
+  },
+  "fieldFullName": "पूरा नाम",
+  "fieldEmail": "इमेल",
+  "fieldPhone": "फोन",
+  "fieldAddress": "ठेगाना",
+  "fieldCardNumber": "कार्ड नम्बर",
+  "fieldCategory": "वर्ग",
+  "fieldJoined": "सदस्य भएको मिति",
+  "fieldExpires": "म्याद सकिने",
+  "fieldDateOfBirth": "जन्म मिति",
+  "fieldGuardian": "अभिभावक",
+  "@fieldGuardian": {
+    "description": "फारामहरू - सदस्य अभिलेखका फिल्ड नामहरू"
+  },
+  "memberFormNewHeading": "नयाँ सदस्य",
+  "memberFormEditHeading": "सदस्य सम्पादन गर्नुहोस्",
+  "memberFormIdentity": "पहिचान",
+  "memberFormMembershipDescription": "वर्गले सापटी अवधि, सापटी सीमा र जरिवाना दर निर्धारण गर्छ।",
+  "memberFormExpiresHint": "सदस्य सुरक्षित गरेपछि वर्गका आधारमा म्याद स्वतः निर्धारण हुन्छ।",
+  "@memberFormExpiresHint": {
+    "description": "सदस्यहरू - सदस्य सम्पादकमा पढ्न मात्र मिल्ने म्याद फिल्डअन्तर्गतको सहयोगी विवरण"
+  },
+  "memberFormNotifications": "म्याद नाघेका सूचना पठाउनुहोस्",
+  "memberFormNotificationsDescription": "सम्पर्क नगर्न अनुरोध गरेको सदस्यका लागि यसलाई बन्द गर्नुहोस्।",
+  "memberFormSave": "सदस्य सुरक्षित गर्नुहोस्",
+  "@memberFormSave": {
+    "description": "सदस्यहरू - सापटी लिने व्यक्ति सम्पादक"
+  },
+  "settingsLibraryTitle": "पुस्तकालय प्रोफाइल",
+  "settingsLibraryBody": "नाम, शाखा, सम्पर्क विवरण र खुल्ने समय।",
+  "settingsLoanRulesTitle": "सापटी नियमहरू",
+  "settingsLoanRulesBody": "सापटी अवधि, नवीकरण, सापटी सीमा र जरिवाना दरहरू।",
+  "settingsAppearanceTitle": "देखावट",
+  "settingsAppearanceBody": "यस उपकरणका लागि विषयवस्तु। यहाँको कुनै पनि कुरा उपकरणबाहिर जाँदैन।",
+  "settingsBackupTitle": "ब्याकअप र डाटा",
+  "settingsBackupBody": "क्याटलग निर्यात गर्नुहोस् वा ब्याकअप पुनर्स्थापना गर्नुहोस्।",
+  "settingsAboutTitle": "खुल्ला डिजिटल पुस्तकालयबारे",
+  "settingsAboutBody": "संस्करण, इजाजतपत्र र स्रोत कहाँ उपलब्ध छ।",
+  "@settingsAboutBody": {
+    "description": "सेटिङहरू - सेटिङ समूहहरूको सूची"
+  },
+  "settingsLibraryIdentity": "पहिचान",
+  "settingsLibraryIdentityDescription": "यस स्थापना वा पुस्तकालयको नाम रसिद र सूचनाहरूमा कसरी देखिन्छ।",
+  "settingsLibraryContact": "सम्पर्क",
+  "settingsLibraryContactDescription": "म्याद नाघेको सूचनामा छापिन्छ, ताकि सदस्यले कसलाई सम्पर्क गर्ने थाहा पाओस्।",
+  "settingsLibraryLocale": "मुद्रा र स्थानीयकरण",
+  "settingsLibraryLocaleDescription": "हरेक जरिवाना, शुल्क र प्रतिस्थापन लागतमा देखाइने मुद्रा।",
+  "settingsLibraryBarcodes": "बारकोडहरू",
+  "settingsLibraryBarcodesDescription": "प्रतिलिपि थप्दा फिल्ड खाली छोडेपछि अर्को प्रतिलिपिको बारकोड कसरी बनाउने।",
+  "fieldLibraryName": "पुस्तकालयको नाम",
+  "fieldOpeningHours": "खुल्ने समय",
+  "fieldCurrency": "मुद्रा",
+  "settingsLibrarySave": "प्रोफाइल सुरक्षित गर्नुहोस्",
+  "@settingsLibrarySave": {
+    "description": "सेटिङहरू - पुस्तकालय प्रोफाइल फाराम"
+  },
+  "settingsLoanPeriods": "सापटी अवधि",
+  "settingsLoanPeriodsDescription": "नयाँ सापटीका पूर्वनिर्धारित मानहरू। सदस्यको वर्गले यसलाई परिवर्तन गर्न सक्छ।",
+  "settingsLoanFines": "जरिवाना",
+  "settingsLoanFinesDescription": "ढिला भएको प्रतिलिपिको लागत र सुरुमा काउन्टरले दिने छुट अवधि।",
+  "settingsLoanHolds": "आरक्षणहरू",
+  "settingsLoanHoldsDescription": "अर्को सदस्यलाई दिनुअघि प्रतिलिपि आरक्षण र्‍याकमा कति समय बस्ने।",
+  "fieldLoanPeriodDays": "सापटी अवधि (दिन)",
+  "fieldRenewalLimit": "नवीकरणको अनुमति",
+  "fieldRenewalPeriodDays": "नवीकरण अवधि (दिन)",
+  "fieldBorrowingLimit": "प्रति सदस्य प्रतिलिपि सीमा",
+  "fieldFinePerDay": "प्रति दिन जरिवाना",
+  "fieldGraceDays": "छुट अवधि (दिन)",
+  "fieldMaximumFine": "प्रति प्रतिलिपि अधिकतम जरिवाना",
+  "fieldMaxOutstandingFine": "रोक लगाउनुअघि अधिकतम बाँकी जरिवाना",
+  "fieldHoldShelfDays": "आरक्षण र्‍याकमा राख्ने दिन",
+  "fieldMembershipDurationMonths": "सदस्यता अवधि (महिना)",
+  "fieldReservationLimit": "प्रति सदस्य आरक्षण सीमा",
+  "settingsLoanBlockOverdue": "म्याद नाघेका प्रतिलिपि भएका सदस्यलाई रोक्नुहोस्",
+  "settingsLoanBlockOverdueDescription": "पहिले नै ढिला भएको सदस्यलाई काउन्टरले प्रतिलिपि जारी गर्न सक्दैन।",
+  "settingsLoanAutoRenew": "कोही प्रतीक्षामा नभएमा स्वतः नवीकरण गर्नुहोस्",
+  "settingsLoanAutoRenewDescription": "शीर्षकमा कुनै आरक्षण नभएको सापटी आफ्नो फिर्ता मितिमा स्वतः थपिन्छ।",
+  "settingsLoanRulesSave": "नियमहरू सुरक्षित गर्नुहोस्",
+  "@settingsLoanRulesSave": {
+    "description": "सेटिङहरू - सापटी नियम फाराम"
+  },
+  "settingsAppearanceTheme": "विषयवस्तु",
+  "settingsAppearanceThemeDescription": "यो उपकरणमा मात्र लागू हुन्छ - सेटिङ स्थानीय रूपमा भण्डारण हुन्छ, क्याटलगमा होइन।",
+  "@settingsAppearanceThemeDescription": {
+    "description": "सेटिङहरू - देखावट पृष्ठ"
+  },
+  "settingsBackupExportTitle": "ब्याकअप निर्यात गर्नुहोस्",
+  "settingsBackupExportBody": "शीर्षक, प्रतिलिपि, सदस्य र सापटीसहित सम्पूर्ण क्याटलगलाई एउटै फाइलमा लेख्नुहोस्।",
+  "settingsBackupExportAction": "निर्यात गर्नुहोस्",
+  "settingsBackupRestoreTitle": "ब्याकअपबाट पुनर्स्थापना गर्नुहोस्",
+  "settingsBackupRestoreBody": "यस पुस्तकालयका सबै कुरा तपाईंले छान्ने ब्याकअप फाइलको सामग्रीले प्रतिस्थापन गर्नुहोस्।",
+  "settingsBackupRestoreAction": "फाइल छान्नुहोस्",
+  "settingsBackupRestoreConfirmTitle": "ब्याकअपबाट पुनर्स्थापना गर्ने?",
+  "settingsBackupRestoreConfirmBody": "यस पुस्तकालयमा अहिले भएका सबै कुरा तपाईंले अर्को चरणमा छान्ने फाइलको सामग्रीले प्रतिस्थापन हुनेछन्। प्रक्रिया पूरा भएपछि अनुप्रयोग पुनःसुरु हुनेछ।",
+  "settingsBackupExported": "ब्याकअप निर्यात भयो।",
+  "settingsBackupLastBackup": "अन्तिम ब्याकअप",
+  "settingsBackupNever": "कहिल्यै होइन",
+  "settingsBackupDatabaseSize": "डाटाबेसको आकार",
+  "settingsBackupEraseAction": "यो पुस्तकालय मेटाउनुहोस्",
+  "settingsBackupEraseTitle": "यो पुस्तकालय मेट्ने?",
+  "settingsBackupEraseBody": "यस उपकरणबाट हरेक शीर्षक, प्रतिलिपि, सदस्य र सापटी मेटाइनेछ। फर्कने एक मात्र उपाय ब्याकअप फाइल हुनेछ।",
+  "@settingsBackupEraseBody": {
+    "description": "सेटिङहरू - ब्याकअप, पुनर्स्थापना र पूर्ण मेटाइ"
+  },
+  "settingsBackupEraseWrongPassword": "त्यो पासवर्ड तपाईंको खातासँग मेल खाएन।",
+  "settingsAboutVersion": "संस्करण",
+  "settingsAboutLicence": "इजाजतपत्र",
+  "settingsAboutStorage": "क्याटलग भण्डारण भएको स्थान",
+  "@settingsAboutStorage": {
+    "description": "सेटिङहरू - जानकारी कार्डका पङ्क्तिहरू"
+  },
+  "errorUnknown": "केही समस्या भयो। कृपया पुनः प्रयास गर्नुहोस्।",
+  "errorNotFound": "हामीले त्यो अभिलेख फेला पार्न सकेनौँ।",
+  "errorDuplicateRecord": "यी विवरण भएको अभिलेख पहिले नै छ।",
+  "errorInvalidInput": "तीमध्ये केही विवरण मान्य छैनन्।",
+  "errorConflict": "त्यो कार्य हालको अभिलेखसँग मेल खाँदैन।",
+  "errorDatabaseUnavailable": "पुस्तकालयको डाटाबेस खोल्न सकिएन।",
+  "errorDatabaseFailure": "डाटाबेसले त्यो परिवर्तन अस्वीकार गर्‍यो।",
+  "errorStorage": "फाइल पढ्न वा लेख्न सकिएन।",
+  "@errorStorage": {
+    "description": "त्रुटिहरू - प्रत्येक AppException अवस्थाका लागि प्रयोगकर्ताले देख्ने सन्देश"
+  },
+  "navReports": "रिपोर्टहरू",
+  "navUsers": "कर्मचारी",
+  "navMore": "थप",
+  "@navMore": {
+    "description": "नेभिगेसन - बारमा नअट्ने खण्डहरू खोल्ने छोटो तल्लो बार प्रविष्टि"
+  },
+  "shellMoreTitle": "सबै खण्डहरू",
+  "shellCopyright": "© {year} {name}",
+  "@shellCopyright": {
+    "description": "नेभिगेसन - रेल फुटर र More सिटमा देखाइने प्रतिलिपि अधिकार पङ्क्ति",
+    "placeholders": {
+      "year": {
+        "type": "String",
+        "example": "2026"
+      },
+      "name": {
+        "type": "String",
+        "example": "Khulla Digital Library"
+      }
+    }
+  },
+  "shellAccountMenu": "खाता",
+  "shellProfile": "तपाईंको प्रोफाइल",
+  "shellSignOut": "साइन आउट गर्नुहोस्",
+  "shellHelp": "मद्दत र सर्टकटहरू",
+  "navCatalogTitles": "शीर्षकहरू",
+  "navCatalogCopies": "प्रतिलिपिहरू",
+  "navCatalogLabels": "लेबल र बारकोडहरू",
+  "navCirculationLoans": "सापटीहरू",
+  "navCirculationCheckOut": "जारी गर्नुहोस्",
+  "navCirculationReturn": "फिर्ता",
+  "navCirculationReservations": "आरक्षणहरू",
+  "navCirculationFines": "जरिवाना",
+  "navUsersAccounts": "कर्मचारी खाताहरू",
+  "navUsersRoles": "भूमिकाहरू",
+  "navSettingsLibrary": "पुस्तकालय प्रोफाइल",
+  "navSettingsLoanRules": "सापटी नियमहरू",
+  "navSettingsAppearance": "देखावट",
+  "navSettingsBackup": "ब्याकअप र पुनर्स्थापना",
+  "commonViewAll": "सबै हेर्नुहोस्",
+  "commonExportCsv": "CSV निर्यात गर्नुहोस्",
+  "commonApply": "लागू गर्नुहोस्",
+  "commonToday": "आज",
+  "commonThisWeek": "यो हप्ता",
+  "commonThisMonth": "यो महिना",
+  "commonThisQuarter": "यो त्रैमासिक",
+  "commonThisYear": "यो वर्ष",
+  "commonLastWeek": "गत हप्तासँग तुलना",
+  "commonLastMonth": "गत महिनासँग तुलना",
+  "commonYesterday": "हिजोसँग तुलना",
+  "commonUnavailable": "-",
+  "@commonUnavailable": {
+    "description": "साझा - अभिलेखमा मान उपलब्ध नभएको अवस्थामा प्रयोग हुने चिन्ह"
+  },
+  "commonShowingRange": "{total} मध्ये {start}–{end} देखाइँदै",
+  "@commonShowingRange": {
+    "description": "साझा - तालिकामुनि देखाइने दायरा",
+    "placeholders": {
+      "start": {
+        "type": "String",
+        "example": "1"
+      },
+      "end": {
+        "type": "String",
+        "example": "9"
+      },
+      "total": {
+        "type": "String",
+        "example": "36"
+      }
+    }
+  },
+  "dashboardStatBorrowed": "सापटी लिएका प्रतिलिपिहरू",
+  "dashboardStatReturned": "फिर्ता गरिएका प्रतिलिपिहरू",
+  "dashboardUsageTitle": "पुस्तकालय प्रयोग",
+  "dashboardUsageSubtitle": "दिनअनुसार जारी र फिर्ता",
+  "dashboardUsageLoans": "जारी",
+  "dashboardUsageReturns": "फिर्ता",
+  "dashboardFinesTitle": "संकलित जरिवाना",
+  "dashboardFinesSubtitle": "म्याद नाघेका प्रतिलिपिले सदस्यलाई लगाएको लागत",
+  "dashboardCollectionTitle": "संग्रहको एक झलक",
+  "dashboardCollectionSubtitle": "क्याटलगका हरेक प्रतिलिपि अहिले कहाँ छन्",
+  "dashboardCollectionTotal": "प्रतिलिपिहरू",
+  "dashboardCategoriesTitle": "विषयहरू",
+  "dashboardCategoriesSubtitle": "क्याटलग विषयअनुसार कसरी विभाजित छ",
+  "dashboardTopTitlesTitle": "सबैभन्दा धेरै सापटी लिइएका",
+  "dashboardTopMembersTitle": "सबैभन्दा सक्रिय सदस्यहरू",
+  "dashboardActivityColumnItem": "वस्तु",
+  "dashboardActivityColumnMember": "सदस्य",
+  "dashboardActivityColumnAction": "गतिविधि",
+  "dashboardActivityColumnWhen": "समय",
+  "dashboardActivityColumnDue": "फिर्ता मिति",
+  "dashboardActivityBorrow": "सापटी लिइयो",
+  "dashboardActivityReturn": "फिर्ता गरियो",
+  "dashboardActivityReserve": "आरक्षण गरियो",
+  "dashboardActivityFine": "जरिवाना लगाइयो",
+  "dashboardBorrowCount": "{count} सापटी",
+  "@dashboardBorrowCount": {
+    "description": "ड्यासबोर्ड - शीर्षक वा सदस्यअन्तर्गत देखाइने सापटी संख्या",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "128"
+      }
+    }
+  },
+  "dashboardAttentionOverdue": "म्याद नाघेका सापटी",
+  "dashboardAttentionHolds": "र्‍याकमा प्रतीक्षामा रहेका आरक्षण",
+  "dashboardAttentionExpiring": "यस महिना म्याद सकिँदै गरेका सदस्यताहरू",
+  "dashboardAttentionDamaged": "क्षतिग्रस्त भनेर रिपोर्ट गरिएका प्रतिलिपिहरू",
+  "reportsHeading": "रिपोर्टहरू",
+  "reportsSubtitle": "निश्चित अवधिमा पुस्तकालयले के गर्‍यो र आज त्यससँग के छ।",
+  "reportsStatBorrowed": "जारी गरिएका सापटी",
+  "reportsStatReturned": "फिर्ता गरिएका प्रतिलिपिहरू",
+  "reportsStatNewMembers": "नयाँ सदस्यहरू",
+  "reportsStatFines": "संकलित जरिवाना",
+  "reportsCirculationTitle": "समयअनुसार पुस्तक लेनदेन",
+  "reportsCirculationSubtitle": "जारी गरिएका सापटी र फिर्ता गरिएका प्रतिलिपिहरू",
+  "reportsCollectionTitle": "संग्रहको मिश्रण",
+  "reportsCollectionSubtitle": "ढाँचाअनुसार क्याटलग गरिएका सबै प्रतिलिपिहरू",
+  "reportsMembersTitle": "सदस्यता वृद्धि",
+  "reportsMembersSubtitle": "महिनाअनुसार सदस्य दर्ता",
+  "reportsFinesTitle": "जरिवाना",
+  "reportsFinesSubtitle": "यस अवधिमा लगाइएका, उठाइएका र माफ गरिएका जरिवाना",
+  "reportsTopTitlesTitle": "सबैभन्दा धेरै सापटी लिइएका शीर्षकहरू",
+  "reportsTopTitlesSubtitle": "चयन गरिएको अवधिका आधारमा क्रमबद्ध",
+  "reportsTopMembersTitle": "सबैभन्दा सक्रिय सदस्यहरू",
+  "reportsTopMembersSubtitle": "सापटी लिएका प्रतिलिपिको आधारमा क्रमबद्ध",
+  "reportsColumnRank": "#",
+  "reportsColumnTitle": "शीर्षक",
+  "reportsColumnMember": "सदस्य",
+  "reportsColumnLoans": "सापटी",
+  "reportsColumnShare": "हिस्सा",
+  "reportsColumnMonth": "महिना",
+  "reportsColumnFormat": "ढाँचा",
+  "reportsColumnCopies": "प्रतिलिपिहरू",
+  "reportsColumnDueDate": "फिर्ता मिति",
+  "reportsColumnDaysLate": "ढिला भएका दिन",
+  "reportsColumnAmount": "रकम",
+  "reportsExportedToast": "{title} निर्यात भयो।",
+  "@reportsExportedToast": {
+    "description": "सुरक्षित रिपोर्टको CSV निर्यात पूरा भएपछि देखाइने टोस्ट",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "Circulation"
+      }
+    }
+  },
+  "reportsFinesRaised": "लगाइएको",
+  "reportsFinesCollected": "उठाइएको",
+  "reportsFinesWaived": "माफ गरिएको",
+  "reportsSavedTitle": "सुरक्षित रिपोर्टहरू",
+  "reportsSavedSubtitle": "समिति वा परिषद्ले माग्ने रिपोर्टहरू, निर्यात गर्न तयार",
+  "reportsSavedCirculation": "मासिक पुस्तक लेनदेन सारांश",
+  "reportsSavedCirculationBody": "एक महिनाका जारी, फिर्ता, नवीकरण र म्याद नाघेका सापटीको संख्या।",
+  "reportsSavedCollection": "संग्रह सूची",
+  "reportsSavedCollectionBody": "र्‍याक स्थानसहित हरेक शीर्षक र प्रतिलिपि।",
+  "reportsSavedMembers": "सदस्यता दर्ता",
+  "reportsSavedMembersBody": "सक्रिय, म्याद सकिँदै गरेका र निलम्बित सदस्यहरू तथा उनीहरूको सापटी इतिहास।",
+  "reportsSavedFines": "जरिवाना अभिलेख",
+  "reportsSavedFinesBody": "सदस्य र कारणसहित लगाइएका, उठाइएका वा माफ गरिएका हरेक जरिवाना।",
+  "reportsSavedOverdue": "म्याद नाघेका सूचनाहरू",
+  "reportsSavedOverdueBody": "फिर्ता मिति नाघेका प्रतिलिपि भएका सदस्यहरू, छाप्न वा इमेल गर्न तयार।",
+  "reportsSavedAcquisitions": "खरिद",
+  "reportsSavedAcquisitionsBody": "अवधिभर थपिएका शीर्षकहरू, लागत र आपूर्तिकर्तासहित।",
+  "usersAdd": "कर्मचारी थप्नुहोस्",
+  "usersSearchHint": "नाम वा इमेलबाट कर्मचारी खोज्नुहोस्",
+  "usersColumnName": "नाम",
+  "usersColumnEmail": "इमेल",
+  "usersColumnRole": "भूमिका",
+  "usersStatusActive": "सक्रिय",
+  "usersStatusDisabled": "निष्क्रिय",
+  "usersFilterActive": "सक्रिय",
+  "usersFilterDisabled": "निष्क्रिय",
+  "usersEditRole": "खाता सम्पादन गर्नुहोस्",
+  "usersResetPassword": "पासवर्ड रिसेट गर्नुहोस्",
+  "usersDisable": "खाता निष्क्रिय गर्नुहोस्",
+  "usersEnable": "खाता सक्रिय गर्नुहोस्",
+  "usersEmptyTitle": "अहिलेसम्म कुनै कर्मचारी खाता छैन",
+  "usersEmptyBody": "काउन्टरमा काम गर्ने मानिसहरू थप्नुहोस्। हरेकले आफ्नै खाताबाट साइन इन गर्ने भएकाले अभिलेखले कसले के गर्‍यो भन्ने देखाउँछ।",
+  "usersAddHeading": "कर्मचारी खाता थप्नुहोस्",
+  "usersEditHeading": "कर्मचारी खाता सम्पादन गर्नुहोस्",
+  "fieldRole": "भूमिका",
+  "usersCreatedToast": "कर्मचारी खाता थपियो।",
+  "usersUpdatedToast": "कर्मचारी खाता अद्यावधिक भयो।",
+  "usersResetPasswordHeading": "पासवर्ड रिसेट गर्नुहोस्",
+  "usersResetPasswordDescription": "{name} का लागि नयाँ पासवर्ड सेट गर्नुहोस्।",
+  "@usersResetPasswordDescription": {
+    "description": "पासवर्ड रिसेट संवादको उपशीर्षक",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Anita Shrestha"
+      }
+    }
+  },
+  "usersResetPasswordToast": "पासवर्ड रिसेट गरियो।",
+  "usersDisableConfirmTitle": "{name} को खाता निष्क्रिय गर्ने?",
+  "@usersDisableConfirmTitle": {
+    "description": "खाता निष्क्रिय गर्ने पुष्टि संवादको शीर्षक",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Anita Shrestha"
+      }
+    }
+  },
+  "usersDisableConfirmBody": "प्रशासकले खाता पुनःसक्रिय नगरेसम्म उनी साइन इन गर्न सक्ने छैनन्।",
+  "usersDisableConfirmAction": "खाता निष्क्रिय गर्नुहोस्",
+  "usersEnabledToast": "खाता सक्रिय गरियो।",
+  "usersDisabledToast": "खाता निष्क्रिय गरियो।",
+  "usersLastAdministratorError": "पुस्तकालयमा सधैं कम्तीमा एक जना सक्रिय प्रशासक हुनुपर्छ।",
+  "usersSelfDisableError": "तपाईं आफ्नो खाता निष्क्रिय गर्न सक्नुहुन्न।",
+  "rolesPeopleCount": "{count} जना",
+  "@rolesPeopleCount": {
+    "description": "भूमिकाहरू - कुनै भूमिका सम्हाल्ने कर्मचारीको संख्या",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "3"
+      }
+    }
+  },
+  "rolesPermissionCount": "{total} मध्ये {count} अनुमति",
+  "@rolesPermissionCount": {
+    "description": "भूमिकाहरू - अनुमति संख्या",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "6"
+      },
+      "total": {
+        "type": "String",
+        "example": "8"
+      }
+    }
+  },
+  "roleAdministrator": "प्रशासक",
+  "roleLibrarian": "पुस्तकालयाध्यक्ष",
+  "roleAssistant": "काउन्टर सहायक",
+  "roleReadOnly": "पढ्न मात्र",
+  "roleAdministratorBody": "कर्मचारी खाता, ब्याकअप र पुस्तकालय सेटिङसहित सबै कुरा।",
+  "roleLibrarianBody": "सम्पूर्ण क्याटलग र पुस्तक लेनदेन काउन्टर, साथै जरिवाना र रिपोर्टहरू।",
+  "roleAssistantBody": "पुस्तक लेनदेन काउन्टर: जारी, फिर्ता र सदस्य खोजी।",
+  "roleReadOnlyBody": "क्याटलग र रिपोर्टहरू हेर्नुहोस्। केही परिवर्तन गर्न सकिँदैन।",
+  "permissionCatalog": "क्याटलग व्यवस्थापन गर्नुहोस्",
+  "permissionCirculation": "पुस्तक लेनदेन काउन्टर सञ्चालन गर्नुहोस्",
+  "permissionMembers": "सदस्यहरू व्यवस्थापन गर्नुहोस्",
+  "permissionFines": "जरिवाना उठाउनुहोस् र माफ गर्नुहोस्",
+  "permissionReports": "रिपोर्टहरू हेर्नुहोस्",
+  "permissionSettings": "पुस्तकालय सेटिङ परिवर्तन गर्नुहोस्",
+  "permissionUsers": "कर्मचारी खाताहरू व्यवस्थापन गर्नुहोस्",
+  "permissionBackup": "ब्याकअप र पुनर्स्थापना चलाउनुहोस्",
+  "rolesMatrixTitle": "अनुमति तालिका",
+  "rolesLevelManage": "परिवर्तन गर्न सक्छ",
+  "rolesLevelView": "हेर्न सक्छ",
+  "rolesLevelNone": "पहुँच छैन",
+  "rolesLegend": "ठीक चिन्हले अभिलेख परिवर्तन गर्न मिल्छ। आँखाले हेर्न मात्र मिल्छ।",
+  "permissionViewOnlyNotice": "तपाईंको भूमिकाले यो हेर्न सक्छ, तर परिवर्तन गर्न सक्दैन।",
+  "syncSubtitle": "खुल्ला पूर्ण रूपमा अफलाइन चल्छ। सिंक अतिरिक्त प्रतिलिपि हो, मूल स्रोत होइन।",
+  "syncStatusTitle": "स्थिति",
+  "syncStatusConnected": "जडान भएको",
+  "syncStatusNever": "सेटअप गरिएको छैन",
+  "syncLastSynced": "अन्तिम सिंक",
+  "syncNextSync": "अर्को सिंक",
+  "syncNow": "अहिले सिंक गर्नुहोस्",
+  "syncProviderTitle": "प्रतिलिपि कहाँ जाने",
+  "syncProviderDescription": "इन्क्रिप्ट गरिएको स्न्यापसट लेखिने रिमोट भण्डारण छान्नुहोस्।",
+  "syncProviderNone": "कन्फिगर गरिएको छैन",
+  "syncProviderFolder": "यस उपकरणमा सिंक हुने फोल्डर",
+  "syncProviderWebdav": "WebDAV सर्भर",
+  "syncProviderS3": "S3-संगत बकेट",
+  "syncAutoTitle": "स्वतः सिंक गर्नुहोस्",
+  "syncAutoDescription": "क्याटलग परिवर्तन हुँदा र नेटवर्क उपलब्ध हुँदा स्न्यापसट लेख्नुहोस्।",
+  "syncEncryptTitle": "स्न्यापसट इन्क्रिप्ट गर्नुहोस्",
+  "syncEncryptDescription": "यस पुस्तकालयको पासफ्रेजबिना स्न्यापसट पढ्न सकिँदैन। पासफ्रेज हराएमा ब्याकअप पनि हराउँछ।",
+  "syncWifiOnlyTitle": "अनमिटर गरिएका नेटवर्कमा मात्र",
+  "syncWifiOnlyDescription": "उपकरण मिटर गरिएको जडानमा हुँदा स्न्यापसट रोक्नुहोस्।",
+  "syncHistoryTitle": "हालैका स्न्यापसटहरू",
+  "syncHistorySubtitle": "के लेखियो, कहिले लेखियो र कति ठूलो थियो",
+  "syncColumnWhen": "समय",
+  "syncColumnSize": "आकार",
+  "syncColumnOutcome": "नतिजा",
+  "syncOutcomeOk": "लेखियो",
+  "syncOutcomeFailed": "असफल",
+  "syncOutcomeSkipped": "छोडियो",
+  "syncHistoryEmptyTitle": "अहिलेसम्म कुनै स्न्यापसट छैन",
+  "syncHistoryEmptyBody": "सिंक कन्फिगर भएपछि हरेक स्न्यापसट यसको आकार र नतिजासहित यहाँ देखिन्छ।",
+  "labelsSubtitle": "प्रतिलिपि थपिँदै जाँदा तिनका स्पाइन लेबल र बारकोड स्टिकर छाप्नुहोस्।",
+  "labelsScanTitle": "बारकोड स्क्यान गर्नुहोस्",
+  "labelsScanSubtitle": "ह्यान्डहेल्ड स्क्यानर वा किबोर्डसँग काम गर्छ - पङ्क्तिमा राख्न Enter थिच्नुहोस्।",
+  "labelsScanHint": "बारकोड",
+  "labelsBulkAction": "सूची टाँस्नुहोस्",
+  "labelsBulkTitle": "बारकोडहरूको सूची टाँस्नुहोस्",
+  "labelsBulkSubtitle": "प्रति पङ्क्ति एउटा बारकोड - स्प्रेडसिट वा थपिएको प्रतिलिपिको सूचीबाट।",
+  "labelsBulkHint": "9781234567890\n9789876543210",
+  "labelsBulkQueueAction": "बारकोडहरू लाइनमा राख्नुहोस्",
+  "labelsBulkAllQueued": "{count} लेबल लाइनमा राखियो",
+  "@labelsBulkAllQueued": {
+    "description": "लेबलहरू - टाँसिएको सूचीमा सबै बारकोड मेल खाएपछि देखाइने टोस्ट",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "labelsBulkPartial": "{queued} लाइनमा - {notFound} फेला परेन",
+  "@labelsBulkPartial": {
+    "description": "लेबलहरू - टाँसिएको सूचीमा केही बारकोड मात्र मेल खाँदा देखाइने टोस्ट",
+    "placeholders": {
+      "queued": {
+        "type": "String",
+        "example": "10"
+      },
+      "notFound": {
+        "type": "String",
+        "example": "2"
+      }
+    }
+  },
+  "labelsQueueTitle": "छपाइ सूची",
+  "labelsQueueSubtitle": "{count} लेबल लाइनमा",
+  "@labelsQueueSubtitle": {
+    "description": "लेबलहरू - लाइनमा रहेका लेबलको संख्या",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "labelsQueueEmptyTitle": "लाइनमा केही छैन",
+  "labelsQueueEmptyBody": "प्रतिलिपिको बारकोड स्क्यान गर्नुहोस् वा प्रतिलिपि सूचीबाट पूरा र्‍याक थप्नुहोस्, अनि त्यसको लेबल छपाइ सूचीमा राखिन्छ।",
+  "labelsColumnBarcode": "बारकोड",
+  "labelsColumnTitle": "शीर्षक",
+  "labelsColumnShelf": "र्‍याक",
+  "labelsColumnCopies": "लेबलहरू",
+  "labelsLayoutTitle": "लेबल ढाँचा",
+  "labelsLayoutSubtitle": "स्टिकरमा के जाने र एउटा पानामा कति वटा अट्ने",
+  "labelsSizeTitle": "स्टिकरको आकार",
+  "labelsSizeSmall": "सानो - 38 × 21 mm",
+  "labelsSizeMedium": "मध्यम - 63 × 38 mm",
+  "labelsSizeLarge": "ठूलो - 99 × 57 mm",
+  "labelsIncludeTitle": "शीर्षक छाप्नुहोस्",
+  "labelsIncludeAuthor": "लेखक छाप्नुहोस्",
+  "labelsIncludeShelf": "र्‍याक चिन्ह छाप्नुहोस्",
+  "labelsIncludeLibrary": "पुस्तकालयको नाम छाप्नुहोस्",
+  "labelsPreviewTitle": "पूर्वावलोकन",
+  "labelsPreviewSubtitle": "छानिएको आकारमा एउटा स्टिकर",
+  "labelsPreviewEmpty": "यहाँ लेबल हेर्न एउटा प्रतिलिपि लाइनमा राख्नुहोस्।",
+  "labelsPrint": "पाना छाप्नुहोस्",
+  "labelsPrintSuccess": "{count} लेबल प्रिन्टरमा पठाइयो",
+  "@labelsPrintSuccess": {
+    "description": "पाना प्रिन्ट संवादमा पुगेपछि देखाइने टोस्ट",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "labelsClearQueue": "लाइन खाली गर्नुहोस्",
+  "labelsRemove": "लाइनबाट हटाउनुहोस्",
+  "settingsAppearanceBrand": "ब्रान्ड रङ",
+  "settingsAppearanceBrandDescription": "बटन, सक्रिय नेभिगेसन र हाइलाइटको रङ। स्थिति रङहरू - म्याद नाघेको, आरक्षणमा, फिर्ता - कहिल्यै परिवर्तन हुँदैनन्।",
+  "@settingsAppearanceBrandDescription": {
+    "description": "सेटिङहरू - देखावट पृष्ठ"
+  },
+  "settingsAppearanceBrandCustom": "आफ्नै",
+  "settingsAppearanceBrandCustomTitle": "आफ्नै ब्रान्ड रङ",
+  "settingsAppearanceBrandCustomDescription": "रङ मिसाउन तान्नुहोस् वा पुस्तकालयले पहिले नै प्रयोग गरेको hex टाँस्नुहोस्।",
+  "settingsAppearanceBrandPreviewAction": "जारी गर्नुहोस्",
+  "settingsAppearanceBrandPreviewSelected": "चयन गरिएको पङ्क्ति",
+  "@settingsAppearanceBrandPreviewSelected": {
+    "description": "सेटिङहरू - देखावट पृष्ठ, रङ चयन पूर्वावलोकनका नमुना चिपहरू"
+  },
+  "fieldColorHex": "Hex",
+  "brandThemeTeal": "टिल",
+  "brandThemeIndigo": "इन्डिगो",
+  "brandThemeBlue": "निलो",
+  "brandThemeViolet": "बैजनी",
+  "brandThemeRose": "गुलाबी",
+  "brandThemeAmber": "एम्बर",
+  "brandThemeForest": "वन हरियो",
+  "brandThemeGraphite": "ग्राफाइट",
+  "@brandThemeGraphite": {
+    "description": "सेटिङहरू - देखावट पृष्ठ, ब्रान्ड रङका नामहरू"
+  },
+  "settingsAppearanceLanguage": "भाषा",
+  "settingsAppearanceLanguageDescription": "खुल्लाले क्याटलग, रसिद र लेबलसहित सम्पूर्ण प्रणालीमा नेपाली युनिकोड प्रयोग गर्छ।",
+  "settingsLanguageEnglish": "अङ्ग्रेजी",
+  "settingsLanguageNepali": "नेपाली",
+  "settingsDesignSystemTitle": "डिजाइन प्रणाली",
+  "settingsDesignSystemBody": "दृश्य भाषा जाँच्न हरेक कम्पोनेन्ट र अवस्था एउटै पृष्ठमा।",
+  "fieldPassword": "पासवर्ड",
+  "fieldConfirmPassword": "पासवर्ड पुष्टि गर्नुहोस्",
+  "@fieldConfirmPassword": {
+    "description": "फारामहरू - कर्मचारी साइन इन गर्न प्रयोग गर्ने प्रमाणका फिल्ड नामहरू"
+  },
+  "validationEmailRequired": "इमेल ठेगाना प्रविष्ट गर्नुहोस्।",
+  "validationEmailInvalid": "यो इमेल ठेगाना जस्तो देखिँदैन।",
+  "validationPasswordRequired": "पासवर्ड प्रविष्ट गर्नुहोस्।",
+  "validationPasswordTooShort": "कम्तीमा {minLength} अक्षर प्रयोग गर्नुहोस्।",
+  "@validationPasswordTooShort": {
+    "description": "मान्यता जाँच - पासवर्ड न्यूनतम लम्बाइभन्दा छोटो छ",
+    "placeholders": {
+      "minLength": {
+        "type": "int",
+        "example": "8"
+      }
+    }
+  },
+  "validationPasswordTooLong": "बढीमा {maxLength} अक्षर प्रयोग गर्नुहोस्।",
+  "@validationPasswordTooLong": {
+    "description": "मान्यता जाँच - पासवर्डले समर्थन गर्ने अधिकतम लम्बाइभन्दा लामो छ",
+    "placeholders": {
+      "maxLength": {
+        "type": "int",
+        "example": "72"
+      }
+    }
+  },
+  "validationConfirmPasswordRequired": "पासवर्ड फेरि टाइप गर्नुहोस्।",
+  "validationPasswordsDoNotMatch": "दुवै पासवर्ड मिलेनन्।",
+  "validationNameRequired": "नाम प्रविष्ट गर्नुहोस्।",
+  "validationNameTooShort": "यो नाम धेरै छोटो देखिन्छ।",
+  "validationFieldRequired": "यो फिल्ड आवश्यक छ।",
+  "@validationFieldRequired": {
+    "description": "मान्यता जाँच - सम्पादन गरिएको तर अझै मान्य नभएको फाराम फिल्डमुनि देखाइने सन्देश"
+  },
+  "validationAmountInvalid": "मान्य रकम प्रविष्ट गर्नुहोस्।",
+  "validationCopiesMin": "कम्तीमा एउटा प्रतिलिपि सिर्जना गर्नुहोस्।",
+  "authBrandTagline": "तपाईंको आफ्नै उपकरणमा चल्ने पुस्तकालय क्याटलग।",
+  "authBrandLocalTitle": "तपाईंका अभिलेख यहीँ रहन्छन्",
+  "authBrandLocalBody": "क्याटलग यही कम्प्युटरमा फाइलका रूपमा रहन्छ। सेटअप वा गुमाउनुपर्ने कुनै क्लाउड खाता छैन।",
+  "authBrandDeskTitle": "काउन्टरका लागि बनाइएको",
+  "authBrandDeskBody": "जडानको प्रतीक्षा नगरी जारी, फिर्ता र नवीकरण गर्नुहोस्। अफलाइनमा पनि उस्तै काम गर्छ।",
+  "authBrandSyncTitle": "अफलाइन पहिलो, चाहँदा सिंक",
+  "authBrandSyncBody": "खुल्ला इन्टरनेटबिनै पूर्ण रूपमा चल्छ। पछि वैकल्पिक अनलाइन सिंक पनि सक्रिय गर्न सकिन्छ - अतिरिक्त प्रतिलिपि मात्र, मूल स्रोत होइन।",
+  "authBrandOpenTitle": "खुला स्रोत",
+  "authBrandOpenBody": "चलाउन निःशुल्क, पढ्न निःशुल्क, फोर्क गर्न निःशुल्क। नवीकरण गर्नुपर्ने कुनै इजाजतपत्र छैन।",
+  "@authBrandOpenBody": {
+    "description": "प्रमाणीकरण - साइन इन र पहिलो सेटअप फारामको छेउमा देखाइने ब्रान्ड प्यानल"
+  },
+  "authRevealPassword": "पासवर्ड देखाउनुहोस्",
+  "authHidePassword": "पासवर्ड लुकाउनुहोस्",
+  "@authHidePassword": {
+    "description": "प्रमाणीकरण - पासवर्ड फिल्ड देखाउने/लुकाउने बटनको टुलटिप"
+  },
+  "signInHeading": "साइन इन गर्नुहोस्",
+  "signInSubtitle": "यो पुस्तकालय सेटअप गर्दा प्रयोग गरिएको कर्मचारी खाता प्रयोग गर्नुहोस्।",
+  "signInRejected": "त्यो इमेल र पासवर्ड कुनै सक्रिय कर्मचारी खातासँग मिलेन।",
+  "signInAction": "साइन इन गर्नुहोस्",
+  "signInEmailHint": "you@library.org",
+  "signInPasswordHint": "आफ्नो पासवर्ड प्रविष्ट गर्नुहोस्",
+  "authConfirmPasswordHint": "पासवर्ड फेरि प्रविष्ट गर्नुहोस्",
+  "signInForgotPasswordUnavailable": "रिकभरी सेटअप गरिएको छैन। Staff बाट अर्को प्रशासकलाई तपाईंको पासवर्ड रिसेट गर्न भन्नुहोस्।",
+  "signInForgotPasswordAction": "पासवर्ड बिर्सनुभयो?",
+  "@signInForgotPasswordAction": {
+    "description": "प्रमाणीकरण - साइन इन पासवर्ड फिल्डमुनिको लिङ्क"
+  },
+  "@signInForgotPasswordUnavailable": {
+    "description": "प्रमाणीकरण - रिकभरी कोड बाँकी नभएको अवस्थामा देखाइने सन्देश"
+  },
+  "currencyNpr": "नेपाली रुपैयाँ (NPR)",
+  "currencyInr": "भारतीय रुपैयाँ (INR)",
+  "currencyUsd": "अमेरिकी डलर (USD)",
+  "currencyEur": "युरो (EUR)",
+  "currencyGbp": "पाउन्ड स्टर्लिङ (GBP)",
+  "currencySearchHint": "मुद्रा खोज्नुहोस्",
+  "@currencyGbp": {
+    "description": "सेटिङहरू - पुस्तकालय सेटअप गर्न सकिने मुद्राहरू"
+  },
+  "onboardingStepCounter": "चरण {step} / {total}",
+  "@onboardingStepCounter": {
+    "description": "पहिलो सेटअप - विजार्डमाथि देखाइने प्रगति विवरण",
+    "placeholders": {
+      "step": {
+        "type": "int",
+        "example": "1"
+      },
+      "total": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "onboardingLibraryHeading": "पुस्तकालय सेटअप गर्नुहोस्",
+  "onboardingLibrarySubtitle": "पुस्तकालयको नाम राख्नुहोस्, आफ्नो प्रशासक खाता सिर्जना गर्नुहोस् र त्यसपछि रिकभरी कोड सुरक्षित गर्नुहोस्। बाँकी सबै कुरा पछि सेटिङहरूमा परिवर्तन गर्न सकिन्छ।",
+  "onboardingLibraryNameLabel": "पुस्तकालयको नाम",
+  "onboardingLibraryNameHint": "काठमाडौं सामुदायिक पुस्तकालय",
+  "onboardingCurrencyLabel": "मुद्रा",
+  "onboardingCurrencyHelp": "यस पुस्तकालयले अभिलेख गर्ने हरेक जरिवाना, शुल्क र धरौटीमा प्रयोग हुन्छ।",
+  "onboardingAccountHeading": "तपाईंको प्रशासक खाता",
+  "onboardingAccountSubtitle": "पहिलो खाताले पुस्तकालय सञ्चालन गर्छ। अन्य कर्मचारीहरू पछि Staff अन्तर्गत थप्न सकिन्छ।",
+  "onboardingEmailHint": "you@library.org",
+  "onboardingEmailTaken": "यो इमेल ठेगाना पहिले नै अर्को कर्मचारी खाताले प्रयोग गरिरहेको छ।",
+  "onboardingPasswordHelp": "कम्तीमा {minLength} अक्षर। आफूलाई सम्झन सजिलो केही रोज्नुहोस्।",
+  "@onboardingPasswordHelp": {
+    "description": "पहिलो सेटअप - पासवर्ड फिल्डमुनिको सूचना",
+    "placeholders": {
+      "minLength": {
+        "type": "int",
+        "example": "8"
+      }
+    }
+  },
+  "onboardingContinue": "जारी राख्नुहोस्",
+  "onboardingBack": "पछाडि",
+  "onboardingFinish": "पुस्तकालय सिर्जना गर्नुहोस्",
+  "onboardingSetupFailed": "पुस्तकालय सेटअप गर्न सकिएन।",
+  "@onboardingSetupFailed": {
+    "description": "पहिलो सेटअप - पहिलो पटक चलाउने सेटअप विजार्ड"
+  },
+  "onboardingRestoreAction": "बरु ब्याकअपबाट पुनर्स्थापना गर्नुहोस्",
+  "onboardingRestoreConfirmTitle": "ब्याकअपबाट पुनर्स्थापना गर्ने?",
+  "onboardingRestoreConfirmBody": "यस सेटअप स्क्रिनमा टाइप गरिएको सबै कुरा हटाइनेछ। क्याटलग, कर्मचारी खाताहरू र सापटी अभिलेखहरू सबै ब्याकअप फाइलबाट आउनेछन् र प्रक्रिया पूरा भएपछि अनुप्रयोग पुनःसुरु हुनेछ।",
+  "@onboardingRestoreConfirmBody": {
+    "description": "पहिलो सेटअप - नयाँ उपकरणमा ब्याकअप फाइल अपनाउनुअघि देखाइने पुष्टि"
+  },
+  "onboardingRecoveryHeading": "तपाईंका रिकभरी कोड सुरक्षित गर्नुहोस्",
+  "onboardingRecoverySubtitle": "यी कोडबाट पासवर्ड बिर्सिएमा प्रशासक पासवर्ड रिसेट गर्न सकिन्छ। यी कोड यही एक पटक मात्र देखाइन्छन्।",
+  "onboardingRecoveryWarning": "अफलाइन सुरक्षित राख्नुहोस्: छापिएको पाना, पासवर्ड व्यवस्थापक वा अर्को उपकरणमा डाउनलोड गरिएको फाइलमा। कोड भएको जो कोहीले नयाँ प्रशासक पासवर्ड सेट गर्न सक्छ।",
+  "onboardingCopyCodes": "कोड प्रतिलिपि गर्नुहोस्",
+  "onboardingDownloadCodes": "डाउनलोड गर्नुहोस्",
+  "onboardingCodesCopied": "कोड प्रतिलिपि गरियो।",
+  "onboardingCodesDownloaded": "रिकभरी कोड सुरक्षित गरियो।",
+  "onboardingCodesDownloadFailed": "फाइल सुरक्षित गर्न सकिएन।",
+  "onboardingCodesSavedLabel": "मैले यी कोड भेट्टाउन सक्ने ठाउँमा सुरक्षित गरेको छु",
+  "onboardingCodesSavedDescription": "साइन आउट भइसकेपछि पासवर्ड सम्झन नसकेमा यीमध्ये एउटा कोड चाहिन्छ।",
+  "recoverPasswordHeading": "रिकभरी कोडबाट रिसेट गर्नुहोस्",
+  "recoverPasswordSubtitle": "सेटअपबाट प्रयोग नभएको एउटा कोड प्रयोग गर्नुहोस् र नयाँ पासवर्ड छान्नुहोस्। त्यो कोड फेरि प्रयोग गर्न सकिँदैन।",
+  "recoverPasswordCodeLabel": "रिकभरी कोड",
+  "recoverPasswordCodeHint": "7K2M-9QWP-4XNH-B6RT",
+  "recoverPasswordNewPassword": "नयाँ पासवर्ड",
+  "recoverPasswordAction": "नयाँ पासवर्ड सेट गर्नुहोस्",
+  "recoverPasswordRejected": "त्यो इमेल र रिकभरी कोड सक्रिय खाताका लागि प्रयोग नभएको कोडसँग मेल खाएन।",
+  "recoverPasswordBackToSignIn": "साइन इनमा फर्कनुहोस्",
+  "@recoverPasswordBackToSignIn": {
+    "description": "प्रमाणीकरण - सेटअपमा प्राप्त एकपटक प्रयोग हुने कोडबाट पहिलो प्रशासकको पासवर्ड पुनःप्राप्त गर्ने"
+  }
+}

@@ -175,11 +175,6 @@ List<ShellDestination> shellDestinations(
       primary: true,
       permission: StaffPermission.members,
     ),
-    // ShellDestination(
-    //   label: l10n.navOpac,
-    //   icon: AppIcons.discover,
-    //   route: Routes.opac,
-    // ),
     ShellDestination(
       label: l10n.navReports,
       icon: AppIcons.insights,
@@ -223,8 +218,9 @@ List<ShellDestination> shellDestinations(
             label: l10n.navSettingsBackup,
             route: Routes.settingsBackup,
           ),
-        if (canSeeSettings)
-          ShellChild(label: l10n.navSettingsSync, route: Routes.settingsSync),
+        // Online sync is hidden until a real data layer lands behind it.
+        // The /settings/sync route stays registered, so it is only out of
+        // the navigation, not unmounted.
       ],
     ),
   ];

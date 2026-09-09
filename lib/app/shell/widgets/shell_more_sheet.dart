@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:go_router/go_router.dart';
+import 'package:khulla/app/shell/widgets/shell_copyright_notice.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -73,6 +74,9 @@ class _MoreList extends StatelessWidget {
             ),
           SizedBox(height: spacing.xxs),
         ],
+        // Phones never see the rail footer, so the sheet carries the same
+        // line at its foot instead of the notice living desktop-only.
+        const ShellCopyrightNotice(showDivider: true),
       ],
     );
   }

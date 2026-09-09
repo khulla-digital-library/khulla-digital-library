@@ -9,19 +9,20 @@ import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/format/app_date_format.dart';
 import 'package:khulla/features/settings/presentation/cubit/backup_cubit.dart';
 import 'package:khulla/features/settings/presentation/cubit/backup_state.dart';
+import 'package:khulla/features/settings/presentation/widgets/confirm_erase_dialog.dart';
 import 'package:khulla/features/settings/presentation/widgets/settings_action_card.dart';
+import 'package:khulla/features/settings/presentation/widgets/settings_erase_card.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Export, restore, import — and the one irreversible action in the app.
+/// Export, restore — and the one irreversible action in the app.
 ///
 /// Khulla is local-first: there is no server holding a second copy of any of
-/// this. That is why the erase action is fenced into its own card with its
-/// own copy, and confirms through [AppDialog] with a button that names the
-/// act rather than saying *OK*.
+/// this. The erase entry sits below the routine actions as one more quiet
+/// row rather than an alarm panel — the danger lives in its button, and the
+/// confirmation dialog behind it is what stops an accident.
 class BackupPage extends StatelessWidget {
   const BackupPage({super.key});
 
@@ -63,13 +64,9 @@ class BackupPage extends StatelessWidget {
 
   Future<void> _confirmErase(BuildContext context) async {
     final l10n = context.l10n;
-    final confirmed = await AppDialog.confirmDestructive(
-      context: context,
-      title: l10n.settingsBackupEraseTitle,
-      message: l10n.settingsBackupEraseBody,
-      confirmLabel: l10n.settingsBackupEraseAction,
-      cancelLabel: l10n.commonCancel,
-    );
+    // The dialog already demanded the operator's password: true means
+    // verified, so the erase proceeds with no second prompt.
+    final confirmed = await ConfirmEraseDialog.show(context);
     if (!context.mounted || !confirmed) return;
 
     final cubit = context.read<BackupCubit>();
@@ -167,7 +164,7 @@ class _BackupBody extends StatelessWidget {
                 ),
                 SizedBox(height: spacing.md),
                 AppResponsiveGrid(
-                  largeColumns: 3,
+                  largeColumns: 2,
                   children: [
                     SettingsActionCard(
                       title: l10n.settingsBackupExportTitle,
@@ -185,28 +182,13 @@ class _BackupBody extends StatelessWidget {
                       isLoading: state.isWorking,
                       onAction: onRestore,
                     ),
-                    SettingsActionCard(
-                      title: l10n.settingsBackupImportTitle,
-                      description: l10n.settingsBackupImportBody,
-                      actionLabel: l10n.settingsBackupImportAction,
-                      icon: AppIcons.upload,
-                      onAction: () => showNotWiredToast(context),
-                    ),
                   ],
                 ),
                 SizedBox(height: spacing.lg),
-                AppSectionHeader(
-                  title: l10n.settingsBackupDangerTitle,
-                  subtitle: l10n.settingsBackupDangerDescription,
-                  icon: AppIcons.warning,
-                ),
-                SizedBox(height: spacing.md),
-                SettingsActionCard(
+                SettingsEraseCard(
                   title: l10n.settingsBackupEraseTitle,
                   description: l10n.settingsBackupEraseBody,
                   actionLabel: l10n.settingsBackupEraseAction,
-                  icon: AppIcons.deleteForever,
-                  isDestructive: true,
                   isLoading: state.isWorking,
                   onAction: onErase,
                 ),

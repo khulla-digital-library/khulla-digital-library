@@ -91,8 +91,6 @@ abstract final class Routes {
   static const String circulationFines = '$circulation/$finesSegment';
 
   /// Members: borrower records and their standing.
-  /// The reader-facing catalogue search.
-  static const String opac = '/opac';
 
   /// Reports and statistics.
   static const String reports = '/reports';
