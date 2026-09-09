@@ -1333,6 +1333,22 @@
     },
     "labelsClearQueue": "Clear the queue",
     "labelsRemove": "Remove from the queue",
+    "settingsAppearanceBrand": "Brand color",
+    "settingsAppearanceBrandDescription": "The color of buttons, active navigation and highlights. Status colors - overdue, on hold, returned - never change.",
+    "@settingsAppearanceBrandDescription": {
+        "description": "Settings - appearance page"
+    },
+    "brandThemeTeal": "Teal",
+    "brandThemeIndigo": "Indigo",
+    "brandThemeBlue": "Blue",
+    "brandThemeViolet": "Violet",
+    "brandThemeRose": "Rose",
+    "brandThemeAmber": "Amber",
+    "brandThemeForest": "Forest",
+    "brandThemeGraphite": "Graphite",
+    "@brandThemeGraphite": {
+        "description": "Settings - appearance page, brand swatch names"
+    },
     "settingsAppearanceLanguage": "Language",
     "settingsAppearanceLanguageDescription": "Khulla renders Nepali Unicode throughout - the catalogue, receipts and labels included.",
     "settingsLanguageEnglish": "English",

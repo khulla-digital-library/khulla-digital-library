@@ -8,9 +8,9 @@ import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/features/users/domain/user_status.dart';
 import 'package:khulla/features/users/presentation/cubit/staff_list_cubit.dart';
 import 'package:khulla/features/users/presentation/cubit/staff_list_state.dart';
-import 'package:khulla/features/users/presentation/user_labels.dart';
 import 'package:khulla/features/users/presentation/widgets/staff_card.dart';
 import 'package:khulla/features/users/presentation/widgets/staff_form_dialog.dart';
+import 'package:khulla/features/users/presentation/widgets/staff_list_widgets.dart';
 import 'package:khulla/features/users/presentation/widgets/staff_reset_password_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
@@ -23,6 +23,10 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// something if it can say *which* member of staff waived a fine, and that
 /// means one account per person rather than a shared login taped to the
 /// monitor.
+///
+/// Search, filters, sort and paging are local state — the register is small
+/// and fully loaded. Columns and toolbar live in `presentation/widgets/`;
+/// the self-disable and last-administrator guards toast here.
 class UserListPage extends StatefulWidget {
   const UserListPage({super.key});
 
@@ -155,108 +159,6 @@ class _UserListPageState extends State<UserListPage> {
     }
   }
 
-  List<AppTableColumn<StaffMember>> _columns(AppLocalizations l10n) {
-    final spacing = context.appSpacing;
-    final colors = context.appColors;
-
-    return [
-      AppTableColumn<StaffMember>(
-        id: 'name',
-        label: l10n.usersColumnName,
-        flex: 3,
-        sortable: true,
-        cellBuilder: (context, staff) => Row(
-          children: [
-            AppAvatar(initials: staff.initials, size: 24),
-            SizedBox(width: spacing.xs),
-            Flexible(
-              child: Text(
-                staff.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: colors.textHigh,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      AppTableColumn<StaffMember>(
-        id: 'email',
-        label: l10n.usersColumnEmail,
-        flex: 3,
-        sortable: true,
-        showFrom: FormFactor.medium,
-        cellBuilder: (context, staff) => Text(
-          staff.email,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: context.textTheme.bodySmall?.copyWith(
-            color: colors.textMuted,
-          ),
-        ),
-      ),
-      AppTableColumn<StaffMember>(
-        id: 'role',
-        label: l10n.usersColumnRole,
-        flex: 2,
-        sortable: true,
-        showFrom: FormFactor.medium,
-        cellBuilder: (context, staff) => Row(
-          children: [
-            AppIcon(
-              staff.role.icon,
-              size: spacing.md,
-              color: staff.role.tone.foreground(context),
-            ),
-            SizedBox(width: spacing.xs),
-            Flexible(child: Text(staff.role.label(l10n))),
-          ],
-        ),
-      ),
-      AppTableColumn<StaffMember>(
-        id: 'status',
-        label: l10n.commonStatus,
-        sortable: true,
-        cellBuilder: (context, staff) => AppStatusBadge(
-          dense: true,
-          label: staff.status.label(l10n),
-          tone: staff.status.tone,
-        ),
-      ),
-      AppTableColumn<StaffMember>(
-        id: 'actions',
-        label: l10n.commonActions,
-        alignment: Alignment.centerRight,
-        cellBuilder: (context, staff) => AppMenuButton(
-          tooltip: l10n.commonMoreActions,
-          actions: [
-            AppMenuAction(
-              label: l10n.usersEditRole,
-              icon: AppIcons.idCard,
-              onSelected: () => unawaited(_edit(staff)),
-            ),
-            AppMenuAction(
-              label: l10n.usersResetPassword,
-              icon: AppIcons.resetPassword,
-              onSelected: () => unawaited(_resetPassword(staff)),
-            ),
-            AppMenuAction(
-              label: staff.status == UserStatus.disabled
-                  ? l10n.usersEnable
-                  : l10n.usersDisable,
-              icon: AppIcons.blocked,
-              isDestructive: staff.status != UserStatus.disabled,
-              onSelected: () => unawaited(_toggleEnabled(staff)),
-            ),
-          ],
-        ),
-      ),
-    ];
-  }
-
   void _pageSizeChanged(int size) {
     if (_pageSize == size) return;
     setState(() {
@@ -283,46 +185,24 @@ class _UserListPageState extends State<UserListPage> {
 
         return CollectionPageView<StaffMember>(
           onPageSizeChanged: _pageSizeChanged,
-          toolbar: AppToolbar(
-            search: AppSearchField(
-              hintText: l10n.usersSearchHint,
-              clearTooltip: l10n.commonClearSearch,
-              dense: true,
-              onChanged: (value) => setState(() {
-                _query = value;
-                _page = 0;
-              }),
-            ),
-            filters: [
-              AppFilterChip(
-                label: l10n.usersFilterActive,
-                selected: _statuses.contains(UserStatus.active),
-                tone: AppStatusTone.success,
-                onSelected: (selected) =>
-                    _toggleStatus(UserStatus.active, selected),
-              ),
-              AppFilterChip(
-                label: l10n.usersFilterDisabled,
-                selected: _statuses.contains(UserStatus.disabled),
-                onSelected: (selected) =>
-                    _toggleStatus(UserStatus.disabled, selected),
-              ),
-            ],
-            actions: [
-              if (_isFiltered)
-                AppTextButton(
-                  onPressed: _clearFilters,
-                  child: Text(l10n.commonClearFilters),
-                ),
-              AppButton(
-                icon: AppIcons.add,
-                onPressed: () => unawaited(_add()),
-                child: Text(l10n.usersAdd),
-              ),
-            ],
+          toolbar: StaffListToolbar(
+            statuses: _statuses,
+            isFiltered: _isFiltered,
+            onSearchChanged: (value) => setState(() {
+              _query = value;
+              _page = 0;
+            }),
+            onStatusToggled: _toggleStatus,
+            onClearFilters: _clearFilters,
+            onAdd: () => unawaited(_add()),
           ),
           items: matches.sublist(start, end),
-          columns: _columns(l10n),
+          columns: staffTableColumns(
+            context,
+            onEdit: (staff) => unawaited(_edit(staff)),
+            onResetPassword: (staff) => unawaited(_resetPassword(staff)),
+            onToggleEnabled: (staff) => unawaited(_toggleEnabled(staff)),
+          ),
           sort: _sort,
           onSort: (next) => setState(() {
             _sort = next;

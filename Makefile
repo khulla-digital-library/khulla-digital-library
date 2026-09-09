@@ -107,4 +107,4 @@ build-apk:
 # ── Git ─────────────────────────────────────────────────────────────────────
 
 pr:
-	git push && gh pr create --base dev
+	git push && gh pr create --fill-first --body "" --base dev
