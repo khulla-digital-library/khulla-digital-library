@@ -89,7 +89,7 @@ dependencies:
 dev_dependencies:
   # Code generation
   build_runner: ^2.16.0
-  drift_dev: ^2.34.3
+  drift_dev: ^2.34.6
   flutter_gen_runner: ^5.15.0
   freezed: ^4.0.0
   injectable_generator: ^3.1.3
