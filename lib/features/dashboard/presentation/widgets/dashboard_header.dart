@@ -3,7 +3,7 @@ import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The board's controls: which period its figures cover, and the one action
+/// The board's controls: which period its figures cover, and the two actions
 /// a shift starts with.
 ///
 /// No greeting and no page title. The shell's top bar already names the page
@@ -49,6 +49,14 @@ class DashboardHeader extends StatelessWidget {
       child: Text(l10n.dashboardCheckOut),
     );
 
+    final returnCopy = AppButton(
+      size: AppButtonSize.medium,
+      variant: AppButtonVariant.outline,
+      icon: AppIcons.checkIn,
+      onPressed: () => context.go(Routes.circulationReturn),
+      child: Text(l10n.dashboardReturnCopy),
+    );
+
     if (stacked) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -57,6 +65,8 @@ class DashboardHeader extends StatelessWidget {
           periods,
           SizedBox(height: spacing.xs),
           checkOut,
+          SizedBox(height: spacing.xs),
+          returnCopy,
         ],
       );
     }
@@ -65,6 +75,8 @@ class DashboardHeader extends StatelessWidget {
       children: [
         periods,
         const Spacer(),
+        returnCopy,
+        SizedBox(width: spacing.xs),
         checkOut,
       ],
     );

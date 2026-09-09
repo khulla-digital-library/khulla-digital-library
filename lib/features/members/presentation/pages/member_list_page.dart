@@ -230,6 +230,7 @@ class _MemberListPageState extends State<MemberListPage> with DisposeBag {
       AppTableColumn<Member>(
         id: 'fines',
         label: l10n.membersColumnFines,
+        flex: 2,
         sortable: true,
         showFrom: FormFactor.expanded,
         cellBuilder: (context, member) => Text(
@@ -258,6 +259,7 @@ class _MemberListPageState extends State<MemberListPage> with DisposeBag {
       AppTableColumn<Member>(
         id: 'status',
         label: l10n.commonStatus,
+        flex: 2,
         cellBuilder: (context, member) => AppStatusBadge(
           dense: true,
           label: member.status.label(l10n),

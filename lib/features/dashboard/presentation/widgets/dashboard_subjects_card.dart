@@ -1,21 +1,22 @@
-import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_placeholder.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_section_card.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// How the catalogue divides by subject.
+/// How the catalogue divides by format — the closest categorical dimension a
+/// title carries; there is no separate subject/genre column.
 ///
 /// Bars on a shared scale rather than a second pie: six categories in a pie
 /// are six slices nobody can rank, while six bars starting from the same edge
 /// are ranked at a glance.
 class DashboardSubjectsCard extends StatelessWidget {
-  const DashboardSubjectsCard({super.key});
+  const DashboardSubjectsCard({required this.subjects, super.key});
+
+  final List<({String label, String count, double share})> subjects;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
-    final subjects = dashboardSubjectShares();
 
     return DashboardSectionCard(
       framed: false,

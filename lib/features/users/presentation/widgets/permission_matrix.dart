@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
@@ -23,100 +25,112 @@ class PermissionMatrix extends StatelessWidget {
     const labelWidth = 240.0;
     const roleWidth = 132.0;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          minWidth: labelWidth + roleWidth * 4,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: scheme.surfaceContainerLow,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(context.appRadius.control),
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: spacing.sm,
-                  vertical: spacing.xs + 2,
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: labelWidth),
-                    for (final role in UserRole.values)
-                      SizedBox(
-                        width: roleWidth,
-                        child: Text(
-                          role.label(l10n),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: context.appTextStyles.columnHeader.copyWith(
-                            color: colors.textMuted,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-            for (final permission in StaffPermission.values)
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: colors.hairline),
+    // A horizontal scroll view hands its child an unbounded width, and a
+    // Column with stretch then tries to expand to infinity and crashes
+    // ("BoxConstraints forces an infinite width"). Pin the column to a
+    // finite width instead: the content width on a narrow window, the full
+    // available width when there is room to stretch into.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final contentWidth = labelWidth + roleWidth * 4 + spacing.sm * 2;
+        final width = constraints.maxWidth.isFinite
+            ? max(contentWidth, constraints.maxWidth)
+            : contentWidth;
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SizedBox(
+            width: width,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(context.appRadius.control),
+                    ),
                   ),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: spacing.sm,
-                    vertical: spacing.sm,
-                  ),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: labelWidth,
-                        child: Text(
-                          permission.label(l10n),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: colors.textHigh,
-                          ),
-                        ),
-                      ),
-                      for (final role in UserRole.values)
-                        SizedBox(
-                          width: roleWidth,
-                          child: Center(
-                            child:
-                                (rolePermissions[role] ??
-                                        const <StaffPermission>{})
-                                    .contains(permission)
-                                ? AppIcon(
-                                    AppIcons.success,
-                                    size: spacing.md + 2,
-                                    color: colors.success,
-                                  )
-                                : AppIcon(
-                                    AppIcons.remove,
-                                    size: spacing.md + 2,
-                                    color: colors.hairlineStrong,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: spacing.sm,
+                      vertical: spacing.xs + 2,
+                    ),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: labelWidth),
+                        for (final role in UserRole.values)
+                          SizedBox(
+                            width: roleWidth,
+                            child: Text(
+                              role.label(l10n),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.appTextStyles.columnHeader
+                                  .copyWith(
+                                    color: colors.textMuted,
                                   ),
+                            ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-          ],
-        ),
-      ),
+                for (final permission in StaffPermission.values)
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: colors.hairline),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: spacing.sm,
+                        vertical: spacing.sm,
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: labelWidth,
+                            child: Text(
+                              permission.label(l10n),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: colors.textHigh,
+                              ),
+                            ),
+                          ),
+                          for (final role in UserRole.values)
+                            SizedBox(
+                              width: roleWidth,
+                              child: Center(
+                                child:
+                                    (rolePermissions[role] ??
+                                            const <StaffPermission>{})
+                                        .contains(permission)
+                                    ? AppIcon(
+                                        AppIcons.success,
+                                        size: spacing.md + 2,
+                                        color: colors.success,
+                                      )
+                                    : AppIcon(
+                                        AppIcons.remove,
+                                        size: spacing.md + 2,
+                                        color: colors.hairlineStrong,
+                                      ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

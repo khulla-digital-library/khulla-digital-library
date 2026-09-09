@@ -1,4 +1,3 @@
-import 'package:khulla/features/dashboard/presentation/placeholder/dashboard_placeholder.dart';
 import 'package:khulla/features/dashboard/presentation/widgets/dashboard_section_card.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -9,14 +8,19 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// operator reads first — "how many copies do we have" — and the slices
 /// answer the follow-up without a second card.
 class DashboardCollectionCard extends StatelessWidget {
-  const DashboardCollectionCard({super.key});
+  const DashboardCollectionCard({required this.slices, super.key});
+
+  /// One slice per copy status that has at least one copy.
+  final List<AppChartPoint> slices;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
-    final slices = dashboardCollectionSlices(l10n);
-    final total = slices.fold<double>(0, (sum, slice) => sum + slice.value);
+    final total = slices.fold<double>(
+      0,
+      (sum, slice) => sum + slice.value,
+    );
 
     return DashboardSectionCard(
       title: l10n.dashboardCollectionTitle,
