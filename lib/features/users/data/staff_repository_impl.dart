@@ -132,7 +132,7 @@ class StaffRepositoryImpl implements StaffRepository {
         role != UserRole.administrator) {
       await _guardLastAdministrator();
     }
-    return _dataSource.updateStaff(
+    return await _dataSource.updateStaff(
       StaffMember(
         id: current.id,
         name: name.trim(),
@@ -159,7 +159,7 @@ class StaffRepositoryImpl implements StaffRepository {
         await _guardLastAdministrator();
       }
     }
-    return _dataSource.setStaffStatus(staffId: id, status: status);
+    return await _dataSource.setStaffStatus(staffId: id, status: status);
   }
 
   @override

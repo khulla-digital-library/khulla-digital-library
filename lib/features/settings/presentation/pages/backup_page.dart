@@ -13,10 +13,9 @@ import 'package:khulla/features/settings/presentation/widgets/settings_action_ca
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Export, restore, import — and the one irreversible action in the app.
+/// Export, restore — and the one irreversible action in the app.
 ///
 /// Khulla is local-first: there is no server holding a second copy of any of
 /// this. That is why the erase action is fenced into its own card with its
@@ -167,7 +166,7 @@ class _BackupBody extends StatelessWidget {
                 ),
                 SizedBox(height: spacing.md),
                 AppResponsiveGrid(
-                  largeColumns: 3,
+                  largeColumns: 2,
                   children: [
                     SettingsActionCard(
                       title: l10n.settingsBackupExportTitle,
@@ -184,13 +183,6 @@ class _BackupBody extends StatelessWidget {
                       icon: AppIcons.restore,
                       isLoading: state.isWorking,
                       onAction: onRestore,
-                    ),
-                    SettingsActionCard(
-                      title: l10n.settingsBackupImportTitle,
-                      description: l10n.settingsBackupImportBody,
-                      actionLabel: l10n.settingsBackupImportAction,
-                      icon: AppIcons.upload,
-                      onAction: () => showNotWiredToast(context),
                     ),
                   ],
                 ),
