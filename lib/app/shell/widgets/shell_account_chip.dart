@@ -8,8 +8,8 @@ import 'package:go_router/go_router.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
+import 'package:khulla/features/users/presentation/widgets/staff_profile_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// Who is signed in, at the foot of the rail.
@@ -46,7 +46,11 @@ class ShellAccountChip extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 220),
       itemBuilder: (context) => [
         PopupMenuItem<int>(
-          onTap: () => showNotWiredToast(context),
+          onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              unawaited(StaffProfileDialog.show(context));
+            }
+          }),
           child: _MenuRow(
             icon: AppIcons.person,
             label: l10n.shellProfile,
@@ -59,13 +63,18 @@ class ShellAccountChip extends StatelessWidget {
             label: l10n.navSettings,
           ),
         ),
-        PopupMenuItem<int>(
-          onTap: () => showNotWiredToast(context),
-          child: _MenuRow(
-            icon: AppIcons.help,
-            label: l10n.shellHelp,
-          ),
-        ),
+        // TODO(sawongam): Add help dialog
+        // PopupMenuItem<int>(
+        //   onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) {
+        //     if (context.mounted) {
+        //       unawaited(HelpDialog.show(context));
+        //     }
+        //   }),
+        //   child: _MenuRow(
+        //     icon: AppIcons.help,
+        //     label: l10n.shellHelp,
+        //   ),
+        // ),
         const PopupMenuDivider(),
         PopupMenuItem<int>(
           // No confirmation: signing out costs nothing to undo, and the
@@ -109,7 +118,7 @@ class ShellAccountChip extends StatelessWidget {
                             staff.role.label(l10n),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: context.textTheme.labelSmall?.copyWith(
+                            style: context.textTheme.bodySmall?.copyWith(
                               color: colors.textMuted,
                             ),
                           ),

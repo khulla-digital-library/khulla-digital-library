@@ -26,31 +26,24 @@ class ShellRailFooter extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: colors.hairline)),
       ),
-      child: Padding(
-        padding: EdgeInsets.only(top: spacing.xs),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ShellAccountChip(compact: !extended),
-            // Collapsed rails stay glyphs-only at 64px — no room for a line of
-            // text, and the brand tooltip already carries the name there.
-            if (extended) ...[
-              SizedBox(height: spacing.xs),
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  spacing.sm,
-                  0,
-                  spacing.sm,
-                  spacing.xxs,
-                ),
-                child: const ShellCopyrightNotice(
-                  textAlign: TextAlign.start,
-                ),
-              ),
-            ],
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: spacing.xs),
+          ShellAccountChip(compact: !extended),
+          // Copyright only shown in the extended rail — collapsed rail has no
+          // room for text, and the brand tooltip already carries the name.
+          if (extended) SizedBox(height: spacing.xxs),
+          Divider(height: 1, thickness: 1, color: colors.hairline),
+          SizedBox(height: spacing.xs),
+          Padding(
+            padding: EdgeInsets.fromLTRB(spacing.sm, 0, spacing.sm, 0),
+            child: const ShellCopyrightNotice(
+              textAlign: TextAlign.start,
+            ),
+          ),
+        ],
       ),
     );
   }

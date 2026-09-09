@@ -15,12 +15,13 @@ import 'package:khulla/shared/models/load_status.dart';
 part 'staff_form_state.freezed.dart';
 
 /// What `StaffFormCubit` is doing: adding a new account, editing an existing
-/// one's identity and role, or setting a new password for one.
+/// one's identity and role, setting a new password for one, or updating
+/// the signed-in operator's own profile.
 ///
-/// One cubit, three modes, rather than three cubits — every mode mutates the
-/// same resource and shares the same load/submit shape; only which fields
+/// One cubit, four modes, rather than multiple cubits — every mode mutates
+/// the same resource and shares the same load/submit shape; only which fields
 /// are validated and which repository call runs differs.
-enum StaffFormMode { create, edit, resetPassword }
+enum StaffFormMode { create, edit, resetPassword, profile }
 
 @freezed
 abstract class StaffFormState with _$StaffFormState {
