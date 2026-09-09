@@ -7,14 +7,39 @@ import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/widgets/app_logo.dart';
 import 'package:khulla_ui/khulla_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// What this product is, who built it, and where to find the source.
 ///
-/// Every link copies to the clipboard instead of opening a browser: the app
-/// carries no URL launcher, and on a locked-down library desktop a browser is
-/// not guaranteed to be there to launch anyway. Copy always works.
+/// Every link here leaves the app, which is the one place in Khulla that
+/// happens: the catalogue is local, and these four addresses are the whole
+/// reason the operator would want a browser.
 class HelpAboutPanel extends StatelessWidget {
   const HelpAboutPanel({super.key});
+
+  /// Opens [url] in the operator's browser.
+  ///
+  /// A desk machine with no browser registered, or a locked-down kiosk, will
+  /// refuse the launch — so the fallback copies the address rather than
+  /// failing silently, and the toast says which of the two happened.
+  static Future<void> openLink(BuildContext context, String url) async {
+    final l10n = context.l10n;
+    var opened = false;
+    try {
+      opened = await launchUrl(
+        Uri.parse(url),
+        mode: LaunchMode.externalApplication,
+      );
+    } on Object {
+      opened = false;
+    }
+    if (opened || !context.mounted) return;
+
+    await Clipboard.setData(ClipboardData(text: url));
+    if (context.mounted) {
+      AppToast.warning(context, message: l10n.helpAboutLinkFailed);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,39 +79,8 @@ class HelpAboutPanel extends StatelessWidget {
           ),
         ),
         AppDetailRow(
-          label: l10n.helpAboutLicenseLabel,
-          child: Text(
-            AppInfo.license,
-            style: typography.body.copyWith(color: colors.textHigh),
-          ),
-        ),
-        SizedBox(height: spacing.md),
-        AppSectionHeader(title: l10n.helpAboutAuthorTitle, dense: true),
-        SizedBox(height: spacing.sm),
-        Row(
-          children: [
-            AppAvatar(initials: AppInfo.authorInitials),
-            SizedBox(width: spacing.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppInfo.authorName,
-                    style: typography.sectionTitle.copyWith(
-                      color: colors.textHigh,
-                    ),
-                  ),
-                  Text(
-                    l10n.helpAboutAuthorRole,
-                    style: typography.caption.copyWith(
-                      color: colors.mutedForeground,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          label: l10n.helpAboutAuthorTitle,
+          child: const _AuthorLink(),
         ),
         SizedBox(height: spacing.md),
         AppSectionHeader(title: l10n.helpAboutLinksTitle, dense: true),
@@ -121,7 +115,29 @@ class HelpAboutPanel extends StatelessWidget {
   }
 }
 
-/// One link: what it is, where it points, and a copy button on the end.
+/// The author's name, which is also the way to their site.
+class _AuthorLink extends StatelessWidget {
+  const _AuthorLink();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Tooltip(
+        message: context.l10n.helpAboutAuthorLinkHint(AppInfo.authorName),
+        child: AppLinkButton(
+          color: colors.brandStrong,
+          onPressed: () => HelpAboutPanel.openLink(context, AppInfo.authorSite),
+          child: const Text(AppInfo.authorName),
+        ),
+      ),
+    );
+  }
+}
+
+/// One link: what it is, where it points, and the button that opens it.
 class _LinkRow extends StatelessWidget {
   const _LinkRow({
     required this.icon,
@@ -139,42 +155,54 @@ class _LinkRow extends StatelessWidget {
     final spacing = context.appSpacing;
     final colors = context.appColors;
     final typography = context.appTextStyles;
+    final radius = BorderRadius.circular(context.appRadius.control);
 
     return Padding(
-      padding: EdgeInsets.only(bottom: spacing.xs),
-      child: Row(
-        children: [
-          AppIcon(icon, size: 18, color: colors.mutedForeground),
-          SizedBox(width: spacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      padding: EdgeInsets.only(bottom: spacing.xxs),
+      child: Tooltip(
+        message: l10n.helpAboutOpenLink,
+        child: InkWell(
+          onTap: () => HelpAboutPanel.openLink(context, url),
+          borderRadius: radius,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: spacing.xs,
+              vertical: spacing.xs,
+            ),
+            child: Row(
               children: [
-                Text(
-                  label,
-                  style: typography.label.copyWith(color: colors.textHigh),
-                ),
-                SelectableText(
-                  url,
-                  maxLines: 1,
-                  style: typography.caption.copyWith(
-                    color: colors.mutedForeground,
+                AppIcon(icon, size: 18, color: colors.mutedForeground),
+                SizedBox(width: spacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: typography.label.copyWith(
+                          color: colors.textHigh,
+                        ),
+                      ),
+                      Text(
+                        url,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: typography.caption.copyWith(
+                          color: colors.mutedForeground,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                AppIcon(
+                  AppIcons.openExternal,
+                  size: 16,
+                  color: colors.mutedForeground,
                 ),
               ],
             ),
           ),
-          AppIconButton(
-            icon: AppIcons.copy,
-            tooltip: l10n.helpAboutCopyLink,
-            onPressed: () async {
-              await Clipboard.setData(ClipboardData(text: url));
-              if (context.mounted) {
-                AppToast.success(context, message: l10n.helpAboutLinkCopied);
-              }
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
