@@ -6,6 +6,8 @@ import 'package:injectable/injectable.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/features/settings/domain/backup_repository.dart';
 import 'package:khulla/features/settings/presentation/cubit/backup_state.dart';
+import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
+import 'package:khulla/features/users/domain/staff_repository.dart';
 import 'package:khulla/shared/models/load_status.dart';
 
 /// The backup screen: the info card, and the three actions on it.
@@ -15,9 +17,12 @@ import 'package:khulla/shared/models/load_status.dart';
 /// gets the chance to run again in this process.
 @injectable
 class BackupCubit extends Cubit<BackupState> {
-  BackupCubit(this._repository) : super(const BackupState());
+  BackupCubit(this._repository, this._staff, this._auth)
+    : super(const BackupState());
 
   final BackupRepository _repository;
+  final StaffRepository _staff;
+  final AuthCubit _auth;
 
   Future<void> load() async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
@@ -67,6 +72,27 @@ class BackupCubit extends Cubit<BackupState> {
       if (!isClosed && state.isWorking) {
         emit(state.copyWith(isWorking: false));
       }
+    }
+  }
+
+  /// Re-authenticates the signed-in account before the erase may proceed.
+  ///
+  /// True when [password] verifies against the session's account. False
+  /// refuses without saying why beyond the dialog's field error — and that
+  /// includes a missing session or a disabled account: without a verified
+  /// operator there is no erase. A database failure emits into state and
+  /// rethrows for the dialog to answer with a toast.
+  Future<bool> verifyErasePassword(String password) async {
+    final email = _auth.state.staff?.email;
+    if (email == null || email.isEmpty) return false;
+    try {
+      final staff = await _staff.signIn(email: email, password: password);
+      if (isClosed) return false;
+      return staff != null;
+    } on AppException catch (error) {
+      if (isClosed) rethrow;
+      emit(state.copyWith(error: error));
+      rethrow;
     }
   }
 
