@@ -131,8 +131,8 @@ class StaffFormCubit extends Cubit<StaffFormState> {
         error: null,
       ),
     );
-    // The edit path needs a loaded record and a signed-in actor. The
-    // dialogs show the load error instead of the form when loading failed,
+    // The edit and profile paths need a loaded record and a signed-in actor.
+    // The dialogs show the load error instead of the form when loading failed,
     // but guard here too so a submit can never hit a null assertion.
     final existing = state.existing;
     final actingId = _auth.state.staff?.id;
@@ -151,10 +151,15 @@ class StaffFormCubit extends Cubit<StaffFormState> {
               id: existing!.id,
               name: name.value,
               email: email.value,
-              role: state.role,
+              role: state.mode == StaffFormMode.profile
+                  ? existing.role
+                  : state.role,
               actingStaffId: actingId!,
             );
       if (isClosed) return saved;
+      if (saved.id == actingId) {
+        _auth.updateStaff(saved);
+      }
       emit(
         state.copyWith(
           submission: FormzSubmissionStatus.success,
