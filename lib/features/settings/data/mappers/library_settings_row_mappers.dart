@@ -1,21 +1,43 @@
 import 'package:drift/drift.dart';
 import 'package:khulla/core/database/app_database.dart';
+import 'package:khulla/core/money/currency.dart';
 import 'package:khulla/features/settings/data/tables/library_settings.dart';
 import 'package:khulla/features/settings/domain/models/library_profile.dart';
 
-/// Row ↔ domain conversions for the single library-settings row.
+/// Maps [LibrarySettingsRow] to [LibraryProfile] and back for drift writes.
 extension LibrarySettingsRowX on LibrarySettingsRow {
-  LibraryProfile toDomain() =>
-      LibraryProfile(name: name, currency: currency, createdAt: createdAt);
+  LibraryProfile toDomain() => LibraryProfile(
+    name: name,
+    currency: AppCurrency(
+      code: currency,
+      name: currencyName,
+      symbol: currencySymbol,
+    ),
+    createdAt: createdAt,
+    email: email,
+    phone: phone,
+    address: address,
+    openingHours: openingHours,
+    barcodePrefix: barcodePrefix,
+    barcodeNextValue: barcodeNextValue,
+    updatedAt: updatedAt,
+  );
 }
 
 extension LibraryProfileX on LibraryProfile {
-  /// The row to write. The id is pinned to the singleton value so a save is
-  /// always an upsert over the same row rather than a second profile.
   LibrarySettingsCompanion toCompanion() => LibrarySettingsCompanion(
     id: const Value(LibrarySettings.singletonId),
     name: Value(name),
-    currency: Value(currency),
+    currency: Value(currency.code),
+    currencyName: Value(currency.name),
+    currencySymbol: Value(currency.symbol),
+    email: Value(email),
+    phone: Value(phone),
+    address: Value(address),
+    openingHours: Value(openingHours),
+    barcodePrefix: Value(barcodePrefix),
+    barcodeNextValue: Value(barcodeNextValue),
     createdAt: Value(createdAt),
+    updatedAt: Value(updatedAt),
   );
 }

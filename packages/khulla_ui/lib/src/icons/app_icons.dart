@@ -111,6 +111,9 @@ abstract final class AppIcons {
   /// Pull data out of the app.
   static const AppIconSpec download = AppIconSpec(SolarIcons.download);
 
+  /// Copy text to the clipboard.
+  static const AppIconSpec copy = AppIconSpec(SolarIcons.copy);
+
   /// Push data into the app.
   static const AppIconSpec upload = AppIconSpec(SolarIcons.upload);
 
@@ -157,6 +160,9 @@ abstract final class AppIcons {
 
   /// Read a barcode or QR label with a scanner.
   static const AppIconSpec scan = AppIconSpec(SolarIcons.codeScan);
+
+  /// Many barcodes entered at once, typed or pasted.
+  static const AppIconSpec bulkEntry = AppIconSpec(SolarIcons.clipboardList);
 
   /// A written piece — an article, a periodical entry.
   static const AppIconSpec article = AppIconSpec(SolarIcons.documentText);
@@ -217,6 +223,10 @@ abstract final class AppIcons {
   /// A group of members.
   static const AppIconSpec people = AppIconSpec(SolarIcons.usersGroupRounded);
 
+  static const AppIconSpec bookBookmark = AppIconSpec(
+    SolarIcons.bookmarkSquare,
+  );
+
   /// Enrol someone new.
   static const AppIconSpec addPerson = AppIconSpec(SolarIcons.userPlusRounded);
 
@@ -266,6 +276,8 @@ abstract final class AppIcons {
 
   /// The settings section.
   static const AppIconSpec settings = AppIconSpec(SolarIcons.settings);
+
+  static const AppIconSpec options = AppIconSpec(SolarIcons.menuDotsSquare);
 
   /// Notifications, none waiting.
   static const AppIconSpec notifications = AppIconSpec(SolarIcons.bell);

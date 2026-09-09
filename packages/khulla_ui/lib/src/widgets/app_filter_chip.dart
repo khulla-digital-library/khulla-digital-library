@@ -4,8 +4,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// One toggleable filter in a toolbar's chip row, with an optional count.
 ///
 /// A plain card — 1px hairline, small corners, no fill — that stays neutral
-/// at rest and switches to a [tone]-tinted border and wash once applied.
-/// Matches the product's real card language rather than a rounded pill.
+/// at rest and, once applied, takes the brand wash. Hue is not the selected
+/// state: a row of green, cyan and orange chips reads as tags, not filters.
 ///
 /// Chips are additive filters that can all be off at once; when exactly one
 /// choice must always be active, that is [AppSegmentedControl] instead.
@@ -39,9 +39,9 @@ class AppFilterChip extends StatelessWidget {
   /// Optional leading glyph.
   final AppIconSpec? icon;
 
-  /// Which semantic family the selected state draws from. Use
-  /// [AppStatusTone.danger] for an *Overdue* chip so the row reads at a
-  /// glance.
+  /// Kept for call sites that used to tint the selected wash. Fill is always
+  /// brand (or [AppStatusTone.danger] for an alarm filter); this no longer
+  /// paints the chip as a rainbow tag.
   final AppStatusTone tone;
 
   @override
@@ -49,21 +49,25 @@ class AppFilterChip extends StatelessWidget {
     final spacing = context.appSpacing;
     final colors = context.appColors;
     final metrics = context.appMetrics;
-    final accent = tone.foreground(context);
+    final selectedTone = tone == AppStatusTone.danger
+        ? AppStatusTone.danger
+        : AppStatusTone.brand;
     final glyph = icon;
     final total = count;
     final enabled = onSelected != null;
-    final foreground = selected ? accent : colors.ink500;
+    final foreground = selected
+        ? selectedTone.foreground(context)
+        : colors.ink500;
     final radius = BorderRadius.circular(context.appRadius.container);
 
     final body = Container(
       height: metrics.buttonHeightSmall,
       padding: EdgeInsets.symmetric(horizontal: spacing.sm),
       decoration: BoxDecoration(
-        color: selected ? tone.background(context) : Colors.transparent,
+        color: selected ? selectedTone.background(context) : Colors.transparent,
         borderRadius: radius,
         border: Border.all(
-          color: selected ? tone.border(context) : colors.hairline,
+          color: selected ? selectedTone.border(context) : colors.hairline,
         ),
       ),
       child: Row(

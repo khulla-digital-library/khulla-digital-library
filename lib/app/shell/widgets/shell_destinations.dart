@@ -68,7 +68,6 @@ List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
     children: [
       ShellChild(label: l10n.navCatalogTitles, route: Routes.catalogTitles),
       ShellChild(label: l10n.navCatalogCopies, route: Routes.catalogCopies),
-      ShellChild(label: l10n.navCatalogAuthors, route: Routes.catalogAuthors),
       ShellChild(label: l10n.navCatalogLabels, route: Routes.catalogLabels),
     ],
   ),
@@ -78,6 +77,10 @@ List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
     route: Routes.circulation,
     primary: true,
     children: [
+      ShellChild(
+        label: l10n.navCirculationLoans,
+        route: Routes.circulationLoans,
+      ),
       ShellChild(
         label: l10n.navCirculationCheckOut,
         route: Routes.circulationCheckOut,
@@ -102,25 +105,25 @@ List<ShellDestination> shellDestinations(AppLocalizations l10n) => [
     route: Routes.members,
     primary: true,
   ),
-  ShellDestination(
-    label: l10n.navOpac,
-    icon: AppIcons.discover,
-    route: Routes.opac,
-  ),
-  ShellDestination(
-    label: l10n.navReports,
-    icon: AppIcons.insights,
-    route: Routes.reports,
-  ),
-  ShellDestination(
-    label: l10n.navUsers,
-    icon: AppIcons.idCard,
-    route: Routes.users,
-    children: [
-      ShellChild(label: l10n.navUsersAccounts, route: Routes.users),
-      ShellChild(label: l10n.navUsersRoles, route: Routes.usersRoles),
-    ],
-  ),
+  // ShellDestination(
+  //   label: l10n.navOpac,
+  //   icon: AppIcons.discover,
+  //   route: Routes.opac,
+  // ),
+  // ShellDestination(
+  //   label: l10n.navReports,
+  //   icon: AppIcons.insights,
+  //   route: Routes.reports,
+  // ),
+  // ShellDestination(
+  //   label: l10n.navUsers,
+  //   icon: AppIcons.idCard,
+  //   route: Routes.users,
+  //   children: [
+  //     ShellChild(label: l10n.navUsersAccounts, route: Routes.users),
+  //     ShellChild(label: l10n.navUsersRoles, route: Routes.usersRoles),
+  //   ],
+  // ),
   ShellDestination(
     label: l10n.navSettings,
     icon: AppIcons.settings,

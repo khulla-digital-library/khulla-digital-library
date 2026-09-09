@@ -17,6 +17,14 @@ abstract class SignInState with _$SignInState {
     /// Distinct from [error], which means the catalogue could not be read at
     /// all — one is the operator's problem, the other is the machine's.
     @Default(false) bool credentialsRejected,
+
+    /// Whether unused recovery codes exist, so the recover link is worth
+    /// showing. False when none remain.
+    @Default(false) bool canRecoverPassword,
+
+    /// Whether [canRecoverPassword] has been read from the catalogue. Until
+    /// then the sign-in form does not show recovery copy either way.
+    @Default(false) bool recoveryAvailabilityLoaded,
     AppException? error,
   }) = _SignInState;
 

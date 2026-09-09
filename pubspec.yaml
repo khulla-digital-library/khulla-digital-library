@@ -43,6 +43,8 @@ dependencies:
   # Password hashing for local accounts. Pure Dart (a jBCrypt port), so
   # it runs identically on desktop, mobile and web — no FFI, no native build.
   bcrypt: ^1.2.0
+  crypto: ^3.0.7
+  file_selector: ^1.0.3
 
   # Stable record identifiers, generated on the device.
   uuid: ^4.5.1
@@ -64,6 +66,14 @@ dependencies:
   # UI
   cupertino_icons: ^1.0.9
   toastification: ^3.2.0
+
+
+  #
+  country_phone_kit:
+    git:
+      url: https://github.com/sawongam/country_phone_kit
+  printing: ^5.15.0
+  pdf: ^3.13.0
 
 dev_dependencies:
   # Code generation

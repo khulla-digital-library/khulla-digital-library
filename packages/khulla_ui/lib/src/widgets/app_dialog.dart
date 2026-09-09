@@ -46,7 +46,9 @@ enum AppDialogWidth {
 ///   thumb on a phone.
 ///
 /// Use [AppDialog.show] for arbitrary content and [AppDialog.confirmDestructive]
-/// for the "delete this?" prompt.
+/// for the "delete this?" prompt — same chrome as [AppFormModal]: left-aligned
+/// [AppTextStyles.displaySmall] title, body copy, [AppDialogWidth.sm], and a
+/// filled destructive confirm.
 /// {@endtemplate}
 class AppDialog extends StatelessWidget {
   /// {@macro app_dialog}
@@ -121,43 +123,52 @@ class AppDialog extends StatelessWidget {
   );
 
   /// Confirms a destructive action. Resolves true only on confirm.
+  ///
+  /// Uses [AppFormModal] so the prompt matches create/edit chrome: heading
+  /// size, description, small width, and a filled danger confirm.
   static Future<bool> confirmDestructive({
     required BuildContext context,
     required String title,
     required String message,
     required String confirmLabel,
     required String cancelLabel,
-    AppIconSpec? icon = AppIcons.delete,
-    Widget? iconWidget,
   }) async {
-    final confirmed = await show<bool>(
+    final confirmed = await AppFormModal.show<bool>(
       context: context,
-      title: title,
-      message: message,
-      icon: iconWidget == null ? icon : null,
-      iconWidget: iconWidget,
-      actionsBuilder: (dialogContext) => AppDialogActions(
-        children: [
+      builder: (dialogContext) => AppFormModal(
+        title: title,
+        description: message,
+        width: AppDialogWidth.sm,
+        actions: [
           secondaryAction(
             context: dialogContext,
             label: cancelLabel,
             onPressed: () => Navigator.of(dialogContext).pop(false),
           ),
-          destructiveAction(
+          destructiveFilledAction(
             context: dialogContext,
             label: confirmLabel,
             onPressed: () => Navigator.of(dialogContext).pop(true),
           ),
         ],
+        children: const [],
       ),
     );
     return confirmed ?? false;
   }
 
-  /// The confirming action of a destructive prompt.
-  ///
-  /// Outlined rather than filled: a solid red slab reads as the recommended
-  /// choice, and in a "delete this?" prompt it is not.
+  /// The confirming action of a destructive prompt in a dialog footer.
+  static Widget destructiveFilledAction({
+    required BuildContext context,
+    required String label,
+    required VoidCallback onPressed,
+  }) => AppButton(
+    onPressed: onPressed,
+    variant: AppButtonVariant.destructiveFilled,
+    child: Text(label),
+  );
+
+  /// An outlined destructive control — a page action, not a dialog confirm.
   static Widget destructiveAction({
     required BuildContext context,
     required String label,
@@ -195,9 +206,7 @@ class AppDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
     final colors = context.appColors;
-    final scheme = context.colorScheme;
     final typography = context.appTextStyles;
-    final maxHeight = MediaQuery.sizeOf(context).height * 0.9;
 
     final badgeGlyph =
         iconWidget ??
@@ -247,36 +256,12 @@ class AppDialog extends StatelessWidget {
       ],
     );
 
-    return Dialog(
-      backgroundColor: scheme.surface,
-      insetPadding: EdgeInsets.all(spacing.lg),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(context.appRadius.control),
-        side: BorderSide(color: colors.hairline),
-      ),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: width.value,
-          maxHeight: maxHeight,
-        ),
-        // The chip hangs outside the panel, so nothing here may clip.
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            SingleChildScrollView(
-              padding: EdgeInsets.all(spacing.dialog),
-              child: body,
-            ),
-            if (showClose)
-              Positioned(
-                top: -spacing.xs,
-                right: -spacing.xs - 2,
-                child: _DialogCloseChip(
-                  onPressed: () => Navigator.of(context).maybePop(),
-                ),
-              ),
-          ],
-        ),
+    return AppDialogShell(
+      maxWidth: width.value,
+      showClose: showClose,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.dialog),
+        child: body,
       ),
     );
   }
@@ -318,62 +303,6 @@ class AppDialogActions extends StatelessWidget {
           child,
         ],
       ],
-    );
-  }
-}
-
-/// The close chip: a bordered square that sits *outside* the dialog's corner,
-/// slides a little further out on hover and turns its glyph a quarter turn.
-class _DialogCloseChip extends StatefulWidget {
-  const _DialogCloseChip({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  State<_DialogCloseChip> createState() => _DialogCloseChipState();
-}
-
-class _DialogCloseChipState extends State<_DialogCloseChip> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final spacing = context.appSpacing;
-    final colors = context.appColors;
-    final motion = context.appMotion;
-    final metrics = context.appMetrics;
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onPressed,
-        child: AnimatedSlide(
-          duration: motion.layout,
-          curve: motion.standard,
-          offset: _hovered ? const Offset(0.15, -0.15) : Offset.zero,
-          child: Container(
-            padding: EdgeInsets.all(spacing.xxs),
-            decoration: BoxDecoration(
-              color: context.colorScheme.surface,
-              borderRadius: BorderRadius.circular(context.appRadius.item),
-              border: Border.all(color: colors.hairline),
-              boxShadow: context.appShadows.overlay,
-            ),
-            child: AnimatedRotation(
-              duration: motion.layout,
-              curve: motion.standard,
-              turns: _hovered ? 0.25 : 0,
-              child: AppIcon(
-                AppIcons.close,
-                size: metrics.icon,
-                color: colors.ink500,
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

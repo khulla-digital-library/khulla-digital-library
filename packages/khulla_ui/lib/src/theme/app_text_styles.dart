@@ -20,13 +20,18 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// {@endtemplate}
 class AppTextStyles extends ThemeExtension<AppTextStyles> {
   /// {@macro app_text_styles}
-  const AppTextStyles({this.density = AppDensity.compact});
+  const AppTextStyles({this.density = AppDensity.comfortable});
 
   /// The rung these styles were resolved at.
   final AppDensity density;
 
   /// Body copy, table cells, field text — the default everything falls to.
   TextStyle get body => _style(density.pick(12, 14), FontWeight.w400);
+
+  /// Counts, money, and other figures that must not jitter as digits change.
+  TextStyle get numeric => body.copyWith(
+    fontFeatures: const [FontFeature.tabularFigures()],
+  );
 
   /// Secondary body: navigation labels, section prose, tooltips.
   TextStyle get bodyLarge => _style(density.pick(14, 16), FontWeight.w400);

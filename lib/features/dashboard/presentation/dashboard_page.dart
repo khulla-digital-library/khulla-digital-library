@@ -107,6 +107,14 @@ class _DashboardPageState extends State<DashboardPage> {
       ],
     );
 
+    // TODO(sawongam): Remove this once the dashboard is implemented.
+    return const AppEmptyView(
+      icon: AppIcons.dashboard,
+      title: 'Dashboard',
+      message: 'This section is under construction',
+    );
+
+    // ignore: dead_code, reason: under-construction gate above.
     return AppPageBody(
       wide: true,
       child: CustomScrollView(

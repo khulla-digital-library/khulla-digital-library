@@ -11,12 +11,12 @@ class ThemeStorage {
 
   static const String _themeModeKey = 'khulla.theme_mode';
 
-  /// The persisted choice, or [ThemeMode.system] when none was saved yet.
+  /// The persisted choice, or [ThemeMode.light] when none was saved yet.
   ThemeMode readThemeMode() {
     final value = _prefs.getString(_themeModeKey);
     return ThemeMode.values.firstWhere(
       (mode) => mode.name == value,
-      orElse: () => ThemeMode.system,
+      orElse: () => ThemeMode.light,
     );
   }
 

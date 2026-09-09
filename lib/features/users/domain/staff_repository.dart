@@ -16,12 +16,16 @@ abstract interface class StaffRepository {
 
   /// Creates an account with a freshly hashed password.
   ///
+  /// [recoveryCodes] are stored as hashes and issued only for the first
+  /// administrator. Later accounts omit them.
+  ///
   /// Throws a `DuplicateRecordException` when the email is already held.
   Future<StaffMember> createStaff({
     required String name,
     required String email,
     required String password,
     required UserRole role,
+    List<String> recoveryCodes = const [],
   });
 
   /// The account for [email] when [password] verifies against it, and null
@@ -32,5 +36,18 @@ abstract interface class StaffRepository {
   Future<StaffMember?> signIn({
     required String email,
     required String password,
+  });
+
+  /// Whether a recovery code can still be spent. The sign-in screen uses this
+  /// to offer the recover path only when it can succeed.
+  Future<bool> hasUnusedRecoveryCodes();
+
+  /// Sets a new password when [recoveryCode] matches an unused code for the
+  /// account at [email], and returns that account. Null when the email, code,
+  /// or account status does not allow it — same one-null as [signIn].
+  Future<StaffMember?> resetPasswordWithRecoveryCode({
+    required String email,
+    required String recoveryCode,
+    required String newPassword,
   });
 }

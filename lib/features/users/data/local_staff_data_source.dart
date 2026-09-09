@@ -1,11 +1,13 @@
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/database/app_database.dart';
+import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/core/error/guard.dart';
 import 'package:khulla/features/users/data/mappers/staff_row_mappers.dart';
 import 'package:khulla/features/users/data/staff_local_data_source.dart';
 import 'package:khulla/features/users/domain/models/staff_credentials.dart';
 import 'package:khulla/features/users/domain/models/staff_member.dart';
+import 'package:uuid/uuid.dart';
 
 /// Drift-backed [StaffLocalDataSource].
 @LazySingleton(as: StaffLocalDataSource)
@@ -15,6 +17,7 @@ class LocalStaffDataSource implements StaffLocalDataSource {
   final AppDatabase _db;
 
   static const String _source = 'LocalStaffDataSource';
+  static const Uuid _uuid = Uuid();
 
   /// Trimmed and lower-cased, so the unique index treats one address as one
   /// account however it was typed. Applied on every read and every write —
@@ -72,17 +75,94 @@ class LocalStaffDataSource implements StaffLocalDataSource {
       );
 
   @override
+  Future<bool> hasUnusedRecoveryCodes() => guardDatabase(
+    () async {
+      final count = _db.staffRecoveryCodes.id.count();
+      final row =
+          await (_db.selectOnly(_db.staffRecoveryCodes)
+                ..addColumns([count])
+                ..where(_db.staffRecoveryCodes.usedAt.isNull()))
+              .getSingle();
+      return (row.read(count) ?? 0) > 0;
+    },
+    source: '$_source.hasUnusedRecoveryCodes',
+  );
+
+  @override
+  Future<List<StoredRecoveryCode>> findUnusedRecoveryCodes(String staffId) =>
+      guardDatabase(
+        () async {
+          final rows =
+              await (_db.select(_db.staffRecoveryCodes)..where(
+                    (code) =>
+                        code.staffId.equals(staffId) & code.usedAt.isNull(),
+                  ))
+                  .get();
+          return [
+            for (final row in rows)
+              StoredRecoveryCode(id: row.id, codeHash: row.codeHash),
+          ];
+        },
+        source: '$_source.findUnusedRecoveryCodes',
+      );
+
+  @override
   Future<StaffMember> insertStaff(
     StaffMember staff, {
     required String passwordHash,
+    List<String> recoveryCodeHashes = const [],
   }) => guardDatabase(
-    () async {
+    () => _db.transaction(() async {
       final normalized = staff.copyWith(email: normalizeEmail(staff.email));
       await _db
           .into(_db.staff)
           .insert(normalized.toCompanion(passwordHash: passwordHash));
+      final now = DateTime.now();
+      for (final hash in recoveryCodeHashes) {
+        await _db
+            .into(_db.staffRecoveryCodes)
+            .insert(
+              StaffRecoveryCodesCompanion.insert(
+                id: _uuid.v4(),
+                staffId: normalized.id,
+                codeHash: hash,
+                createdAt: now,
+              ),
+            );
+      }
       return normalized;
-    },
+    }),
     source: '$_source.insertStaff',
+  );
+
+  @override
+  Future<void> resetPasswordWithRecoveryCode({
+    required String staffId,
+    required String passwordHash,
+    required String recoveryCodeId,
+  }) => guardDatabase(
+    () => _db.transaction(() async {
+      await (_db.update(
+        _db.staff,
+      )..where((staff) => staff.id.equals(staffId))).write(
+        StaffCompanion(passwordHash: Value(passwordHash)),
+      );
+      final marked =
+          await (_db.update(_db.staffRecoveryCodes)..where(
+                (code) =>
+                    code.id.equals(recoveryCodeId) &
+                    code.staffId.equals(staffId) &
+                    code.usedAt.isNull(),
+              ))
+              .write(
+                StaffRecoveryCodesCompanion(usedAt: Value(DateTime.now())),
+              );
+      if (marked == 0) {
+        throw const ConflictException(
+          'That recovery code has already been used.',
+        );
+      }
+    }),
+    source: '$_source.resetPasswordWithRecoveryCode',
   );
 }

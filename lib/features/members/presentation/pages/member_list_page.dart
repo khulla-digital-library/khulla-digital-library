@@ -1,21 +1,33 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/app/router/app_router.dart';
+import 'package:khulla/core/di/injection.dart';
+import 'package:khulla/core/error/app_exception.dart';
+import 'package:khulla/core/feedback/app_toast.dart';
+import 'package:khulla/core/lifecycle/dispose_bag.dart';
 import 'package:khulla/core/router/routes.dart';
-import 'package:khulla/features/members/domain/member_status.dart';
+import 'package:khulla/features/members/domain/models/member.dart';
+import 'package:khulla/features/members/domain/models/member_query.dart';
+import 'package:khulla/features/members/presentation/cubit/member_cubit.dart';
+import 'package:khulla/features/members/presentation/cubit/member_state.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
+import 'package:khulla/features/members/presentation/member_list_refresh.dart';
 import 'package:khulla/features/members/presentation/pages/member_form_dialog.dart';
-import 'package:khulla/features/members/presentation/placeholder/member_record.dart';
-import 'package:khulla/features/members/presentation/placeholder/members_placeholder.dart';
 import 'package:khulla/features/members/presentation/widgets/member_card.dart';
 import 'package:khulla/l10n/l10n.dart';
-import 'package:khulla/shared/utils/not_wired_action.dart';
+import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
+import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The register: every borrower and how they stand.
 ///
 /// The filters are the questions a desk actually asks of it — who is holding
 /// something, who owes something, whose card has stopped working — rather
-/// than one chip per enum value.
+/// than one chip per enum value. [MemberCubit] turns search, those filters,
+/// sort and paging into one query. Check-out jumps to the circulation desk.
 class MemberListPage extends StatefulWidget {
   const MemberListPage({super.key});
 
@@ -23,58 +35,138 @@ class MemberListPage extends StatefulWidget {
   State<MemberListPage> createState() => _MemberListPageState();
 }
 
-class _MemberListPageState extends State<MemberListPage> {
-  static const int _pageSize = 8;
+class _MemberListPageState extends State<MemberListPage> with DisposeBag {
+  late final TextEditingController _search = textController();
+  late final GoRouterDelegate _routerDelegate =
+      getIt<AppRouter>().router.routerDelegate;
 
-  String _query = '';
-  bool _withLoans = false;
-  bool _owesFines = false;
-  bool _suspended = false;
-  bool _expiring = false;
-  AppTableSort _sort = const AppTableSort(columnId: 'name');
-  int _page = 0;
-
-  bool get _isFiltered =>
-      _query.isNotEmpty || _withLoans || _owesFines || _suspended || _expiring;
-
-  void _clearFilters() => setState(() {
-    _query = '';
-    _withLoans = false;
-    _owesFines = false;
-    _suspended = false;
-    _expiring = false;
-    _page = 0;
-  });
-
-  List<MemberRecord> get _matches {
-    final needle = _query.trim().toLowerCase();
-    final matches = [
-      for (final member in placeholderMembers)
-        if ((needle.isEmpty ||
-                member.name.toLowerCase().contains(needle) ||
-                member.cardNumber.toLowerCase().contains(needle) ||
-                (member.phone?.contains(needle) ?? false)) &&
-            (!_withLoans || member.loansOut > 0) &&
-            (!_owesFines || member.finesOwed.isPositive) &&
-            (!_suspended || member.status == MemberStatus.suspended) &&
-            (!_expiring || member.status == MemberStatus.expiring))
-          member,
-    ];
-
-    return matches..sort((a, b) {
-      final order = switch (_sort.columnId) {
-        'card' => a.cardNumber.compareTo(b.cardNumber),
-        'loans' => a.loansOut.compareTo(b.loansOut),
-        'fines' => a.finesOwed.compareTo(b.finesOwed),
-        'joined' => a.joined.compareTo(b.joined),
-        'expires' => a.expires.compareTo(b.expires),
-        _ => a.name.compareTo(b.name),
-      };
-      return _sort.ascending ? order : -order;
-    });
+  @override
+  void initState() {
+    super.initState();
+    getIt<MemberListRefresh>().reload = _reload;
+    _routerDelegate.addListener(_handleRouteChange);
   }
 
-  List<AppTableColumn<MemberRecord>> _columns(AppLocalizations l10n) {
+  @override
+  void dispose() {
+    _routerDelegate.removeListener(_handleRouteChange);
+    getIt<MemberListRefresh>().reload = null;
+    super.dispose();
+  }
+
+  /// Resets the list whenever the operator leaves the members section —
+  /// switching rail tabs, checking out to a member, anything that moves the
+  /// location out from under `/members`. The shell keeps every branch alive,
+  /// so without this the stale search is still sitting there on return.
+  /// Dialogs never change the location, so add/edit dialogs are unaffected.
+  void _handleRouteChange() {
+    if (!mounted) return;
+    final location = _routerDelegate.currentConfiguration.uri.toString();
+    if (Routes.isUnder(location, Routes.members)) return;
+    final cubit = context.read<MemberCubit>();
+    if (cubit.state.query == MemberQuery(limit: cubit.state.query.limit)) {
+      return;
+    }
+    _search.clear();
+    cubit.clearFilters();
+  }
+
+  void _reload() {
+    if (!mounted) return;
+    unawaited(context.read<MemberCubit>().loadMembers());
+  }
+
+  /// Opens a member's detail page from a clean list: the list cubit outlives
+  /// the push (detail is a sub-route), so the search field and its query are
+  /// cleared up front — otherwise coming back shows the stale search.
+  void _openMember(Member member) {
+    _search.clear();
+    context.read<MemberCubit>().clearFilters();
+    context.go(Routes.member(member.id));
+  }
+
+  Future<void> _addMember() async {
+    final saved = await MemberFormDialog.show(context);
+    if (saved == true && mounted) {
+      await context.read<MemberCubit>().loadMembers();
+    }
+  }
+
+  Future<void> _editMember(Member member) async {
+    final saved = await MemberFormDialog.show(context, memberId: member.id);
+    if (saved == true && mounted) {
+      await context.read<MemberCubit>().loadMembers();
+    }
+  }
+
+  Future<void> _renewMembership(BuildContext context, Member member) async {
+    final l10n = context.l10n;
+    try {
+      await context.read<MemberCubit>().renewMembership(member.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailRenewSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _suspendMembership(BuildContext context, Member member) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.memberDetailSuspend,
+      message: l10n.memberDetailSuspendBody,
+      confirmLabel: l10n.memberDetailSuspend,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!context.mounted || !confirmed) return;
+    try {
+      await context.read<MemberCubit>().suspendMember(member.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailSuspendSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _unsuspendMembership(BuildContext context, Member member) async {
+    final l10n = context.l10n;
+    try {
+      await context.read<MemberCubit>().unsuspendMember(member.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailUnsuspendSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _archiveMember(BuildContext context, Member member) async {
+    final l10n = context.l10n;
+    final confirmed = await AppDialog.confirmDestructive(
+      context: context,
+      title: l10n.memberDetailArchiveTitle,
+      message: l10n.memberDetailArchiveBody,
+      confirmLabel: l10n.memberDetailArchive,
+      cancelLabel: l10n.commonCancel,
+    );
+    if (!context.mounted || !confirmed) return;
+    try {
+      await context.read<MemberCubit>().archiveMember(member.id);
+      if (!context.mounted) return;
+      AppToast.success(context, message: l10n.memberDetailArchiveSuccess);
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  List<AppTableColumn<Member>> _columns(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     final spacing = context.appSpacing;
     final scheme = context.colorScheme;
     final muted = context.textTheme.bodyMedium?.copyWith(
@@ -82,10 +174,10 @@ class _MemberListPageState extends State<MemberListPage> {
     );
 
     return [
-      AppTableColumn<MemberRecord>(
+      AppTableColumn<Member>(
         id: 'name',
         label: l10n.membersColumnName,
-        flex: 4,
+        flex: 3,
         sortable: true,
         cellBuilder: (context, member) => Row(
           children: [
@@ -95,7 +187,7 @@ class _MemberListPageState extends State<MemberListPage> {
           ],
         ),
       ),
-      AppTableColumn<MemberRecord>(
+      AppTableColumn<Member>(
         id: 'card',
         label: l10n.membersColumnCard,
         flex: 2,
@@ -103,7 +195,7 @@ class _MemberListPageState extends State<MemberListPage> {
         showFrom: FormFactor.medium,
         cellBuilder: (context, member) => Text(member.cardNumber, style: muted),
       ),
-      AppTableColumn<MemberRecord>(
+      AppTableColumn<Member>(
         id: 'category',
         label: l10n.membersColumnCategory,
         flex: 2,
@@ -111,25 +203,23 @@ class _MemberListPageState extends State<MemberListPage> {
         cellBuilder: (context, member) => Row(
           children: [
             AppIcon(
-              member.category.icon,
+              member.memberTypeCode.memberTypeIcon,
               size: spacing.md,
               color: scheme.onSurfaceVariant,
             ),
             SizedBox(width: spacing.xs),
-            Flexible(child: Text(member.category.label(l10n))),
+            Flexible(child: Text(member.memberTypeName)),
           ],
         ),
       ),
-      AppTableColumn<MemberRecord>(
+      AppTableColumn<Member>(
         id: 'loans',
         label: l10n.membersColumnLoans,
-        width: 90,
         sortable: true,
-        alignment: Alignment.centerRight,
         showFrom: FormFactor.medium,
         cellBuilder: (context, member) => Text(
           '${member.loansOut}',
-          style: member.overdue > 0
+          style: member.overdueLoans > 0
               ? context.textTheme.bodyMedium?.copyWith(
                   color: scheme.error,
                   fontWeight: FontWeight.w500,
@@ -137,12 +227,10 @@ class _MemberListPageState extends State<MemberListPage> {
               : null,
         ),
       ),
-      AppTableColumn<MemberRecord>(
+      AppTableColumn<Member>(
         id: 'fines',
         label: l10n.membersColumnFines,
-        width: 110,
         sortable: true,
-        alignment: Alignment.centerRight,
         showFrom: FormFactor.expanded,
         cellBuilder: (context, member) => Text(
           member.finesOwed.isZero
@@ -156,29 +244,29 @@ class _MemberListPageState extends State<MemberListPage> {
                 ),
         ),
       ),
-      AppTableColumn<MemberRecord>(
+      AppTableColumn<Member>(
         id: 'expires',
+
         label: l10n.membersColumnExpires,
-        flex: 2,
         sortable: true,
-        alignment: Alignment.centerRight,
         showFrom: FormFactor.large,
-        cellBuilder: (context, member) => Text(member.expires, style: muted),
+        cellBuilder: (context, member) => Text(
+          member.expires.isEmpty ? l10n.commonNotSet : member.expires,
+          style: muted,
+        ),
       ),
-      AppTableColumn<MemberRecord>(
+      AppTableColumn<Member>(
         id: 'status',
         label: l10n.commonStatus,
-        width: 130,
         cellBuilder: (context, member) => AppStatusBadge(
           dense: true,
           label: member.status.label(l10n),
           tone: member.status.tone,
         ),
       ),
-      AppTableColumn<MemberRecord>(
+      AppTableColumn<Member>(
         id: 'actions',
         label: l10n.commonActions,
-        width: 56,
         alignment: Alignment.centerRight,
         cellBuilder: (context, member) => AppMenuButton(
           tooltip: l10n.commonMoreActions,
@@ -186,24 +274,40 @@ class _MemberListPageState extends State<MemberListPage> {
             AppMenuAction(
               label: l10n.memberDetailCheckOut,
               icon: AppIcons.scan,
-              onSelected: () => context.go(Routes.circulationCheckOut),
+              onSelected: () => context.go(
+                Routes.circulationCheckOutForMember(member.cardNumber),
+              ),
             ),
             AppMenuAction(
               label: l10n.memberDetailEdit,
               icon: AppIcons.edit,
-              onSelected: () =>
-                  MemberFormDialog.show(context, memberId: member.id),
+              onSelected: () => unawaited(_editMember(member)),
             ),
             AppMenuAction(
               label: l10n.memberDetailRenewMembership,
               icon: AppIcons.renew,
-              onSelected: () => showNotWiredToast(context),
+              onSelected: () => unawaited(_renewMembership(context, member)),
             ),
+            if (member.suspendedAt != null)
+              AppMenuAction(
+                label: l10n.memberDetailUnsuspend,
+                icon: AppIcons.restore,
+                onSelected: () =>
+                    unawaited(_unsuspendMembership(context, member)),
+              )
+            else
+              AppMenuAction(
+                label: l10n.memberDetailSuspend,
+                icon: AppIcons.blocked,
+                isDestructive: true,
+                onSelected: () =>
+                    unawaited(_suspendMembership(context, member)),
+              ),
             AppMenuAction(
-              label: l10n.memberDetailSuspend,
-              icon: AppIcons.blocked,
+              label: l10n.memberDetailArchive,
+              icon: AppIcons.delete,
               isDestructive: true,
-              onSelected: () => showNotWiredToast(context),
+              onSelected: () => unawaited(_archiveMember(context, member)),
             ),
           ],
         ),
@@ -211,118 +315,133 @@ class _MemberListPageState extends State<MemberListPage> {
     ];
   }
 
+  bool _isFiltered(MemberState state) =>
+      state.query.search.isNotEmpty ||
+      state.query.withLoans ||
+      state.query.owesFines ||
+      state.query.suspended ||
+      state.query.expiring;
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final matches = _matches;
-    final pageCount = (matches.length / _pageSize).ceil();
-    final page = _page.clamp(0, pageCount == 0 ? 0 : pageCount - 1);
-    final start = page * _pageSize;
-    final end = (start + _pageSize).clamp(0, matches.length);
+    final cubit = context.read<MemberCubit>();
 
-    return CollectionPageView<MemberRecord>(
-      summary: l10n.membersSubtitle('${placeholderMembers.length}'),
-      toolbar: AppToolbar(
-        search: AppSearchField(
-          hintText: l10n.membersSearchHint,
-          clearTooltip: l10n.commonClearSearch,
-          onChanged: (value) => setState(() {
-            _query = value;
-            _page = 0;
-          }),
-        ),
-        filters: [
-          AppFilterChip(
-            label: l10n.membersFilterWithLoans,
-            icon: AppIcons.transfer,
-            selected: _withLoans,
-            onSelected: (selected) => setState(() {
-              _withLoans = selected;
-              _page = 0;
-            }),
-          ),
-          AppFilterChip(
-            label: l10n.membersFilterOwesFines,
-            icon: AppIcons.wallet,
-            tone: AppStatusTone.danger,
-            selected: _owesFines,
-            onSelected: (selected) => setState(() {
-              _owesFines = selected;
-              _page = 0;
-            }),
-          ),
-          AppFilterChip(
-            label: l10n.membersFilterExpiring,
-            icon: AppIcons.clock,
-            tone: AppStatusTone.warning,
-            selected: _expiring,
-            onSelected: (selected) => setState(() {
-              _expiring = selected;
-              _page = 0;
-            }),
-          ),
-          AppFilterChip(
-            label: l10n.membersFilterSuspended,
-            icon: AppIcons.blocked,
-            tone: AppStatusTone.danger,
-            selected: _suspended,
-            onSelected: (selected) => setState(() {
-              _suspended = selected;
-              _page = 0;
-            }),
-          ),
-        ],
-        actions: [
-          if (_isFiltered)
-            AppTextButton(
-              onPressed: _clearFilters,
-              child: Text(l10n.commonClearFilters),
+    return BlocBuilder<MemberCubit, MemberState>(
+      builder: (context, state) {
+        if (state.hasError) {
+          return ErrorRetryView(
+            error: state.error,
+            onRetry: cubit.loadMembers,
+          );
+        }
+
+        final bootstrapping = state.isLoading && state.members.isEmpty;
+
+        final pageSize = state.query.limit;
+        final pageCount = (state.totalCount / pageSize).ceil();
+        final page = (state.query.offset / pageSize).floor().clamp(
+          0,
+          pageCount == 0 ? 0 : pageCount - 1,
+        );
+        final start = state.totalCount == 0 ? 0 : page * pageSize;
+        final end = (start + state.members.length).clamp(0, state.totalCount);
+        final sort = AppTableSort(
+          columnId: state.query.sortColumn,
+          ascending: state.query.sortAscending,
+        );
+
+        return CollectionPageView<Member>(
+          onPageSizeChanged: cubit.limitChanged,
+          summary: l10n.membersSubtitle('${state.totalCount}'),
+          toolbar: AppToolbar(
+            search: AppSearchField(
+              hintText: l10n.membersSearchHint,
+              clearTooltip: l10n.commonClearSearch,
+              controller: _search,
+              onChanged: cubit.searchChanged,
             ),
-        ],
-      ),
-      items: matches.sublist(start, end),
-      columns: _columns(l10n),
-      sort: _sort,
-      onSort: (next) => setState(() {
-        _sort = next;
-        _page = 0;
-      }),
-      onRowTap: (member) => context.go(Routes.member(member.id)),
-      compactBuilder: (context, member) => MemberCard(
-        member: member,
-        onTap: () => context.go(Routes.member(member.id)),
-      ),
-      emptyState: _isFiltered
-          ? AppEmptyView(
-              icon: AppIcons.noResults,
-              title: l10n.commonNoMatchesTitle,
-              message: l10n.commonNoMatchesBody,
-              actionLabel: l10n.commonClearFilters,
-              onAction: _clearFilters,
-            )
-          : AppEmptyView(
-              icon: AppIcons.people,
-              title: l10n.membersEmptyTitle,
-              message: l10n.membersEmptyBody,
-              actionLabel: l10n.membersAdd,
-              onAction: () => MemberFormDialog.show(context),
+            filters: [
+              AppFilterChip(
+                label: l10n.membersFilterWithLoans,
+                icon: AppIcons.transfer,
+                selected: state.query.withLoans,
+                onSelected: cubit.withLoansChanged,
+              ),
+              AppFilterChip(
+                label: l10n.membersFilterOwesFines,
+                icon: AppIcons.wallet,
+                tone: AppStatusTone.danger,
+                selected: state.query.owesFines,
+                onSelected: cubit.owesFinesChanged,
+              ),
+              AppFilterChip(
+                label: l10n.membersFilterExpiring,
+                icon: AppIcons.clock,
+                tone: AppStatusTone.warning,
+                selected: state.query.expiring,
+                onSelected: cubit.expiringChanged,
+              ),
+              AppFilterChip(
+                label: l10n.membersFilterSuspended,
+                icon: AppIcons.blocked,
+                tone: AppStatusTone.danger,
+                selected: state.query.suspended,
+                onSelected: cubit.suspendedChanged,
+              ),
+            ],
+            actions: [
+              if (_isFiltered(state))
+                AppTextButton(
+                  onPressed: cubit.clearFilters,
+                  child: Text(l10n.commonClearFilters),
+                ),
+            ],
+          ),
+          items: state.members,
+          columns: _columns(context, l10n),
+          sort: sort,
+          onSort: (next) => cubit.sortChanged(next.columnId, next.ascending),
+          onRowTap: _openMember,
+          compactBuilder: (context, member) => MemberCard(
+            member: member,
+            onTap: () => _openMember(member),
+          ),
+          emptyState: bootstrapping
+              ? const Center(child: AppSpinner())
+              : _isFiltered(state)
+              ? AppEmptyView(
+                  icon: AppIcons.noResults,
+                  title: l10n.commonNoMatchesTitle,
+                  message: l10n.commonNoMatchesBody,
+                  actionLabel: l10n.commonClearFilters,
+                  onAction: cubit.clearFilters,
+                )
+              : AppEmptyView(
+                  icon: AppIcons.people,
+                  title: l10n.membersEmptyTitle,
+                  message: l10n.membersEmptyBody,
+                  actionLabel: l10n.membersAdd,
+                  onAction: () => unawaited(_addMember()),
+                ),
+          footer: AppPagination(
+            rangeLabel: l10n.commonShowingRange(
+              '${start + 1}',
+              '$end',
+              '${state.totalCount}',
             ),
-      footer: AppPagination(
-        rangeLabel: l10n.commonShowingRange(
-          '${start + 1}',
-          '$end',
-          '${matches.length}',
-        ),
-        previousTooltip: l10n.commonPreviousPage,
-        nextTooltip: l10n.commonNextPage,
-        pageCount: pageCount,
-        currentPage: page,
-        onPageSelected: (next) => setState(() => _page = next),
-        onPrevious: page == 0 ? null : () => setState(() => _page = page - 1),
-        onNext: page >= pageCount - 1
-            ? null
-            : () => setState(() => _page = page + 1),
-      ),
+            previousTooltip: l10n.commonPreviousPage,
+            nextTooltip: l10n.commonNextPage,
+            pageCount: pageCount,
+            currentPage: page,
+            onPageSelected: cubit.pageChanged,
+            onPrevious: page == 0 ? null : () => cubit.pageChanged(page - 1),
+            onNext: page >= pageCount - 1
+                ? null
+                : () => cubit.pageChanged(page + 1),
+          ),
+        );
+      },
     );
   }
 }

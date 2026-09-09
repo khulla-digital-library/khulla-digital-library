@@ -1,12 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:khulla/core/lifecycle/dispose_bag.dart';
+import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/staff_auth/presentation/auth_labels.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/cubit/sign_in_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/cubit/sign_in_state.dart';
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_error_notice.dart';
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_header.dart';
-import 'package:khulla/features/staff_auth/presentation/widgets/auth_password_field.dart';
 import 'package:khulla/features/staff_auth/presentation/widgets/auth_scaffold.dart';
+import 'package:khulla/features/staff_auth/presentation/widgets/auth_secondary_action.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -26,6 +28,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> with DisposeBag {
   late final TextEditingController _email = textController();
   late final TextEditingController _password = textController();
+  bool _passwordRevealed = false;
 
   void _submit() => context.read<SignInCubit>().signIn();
 
@@ -52,6 +55,7 @@ class _SignInPageState extends State<SignInPage> with DisposeBag {
               SizedBox(height: spacing.lg),
               AppTextField(
                 label: l10n.fieldEmail,
+                hintText: l10n.signInEmailHint,
                 required: true,
                 controller: _email,
                 autofocus: true,
@@ -61,13 +65,27 @@ class _SignInPageState extends State<SignInPage> with DisposeBag {
                 onChanged: cubit.emailChanged,
               ),
               SizedBox(height: spacing.sm),
-              AuthPasswordField(
+              AppTextField(
                 label: l10n.fieldPassword,
+                hintText: l10n.signInPasswordHint,
+                required: true,
                 controller: _password,
+                obscureText: !_passwordRevealed,
                 textInputAction: TextInputAction.done,
                 errorText: state.password.messageFor(l10n),
                 onChanged: cubit.passwordChanged,
                 onSubmitted: (_) => _submit(),
+                suffixIcon: AppIconButton(
+                  icon: _passwordRevealed
+                      ? AppIcons.hidePassword
+                      : AppIcons.revealPassword,
+                  tooltip: _passwordRevealed
+                      ? l10n.authHidePassword
+                      : l10n.authRevealPassword,
+                  size: AppIconButtonSize.small,
+                  onPressed: () =>
+                      setState(() => _passwordRevealed = !_passwordRevealed),
+                ),
               ),
               if (state.credentialsRejected) ...[
                 SizedBox(height: spacing.md),
@@ -85,12 +103,22 @@ class _SignInPageState extends State<SignInPage> with DisposeBag {
                 onPressed: _submit,
                 child: Text(l10n.signInAction),
               ),
-              SizedBox(height: spacing.md),
-              Text(
-                l10n.signInForgotPassword,
-                textAlign: TextAlign.center,
-                style: typography.caption.copyWith(color: colors.textMuted),
-              ),
+              if (state.recoveryAvailabilityLoaded) ...[
+                SizedBox(height: spacing.lg),
+                if (state.canRecoverPassword)
+                  AuthSecondaryAction(
+                    label: l10n.signInForgotPasswordAction,
+                    onTap: () => context.go(Routes.recoverPassword),
+                  )
+                else
+                  Text(
+                    l10n.signInForgotPasswordUnavailable,
+                    textAlign: TextAlign.center,
+                    style: typography.caption.copyWith(
+                      color: colors.textMuted,
+                    ),
+                  ),
+              ],
             ],
           );
         },

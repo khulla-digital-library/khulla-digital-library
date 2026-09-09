@@ -9,9 +9,13 @@ enum AppButtonVariant {
   /// The one action a screen is built around. Filled brand.
   primary,
 
-  /// A destructive confirmation. **Outlined, never filled** — a red slab
-  /// reads as the recommended action, which is the opposite of the intent.
+  /// An outlined destructive control on a page (e.g. a header Delete).
+  /// Dialog confirms use the filled destructive variant instead.
   destructive,
+
+  /// The confirming action on a destructive prompt and form-modal footers.
+  /// Filled like [primary] but in the danger color.
+  destructiveFilled,
 
   /// The neutral action next to a primary one: Cancel, Back, a filter.
   outline,
@@ -26,23 +30,26 @@ enum AppButtonVariant {
   /// A confirming action that is not the page's primary — "Mark returned".
   success,
 
+  /// A positive secondary action drawn as an outline — "Add a copy".
+  successOutline,
+
   /// Inline navigation inside a sentence. Reads as a link, not a control.
   link,
 }
 
 /// How much room a button takes.
 ///
-/// [small] is the default and is what most of the product uses: 36px, which
+/// [small] is the default and is what most of the product uses: 40px, which
 /// is what lets a filter row, a table toolbar and a dialog footer stay dense.
 /// Reach for [large] only for a page's single most important action.
 enum AppButtonSize {
-  /// 36px. The default.
+  /// 40px. The default.
   small,
 
-  /// 40px.
+  /// 44px.
   medium,
 
-  /// 44px.
+  /// 48px.
   large,
 }
 
@@ -246,6 +253,14 @@ class _AppButtonState extends State<AppButton> {
         ripple: colors.danger.withValues(alpha: 0.2),
         ring: colors.danger,
       ),
+      AppButtonVariant.destructiveFilled => _ButtonStyle(
+        fill: colors.danger,
+        hoverFill: colors.danger.withValues(alpha: 0.9),
+        foreground: colors.onDanger,
+        border: colors.danger.withValues(alpha: 0.7),
+        ripple: colors.secondary,
+        ring: colors.danger,
+      ),
       AppButtonVariant.outline => _ButtonStyle(
         fill: scheme.surface,
         hoverFill: colors.secondary,
@@ -279,6 +294,14 @@ class _AppButtonState extends State<AppButton> {
         foreground: colors.onSuccess,
         border: colors.success.withValues(alpha: 0.7),
         ripple: colors.secondary,
+        ring: colors.success,
+      ),
+      AppButtonVariant.successOutline => _ButtonStyle(
+        fill: Colors.transparent,
+        hoverFill: tints.successHover,
+        foreground: colors.success,
+        border: colors.success,
+        ripple: colors.success.withValues(alpha: 0.2),
         ring: colors.success,
       ),
       AppButtonVariant.link => _ButtonStyle(

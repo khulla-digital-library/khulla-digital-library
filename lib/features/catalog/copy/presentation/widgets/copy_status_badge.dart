@@ -9,7 +9,11 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// copy is `danger` and a reserved one is `info` — the mapping lives once, on
 /// the enum, and every table row reads it through here.
 class CopyStatusBadge extends StatelessWidget {
-  const CopyStatusBadge({required this.status, this.dense = true, super.key});
+  const CopyStatusBadge({
+    required this.status,
+    this.dense = true,
+    super.key,
+  });
 
   final CopyStatus status;
   final bool dense;

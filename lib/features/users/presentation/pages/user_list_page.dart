@@ -22,7 +22,7 @@ class UserListPage extends StatefulWidget {
 }
 
 class _UserListPageState extends State<UserListPage> {
-  static const int _pageSize = 8;
+  int _pageSize = 20;
 
   String _query = '';
   final Set<UserStatus> _statuses = <UserStatus>{};
@@ -190,6 +190,14 @@ class _UserListPageState extends State<UserListPage> {
     ];
   }
 
+  void _pageSizeChanged(int size) {
+    if (_pageSize == size) return;
+    setState(() {
+      _pageSize = size;
+      _page = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -200,6 +208,7 @@ class _UserListPageState extends State<UserListPage> {
     final end = (start + _pageSize).clamp(0, matches.length);
 
     return CollectionPageView<StaffRecord>(
+      onPageSizeChanged: _pageSizeChanged,
       summary: l10n.usersSubtitle('${placeholderStaff.length}'),
       toolbar: AppToolbar(
         search: AppSearchField(

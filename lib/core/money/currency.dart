@@ -1,35 +1,67 @@
+import 'package:country_phone_kit/country_phone_kit.dart';
+import 'package:flutter/foundation.dart';
 import 'package:khulla/core/money/money_format.dart';
 
-/// The currencies a library can be set up in.
+/// The currency a library charges fines and fees in.
 ///
-/// Deliberately a short list rather than the ISO 4217 table: the currency is
-/// chosen once, during first-run setup, by someone who wants to get to the
-/// catalogue — not a lookup exercise through 180 codes. Adding one is a
-/// constant here and a [MoneyFormat] beside it.
-///
-/// The enum name is what the database stores, so a case is never renamed or
-/// reordered out from under a saved row.
-enum AppCurrency {
-  npr,
-  inr,
-  usd,
-  eur,
-  gbp;
+/// [code], [name] and [symbol] are what the catalogue stores. The picker is
+/// seeded from [Currencies], but amounts on screen read the saved symbol — not
+/// a live lookup.
+@immutable
+final class AppCurrency implements Comparable<AppCurrency> {
+  const AppCurrency({
+    required this.code,
+    required this.name,
+    required this.symbol,
+  });
 
-  /// The ISO 4217 code, shown next to the currency's name in the picker.
-  String get code => name.toUpperCase();
+  factory AppCurrency.fromCountryCurrency(CountryCurrency currency) =>
+      AppCurrency(
+        code: currency.code,
+        name: currency.name,
+        symbol: currency.symbol,
+      );
+
+  /// ISO-4217 alpha code, e.g. `NPR`, `EUR`, `USD`.
+  final String code;
+
+  /// English name, e.g. `Nepalese rupee`.
+  final String name;
+
+  /// The symbol as written locally, e.g. `Rs`, `€`.
+  final String symbol;
+
+  /// Every currency the picker can offer, sorted by code.
+  static List<AppCurrency> get values => Currencies.all
+      .map(AppCurrency.fromCountryCurrency)
+      .toList(growable: false);
+
+  static const npr = AppCurrency(
+    code: 'NPR',
+    name: 'Nepalese rupee',
+    symbol: 'Rs',
+  );
 
   /// How amounts are rendered in this currency: symbol, side, and grouping.
   ///
   /// What this never decides is the storage unit — every amount is an integer
   /// number of hundredths whatever the currency. See `Money`.
-  MoneyFormat get format => switch (this) {
-    AppCurrency.npr => MoneyFormat.nepaliRupee,
-    AppCurrency.inr => MoneyFormat.indianRupee,
-    AppCurrency.usd => MoneyFormat.usDollar,
-    AppCurrency.eur => MoneyFormat.euro,
-    AppCurrency.gbp => MoneyFormat.britishPound,
-  };
-}
+  MoneyFormat get format => MoneyFormat(symbol: symbol);
 
-//TODO(sawongam): Add a custom currency package later (will do later)
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AppCurrency &&
+          other.code == code &&
+          other.name == name &&
+          other.symbol == symbol;
+
+  @override
+  int get hashCode => Object.hash(code, name, symbol);
+
+  @override
+  int compareTo(AppCurrency other) => code.compareTo(other.code);
+
+  @override
+  String toString() => 'AppCurrency($code)';
+}

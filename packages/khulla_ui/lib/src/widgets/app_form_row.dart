@@ -24,6 +24,7 @@ class AppFormRow extends StatelessWidget {
   final List<Widget> children;
 
   /// Relative widths, one per child. Null gives every field equal width.
+  /// A `0` keeps that child at its intrinsic width instead of expanding.
   final List<int>? flexes;
 
   /// Slot width below which the fields stack. When null, derived from the
@@ -66,7 +67,10 @@ class AppFormRow extends StatelessWidget {
           children: [
             for (final (index, field) in children.indexed) ...[
               if (index > 0) SizedBox(width: spacing.sm),
-              Expanded(flex: weights?[index] ?? 1, child: field),
+              switch (weights?[index] ?? 1) {
+                0 => field,
+                final flex => Expanded(flex: flex, child: field),
+              },
             ],
           ],
         );

@@ -40,47 +40,50 @@ class AppErrorView extends StatelessWidget {
     final label = retryLabel;
     final retry = onRetry;
 
-    return Padding(
-      padding:
-          padding ??
-          (isCentered
-              ? EdgeInsets.symmetric(
-                  horizontal: spacing.page,
-                  vertical: spacing.xlg,
-                )
-              : EdgeInsets.zero),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: isCentered
-            ? CrossAxisAlignment.center
-            : CrossAxisAlignment.start,
-        children: [
-          if (isCentered) ...[
-            AppIcon(
-              AppIcons.error,
-              size: spacing.xlg,
-              color: scheme.onSurfaceVariant,
+    return wrapFeedbackVariant(
+      variant: variant,
+      child: Padding(
+        padding:
+            padding ??
+            (isCentered
+                ? EdgeInsets.symmetric(
+                    horizontal: spacing.page,
+                    vertical: spacing.xlg,
+                  )
+                : EdgeInsets.zero),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: isCentered
+              ? CrossAxisAlignment.center
+              : CrossAxisAlignment.start,
+          children: [
+            if (isCentered) ...[
+              AppIcon(
+                AppIcons.error,
+                size: spacing.xlg,
+                color: scheme.onSurfaceVariant,
+              ),
+              SizedBox(height: spacing.md),
+            ],
+            Text(
+              message,
+              textAlign: isCentered ? TextAlign.center : TextAlign.start,
+              style: context.textTheme.bodySmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+                height: 1.4,
+              ),
             ),
-            SizedBox(height: spacing.md),
+            if (label != null && retry != null) ...[
+              SizedBox(height: isCentered ? spacing.md : spacing.sm),
+              AppButton(
+                variant: AppButtonVariant.outline,
+                size: isCentered ? AppButtonSize.medium : AppButtonSize.small,
+                onPressed: retry,
+                child: Text(label),
+              ),
+            ],
           ],
-          Text(
-            message,
-            textAlign: isCentered ? TextAlign.center : TextAlign.start,
-            style: context.textTheme.bodySmall?.copyWith(
-              color: scheme.onSurfaceVariant,
-              height: 1.4,
-            ),
-          ),
-          if (label != null && retry != null) ...[
-            SizedBox(height: isCentered ? spacing.md : spacing.sm),
-            AppButton(
-              variant: AppButtonVariant.outline,
-              size: isCentered ? AppButtonSize.medium : AppButtonSize.small,
-              onPressed: retry,
-              child: Text(label),
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }

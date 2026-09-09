@@ -1,5 +1,5 @@
 .PHONY: bootstrap install-sdk build migrate db-diagram localize analyze format fix test check clean \
-        db-web run-web run-windows run-linux build-web build-windows build-apk pr
+        db-web run-web run-windows run-linux build-web build-windows build-apk pr seed-mock
 
 FLUTTER := fvm flutter
 DART := fvm dart
@@ -50,6 +50,14 @@ localize:
 icons:
 	$(DART) run icons_launcher:create
 
+# ── Scratch data ────────────────────────────────────────────────────────────
+
+## Insert mock books into a catalogue file. Pass the dev catalogue explicitly;
+## bare `make seed-mock` only prints the script help, never touches real data.
+ARGS ?= --help
+seed-mock:
+	$(DART) run script/seed_mock_books.dart $(ARGS)
+
 ## Wipe the build_runner cache. Use when codegen fails after a dependency bump.
 clean:
 	rm -rf .dart_tool/build
@@ -99,4 +107,4 @@ build-apk:
 # ── Git ─────────────────────────────────────────────────────────────────────
 
 pr:
-	git push && gh pr create --fill --base dev
+	git push && gh pr create --base dev

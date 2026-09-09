@@ -1,4 +1,3 @@
-import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 
 /// One physical item on a shelf.
@@ -13,7 +12,6 @@ class CatalogCopy {
     required this.titleId,
     required this.titleName,
     required this.shelf,
-    required this.condition,
     required this.status,
     required this.acquired,
     this.borrower,
@@ -25,7 +23,6 @@ class CatalogCopy {
   final String titleId;
   final String titleName;
   final String shelf;
-  final CopyCondition condition;
   final CopyStatus status;
   final String acquired;
 
