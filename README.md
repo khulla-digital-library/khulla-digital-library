@@ -85,7 +85,8 @@ khulla-digital-library/
 | Command | What it does |
 | --- | --- |
 | `make bootstrap` | Resolve dependencies across the workspace |
-| `make build` | Run code generation |
+| `make build` | Run code generation, including the app version |
+| `make version` | Regenerate `lib/gen/app_version.dart` from `pubspec.yaml` after a bump |
 | `make localize` | Regenerate localizations from `lib/l10n/arb/` |
 | `make check` | Format, copyright, analyze and test — run this before a PR |
 | `make ci` | The same gates CI runs, failing on unformatted code instead of rewriting it |
@@ -107,6 +108,8 @@ The full guide lives in [CLAUDE.md](./CLAUDE.md) — folder conventions, the dat
 Contributions are welcome. See [docs/contributing](./docs/contributing/) for setup, conventions and the pull-request flow.
 
 Commits follow a conventional format — `feat:`, `fix:`, `chore:`, `refactor:`, `sync:`, `ci:` — enforced by a git hook. Branch off `dev`; direct commits to `dev` and `prod` are blocked.
+
+Merging into `prod` publishes a release at the version in `pubspec.yaml` and redeploys the web demo — see [releasing](./docs/contributing/releasing.md).
 
 ## License
 

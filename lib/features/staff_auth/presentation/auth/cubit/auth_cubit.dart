@@ -68,6 +68,13 @@ class AuthCubit extends Cubit<AuthState> {
     await _storage.saveStaffId(staff.id);
   }
 
+  /// Updates the signed-in account in memory when its details change.
+  void updateStaff(StaffMember staff) {
+    if (state.status == AuthStatus.signedIn && state.staff?.id == staff.id) {
+      emit(state.copyWith(staff: staff));
+    }
+  }
+
   /// Ends the session on this device. The catalogue is untouched, so the next
   /// screen is sign-in and never onboarding.
   Future<void> signOut() async {

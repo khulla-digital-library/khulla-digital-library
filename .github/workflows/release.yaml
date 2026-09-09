@@ -1,15 +1,19 @@
 name: Release
 
-# Push a tag to publish a release:
+# Landing on `prod` is what ships. Every push to it builds all four targets and
+# publishes them as a release at the version in pubspec.yaml — no tag to push by
+# hand, no second step to forget. The workflow creates the `v<version>` tag.
 #
-#   git tag v1.0.0 && git push origin v1.0.0
+# So bumping `version:` in pubspec.yaml is part of the pull request, not an
+# afterthought. A push whose version was already released publishes nothing and
+# says so, rather than overwriting the release people already downloaded.
 #
-# Run it by hand ("Run workflow" in the Actions tab) to get the same set of
-# builds as downloadable artifacts without publishing anything — that is how a
-# tester gets a build of an unreleased branch.
+# Run it by hand ("Run workflow" in the Actions tab) on any branch to get the
+# same four builds as downloadable artifacts with nothing published — that is
+# how a tester gets a build of unreleased work.
 on:
   push:
-    tags: ["v*"]
+    branches: [prod]
   workflow_dispatch:
 
 concurrency:
@@ -25,39 +29,72 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.resolve.outputs.version }}
+      tag: ${{ steps.resolve.outputs.tag }}
+      build: ${{ steps.resolve.outputs.build }}
       release: ${{ steps.resolve.outputs.release }}
     steps:
       - uses: actions/checkout@v4
+
+      # tools/version.dart imports nothing but dart:io, so this job needs a
+      # bare SDK — no Flutter, no pub get, no code generation.
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
 
       - name: Resolve the version being built
         id: resolve
         shell: bash
         run: |
-          # pubspec carries `version: 1.2.3+4`; the tag carries `v1.2.3`.
-          pubspec="$(grep -m1 '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)"
+          # The same script the app reads its version from, so the number in
+          # the release, the tag and the About line cannot disagree.
+          version="$(dart tools/version.dart)"
+          tag="v$version"
 
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            tag="${GITHUB_REF#refs/tags/v}"
-            if [[ "$tag" != "$pubspec" ]]; then
-              echo "::error::Tag v$tag does not match the pubspec version $pubspec." \
-                   "Bump pubspec.yaml and retag, so the About screen agrees with the download."
-              exit 1
-            fi
-            echo "version=$tag" >> "$GITHUB_OUTPUT"
-            echo "release=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "version=$pubspec-dev.${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-            echo "release=false" >> "$GITHUB_OUTPUT"
+          # A manual run is for handing someone a build, never for publishing:
+          # it can be fired from any branch, at any state of the version.
+          if [ "$GITHUB_EVENT_NAME" != "push" ]; then
+            {
+              echo "version=$version-dev.${GITHUB_SHA::7}"
+              echo "build=true"
+              echo "release=false"
+            } >> "$GITHUB_OUTPUT"
+            echo "Manual run — building \`$version-dev.${GITHUB_SHA::7}\` as artifacts. Nothing is published." \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
 
-      - name: Report
-        run: |
-          echo "Building ${{ steps.resolve.outputs.version }} (publish a release: ${{ steps.resolve.outputs.release }})" \
-            >> "$GITHUB_STEP_SUMMARY"
+          # The tag is the record of what has already shipped. Re-releasing over
+          # it would change what a download at that version contains, which is
+          # exactly what a version number is supposed to rule out.
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+            {
+              echo "version=$version"
+              echo "build=false"
+              echo "release=false"
+            } >> "$GITHUB_OUTPUT"
+            echo "::warning::$tag is already released, so this push shipped nothing." \
+                 "Bump version: in pubspec.yaml to release these changes."
+            {
+              echo "### No release"
+              echo
+              echo "\`$tag\` already exists, so this push published nothing."
+              echo "Bump \`version:\` in \`pubspec.yaml\` and merge again to ship these changes."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          {
+            echo "version=$version"
+            echo "tag=$tag"
+            echo "build=true"
+            echo "release=true"
+          } >> "$GITHUB_OUTPUT"
+          echo "Releasing **$tag** from \`pubspec.yaml\`." >> "$GITHUB_STEP_SUMMARY"
 
   windows:
     name: Windows
     needs: version
+    if: needs.version.outputs.build == 'true'
     runs-on: windows-latest
     timeout-minutes: 45
     steps:
@@ -89,6 +126,7 @@ jobs:
   linux:
     name: Linux
     needs: version
+    if: needs.version.outputs.build == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -123,6 +161,7 @@ jobs:
   android:
     name: Android
     needs: version
+    if: needs.version.outputs.build == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -161,6 +200,7 @@ jobs:
   web:
     name: Web
     needs: version
+    if: needs.version.outputs.build == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -208,10 +248,13 @@ jobs:
           sha256sum * > SHA256SUMS.txt
           ls -lh
 
+      # Creates the tag as well as the release — nobody tags by hand, and the
+      # tag is what tells the next push to prod that this version has shipped.
       - uses: softprops/action-gh-release@v2
         with:
           name: Khulla ${{ needs.version.outputs.version }}
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ needs.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           generate_release_notes: true
           files: dist/*
           body: |
