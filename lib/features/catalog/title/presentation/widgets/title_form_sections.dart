@@ -3,7 +3,7 @@ import 'package:khulla/features/catalog/title/domain/models/title_format.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The bibliographic half of [TitleFormDialog]: title and author, the
+/// The bibliographic half of the title form: title and author, the
 /// imprint row, the format row, and the description.
 ///
 /// Error strings arrive as parameters and clear through the matching
@@ -145,7 +145,7 @@ class TitleFormBibliographicSection extends StatelessWidget {
   }
 }
 
-/// The shelving half of [TitleFormDialog]: shelf mark, replacement cost, the
+/// The shelving half of the title form: shelf mark, replacement cost, the
 /// initial-copies stepper on create, and the lendable switch.
 class TitleFormShelvingSection extends StatelessWidget {
   const TitleFormShelvingSection({

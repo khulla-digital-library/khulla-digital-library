@@ -3,7 +3,7 @@ import 'package:khulla/features/members/presentation/widgets/member_type_row.dar
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The category rows inside [MemberTypeSheetBody]: an inline empty state
+/// The category rows inside the sheet body: an inline empty state
 /// when there is nothing yet, otherwise one [MemberTypeRow] per type.
 ///
 /// `canArchive` guards the last active category — archiving it would leave
@@ -15,6 +15,7 @@ class MemberTypeList extends StatelessWidget {
     required this.onEdit,
     required this.onArchive,
     required this.onRestore,
+    super.key,
   });
 
   final List<MemberType> types;

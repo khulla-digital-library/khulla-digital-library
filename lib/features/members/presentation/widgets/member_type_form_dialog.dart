@@ -6,17 +6,18 @@ import 'package:khulla/features/members/presentation/widgets/member_type_form_se
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The category editor behind [MemberTypeListDialog], used for both a new
+/// The category editor behind the category dialog, used for both a new
 /// category and an existing one.
 ///
-/// Returns the draft on confirm; the caller writes it through
-/// [MemberTypeCubit] so validation toasts stay at the call site. Blank
+/// Returns the draft on confirm; the caller writes it through the member
+/// type cubit so validation toasts stay at the call site. Blank
 /// override fields mean "fall back to the library rules".
 class MemberTypeFormDialog extends StatefulWidget {
   const MemberTypeFormDialog({
     required this.heading,
     required this.confirmLabel,
     this.existing,
+    super.key,
   });
 
   final String heading;

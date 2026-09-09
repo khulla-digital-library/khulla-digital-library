@@ -7,7 +7,7 @@ import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The sheet body behind [MemberTypeListDialog]: loading, error and the
+/// The sheet body behind the category dialog: loading, error and the
 /// [MemberTypeList], with row taps fanning out to the dialog's handlers.
 class MemberTypeSheetBody extends StatelessWidget {
   const MemberTypeSheetBody({
@@ -48,7 +48,7 @@ class MemberTypeSheetBody extends StatelessWidget {
   }
 }
 
-/// The sheet footer behind [MemberTypeListDialog]: the single add-category
+/// The sheet footer behind the category dialog: the single add-category
 /// action.
 class MemberTypeSheetActions extends StatelessWidget {
   const MemberTypeSheetActions({required this.onAdd, super.key});

@@ -154,15 +154,11 @@ class _ReportsBoard extends StatelessWidget {
                 SizedBox(height: spacing.md),
                 NavigationGroup(
                   children: [
-                    for (final (index, report) in reportsSaved(l10n).indexed)
+                    for (final report in reportsSaved(l10n))
                       SavedReportTile(
                         report: report,
                         onExport: () => unawaited(
-                          _export(
-                            context,
-                            reportsExportKinds[index],
-                            report.title,
-                          ),
+                          _export(context, report.kind, report.title),
                         ),
                       ),
                   ],

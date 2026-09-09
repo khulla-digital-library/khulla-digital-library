@@ -5,8 +5,8 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// Search plus the desk's four questions of the register — who is holding
 /// something, who owes something, whose card is expiring or stopped working.
 ///
-/// Dumb by design: the page owns the [MemberQuery] and wires every control
-/// back to [MemberCubit].
+/// Dumb by design: the page owns the query and wires every control
+/// back to its cubit.
 class MemberListToolbar extends StatelessWidget {
   const MemberListToolbar({
     required this.searchController,

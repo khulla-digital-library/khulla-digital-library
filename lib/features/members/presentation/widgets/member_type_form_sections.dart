@@ -1,7 +1,7 @@
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Loan-rule overrides in [MemberTypeFormDialog]: period, limits and the
+/// Loan-rule overrides in the category form: period, limits and the
 /// renewal pair.
 class MemberTypeFormLoanSection extends StatelessWidget {
   const MemberTypeFormLoanSection({
@@ -63,7 +63,7 @@ class MemberTypeFormLoanSection extends StatelessWidget {
   }
 }
 
-/// Fine-rule overrides in [MemberTypeFormDialog]: the daily rate, the grace
+/// Fine-rule overrides in the category form: the daily rate, the grace
 /// window and the two ceilings.
 class MemberTypeFormFineSection extends StatelessWidget {
   const MemberTypeFormFineSection({
@@ -126,7 +126,7 @@ class MemberTypeFormFineSection extends StatelessWidget {
   }
 }
 
-/// Membership-rule overrides in [MemberTypeFormDialog]: how long a card
+/// Membership-rule overrides in the category form: how long a card
 /// lasts and how many holds it may carry.
 class MemberTypeFormMembershipSection extends StatelessWidget {
   const MemberTypeFormMembershipSection({

@@ -3,7 +3,7 @@ import 'package:khulla/features/members/presentation/member_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// One category row in [MemberTypeList]: the icon, name, system/archived
+/// One category row in the category list: the icon, name, system/archived
 /// badges, the loan-rule overrides it carries, and its edit/archive or
 /// restore actions.
 ///
@@ -16,6 +16,7 @@ class MemberTypeRow extends StatelessWidget {
     required this.onEdit,
     required this.onArchive,
     required this.onRestore,
+    super.key,
   });
 
   final MemberType type;

@@ -2,7 +2,7 @@ import 'package:khulla/core/lifecycle/dispose_bag.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The inline "new category" prompt behind [MemberFormDialog]: one required
+/// The inline "new category" prompt behind the member form: one required
 /// field, capped at 60 characters. Returns the name on confirm.
 class CreateCategoryForm extends StatefulWidget {
   const CreateCategoryForm({super.key});

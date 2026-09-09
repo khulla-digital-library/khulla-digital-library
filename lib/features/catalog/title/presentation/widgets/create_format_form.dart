@@ -2,7 +2,7 @@ import 'package:khulla/core/lifecycle/dispose_bag.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// The inline "new format" prompt behind [TitleFormDialog]: one required
+/// The inline "new format" prompt behind the title form: one required
 /// field, capped at 60 characters. Returns the name on confirm.
 class CreateFormatForm extends StatefulWidget {
   const CreateFormatForm({super.key});

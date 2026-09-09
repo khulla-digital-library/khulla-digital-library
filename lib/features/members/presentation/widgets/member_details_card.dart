@@ -1,12 +1,11 @@
 import 'package:khulla/core/format/app_date_format.dart';
-import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/presentation/member_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Membership and contact fields the [MemberDetailHeader] does not repeat.
+/// Membership and contact fields the detail header does not repeat.
 ///
 /// Two [SectionCard]s — membership (card, category, standing, dates) and
 /// contact — rendered from ready-made strings.
