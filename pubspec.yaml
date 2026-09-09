@@ -72,6 +72,10 @@ dependencies:
   # UI
   toastification: ^3.2.0
 
+  # Opening the project and author links in the operator's browser. The about
+  # panel is the only caller; everything else in the app is local.
+  url_launcher: ^6.3.2
+
 
   # Phone, Currency and Country code
   country_phone_kit:

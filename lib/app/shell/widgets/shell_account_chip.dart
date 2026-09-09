@@ -118,7 +118,7 @@ class ShellAccountChip extends StatelessWidget {
                             staff.role.label(l10n),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: context.textTheme.labelSmall?.copyWith(
+                            style: context.textTheme.bodySmall?.copyWith(
                               color: colors.textMuted,
                             ),
                           ),

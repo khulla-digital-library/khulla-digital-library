@@ -25,7 +25,12 @@ enum AppDialogWidth {
   xxl(672),
 
   /// 768px — a form with a table or a preview in it.
-  xxxl(768);
+  xxxl(768),
+
+  /// 864px — the widest a dialog goes: long prose that needs a comfortable
+  /// measure, or a two-column form beside a preview. Past this, the content
+  /// wants a page rather than a panel over one.
+  xxxxl(864);
 
   AppDialogWidth(this.value);
 

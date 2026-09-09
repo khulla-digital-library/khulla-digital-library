@@ -30,21 +30,19 @@ class ShellRailFooter extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
+          SizedBox(height: spacing.xs),
           ShellAccountChip(compact: !extended),
           // Copyright only shown in the extended rail — collapsed rail has no
           // room for text, and the brand tooltip already carries the name.
-          if (extended)
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                spacing.sm,
-                0,
-                spacing.sm,
-                spacing.xs,
-              ),
-              child: const ShellCopyrightNotice(
-                textAlign: TextAlign.start,
-              ),
+          if (extended) SizedBox(height: spacing.xxs),
+          Divider(height: 1, thickness: 1, color: colors.hairline),
+          SizedBox(height: spacing.xs),
+          Padding(
+            padding: EdgeInsets.fromLTRB(spacing.sm, 0, spacing.sm, 0),
+            child: const ShellCopyrightNotice(
+              textAlign: TextAlign.start,
             ),
+          ),
         ],
       ),
     );

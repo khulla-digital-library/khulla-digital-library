@@ -45,7 +45,7 @@ class ShellCopyrightNotice extends StatelessWidget {
     );
 
     if (!showDivider) return notice;
-
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,

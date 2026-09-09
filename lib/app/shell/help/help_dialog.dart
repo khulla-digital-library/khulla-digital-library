@@ -34,15 +34,12 @@ class HelpDialog extends StatefulWidget {
   static Future<void> show(BuildContext context) => AppDialog.show<void>(
     context: context,
     title: context.l10n.helpDialogTitle,
-    width: AppDialogWidth.xxl,
-    icon: AppIcons.help,
-    iconTone: AppStatusTone.info,
+    width: AppDialogWidth.xxxxl,
     content: const HelpDialog(),
-    actionsBuilder: (dialogContext) => AppDialog.secondaryAction(
-      context: dialogContext,
-      label: dialogContext.l10n.commonClose,
-      onPressed: () => Navigator.of(dialogContext).pop(),
-    ),
+    // No footer button: help is read and dismissed, never confirmed, and a
+    // lone *Close* under eight steps of prose only adds a second thing that
+    // does what the close chip already does.
+    actionsBuilder: (_) => const SizedBox.shrink(),
   );
 
   @override
@@ -69,12 +66,17 @@ class _HelpDialogState extends State<HelpDialog> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        AppSegmentedControl<HelpTab>(
-          value: _tab,
-          items: HelpTab.values,
-          itemLabel: _label,
-          expand: true,
-          onChanged: (tab) => setState(() => _tab = tab),
+        // Hugging its labels rather than stretching: the track is a control,
+        // and a control stretched to a 768px dialog reads as a header band
+        // with three words lost in it.
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: AppSegmentedControl<HelpTab>(
+            value: _tab,
+            items: HelpTab.values,
+            itemLabel: _label,
+            onChanged: (tab) => setState(() => _tab = tab),
+          ),
         ),
         SizedBox(height: spacing.md),
         switch (_tab) {
