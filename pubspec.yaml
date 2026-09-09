@@ -46,6 +46,12 @@ dependencies:
   crypto: ^3.0.7
   file_selector: ^1.0.3
 
+  # A backup restore replaces the catalogue file/store underneath a live
+  # connection — the app has to restart cleanly, and on web that means
+  # reloading the page. Already resolved transitively; declared directly
+  # because lib/core/lifecycle/restart_app_web.dart imports it.
+  web: ^1.1.1
+
   # Stable record identifiers, generated on the device.
   uuid: ^4.5.1
 
@@ -68,10 +74,12 @@ dependencies:
   toastification: ^3.2.0
 
 
-  #
+  # Phone, Currency and Country code
   country_phone_kit:
     git:
       url: https://github.com/sawongam/country_phone_kit
+
+  # Printing and PDF
   printing: ^5.15.0
   pdf: ^3.13.0
 

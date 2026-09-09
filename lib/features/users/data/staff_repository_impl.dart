@@ -105,4 +105,77 @@ class StaffRepositoryImpl implements StaffRepository {
     }
     return credentials.staff;
   }
+
+  @override
+  Future<StaffMember> updateStaff({
+    required String id,
+    required String name,
+    required String email,
+    required UserRole role,
+    required String actingStaffId,
+  }) async {
+    final current = await _dataSource.findStaffById(id);
+    if (current == null) {
+      throw const NotFoundException('That staff account no longer exists.');
+    }
+    if (current.role == UserRole.administrator &&
+        role != UserRole.administrator) {
+      await _guardLastAdministrator();
+    }
+    return _dataSource.updateStaff(
+      StaffMember(
+        id: current.id,
+        name: name.trim(),
+        email: email,
+        role: role,
+        status: current.status,
+        createdAt: current.createdAt,
+      ),
+    );
+  }
+
+  @override
+  Future<StaffMember> setStaffStatus({
+    required String id,
+    required UserStatus status,
+    required String actingStaffId,
+  }) async {
+    if (status != UserStatus.active) {
+      if (id == actingStaffId) {
+        throw const ConflictException('You cannot disable your own account.');
+      }
+      final current = await _dataSource.findStaffById(id);
+      if (current?.role == UserRole.administrator) {
+        await _guardLastAdministrator();
+      }
+    }
+    return _dataSource.setStaffStatus(staffId: id, status: status);
+  }
+
+  @override
+  Future<void> adminResetPassword({
+    required String id,
+    required String newPassword,
+  }) => _dataSource.setPasswordHash(
+    staffId: id,
+    passwordHash: _hasher.hash(newPassword),
+  );
+
+  /// Refuses a change that would leave the library with no active
+  /// administrator.
+  ///
+  /// Called before the target account's role or status is written, so the
+  /// count still includes it — "one" here means "only this one, and it is
+  /// the one about to lose the role or be disabled".
+  Future<void> _guardLastAdministrator() async {
+    final activeAdmins = await _dataSource.countStaffWithRoleAndStatus(
+      role: UserRole.administrator,
+      status: UserStatus.active,
+    );
+    if (activeAdmins <= 1) {
+      throw const ConflictException(
+        'The library must always have at least one active administrator.',
+      );
+    }
+  }
 }

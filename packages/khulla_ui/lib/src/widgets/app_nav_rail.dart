@@ -70,8 +70,13 @@ class _AppNavRailState extends State<AppNavRail> {
   @override
   void initState() {
     super.initState();
+    // Start collapsed: expanding every group pushes Settings and Staff far
+    // down the rail on first paint. Only a deep link straight into a
+    // sub-section auto-expands its parent so the selection stays visible.
     for (final (index, destination) in widget.destinations.indexed) {
-      if (destination.children.isNotEmpty) _expanded.add(index);
+      if (destination.children.any((child) => child.selected)) {
+        _expanded.add(index);
+      }
     }
   }
 

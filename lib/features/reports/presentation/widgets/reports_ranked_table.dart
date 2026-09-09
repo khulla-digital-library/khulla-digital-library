@@ -1,6 +1,8 @@
-import 'package:khulla/features/reports/presentation/placeholder/reports_placeholder.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
+
+/// One row of a ranked report table.
+typedef ReportsRankedRow = ({String name, String detail, int loans});
 
 /// A ranked report table — most borrowed titles, most active members.
 ///

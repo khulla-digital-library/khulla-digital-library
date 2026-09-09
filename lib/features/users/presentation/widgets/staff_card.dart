@@ -1,4 +1,4 @@
-import 'package:khulla/features/users/presentation/placeholder/staff_record.dart';
+import 'package:khulla/features/users/domain/models/staff_member.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -8,7 +8,7 @@ class StaffCard extends StatelessWidget {
   const StaffCard({required this.staff, this.onTap, super.key});
 
   /// The account to draw.
-  final StaffRecord staff;
+  final StaffMember staff;
 
   /// Opens the account.
   final VoidCallback? onTap;

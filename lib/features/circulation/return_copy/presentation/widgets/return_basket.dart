@@ -61,7 +61,7 @@ class ReturnBasket extends StatelessWidget {
                 AppTableColumn<Loan>(
                   id: 'title',
                   label: l10n.loansColumnTitle,
-                  flex: 4,
+                  flex: 2,
                   cellBuilder: (context, loan) =>
                       Text(loan.titleName ?? l10n.commonNotSet),
                 ),
@@ -80,8 +80,6 @@ class ReturnBasket extends StatelessWidget {
                 AppTableColumn<Loan>(
                   id: 'daysLate',
                   label: l10n.returnsColumnDaysLate,
-                  flex: 2,
-                  alignment: Alignment.centerRight,
                   showFrom: FormFactor.medium,
                   cellBuilder: (context, loan) => Text(
                     loan.daysLate == 0 ? l10n.commonNotSet : '${loan.daysLate}',
@@ -95,8 +93,6 @@ class ReturnBasket extends StatelessWidget {
                 AppTableColumn<Loan>(
                   id: 'fine',
                   label: l10n.returnsColumnFine,
-                  flex: 2,
-                  alignment: Alignment.centerRight,
                   cellBuilder: (context, loan) => Text(
                     loan.accruedFine.isZero
                         ? l10n.commonNotSet
@@ -114,7 +110,6 @@ class ReturnBasket extends StatelessWidget {
                 AppTableColumn<Loan>(
                   id: 'status',
                   label: l10n.commonStatus,
-                  flex: 2,
                   showFrom: FormFactor.large,
                   cellBuilder: (context, loan) => AppStatusBadge(
                     dense: true,

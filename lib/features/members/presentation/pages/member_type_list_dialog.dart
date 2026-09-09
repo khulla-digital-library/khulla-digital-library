@@ -436,9 +436,19 @@ class _MemberTypeFormDialogState extends State<_MemberTypeFormDialog>
               keyboardType: numberInput,
               onChanged: (_) {},
             ),
+          ],
+        ),
+        AppFormRow(
+          children: [
             AppTextField(
               label: l10n.fieldRenewalLimit,
               controller: _renewalLimit,
+              keyboardType: numberInput,
+              onChanged: (_) {},
+            ),
+            AppTextField(
+              label: l10n.fieldRenewalPeriodDays,
+              controller: _renewalPeriodDays,
               keyboardType: numberInput,
               onChanged: (_) {},
             ),
@@ -446,12 +456,6 @@ class _MemberTypeFormDialogState extends State<_MemberTypeFormDialog>
         ),
         AppFormRow(
           children: [
-            AppTextField(
-              label: l10n.fieldRenewalPeriodDays,
-              controller: _renewalPeriodDays,
-              keyboardType: numberInput,
-              onChanged: (_) {},
-            ),
             AppTextField(
               label: l10n.fieldFinePerDay,
               controller: _finePerDay,
