@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
+import 'package:khulla/app/router/route_access.dart';
 import 'package:khulla/app/shell/app_shell.dart';
 import 'package:khulla/core/config/app_config.dart';
 import 'package:khulla/core/di/injection.dart';
@@ -50,7 +51,6 @@ import 'package:khulla/features/staff_auth/presentation/recover_password/cubit/r
 import 'package:khulla/features/staff_auth/presentation/recover_password/recover_password_page.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/cubit/sign_in_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/sign_in/sign_in_page.dart';
-import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/features/users/presentation/cubit/staff_list_cubit.dart';
 import 'package:khulla/features/users/presentation/pages/role_list_page.dart';
 import 'package:khulla/features/users/presentation/pages/user_list_page.dart';
@@ -353,8 +353,12 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: Routes.settings,
+                  // Where the section opens depends on the role: sending an
+                  // account without the settings permission to the library
+                  // profile would bounce it straight back out, which reads
+                  // as the rail row doing nothing at all.
                   redirect: (_, state) => state.uri.path == Routes.settings
-                      ? Routes.settingsLibrary
+                      ? settingsLandingFor(_auth.state.role)
                       : null,
                   routes: [
                     GoRoute(
@@ -453,20 +457,17 @@ class AppRouter {
 
   /// Sends a signed-in operator away from a section their role cannot open.
   ///
-  /// A role change is rare and the shell already hides these destinations, so
-  /// this only matters for a stale link, a typed URL, or a role change on
-  /// another window — quiet cases that still deserve a real answer rather
-  /// than a section that renders and then throws on missing data.
+  /// The shell already hides what a role cannot reach, so this catches the
+  /// quiet ways in that the rail cannot: a stale link, a typed URL, a
+  /// bookmark, or a role that changed under a window left open. Every one of
+  /// them deserves a real answer rather than a section that renders and then
+  /// writes something the role was never meant to write.
+  ///
+  /// [accessFor] holds the whole map, and the dashboard is the floor every
+  /// role keeps, so the redirect can never loop.
   String? _redirectForPermission(String location) {
-    StaffPermission? permission;
-    if (Routes.isUnder(location, Routes.users)) {
-      permission = StaffPermission.users;
-    } else if (Routes.isUnder(location, Routes.reports)) {
-      permission = StaffPermission.reports;
-    } else if (Routes.isUnder(location, Routes.settingsBackup)) {
-      permission = StaffPermission.backup;
-    }
-    if (permission == null) return null;
-    return _auth.state.hasPermission(permission) ? null : Routes.dashboard;
+    final access = accessFor(location);
+    if (access == null || access.allows(_auth.state.role)) return null;
+    return Routes.dashboard;
   }
 }

@@ -3,11 +3,11 @@ import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/core/error/guard.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 
-/// Single-copy status writes shared by loans and the hold queue.
+/// Single-copy status writes shared by the loan and hold-queue helpers.
 ///
-/// Free function on purpose: both [CirculationLoanWrites] and
-/// [CirculationHoldQueue] need it, and it must run inside the caller's
-/// transaction — pass the same [AppDatabase] the transaction runs on.
+/// Free function on purpose: both helpers need it, and it must run inside
+/// the caller's transaction — pass the same [AppDatabase] the transaction
+/// runs on.
 Future<void> setCopyStatus(
   AppDatabase db,
   String copyId,

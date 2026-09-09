@@ -13,21 +13,27 @@ import 'package:khulla_ui/khulla_ui.dart';
 class TitleCopiesCard extends StatelessWidget {
   const TitleCopiesCard({
     required this.copies,
-    required this.onMarkLost,
-    required this.onMarkDamaged,
-    required this.onWithdraw,
+    this.onMarkLost,
+    this.onMarkDamaged,
+    this.onWithdraw,
     super.key,
   });
 
   final List<Copy> copies;
-  final void Function(Copy copy) onMarkLost;
-  final void Function(Copy copy) onMarkDamaged;
-  final void Function(Copy copy) onWithdraw;
+
+  /// Per-copy maintenance, passed down to each row. Null for a role that may
+  /// read the catalogue but not change it.
+  final void Function(Copy copy)? onMarkLost;
+  final void Function(Copy copy)? onMarkDamaged;
+  final void Function(Copy copy)? onWithdraw;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = context.appColors;
+    final markLost = onMarkLost;
+    final markDamaged = onMarkDamaged;
+    final withdraw = onWithdraw;
 
     return SectionCard(
       title: l10n.titleDetailCopiesTitle,
@@ -46,9 +52,11 @@ class TitleCopiesCard extends StatelessWidget {
                   if (index > 0) Divider(height: 1, color: colors.hairline),
                   TitleCopyRow(
                     copy: copy,
-                    onMarkLost: () => onMarkLost(copy),
-                    onMarkDamaged: () => onMarkDamaged(copy),
-                    onWithdraw: () => onWithdraw(copy),
+                    onMarkLost: markLost == null ? null : () => markLost(copy),
+                    onMarkDamaged: markDamaged == null
+                        ? null
+                        : () => markDamaged(copy),
+                    onWithdraw: withdraw == null ? null : () => withdraw(copy),
                   ),
                 ],
               ],

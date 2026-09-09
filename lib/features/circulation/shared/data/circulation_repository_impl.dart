@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/core/error/app_exception.dart';
@@ -123,9 +122,12 @@ class CirculationRepositoryImpl implements CirculationRepository {
 
     final rules = await _policy.loadEffectiveRules(memberRow.memberTypeId);
 
-    _policy.rejectArchivedMember(memberRow.archivedAt);
-    _policy.rejectSuspendedMember(memberRow.suspendedAt);
-    _policy.rejectExpiredMember(memberRow.expiresAt, today);
+    _policy.rejectIneligibleMember(
+      archivedAt: memberRow.archivedAt,
+      suspendedAt: memberRow.suspendedAt,
+      expiresAt: memberRow.expiresAt,
+      today: today,
+    );
 
     if (copyRow.archivedAt != null) {
       throw const ConflictException('That copy has been archived.');
@@ -371,9 +373,12 @@ class CirculationRepositoryImpl implements CirculationRepository {
 
     final rules = await _policy.loadEffectiveRules(memberRow.memberTypeId);
 
-    _policy.rejectArchivedMember(memberRow.archivedAt);
-    _policy.rejectSuspendedMember(memberRow.suspendedAt);
-    _policy.rejectExpiredMember(memberRow.expiresAt, today);
+    _policy.rejectIneligibleMember(
+      archivedAt: memberRow.archivedAt,
+      suspendedAt: memberRow.suspendedAt,
+      expiresAt: memberRow.expiresAt,
+      today: today,
+    );
 
     if (titleRow.archivedAt != null) {
       throw const ConflictException('That title has been archived.');

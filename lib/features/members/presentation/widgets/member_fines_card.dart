@@ -16,29 +16,38 @@ import 'package:khulla_ui/khulla_ui.dart';
 class MemberFinesCard extends StatelessWidget {
   const MemberFinesCard({
     required this.fines,
-    required this.onCollect,
-    required this.onWaive,
-    required this.onCharge,
+    this.onCollect,
+    this.onWaive,
+    this.onCharge,
     super.key,
   });
 
   final List<Fine> fines;
-  final void Function(Fine fine) onCollect;
-  final void Function(Fine fine) onWaive;
-  final VoidCallback onCharge;
+
+  /// Collecting, waiving and charging are all the fines permission at its
+  /// `manage` level. All three are null for a role that may see what a member
+  /// owes without settling it, and the card then shows the ledger alone.
+  final void Function(Fine fine)? onCollect;
+  final void Function(Fine fine)? onWaive;
+  final VoidCallback? onCharge;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final scheme = context.colorScheme;
+    final collect = onCollect;
+    final waive = onWaive;
+    final charge = onCharge;
 
     return SectionCard(
       title: l10n.memberDetailFinesTitle,
       subtitle: l10n.memberDetailFinesSubtitle,
-      trailing: AppTextButton(
-        onPressed: onCharge,
-        child: Text(l10n.finesChargeAction),
-      ),
+      trailing: charge == null
+          ? null
+          : AppTextButton(
+              onPressed: charge,
+              child: Text(l10n.finesChargeAction),
+            ),
       child: fines.isEmpty
           ? AppEmptyView(
               variant: AppFeedbackVariant.inline,
@@ -90,29 +99,32 @@ class MemberFinesCard extends StatelessWidget {
                     tone: fine.status.tone,
                   ),
                 ),
-                AppTableColumn<Fine>(
-                  id: 'actions',
-                  label: l10n.commonActions,
-                  alignment: Alignment.centerRight,
-                  cellBuilder: (context, fine) => AppMenuButton(
-                    tooltip: l10n.commonMoreActions,
-                    actions: [
-                      AppMenuAction(
-                        label: l10n.finesCollect,
-                        icon: AppIcons.payment,
-                        enabled: fine.status == FineStatus.unpaid,
-                        onSelected: () => onCollect(fine),
-                      ),
-                      AppMenuAction(
-                        label: l10n.finesWaive,
-                        icon: AppIcons.waiveFine,
-                        isDestructive: true,
-                        enabled: fine.status == FineStatus.unpaid,
-                        onSelected: () => onWaive(fine),
-                      ),
-                    ],
+                if (collect != null || waive != null)
+                  AppTableColumn<Fine>(
+                    id: 'actions',
+                    label: l10n.commonActions,
+                    alignment: Alignment.centerRight,
+                    cellBuilder: (context, fine) => AppMenuButton(
+                      tooltip: l10n.commonMoreActions,
+                      actions: [
+                        if (collect != null)
+                          AppMenuAction(
+                            label: l10n.finesCollect,
+                            icon: AppIcons.payment,
+                            enabled: fine.status == FineStatus.unpaid,
+                            onSelected: () => collect(fine),
+                          ),
+                        if (waive != null)
+                          AppMenuAction(
+                            label: l10n.finesWaive,
+                            icon: AppIcons.waiveFine,
+                            isDestructive: true,
+                            enabled: fine.status == FineStatus.unpaid,
+                            onSelected: () => waive(fine),
+                          ),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
     );

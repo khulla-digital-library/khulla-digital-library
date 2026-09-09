@@ -132,67 +132,48 @@ class _StaffFormBodyState extends State<_StaffFormBody> with DisposeBag {
         ),
       ],
       children: [
-        AppFormSection(
-          title: l10n.usersFormIdentity,
-          description: l10n.usersFormIdentityDescription,
-          children: [
-            AppTextField(
-              label: l10n.fieldFullName,
-              required: true,
-              autofocus: true,
-              controller: _name,
-              textCapitalization: TextCapitalization.words,
-              errorText: state.name.messageFor(l10n),
-              onChanged: cubit.nameChanged,
-            ),
-            AppTextField(
-              label: l10n.fieldEmail,
-              required: true,
-              controller: _email,
-              keyboardType: TextInputType.emailAddress,
-              errorText: state.emailTaken
-                  ? l10n.onboardingEmailTaken
-                  : state.email.messageFor(l10n),
-              onChanged: cubit.emailChanged,
-            ),
-          ],
+        AppTextField(
+          label: l10n.fieldFullName,
+          required: true,
+          autofocus: true,
+          controller: _name,
+          textCapitalization: TextCapitalization.words,
+          errorText: state.name.messageFor(l10n),
+          onChanged: cubit.nameChanged,
         ),
-        AppFormSection(
-          title: l10n.usersFormAccess,
-          description: l10n.usersFormAccessDescription,
-          children: [
-            AppDropdownField<UserRole>(
-              label: l10n.fieldRole,
-              required: true,
-              value: state.role,
-              items: UserRole.values,
-              itemLabel: (role) => role.label(l10n),
-              itemIcon: (role) => role.icon,
-              onChanged: (role) =>
-                  role == null ? null : cubit.roleChanged(role),
-            ),
-          ],
+        AppTextField(
+          label: l10n.fieldEmail,
+          required: true,
+          controller: _email,
+          keyboardType: TextInputType.emailAddress,
+          errorText: state.emailTaken
+              ? l10n.onboardingEmailTaken
+              : state.email.messageFor(l10n),
+          onChanged: cubit.emailChanged,
+        ),
+        AppDropdownField<UserRole>(
+          label: l10n.fieldRole,
+          required: true,
+          value: state.role,
+          items: UserRole.values,
+          itemLabel: (role) => role.label(l10n),
+          itemIcon: (role) => role.icon,
+          onChanged: (role) => role == null ? null : cubit.roleChanged(role),
         ),
         if (!_isEditing)
-          AppFormSection(
-            title: l10n.fieldPassword,
-            description: l10n.usersFormCredentialsDescription,
+          AppFormRow(
             children: [
-              AppFormRow(
-                children: [
-                  AuthPasswordField(
-                    label: l10n.fieldPassword,
-                    controller: _password,
-                    errorText: state.password.messageFor(l10n),
-                    onChanged: cubit.passwordChanged,
-                  ),
-                  AuthPasswordField(
-                    label: l10n.fieldConfirmPassword,
-                    controller: _confirmPassword,
-                    errorText: state.confirmPassword.messageFor(l10n),
-                    onChanged: cubit.confirmPasswordChanged,
-                  ),
-                ],
+              AuthPasswordField(
+                label: l10n.fieldPassword,
+                controller: _password,
+                errorText: state.password.messageFor(l10n),
+                onChanged: cubit.passwordChanged,
+              ),
+              AuthPasswordField(
+                label: l10n.fieldConfirmPassword,
+                controller: _confirmPassword,
+                errorText: state.confirmPassword.messageFor(l10n),
+                onChanged: cubit.confirmPasswordChanged,
               ),
             ],
           ),

@@ -16,14 +16,20 @@ import 'package:khulla_ui/khulla_ui.dart';
 class TitleDetailHeader extends StatelessWidget {
   const TitleDetailHeader({
     required this.title,
-    required this.onEdit,
-    required this.onDelete,
+    this.onEdit,
+    this.onDelete,
     super.key,
   });
 
   final catalog.Title title;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
+
+  /// Opens the title's form. Null for a role that may read the catalogue but
+  /// not change it — the button is absent rather than disabled, because a
+  /// control that can never be pressed is furniture.
+  final VoidCallback? onEdit;
+
+  /// Removes the title. Null for the same reason.
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -96,18 +102,20 @@ class TitleDetailHeader extends StatelessWidget {
           runSpacing: spacing.xs,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            AppButton(
-              variant: AppButtonVariant.destructive,
-              size: AppButtonSize.medium,
-              icon: AppIcons.delete,
-              onPressed: onDelete,
-              child: Text(l10n.titleDetailDelete),
-            ),
-            AppButton(
-              size: AppButtonSize.medium,
-              onPressed: onEdit,
-              child: Text(l10n.titleDetailEdit(title.title)),
-            ),
+            if (onDelete != null)
+              AppButton(
+                variant: AppButtonVariant.destructive,
+                size: AppButtonSize.medium,
+                icon: AppIcons.delete,
+                onPressed: onDelete,
+                child: Text(l10n.titleDetailDelete),
+              ),
+            if (onEdit != null)
+              AppButton(
+                size: AppButtonSize.medium,
+                onPressed: onEdit,
+                child: Text(l10n.titleDetailEdit(title.title)),
+              ),
           ],
         ),
       ],

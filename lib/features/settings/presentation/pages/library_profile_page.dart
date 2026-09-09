@@ -11,9 +11,12 @@ import 'package:khulla/features/settings/domain/models/library_profile.dart';
 import 'package:khulla/features/settings/presentation/cubit/library_profile_cubit.dart';
 import 'package:khulla/features/settings/presentation/cubit/library_profile_state.dart';
 import 'package:khulla/features/staff_auth/presentation/auth_labels.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
+import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
+import 'package:khulla/shared/widgets/view_only_notice.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 class LibraryProfilePage extends StatefulWidget {
@@ -89,6 +92,10 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final spacing = context.appSpacing;
+    // The library's own settings read at `view` and write at `manage`, so a
+    // librarian can answer "how long is a loan" without being able to change
+    // the answer. The form stays legible and stops accepting input.
+    final viewOnly = !context.canManage(StaffPermission.settings);
     const numberInput = TextInputType.number;
 
     return BlocConsumer<LibraryProfileCubit, LibraryProfileState>(
@@ -126,137 +133,145 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
 
         return AppPageBody(
           wide: true,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(
-              spacing.page,
-              spacing.lg,
-              spacing.page,
-              spacing.xlg,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AppFormSection(
-                  title: l10n.settingsLibraryIdentity,
-                  description: l10n.settingsLibraryIdentityDescription,
-                  children: [
-                    AppTextField(
-                      label: l10n.fieldLibraryName,
-                      required: true,
-                      controller: _name,
-                      textCapitalization: TextCapitalization.words,
-                      onChanged: (_) {},
-                    ),
+          child: ViewOnlyForm(
+            viewOnly: viewOnly,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                spacing.page,
+                spacing.lg,
+                spacing.page,
+                spacing.xlg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (viewOnly) ...[
+                    const ViewOnlyNotice(),
+                    SizedBox(height: spacing.md),
                   ],
-                ),
-                SizedBox(height: spacing.lg),
-                AppFormSection(
-                  title: l10n.settingsLibraryContact,
-                  description: l10n.settingsLibraryContactDescription,
-                  children: [
-                    AppFormRow(
+                  AppFormSection(
+                    title: l10n.settingsLibraryIdentity,
+                    description: l10n.settingsLibraryIdentityDescription,
+                    children: [
+                      AppTextField(
+                        label: l10n.fieldLibraryName,
+                        required: true,
+                        controller: _name,
+                        textCapitalization: TextCapitalization.words,
+                        onChanged: (_) {},
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: spacing.lg),
+                  AppFormSection(
+                    title: l10n.settingsLibraryContact,
+                    description: l10n.settingsLibraryContactDescription,
+                    children: [
+                      AppFormRow(
+                        children: [
+                          AppTextField(
+                            label: l10n.fieldEmail,
+                            controller: _email,
+                            keyboardType: TextInputType.emailAddress,
+                            onChanged: (_) {},
+                          ),
+                          AppTextField(
+                            label: l10n.fieldPhone,
+                            controller: _phone,
+                            keyboardType: TextInputType.phone,
+                            onChanged: (_) {},
+                          ),
+                        ],
+                      ),
+                      AppFormRow(
+                        children: [
+                          AppTextField(
+                            label: l10n.fieldAddress,
+                            controller: _address,
+                            textCapitalization: TextCapitalization.words,
+                            onChanged: (_) {},
+                          ),
+                          AppTextField(
+                            label: l10n.fieldOpeningHours,
+                            controller: _openingHours,
+                            onChanged: (_) {},
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: spacing.lg),
+                  AppFormSection(
+                    title: l10n.settingsLibraryLocale,
+                    description: l10n.settingsLibraryLocaleDescription,
+                    children: [
+                      AppDropdownField<AppCurrency>(
+                        label: l10n.fieldCurrency,
+                        required: true,
+                        value: _currency,
+                        items: AppCurrency.values,
+                        itemLabel: (currency) => currency.label(l10n),
+                        searchHint: l10n.currencySearchHint,
+                        clearSearchTooltip: l10n.commonClearSearch,
+                        emptySearchMessage: l10n.commonNoMatchesTitle,
+                        itemMatchesSearch: (currency, query) =>
+                            currency.name.toLowerCase().contains(query) ||
+                            currency.code.toLowerCase().contains(query),
+                        onChanged: (currency) {
+                          if (currency != null) {
+                            setState(() => _currency = currency);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: spacing.lg),
+                  AppFormSection(
+                    title: l10n.settingsLibraryBarcodes,
+                    description: l10n.settingsLibraryBarcodesDescription,
+                    children: [
+                      AppFormRow(
+                        children: [
+                          AppTextField(
+                            label: l10n.fieldBarcodePrefix,
+                            required: true,
+                            controller: _barcodePrefix,
+                            onChanged: (_) {},
+                          ),
+                          AppTextField(
+                            label: l10n.fieldBarcodeNextValue,
+                            required: true,
+                            controller: _barcodeNextValue,
+                            keyboardType: numberInput,
+                            onChanged: (_) {},
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: spacing.xlg),
+                  if (!viewOnly)
+                    Row(
                       children: [
-                        AppTextField(
-                          label: l10n.fieldEmail,
-                          controller: _email,
-                          keyboardType: TextInputType.emailAddress,
-                          onChanged: (_) {},
+                        AppButton(
+                          variant: AppButtonVariant.outline,
+                          size: AppButtonSize.medium,
+                          onPressed: () => context.go(Routes.settings),
+                          child: Text(l10n.commonCancel),
                         ),
-                        AppTextField(
-                          label: l10n.fieldPhone,
-                          controller: _phone,
-                          keyboardType: TextInputType.phone,
-                          onChanged: (_) {},
+                        const Spacer(),
+                        AppButton(
+                          size: AppButtonSize.medium,
+                          isLoading: state.isSaving,
+                          onPressed: state.isSaving
+                              ? null
+                              : () => unawaited(_save(context)),
+                          child: Text(l10n.settingsLibrarySave),
                         ),
                       ],
                     ),
-                    AppFormRow(
-                      children: [
-                        AppTextField(
-                          label: l10n.fieldAddress,
-                          controller: _address,
-                          textCapitalization: TextCapitalization.words,
-                          onChanged: (_) {},
-                        ),
-                        AppTextField(
-                          label: l10n.fieldOpeningHours,
-                          controller: _openingHours,
-                          onChanged: (_) {},
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: spacing.lg),
-                AppFormSection(
-                  title: l10n.settingsLibraryLocale,
-                  description: l10n.settingsLibraryLocaleDescription,
-                  children: [
-                    AppDropdownField<AppCurrency>(
-                      label: l10n.fieldCurrency,
-                      required: true,
-                      value: _currency,
-                      items: AppCurrency.values,
-                      itemLabel: (currency) => currency.label(l10n),
-                      searchHint: l10n.currencySearchHint,
-                      clearSearchTooltip: l10n.commonClearSearch,
-                      emptySearchMessage: l10n.commonNoMatchesTitle,
-                      itemMatchesSearch: (currency, query) =>
-                          currency.name.toLowerCase().contains(query) ||
-                          currency.code.toLowerCase().contains(query),
-                      onChanged: (currency) {
-                        if (currency != null) {
-                          setState(() => _currency = currency);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                SizedBox(height: spacing.lg),
-                AppFormSection(
-                  title: l10n.settingsLibraryBarcodes,
-                  description: l10n.settingsLibraryBarcodesDescription,
-                  children: [
-                    AppFormRow(
-                      children: [
-                        AppTextField(
-                          label: l10n.fieldBarcodePrefix,
-                          required: true,
-                          controller: _barcodePrefix,
-                          onChanged: (_) {},
-                        ),
-                        AppTextField(
-                          label: l10n.fieldBarcodeNextValue,
-                          required: true,
-                          controller: _barcodeNextValue,
-                          keyboardType: numberInput,
-                          onChanged: (_) {},
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: spacing.xlg),
-                Row(
-                  children: [
-                    AppButton(
-                      variant: AppButtonVariant.outline,
-                      size: AppButtonSize.medium,
-                      onPressed: () => context.go(Routes.settings),
-                      child: Text(l10n.commonCancel),
-                    ),
-                    const Spacer(),
-                    AppButton(
-                      size: AppButtonSize.medium,
-                      isLoading: state.isSaving,
-                      onPressed: state.isSaving
-                          ? null
-                          : () => unawaited(_save(context)),
-                      child: Text(l10n.settingsLibrarySave),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

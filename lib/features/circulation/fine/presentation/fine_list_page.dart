@@ -11,8 +11,10 @@ import 'package:khulla/features/circulation/fine/presentation/cubit/fine_list_cu
 import 'package:khulla/features/circulation/fine/presentation/cubit/fine_list_state.dart';
 import 'package:khulla/features/circulation/shared/domain/fine_status.dart';
 import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
+import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -100,6 +102,8 @@ class FineListPage extends StatelessWidget {
     final muted = context.textTheme.bodyMedium?.copyWith(
       color: scheme.onSurfaceVariant,
     );
+    final canSettle = context.canManage(StaffPermission.fines);
+    final canSeeMembers = context.canView(StaffPermission.members);
 
     return BlocBuilder<FineListCubit, FineListState>(
       builder: (context, state) {
@@ -241,34 +245,42 @@ class FineListPage extends StatelessWidget {
                 tone: fine.status.tone,
               ),
             ),
-            AppTableColumn<Fine>(
-              id: 'actions',
-              label: l10n.commonActions,
-              alignment: Alignment.centerRight,
-              cellBuilder: (context, fine) => AppMenuButton(
-                tooltip: l10n.commonMoreActions,
-                actions: [
-                  AppMenuAction(
-                    label: l10n.finesCollect,
-                    icon: AppIcons.payment,
-                    enabled: fine.status == FineStatus.unpaid,
-                    onSelected: () => unawaited(_collect(context, fine)),
-                  ),
-                  AppMenuAction(
-                    label: l10n.loansViewMember,
-                    icon: AppIcons.person,
-                    onSelected: () => context.go(Routes.member(fine.memberId)),
-                  ),
-                  AppMenuAction(
-                    label: l10n.finesWaive,
-                    icon: AppIcons.waiveFine,
-                    isDestructive: true,
-                    enabled: fine.status == FineStatus.unpaid,
-                    onSelected: () => unawaited(_waive(context, fine)),
-                  ),
-                ],
+            // Reading the ledger and settling what is on it are two levels of
+            // the same permission: a desk assistant can tell a member what
+            // they owe, and a librarian is the one who takes or waives it.
+            if (canSettle || canSeeMembers)
+              AppTableColumn<Fine>(
+                id: 'actions',
+                label: l10n.commonActions,
+                alignment: Alignment.centerRight,
+                cellBuilder: (context, fine) => AppMenuButton(
+                  tooltip: l10n.commonMoreActions,
+                  actions: [
+                    if (canSettle)
+                      AppMenuAction(
+                        label: l10n.finesCollect,
+                        icon: AppIcons.payment,
+                        enabled: fine.status == FineStatus.unpaid,
+                        onSelected: () => unawaited(_collect(context, fine)),
+                      ),
+                    if (canSeeMembers)
+                      AppMenuAction(
+                        label: l10n.loansViewMember,
+                        icon: AppIcons.person,
+                        onSelected: () =>
+                            context.go(Routes.member(fine.memberId)),
+                      ),
+                    if (canSettle)
+                      AppMenuAction(
+                        label: l10n.finesWaive,
+                        icon: AppIcons.waiveFine,
+                        isDestructive: true,
+                        enabled: fine.status == FineStatus.unpaid,
+                        onSelected: () => unawaited(_waive(context, fine)),
+                      ),
+                  ],
+                ),
               ),
-            ),
           ],
           emptyState: bootstrapping
               ? const Center(child: AppSpinner())

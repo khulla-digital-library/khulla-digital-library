@@ -10,9 +10,11 @@ import 'package:khulla/features/circulation/circulation/presentation/cubit/loan_
 import 'package:khulla/features/circulation/loan/domain/models/loan.dart';
 import 'package:khulla/features/circulation/shared/domain/loan_status.dart';
 import 'package:khulla/features/circulation/shared/presentation/circulation_labels.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla/shared/utils/not_wired_action.dart';
+import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/collection_page_view.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -50,6 +52,8 @@ class CirculationPage extends StatelessWidget {
     final muted = context.textTheme.bodyMedium?.copyWith(
       color: scheme.onSurfaceVariant,
     );
+    final canWorkTheDesk = context.canManage(StaffPermission.circulation);
+    final canSeeMembers = context.canView(StaffPermission.members);
 
     return [
       AppTableColumn<Loan>(
@@ -122,37 +126,45 @@ class CirculationPage extends StatelessWidget {
           tone: loan.status.tone,
         ),
       ),
-      AppTableColumn<Loan>(
-        id: 'actions',
-        label: l10n.commonActions,
-        alignment: Alignment.centerRight,
-        cellBuilder: (context, loan) => AppMenuButton(
-          tooltip: l10n.commonMoreActions,
-          actions: [
-            AppMenuAction(
-              label: l10n.loansReturn,
-              icon: AppIcons.checkIn,
-              onSelected: () => context.go(Routes.circulationReturn),
-            ),
-            AppMenuAction(
-              label: l10n.loansRenew,
-              icon: AppIcons.refresh,
-              onSelected: () => unawaited(_renewLoan(context, loan)),
-            ),
-            AppMenuAction(
-              label: l10n.loansViewMember,
-              icon: AppIcons.person,
-              onSelected: () => context.go(Routes.member(loan.memberId)),
-            ),
-            AppMenuAction(
-              label: l10n.loansMarkLost,
-              icon: AppIcons.help,
-              isDestructive: true,
-              onSelected: () => showNotWiredToast(context),
-            ),
-          ],
+      // Opening the borrower's record is a read, and belongs to the members
+      // permission; returning, renewing and writing a copy off are the desk's
+      // work. A role holding neither gets the list without the column.
+      if (canWorkTheDesk || canSeeMembers)
+        AppTableColumn<Loan>(
+          id: 'actions',
+          label: l10n.commonActions,
+          alignment: Alignment.centerRight,
+          cellBuilder: (context, loan) => AppMenuButton(
+            tooltip: l10n.commonMoreActions,
+            actions: [
+              if (canWorkTheDesk) ...[
+                AppMenuAction(
+                  label: l10n.loansReturn,
+                  icon: AppIcons.checkIn,
+                  onSelected: () => context.go(Routes.circulationReturn),
+                ),
+                AppMenuAction(
+                  label: l10n.loansRenew,
+                  icon: AppIcons.refresh,
+                  onSelected: () => unawaited(_renewLoan(context, loan)),
+                ),
+              ],
+              if (canSeeMembers)
+                AppMenuAction(
+                  label: l10n.loansViewMember,
+                  icon: AppIcons.person,
+                  onSelected: () => context.go(Routes.member(loan.memberId)),
+                ),
+              if (canWorkTheDesk)
+                AppMenuAction(
+                  label: l10n.loansMarkLost,
+                  icon: AppIcons.help,
+                  isDestructive: true,
+                  onSelected: () => showNotWiredToast(context),
+                ),
+            ],
+          ),
         ),
-      ),
     ];
   }
 
@@ -273,8 +285,12 @@ class CirculationPage extends StatelessWidget {
                   icon: AppIcons.transfer,
                   title: l10n.circulationLoansEmptyTitle,
                   message: l10n.circulationLoansEmptyBody,
-                  actionLabel: l10n.circulationCheckOut,
-                  onAction: () => context.go(Routes.circulationCheckOut),
+                  actionLabel: context.canManage(StaffPermission.circulation)
+                      ? l10n.circulationCheckOut
+                      : null,
+                  onAction: context.canManage(StaffPermission.circulation)
+                      ? () => context.go(Routes.circulationCheckOut)
+                      : null,
                 ),
         );
       },

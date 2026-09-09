@@ -16,9 +16,11 @@ import 'package:khulla/features/members/presentation/pages/member_form_dialog.da
 import 'package:khulla/features/members/presentation/widgets/member_detail_header.dart';
 import 'package:khulla/features/members/presentation/widgets/member_fines_card.dart';
 import 'package:khulla/features/members/presentation/widgets/member_loans_card.dart';
+import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/components/section_card.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
+import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -228,6 +230,13 @@ class MemberDetailPage extends StatelessWidget {
         }
 
         final twoPane = context.formFactor.isAtLeast(FormFactor.expanded);
+        // A member's record reads under the members permission; changing it
+        // needs that permission at `manage`. Fines are their own permission —
+        // a desk assistant sees what is owed without being able to settle it
+        // — and the checkout button is circulation's.
+        final canManage = context.canManage(StaffPermission.members);
+        final canSettleFines = context.canManage(StaffPermission.fines);
+        final canWorkTheDesk = context.canManage(StaffPermission.circulation);
 
         final loansCard = MemberLoansCard(
           title: l10n.memberDetailLoansTitle,
@@ -246,9 +255,15 @@ class MemberDetailPage extends StatelessWidget {
         );
         final finesCard = MemberFinesCard(
           fines: state.fines,
-          onCollect: (fine) => unawaited(_collectFine(context, fine)),
-          onWaive: (fine) => unawaited(_waiveFine(context, fine)),
-          onCharge: () => unawaited(_chargeFine(context)),
+          onCollect: !canSettleFines
+              ? null
+              : (fine) => unawaited(_collectFine(context, fine)),
+          onWaive: !canSettleFines
+              ? null
+              : (fine) => unawaited(_waiveFine(context, fine)),
+          onCharge: !canSettleFines
+              ? null
+              : () => unawaited(_chargeFine(context)),
         );
         final detailsCard = _MemberDetailsCard(member: member);
 
@@ -267,47 +282,55 @@ class MemberDetailPage extends StatelessWidget {
                   children: [
                     MemberDetailHeader(
                       member: member,
-                      onCheckOut: () => context.go(
-                        Routes.circulationCheckOutForMember(member.cardNumber),
-                      ),
+                      onCheckOut: !canWorkTheDesk
+                          ? null
+                          : () => context.go(
+                              Routes.circulationCheckOutForMember(
+                                member.cardNumber,
+                              ),
+                            ),
                       menuActions: [
-                        AppMenuAction(
-                          label: l10n.memberDetailEdit,
-                          icon: AppIcons.edit,
-                          onSelected: () => unawaited(_edit(context)),
-                        ),
-                        AppMenuAction(
-                          label: l10n.memberDetailRenewMembership,
-                          icon: AppIcons.renew,
-                          onSelected: () =>
-                              unawaited(_renewMembership(context)),
-                        ),
-                        if (member.suspendedAt != null)
+                        if (canManage) ...[
                           AppMenuAction(
-                            label: l10n.memberDetailUnsuspend,
-                            icon: AppIcons.restore,
-                            onSelected: () =>
-                                unawaited(_unsuspendMembership(context)),
-                          )
-                        else
-                          AppMenuAction(
-                            label: l10n.memberDetailSuspend,
-                            icon: AppIcons.blocked,
-                            onSelected: () =>
-                                unawaited(_suspendMembership(context)),
+                            label: l10n.memberDetailEdit,
+                            icon: AppIcons.edit,
+                            onSelected: () => unawaited(_edit(context)),
                           ),
-                        AppMenuAction(
-                          label: l10n.memberDetailArchive,
-                          icon: AppIcons.delete,
-                          isDestructive: true,
-                          onSelected: () => unawaited(_archiveMember(context)),
-                        ),
-                        AppMenuAction(
-                          label: l10n.memberDetailDelete,
-                          icon: AppIcons.delete,
-                          isDestructive: true,
-                          onSelected: () => unawaited(_confirmDelete(context)),
-                        ),
+                          AppMenuAction(
+                            label: l10n.memberDetailRenewMembership,
+                            icon: AppIcons.renew,
+                            onSelected: () =>
+                                unawaited(_renewMembership(context)),
+                          ),
+                          if (member.suspendedAt != null)
+                            AppMenuAction(
+                              label: l10n.memberDetailUnsuspend,
+                              icon: AppIcons.restore,
+                              onSelected: () =>
+                                  unawaited(_unsuspendMembership(context)),
+                            )
+                          else
+                            AppMenuAction(
+                              label: l10n.memberDetailSuspend,
+                              icon: AppIcons.blocked,
+                              onSelected: () =>
+                                  unawaited(_suspendMembership(context)),
+                            ),
+                          AppMenuAction(
+                            label: l10n.memberDetailArchive,
+                            icon: AppIcons.delete,
+                            isDestructive: true,
+                            onSelected: () =>
+                                unawaited(_archiveMember(context)),
+                          ),
+                          AppMenuAction(
+                            label: l10n.memberDetailDelete,
+                            icon: AppIcons.delete,
+                            isDestructive: true,
+                            onSelected: () =>
+                                unawaited(_confirmDelete(context)),
+                          ),
+                        ],
                       ],
                     ),
                     SizedBox(height: spacing.md),

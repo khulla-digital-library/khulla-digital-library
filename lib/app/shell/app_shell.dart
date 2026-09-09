@@ -74,7 +74,7 @@ class AppShell extends StatelessWidget {
     final visibleIndices = [
       for (var i = 0; i < destinations.length; i++)
         if (destinations[i].permission == null ||
-            auth.hasPermission(destinations[i].permission!))
+            auth.canView(destinations[i].permission!))
           i,
     ];
     final visibleDestinations = [
@@ -113,11 +113,17 @@ class AppShell extends StatelessWidget {
     );
 
     if (!formFactor.usesNavigationRail) {
-      // Primary destinations carry no permission (see `shellDestinations`),
-      // so they are always a stable, always-visible prefix of the branch
-      // list — `_goBranch(selected)` below can keep indexing them directly.
-      final compact = visibleDestinations.where((d) => d.primary).toList();
-      final index = navigationShell.currentIndex;
+      // A primary destination can be hidden like any other — a role that
+      // cannot open the catalogue does not get a catalogue tab — so the bar's
+      // slots are numbered over what this role actually sees. `compactSlots`
+      // maps a slot back to its branch index; anything past the four slots,
+      // and any section that is not showing, lives behind *More*.
+      final compactSlots = [
+        for (final i in visibleIndices)
+          if (destinations[i].primary) i,
+      ].take(_compactSlots).toList();
+      final compact = [for (final i in compactSlots) destinations[i]];
+      final slot = compactSlots.indexOf(navigationShell.currentIndex);
 
       return Scaffold(
         body: Column(
@@ -127,10 +133,12 @@ class AppShell extends StatelessWidget {
           ],
         ),
         bottomNavigationBar: AppNavBar(
-          selectedIndex: index < _compactSlots ? index : _compactSlots,
+          // The current section may have no slot of its own — a role reading
+          // reports is inside *More* — and the bar then highlights *More*.
+          selectedIndex: slot >= 0 ? slot : compactSlots.length,
           onDestinationSelected: (selected) {
-            if (selected < _compactSlots) {
-              _goBranch(context, selected, role);
+            if (selected < compactSlots.length) {
+              _goBranch(context, compactSlots[selected], role);
               return;
             }
             unawaited(
