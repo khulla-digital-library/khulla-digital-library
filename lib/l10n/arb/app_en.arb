@@ -832,8 +832,6 @@
     "settingsBackupLastBackup": "Last backup",
     "settingsBackupNever": "Never",
     "settingsBackupDatabaseSize": "Database size",
-    "settingsBackupDangerTitle": "Danger zone",
-    "settingsBackupDangerDescription": "This library holds its only copy of these records. There is no server to restore from.",
     "settingsBackupEraseAction": "Erase this library",
     "settingsBackupEraseTitle": "Erase this library?",
     "settingsBackupEraseBody": "Every title, copy, member and loan is deleted from this device. A backup file is the only way back.",

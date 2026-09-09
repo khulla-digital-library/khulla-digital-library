@@ -257,12 +257,6 @@ class _LoanRulesPageState extends State<LoanRulesPage> with DisposeBag {
                   if (!viewOnly)
                     Row(
                       children: [
-                        AppButton(
-                          variant: AppButtonVariant.outline,
-                          size: AppButtonSize.medium,
-                          onPressed: () => context.go(Routes.settings),
-                          child: Text(l10n.commonCancel),
-                        ),
                         const Spacer(),
                         AppButton(
                           size: AppButtonSize.medium,
