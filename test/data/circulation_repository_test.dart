@@ -6,18 +6,19 @@ import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/circulation/fine/data/local_fine_data_source.dart';
+import 'package:khulla/features/circulation/loan/data/local_loan_data_source.dart';
 import 'package:khulla/features/circulation/reservation/data/local_reservation_data_source.dart';
 import 'package:khulla/features/circulation/shared/data/circulation_repository_impl.dart';
 import 'package:khulla/features/circulation/shared/domain/circulation_fine.dart';
 
 import '../helpers/catalog_fixtures.dart';
-import '../helpers/stub_loan_data_source.dart';
 import '../helpers/test_database.dart';
 
 /// Integration tests for [CirculationRepositoryImpl] against a real database.
 ///
-/// [StubLoanLocalDataSource] keeps the constructor honest while these tests
-/// focus on transactional writes — duplicate loans, fines on return, and copy
+/// Loan reads go through the real [LocalLoanDataSource] so checkout/return
+/// views reload the rows the transaction just wrote; these tests focus on
+/// transactional writes — duplicate loans, fines on return, and copy
 /// status changes — without also asserting loan-list queries.
 void main() {
   late AppDatabase db;
@@ -27,7 +28,7 @@ void main() {
     db = await openTestDatabase();
     repository = CirculationRepositoryImpl(
       db,
-      StubLoanLocalDataSource(),
+      LocalLoanDataSource(db),
       LocalFineDataSource(db),
       LocalReservationDataSource(db),
     );
