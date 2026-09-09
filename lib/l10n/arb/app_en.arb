@@ -628,6 +628,7 @@
     "@settingsBackupEraseBody": {
         "description": "Settings - backup, restore and the destructive reset"
     },
+    "settingsBackupEraseWrongPassword": "That password did not match your account.",
     "settingsAboutVersion": "Version",
     "settingsAboutLicence": "Licence",
     "settingsAboutStorage": "Catalogue stored at",
@@ -645,7 +646,6 @@
     "@errorStorage": {
         "description": "Errors - user-facing copy for every AppException case"
     },
-    "navOpac": "Public search",
     "navReports": "Reports",
     "navUsers": "Staff",
     "navMore": "More",
@@ -742,45 +742,6 @@
     "dashboardAttentionHolds": "Holds waiting on the shelf",
     "dashboardAttentionExpiring": "Memberships expiring this month",
     "dashboardAttentionDamaged": "Copies reported damaged",
-    "opacHeading": "Public catalogue",
-    "opacSubtitle": "What a reader sees: search the shelves, check what is in, and place a hold.",
-    "opacSearchHint": "Search by title, author, subject or ISBN",
-    "opacKioskTitle": "Kiosk mode",
-    "opacKioskBody": "Open this screen full-screen on the reading-room machine. It shows availability and never exposes member data.",
-    "opacKioskAction": "Open kiosk mode",
-    "opacFilterAvailableOnly": "On the shelf now",
-    "opacResultsTitle": "Results",
-    "opacResultsSubtitle": "{count} titles match",
-    "@opacResultsSubtitle": {
-        "description": "OPAC - result tally",
-        "placeholders": {
-            "count": {
-                "type": "String",
-                "example": "24"
-            }
-        }
-    },
-    "opacFeaturedTitle": "New this month",
-    "opacFeaturedSubtitle": "Recently catalogued and ready to borrow",
-    "opacPlaceHold": "Place a hold",
-    "opacViewDetails": "Details",
-    "opacCopiesAvailable": "{available} of {total} on the shelf",
-    "@opacCopiesAvailable": {
-        "description": "OPAC - availability line on a result",
-        "placeholders": {
-            "available": {
-                "type": "String",
-                "example": "2"
-            },
-            "total": {
-                "type": "String",
-                "example": "3"
-            }
-        }
-    },
-    "opacNoCopies": "All copies are out",
-    "opacEmptyTitle": "Nothing matched that search",
-    "opacEmptyBody": "Try a shorter phrase, an author’s surname, or browse by subject instead.",
     "reportsHeading": "Reports",
     "reportsSubtitle": "What the library did over a period, and what it holds today.",
     "reportsStatBorrowed": "Loans issued",

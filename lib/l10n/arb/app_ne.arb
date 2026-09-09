@@ -630,6 +630,7 @@
   "@settingsBackupEraseBody": {
     "description": "सेटिङहरू - ब्याकअप, पुनर्स्थापना र पूर्ण मेटाइ"
   },
+  "settingsBackupEraseWrongPassword": "त्यो पासवर्ड तपाईंको खातासँग मेल खाएन।",
   "settingsAboutVersion": "संस्करण",
   "settingsAboutLicence": "इजाजतपत्र",
   "settingsAboutStorage": "क्याटलग भण्डारण भएको स्थान",
@@ -647,7 +648,6 @@
   "@errorStorage": {
     "description": "त्रुटिहरू - प्रत्येक AppException अवस्थाका लागि प्रयोगकर्ताले देख्ने सन्देश"
   },
-  "navOpac": "सार्वजनिक खोज",
   "navReports": "रिपोर्टहरू",
   "navUsers": "कर्मचारी",
   "navMore": "थप",
@@ -744,45 +744,6 @@
   "dashboardAttentionHolds": "र्‍याकमा प्रतीक्षामा रहेका आरक्षण",
   "dashboardAttentionExpiring": "यस महिना म्याद सकिँदै गरेका सदस्यताहरू",
   "dashboardAttentionDamaged": "क्षतिग्रस्त भनेर रिपोर्ट गरिएका प्रतिलिपिहरू",
-  "opacHeading": "सार्वजनिक क्याटलग",
-  "opacSubtitle": "पाठकले देख्ने कुरा: र्‍याकमा खोज्नुहोस्, उपलब्धता हेर्नुहोस् र आरक्षण राख्नुहोस्।",
-  "opacSearchHint": "शीर्षक, लेखक, विषय वा ISBN बाट खोज्नुहोस्",
-  "opacKioskTitle": "किओस्क मोड",
-  "opacKioskBody": "पठनकक्षको उपकरणमा यो स्क्रिन पूर्णस्क्रिनमा खोल्नुहोस्। यसले उपलब्धता देखाउँछ र सदस्यको डाटा कहिल्यै देखाउँदैन।",
-  "opacKioskAction": "किओस्क मोड खोल्नुहोस्",
-  "opacFilterAvailableOnly": "अहिले र्‍याकमा",
-  "opacResultsTitle": "परिणामहरू",
-  "opacResultsSubtitle": "{count} शीर्षकसँग मेल खान्छ",
-  "@opacResultsSubtitle": {
-    "description": "OPAC - परिणाम संख्या",
-    "placeholders": {
-      "count": {
-        "type": "String",
-        "example": "24"
-      }
-    }
-  },
-  "opacFeaturedTitle": "यस महिनाका नयाँ",
-  "opacFeaturedSubtitle": "हालै क्याटलग गरिएका र सापटीका लागि तयार",
-  "opacPlaceHold": "आरक्षण राख्नुहोस्",
-  "opacViewDetails": "विवरण",
-  "opacCopiesAvailable": "{total} मध्ये {available} र्‍याकमा",
-  "@opacCopiesAvailable": {
-    "description": "OPAC - परिणाममा उपलब्धताको विवरण",
-    "placeholders": {
-      "available": {
-        "type": "String",
-        "example": "2"
-      },
-      "total": {
-        "type": "String",
-        "example": "3"
-      }
-    }
-  },
-  "opacNoCopies": "सबै प्रतिलिपि बाहिर छन्",
-  "opacEmptyTitle": "त्यो खोजीसँग केही पनि मेल खाएन",
-  "opacEmptyBody": "छोटो वाक्यांश, लेखकको थर प्रयोग गर्नुहोस् वा विषयअनुसार ब्राउज गर्नुहोस्।",
   "reportsHeading": "रिपोर्टहरू",
   "reportsSubtitle": "निश्चित अवधिमा पुस्तकालयले के गर्‍यो र आज त्यससँग के छ।",
   "reportsStatBorrowed": "जारी गरिएका सापटी",

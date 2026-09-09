@@ -9,6 +9,7 @@ import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/core/format/app_date_format.dart';
 import 'package:khulla/features/settings/presentation/cubit/backup_cubit.dart';
 import 'package:khulla/features/settings/presentation/cubit/backup_state.dart';
+import 'package:khulla/features/settings/presentation/widgets/confirm_erase_dialog.dart';
 import 'package:khulla/features/settings/presentation/widgets/settings_action_card.dart';
 import 'package:khulla/features/settings/presentation/widgets/settings_erase_card.dart';
 import 'package:khulla/l10n/l10n.dart';
@@ -63,13 +64,9 @@ class BackupPage extends StatelessWidget {
 
   Future<void> _confirmErase(BuildContext context) async {
     final l10n = context.l10n;
-    final confirmed = await AppDialog.confirmDestructive(
-      context: context,
-      title: l10n.settingsBackupEraseTitle,
-      message: l10n.settingsBackupEraseBody,
-      confirmLabel: l10n.settingsBackupEraseAction,
-      cancelLabel: l10n.commonCancel,
-    );
+    // The dialog already demanded the operator's password: true means
+    // verified, so the erase proceeds with no second prompt.
+    final confirmed = await ConfirmEraseDialog.show(context);
     if (!context.mounted || !confirmed) return;
 
     final cubit = context.read<BackupCubit>();
