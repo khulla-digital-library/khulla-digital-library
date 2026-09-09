@@ -655,6 +655,20 @@
     "description": "नेभिगेसन - बारमा नअट्ने खण्डहरू खोल्ने छोटो तल्लो बार प्रविष्टि"
   },
   "shellMoreTitle": "सबै खण्डहरू",
+  "shellCopyright": "© {year} {name}",
+  "@shellCopyright": {
+    "description": "नेभिगेसन - रेल फुटर र More सिटमा देखाइने प्रतिलिपि अधिकार पङ्क्ति",
+    "placeholders": {
+      "year": {
+        "type": "String",
+        "example": "2026"
+      },
+      "name": {
+        "type": "String",
+        "example": "Khulla Digital Library"
+      }
+    }
+  },
   "shellAccountMenu": "खाता",
   "shellProfile": "तपाईंको प्रोफाइल",
   "shellSignOut": "साइन आउट गर्नुहोस्",

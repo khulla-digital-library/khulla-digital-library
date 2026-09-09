@@ -653,6 +653,20 @@
         "description": "Navigation - the compact bottom bar entry that opens the sections the bar cannot hold"
     },
     "shellMoreTitle": "All sections",
+    "shellCopyright": "© {year} {name}",
+    "@shellCopyright": {
+        "description": "Shell - copyright line in the rail footer and the More sheet",
+        "placeholders": {
+            "year": {
+                "type": "String",
+                "example": "2026"
+            },
+            "name": {
+                "type": "String",
+                "example": "Khulla Digital Library"
+            }
+        }
+    },
     "shellAccountMenu": "Account",
     "shellProfile": "Your profile",
     "shellSignOut": "Sign out",
