@@ -4,11 +4,15 @@
 import 'dart:typed_data';
 
 import 'package:crop_your_image/crop_your_image.dart';
+import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
-/// Crops a freshly picked image down to the square the shell's brand slot
-/// actually shows.
+/// Crops a freshly picked image before it becomes the shell's brand mark.
+///
+/// No fixed aspect ratio — the shell's brand mark renders whatever shape
+/// comes out of this, so cropping is free-form rather than forced to a
+/// square.
 ///
 /// `crop_your_image` rather than `image_cropper`: the latter opens a native
 /// iOS/Android crop screen that doesn't exist on Windows or web, this app's
@@ -43,7 +47,7 @@ class _SettingsLogoCropDialogState extends State<SettingsLogoCropDialog> {
         Navigator.of(context).pop(croppedImage);
       case CropFailure():
         setState(() => _isCropping = false);
-        AppToast.error(context, message: context.l10n.commonSomethingWentWrong);
+        AppToast.error(context, message: context.l10n.errorUnknown);
     }
   }
 
@@ -87,7 +91,6 @@ class _SettingsLogoCropDialogState extends State<SettingsLogoCropDialog> {
               child: Crop(
                 image: widget.imageBytes,
                 controller: _controller,
-                aspectRatio: 1,
                 interactive: true,
                 baseColor: scheme.surface,
                 maskColor: scheme.scrim.withValues(alpha: 0.6),

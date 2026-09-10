@@ -14,6 +14,7 @@ import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/settings/domain/models/library_profile.dart';
 import 'package:khulla/features/settings/presentation/cubit/library_profile_cubit.dart';
 import 'package:khulla/features/settings/presentation/cubit/library_profile_state.dart';
+import 'package:khulla/features/settings/presentation/widgets/settings_logo_crop_dialog.dart';
 import 'package:khulla/features/settings/presentation/widgets/settings_logo_field.dart';
 import 'package:khulla/features/staff_auth/presentation/auth_labels.dart';
 import 'package:khulla/features/users/domain/user_role.dart';
@@ -73,12 +74,19 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
     if (picked == null) return;
     if (!context.mounted) return;
 
-    final bytes = await picked.readAsBytes();
-    final extension = picked.name.split('.').last.toLowerCase();
+    final pickedBytes = await picked.readAsBytes();
+    if (!context.mounted) return;
+
+    final cropped = await SettingsLogoCropDialog.show(
+      context,
+      imageBytes: pickedBytes,
+    );
+    if (cropped == null) return;
     if (!context.mounted) return;
 
     try {
-      await context.read<LibraryProfileCubit>().uploadLogo(bytes, extension);
+      // The cropper always re-encodes to PNG, whatever the source format was.
+      await context.read<LibraryProfileCubit>().uploadLogo(cropped, 'png');
       if (!context.mounted) return;
       await context.read<LibraryBrandingCubit>().refreshLogo();
     } on AppException catch (error) {
