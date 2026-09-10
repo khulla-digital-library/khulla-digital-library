@@ -12,9 +12,9 @@ abstract interface class MemberLocalDataSource {
 
   Future<Member?> findMemberByCardNumber(String cardNumber);
 
-  Future<Member> insertMember(Member member, {required String searchText});
+  Future<Member> insertMember(Member member);
 
-  Future<Member> updateMember(Member member, {required String searchText});
+  Future<Member> updateMember(Member member);
 
   Future<void> archiveMember(String id, DateTime archivedAt);
 

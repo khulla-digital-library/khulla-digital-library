@@ -27,3 +27,12 @@ targets:
 
           # Generated companions and query methods take named parameters.
           named_parameters: true
+
+          # FTS5 backs catalogue and member search (`titles_fts.drift`,
+          # `members_fts.drift`). The native sqlite3 build and
+          # web/sqlite3.wasm both compile it in, trigram tokenizer included.
+          sql:
+            dialect: sqlite
+            options:
+              modules:
+                - fts5

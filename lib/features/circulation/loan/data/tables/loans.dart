@@ -14,8 +14,9 @@ import 'package:khulla/features/users/data/tables/staff.dart';
 @TableIndex.sql(
   'CREATE UNIQUE INDEX loans_one_open_per_copy ON loans (copy_id) WHERE returned_at IS NULL',
 )
+// `due_at` makes the member list's open and overdue counts index-only.
 @TableIndex.sql(
-  'CREATE INDEX loans_open_by_member ON loans (member_id) WHERE returned_at IS NULL',
+  'CREATE INDEX loans_open_by_member ON loans (member_id, due_at) WHERE returned_at IS NULL',
 )
 @TableIndex.sql(
   'CREATE INDEX loans_due ON loans (due_at) WHERE returned_at IS NULL',
@@ -25,6 +26,11 @@ import 'package:khulla/features/users/data/tables/staff.dart';
 )
 @TableIndex.sql(
   'CREATE INDEX loans_copy_history ON loans (copy_id, checked_out_at DESC)',
+)
+// Date-range reads on the dashboard and reports, and recent activity.
+@TableIndex.sql('CREATE INDEX loans_checked_out ON loans (checked_out_at)')
+@TableIndex.sql(
+  'CREATE INDEX loans_returned ON loans (returned_at) WHERE returned_at IS NOT NULL',
 )
 class Loans extends Table {
   TextColumn get id => text()();

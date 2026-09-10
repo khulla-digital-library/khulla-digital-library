@@ -6,9 +6,11 @@ import 'package:khulla/core/database/converters/date_only_converter.dart';
 import 'package:khulla/features/members/data/tables/member_types.dart';
 
 /// One borrower on the register.
+///
+/// Searched through `members_fts` (`members_fts.drift`), kept current by
+/// triggers on this table.
 @DataClassName('MemberRow')
 @TableIndex(name: 'members_card', columns: {#cardNumber}, unique: true)
-@TableIndex(name: 'members_search', columns: {#searchText})
 @TableIndex(name: 'members_type', columns: {#memberTypeId})
 @TableIndex.sql(
   'CREATE INDEX members_expiry ON members (expires_at) WHERE archived_at IS NULL',
@@ -46,8 +48,6 @@ class Members extends Table {
   TextColumn get suspensionReason => text().nullable()();
 
   BoolColumn get sendNotices => boolean().withDefault(const Constant(true))();
-
-  TextColumn get searchText => text()();
 
   DateTimeColumn get createdAt => dateTime()();
 

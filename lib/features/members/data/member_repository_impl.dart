@@ -12,7 +12,6 @@ import 'package:khulla/features/members/domain/member_repository.dart';
 import 'package:khulla/features/members/domain/models/member.dart';
 import 'package:khulla/features/members/domain/models/member_query.dart';
 import 'package:khulla/features/settings/domain/loan_rules_repository.dart';
-import 'package:khulla/shared/utils/search_text.dart';
 import 'package:uuid/uuid.dart';
 
 /// [MemberRepository] over the local catalogue.
@@ -66,15 +65,6 @@ class MemberRepositoryImpl implements MemberRepository {
       throw const NotFoundException('That member type was not found.');
     }
 
-    final search = buildSearchText([
-      fullName,
-      cardNumber,
-      email ?? '',
-      phone ?? '',
-      address ?? '',
-      guardian ?? '',
-    ]);
-
     final joinedAt = existing?.joinedAt ?? now;
     var expiresAt = existing?.expiresAt;
     if (existing == null) {
@@ -117,9 +107,9 @@ class MemberRepositoryImpl implements MemberRepository {
     );
 
     if (existing == null) {
-      return await _dataSource.insertMember(draft, searchText: search);
+      return await _dataSource.insertMember(draft);
     }
-    return await _dataSource.updateMember(draft, searchText: search);
+    return await _dataSource.updateMember(draft);
   }
 
   @override
@@ -142,7 +132,6 @@ class MemberRepositoryImpl implements MemberRepository {
         suspensionReason: reason?.trim(),
         updatedAt: now,
       ),
-      searchText: _searchText(existing),
     );
   }
 
@@ -162,7 +151,6 @@ class MemberRepositoryImpl implements MemberRepository {
         suspensionReason: null,
         updatedAt: now,
       ),
-      searchText: _searchText(existing),
     );
   }
 
@@ -188,18 +176,8 @@ class MemberRepositoryImpl implements MemberRepository {
     final renewed = _membershipExpiresAt(base, rules.membershipDurationMonths);
     return await _dataSource.updateMember(
       existing.copyWith(expiresAt: renewed, updatedAt: now),
-      searchText: _searchText(existing),
     );
   }
-
-  String _searchText(Member member) => buildSearchText([
-    member.fullName,
-    member.cardNumber,
-    member.email ?? '',
-    member.phone ?? '',
-    member.address ?? '',
-    member.guardian ?? '',
-  ]);
 
   @override
   Future<void> removeMember(String id) async {

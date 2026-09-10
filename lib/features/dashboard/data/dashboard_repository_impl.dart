@@ -32,6 +32,9 @@ class DashboardRepositoryImpl implements DashboardRepository {
 
   static const DateOnlyConverter _dates = DateOnlyConverter();
 
+  /// Rows the recent-activity list shows.
+  static const int _activityLimit = 8;
+
   @override
   Future<DashboardSummary> loadSummary({
     required DateTime start,
@@ -209,50 +212,74 @@ LIMIT 6
   }
 
   /// The last few things that happened at the desk, most recent first.
+  ///
+  /// Each arm takes its own newest [_activityLimit] rows before the arms are
+  /// merged. The overall newest rows must be among them, and it lets every
+  /// arm walk its date index backwards and stop, instead of joining and
+  /// sorting the whole circulation history on each dashboard open.
   Future<List<DashboardActivityEvent>> _recentActivity() async {
-    final rows = await _db.customSelect(
-      '''
+    final rows = await _db
+        .customSelect(
+          '''
 SELECT * FROM (
-  SELECT 'borrow' AS kind, t.title AS item, c.barcode AS item_code,
-         m.full_name AS member, m.card_number AS member_code,
-         l.checked_out_at AS at, l.due_at AS due
-  FROM loans l
-  JOIN copies c ON c.id = l.copy_id
-  JOIN titles t ON t.id = c.title_id
-  JOIN members m ON m.id = l.member_id
+  SELECT * FROM (
+    SELECT 'borrow' AS kind, t.title AS item, c.barcode AS item_code,
+           m.full_name AS member, m.card_number AS member_code,
+           l.checked_out_at AS at, l.due_at AS due
+    FROM loans l
+    JOIN copies c ON c.id = l.copy_id
+    JOIN titles t ON t.id = c.title_id
+    JOIN members m ON m.id = l.member_id
+    ORDER BY l.checked_out_at DESC
+    LIMIT ?1
+  )
 
   UNION ALL
 
-  SELECT 'returned', t.title, c.barcode, m.full_name, m.card_number,
-         l.returned_at, NULL
-  FROM loans l
-  JOIN copies c ON c.id = l.copy_id
-  JOIN titles t ON t.id = c.title_id
-  JOIN members m ON m.id = l.member_id
-  WHERE l.returned_at IS NOT NULL
+  SELECT * FROM (
+    SELECT 'returned', t.title, c.barcode, m.full_name, m.card_number,
+           l.returned_at, NULL
+    FROM loans l
+    JOIN copies c ON c.id = l.copy_id
+    JOIN titles t ON t.id = c.title_id
+    JOIN members m ON m.id = l.member_id
+    WHERE l.returned_at IS NOT NULL
+    ORDER BY l.returned_at DESC
+    LIMIT ?1
+  )
 
   UNION ALL
 
-  SELECT 'reserved', t.title, '', m.full_name, m.card_number,
-         r.placed_at, NULL
-  FROM reservations r
-  JOIN titles t ON t.id = r.title_id
-  JOIN members m ON m.id = r.member_id
+  SELECT * FROM (
+    SELECT 'reserved', t.title, '', m.full_name, m.card_number,
+           r.placed_at, NULL
+    FROM reservations r
+    JOIN titles t ON t.id = r.title_id
+    JOIN members m ON m.id = r.member_id
+    ORDER BY r.placed_at DESC
+    LIMIT ?1
+  )
 
   UNION ALL
 
-  SELECT 'fine', COALESCE(t.title, ''), COALESCE(c.barcode, ''),
-         m.full_name, m.card_number, f.raised_at, NULL
-  FROM fines f
-  JOIN members m ON m.id = f.member_id
-  LEFT JOIN loans l ON l.id = f.loan_id
-  LEFT JOIN copies c ON c.id = l.copy_id
-  LEFT JOIN titles t ON t.id = c.title_id
+  SELECT * FROM (
+    SELECT 'fine', COALESCE(t.title, ''), COALESCE(c.barcode, ''),
+           m.full_name, m.card_number, f.raised_at, NULL
+    FROM fines f
+    JOIN members m ON m.id = f.member_id
+    LEFT JOIN loans l ON l.id = f.loan_id
+    LEFT JOIN copies c ON c.id = l.copy_id
+    LEFT JOIN titles t ON t.id = c.title_id
+    ORDER BY f.raised_at DESC
+    LIMIT ?1
+  )
 )
 ORDER BY at DESC
-LIMIT 8
+LIMIT ?1
 ''',
-    ).get();
+          variables: const [Variable<int>(_activityLimit)],
+        )
+        .get();
     return [
       for (final row in rows)
         (
