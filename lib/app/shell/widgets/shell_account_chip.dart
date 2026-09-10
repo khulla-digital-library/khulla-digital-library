@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:khulla/app/shell/help/help_dialog.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
@@ -63,18 +64,17 @@ class ShellAccountChip extends StatelessWidget {
             label: l10n.navSettings,
           ),
         ),
-        // TODO(sawongam): Add help dialog
-        // PopupMenuItem<int>(
-        //   onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) {
-        //     if (context.mounted) {
-        //       unawaited(HelpDialog.show(context));
-        //     }
-        //   }),
-        //   child: _MenuRow(
-        //     icon: AppIcons.help,
-        //     label: l10n.shellHelp,
-        //   ),
-        // ),
+        PopupMenuItem<int>(
+          onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              unawaited(HelpDialog.show(context));
+            }
+          }),
+          child: _MenuRow(
+            icon: AppIcons.help,
+            label: l10n.shellHelp,
+          ),
+        ),
         const PopupMenuDivider(),
         PopupMenuItem<int>(
           // No confirmation: signing out costs nothing to undo, and the

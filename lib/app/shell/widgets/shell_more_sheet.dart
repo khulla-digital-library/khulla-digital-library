@@ -5,8 +5,8 @@ import 'dart:async';
 
 import 'package:go_router/go_router.dart';
 import 'package:khulla/app/shell/help/help_dialog.dart';
-import 'package:khulla/app/shell/widgets/shell_copyright_notice.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
+import 'package:khulla/app/shell/widgets/shell_version_label.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -79,7 +79,7 @@ class _MoreList extends StatelessWidget {
         ],
         // Phones never see the rail footer, and the account menu that carries
         // help on a window lives in it — so the manual hangs here instead,
-        // below the sections and above the copyright line.
+        // below the sections and above the version line.
         _MoreRow(
           label: context.l10n.shellHelp,
           icon: AppIcons.help,
@@ -87,7 +87,7 @@ class _MoreList extends StatelessWidget {
           onTap: () => unawaited(HelpDialog.show(context)),
         ),
         SizedBox(height: spacing.xxs),
-        const ShellCopyrightNotice(showDivider: true),
+        const ShellVersionLabel(showDivider: true),
       ],
     );
   }

@@ -23,5 +23,6 @@ abstract class LibraryProfile with _$LibraryProfile {
     @Default('KH-') String barcodePrefix,
     @Default(1) int barcodeNextValue,
     DateTime? updatedAt,
+    String? logoRef,
   }) = _LibraryProfile;
 }

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Khulla Digital Library contributors.
 // SPDX-License-Identifier: MIT
 
+import 'dart:typed_data';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:khulla/core/error/app_exception.dart';
 import 'package:khulla/features/settings/domain/models/library_profile.dart';
@@ -16,6 +18,8 @@ abstract class LibraryProfileState with _$LibraryProfileState {
     LibraryProfile? profile,
     AppException? error,
     @Default(false) bool isSaving,
+    Uint8List? logoBytes,
+    @Default(false) bool isSavingLogo,
   }) = _LibraryProfileState;
 
   const LibraryProfileState._();

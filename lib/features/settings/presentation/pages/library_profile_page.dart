@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:file_selector/file_selector.dart' show XTypeGroup, openFile;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:khulla/core/error/app_exception.dart';
@@ -13,9 +14,11 @@ import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/settings/domain/models/library_profile.dart';
 import 'package:khulla/features/settings/presentation/cubit/library_profile_cubit.dart';
 import 'package:khulla/features/settings/presentation/cubit/library_profile_state.dart';
+import 'package:khulla/features/settings/presentation/widgets/settings_logo_field.dart';
 import 'package:khulla/features/staff_auth/presentation/auth_labels.dart';
 import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
+import 'package:khulla/shared/presentation/cubit/library_branding_cubit.dart';
 import 'package:khulla/shared/utils/app_exception_l10n.dart';
 import 'package:khulla/shared/utils/permission_context.dart';
 import 'package:khulla/shared/widgets/error_retry_view.dart';
@@ -56,6 +59,45 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
   }
 
   int? _parseInt(String text) => int.tryParse(text.trim());
+
+  Future<void> _uploadLogo(BuildContext context) async {
+    final l10n = context.l10n;
+    final picked = await openFile(
+      acceptedTypeGroups: const [
+        XTypeGroup(
+          label: 'Image',
+          extensions: ['png', 'jpg', 'jpeg', 'webp'],
+        ),
+      ],
+    );
+    if (picked == null) return;
+    if (!context.mounted) return;
+
+    final bytes = await picked.readAsBytes();
+    final extension = picked.name.split('.').last.toLowerCase();
+    if (!context.mounted) return;
+
+    try {
+      await context.read<LibraryProfileCubit>().uploadLogo(bytes, extension);
+      if (!context.mounted) return;
+      await context.read<LibraryBrandingCubit>().refreshLogo();
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
+  Future<void> _removeLogo(BuildContext context) async {
+    final l10n = context.l10n;
+    try {
+      await context.read<LibraryProfileCubit>().removeLogo();
+      if (!context.mounted) return;
+      await context.read<LibraryBrandingCubit>().refreshLogo();
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
 
   Future<void> _save(BuildContext context) async {
     final l10n = context.l10n;
@@ -163,6 +205,17 @@ class _LibraryProfilePageState extends State<LibraryProfilePage>
                         textCapitalization: TextCapitalization.words,
                         onChanged: (_) {},
                       ),
+                      if (!viewOnly) ...[
+                        SizedBox(height: spacing.md),
+                        SettingsLogoField(
+                          logoBytes: state.logoBytes,
+                          isSaving: state.isSavingLogo,
+                          onUpload: () => unawaited(_uploadLogo(context)),
+                          onRemove: state.logoBytes == null
+                              ? null
+                              : () => unawaited(_removeLogo(context)),
+                        ),
+                      ],
                     ],
                   ),
                   SizedBox(height: spacing.lg),
