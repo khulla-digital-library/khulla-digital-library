@@ -4,6 +4,7 @@
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/database/app_database.dart';
+import 'package:khulla/core/database/fts_filter.dart';
 import 'package:khulla/core/error/guard.dart';
 import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/catalog/title/data/mappers/title_row_mappers.dart';
@@ -13,8 +14,8 @@ import 'package:khulla/features/catalog/title/domain/models/title_query.dart';
 
 /// Drift-backed [TitleLocalDataSource].
 ///
-/// List and detail queries use custom SQL so copy and availability counts arrive
-/// in one round trip. Sort column names match [TitleQuery.sortColumn].
+/// List and detail queries use custom SQL so copy and availability counts
+/// arrive in one round trip. Sort column names match [TitleQuery.sortColumn].
 @LazySingleton(as: TitleLocalDataSource)
 class LocalTitleDataSource implements TitleLocalDataSource {
   LocalTitleDataSource(this._db);
@@ -23,50 +24,69 @@ class LocalTitleDataSource implements TitleLocalDataSource {
 
   static const String _source = 'LocalTitleDataSource';
 
+  /// The `titles_fts` columns a search looks in.
+  static const List<String> _searchColumns = [
+    'title',
+    'author',
+    'isbn',
+    'publisher',
+    'shelf',
+  ];
+
+  /// Copy counts as per-row subqueries over `copies_title`, not a joined
+  /// `GROUP BY`. A page sorted by title can then read its rows off
+  /// `titles_sort` and stop at the limit, instead of grouping every title in
+  /// the catalogue first.
+  static const String _selectColumns = '''
+t.*,
+f.name AS format_name,
+f.code AS format_code,
+(SELECT COUNT(*) FROM copies c
+ WHERE c.title_id = t.id AND c.archived_at IS NULL) AS copy_count,
+(SELECT COUNT(*) FROM copies c
+ WHERE c.title_id = t.id AND c.archived_at IS NULL
+   AND c.status = 'available') AS available_count
+''';
+
+  static const String _hasAvailableCopy = '''
+EXISTS (SELECT 1 FROM copies c
+        WHERE c.title_id = t.id AND c.archived_at IS NULL
+          AND c.status = 'available')''';
+
   @override
   Future<TitleListResult> findTitles(TitleQuery query) => guardDatabase(
     () async {
-      final needle = query.search.trim().toLowerCase();
       final where = StringBuffer('t.archived_at IS NULL');
       final variables = <Variable<Object>>[];
 
-      if (needle.isNotEmpty) {
-        where.write(' AND t.search_text LIKE ?');
-        variables.add(Variable<String>('%$needle%'));
+      final search = ftsFilter(
+        search: query.search,
+        table: 'titles_fts',
+        columns: _searchColumns,
+        rowid: 't.rowid',
+      );
+      if (search != null) {
+        where.write(' AND ${search.sql}');
+        variables.addAll(search.variables);
       }
       if (query.formatId != null) {
         where.write(' AND t.format_id = ?');
         variables.add(Variable<String>(query.formatId));
       }
-
-      final having = query.availableOnly ? ' HAVING available_count > 0' : '';
+      if (query.availableOnly) {
+        where.write(' AND $_hasAvailableCopy');
+      }
 
       final order = _orderClause(query);
 
-      final countSql =
-          '''
-SELECT COUNT(*) AS total FROM (
-  SELECT t.id,
-         COUNT(CASE WHEN c.status = 'available' AND c.archived_at IS NULL THEN 1 END) AS available_count
-  FROM titles t
-  LEFT JOIN copies c ON c.title_id = t.id AND c.archived_at IS NULL
-  WHERE $where
-  GROUP BY t.id$having
-)''';
+      final countSql = 'SELECT COUNT(*) AS total FROM titles t WHERE $where';
 
       final listSql =
           '''
-SELECT t.*,
-       f.name AS format_name,
-       f.code AS format_code,
-       COUNT(c.id) AS copy_count,
-       COUNT(CASE WHEN c.status = 'available' THEN 1 END) AS available_count
+SELECT $_selectColumns
 FROM titles t
 JOIN title_formats f ON f.id = t.format_id
-LEFT JOIN copies c ON c.title_id = t.id AND c.archived_at IS NULL
 WHERE $where
-GROUP BY t.id
-$having
 ORDER BY $order
 LIMIT ? OFFSET ?''';
 
@@ -133,16 +153,10 @@ LIMIT ? OFFSET ?''';
       final rows = await _db
           .customSelect(
             '''
-SELECT t.*,
-       f.name AS format_name,
-       f.code AS format_code,
-       COUNT(c.id) AS copy_count,
-       COUNT(CASE WHEN c.status = 'available' THEN 1 END) AS available_count
+SELECT $_selectColumns
 FROM titles t
 JOIN title_formats f ON f.id = t.format_id
-LEFT JOIN copies c ON c.title_id = t.id AND c.archived_at IS NULL
 WHERE t.id = ?
-GROUP BY t.id
 ''',
             variables: [Variable<String>(id)],
           )
@@ -154,29 +168,24 @@ GROUP BY t.id
   );
 
   @override
-  Future<Title> insertTitle(Title title, {required String searchText}) =>
-      guardDatabase(
-        () async {
-          await _db
-              .into(_db.titles)
-              .insert(
-                title.toCompanion(searchText: searchText),
-              );
-          return (await findTitleById(title.id))!;
-        },
-        source: '$_source.insertTitle',
-      );
+  Future<Title> insertTitle(Title title) => guardDatabase(
+    () async {
+      await _db.into(_db.titles).insert(title.toCompanion());
+      return (await findTitleById(title.id))!;
+    },
+    source: '$_source.insertTitle',
+  );
 
   @override
-  Future<Title> updateTitle(Title title, {required String searchText}) =>
-      guardDatabase(
-        () async {
-          await (_db.update(_db.titles)..where((t) => t.id.equals(title.id)))
-              .write(title.toCompanion(searchText: searchText));
-          return (await findTitleById(title.id))!;
-        },
-        source: '$_source.updateTitle',
-      );
+  Future<Title> updateTitle(Title title) => guardDatabase(
+    () async {
+      await (_db.update(
+        _db.titles,
+      )..where((t) => t.id.equals(title.id))).write(title.toCompanion());
+      return (await findTitleById(title.id))!;
+    },
+    source: '$_source.updateTitle',
+  );
 
   @override
   Future<void> archiveTitle(String id, DateTime archivedAt) => guardDatabase(

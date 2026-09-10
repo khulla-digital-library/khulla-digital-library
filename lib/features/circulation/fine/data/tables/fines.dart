@@ -12,6 +12,13 @@ import 'package:khulla/features/members/data/tables/members.dart';
 @TableIndex.sql(
   'CREATE INDEX fines_outstanding ON fines (member_id) WHERE paid + waived < assessed',
 )
+// A member's whole fine history, and the lookup a member delete needs —
+// `fines_outstanding` is partial, so it serves neither.
+@TableIndex.sql(
+  'CREATE INDEX fines_member ON fines (member_id, raised_at DESC)',
+)
+// Date-range reads on the dashboard and reports, and recent activity.
+@TableIndex.sql('CREATE INDEX fines_raised ON fines (raised_at)')
 class Fines extends Table {
   TextColumn get id => text()();
 

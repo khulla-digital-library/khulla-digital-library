@@ -54,6 +54,12 @@ part 'app_database.g.dart';
     Fines,
     Reservations,
   ],
+  // FTS5 search indexes and the triggers that fill them — virtual tables and
+  // triggers can only be declared in SQL.
+  include: {
+    'package:khulla/features/catalog/title/data/tables/titles_fts.drift',
+    'package:khulla/features/members/data/tables/members_fts.drift',
+  },
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(AppConfig config) : super(openDatabaseConnection(config));
@@ -64,7 +70,7 @@ class AppDatabase extends _$AppDatabase {
   static const String _source = 'AppDatabase';
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -306,6 +312,102 @@ class AppDatabase extends _$AppDatabase {
       from10To11: (m, schema) async {
         await m.dropColumn(schema.copies, 'condition');
       },
+      from11To12: (m, schema) async {
+        // Search moves from a hand-built `search_text` column, read with a
+        // leading-wildcard LIKE no index can serve, to FTS5 tables that
+        // triggers keep in step. The trigger SQL is written out here rather
+        // than taken from the live database, so this step stays what v12 was.
+        await customStatement('DROP INDEX titles_search');
+        await customStatement('DROP INDEX members_search');
+        await m.dropColumn(schema.titles, 'search_text');
+        await m.dropColumn(schema.members, 'search_text');
+        await m.create(schema.titlesFts);
+        await m.create(schema.membersFts);
+        for (final statement in _v12SearchTriggers) {
+          await customStatement(statement);
+        }
+        await customStatement(
+          'INSERT INTO titles_fts (rowid, title, author, isbn, publisher, shelf) '
+          'SELECT rowid, title, author, isbn, publisher, shelf FROM titles',
+        );
+        await customStatement(
+          'INSERT INTO members_fts '
+          '(rowid, full_name, card_number, email, phone, address, guardian) '
+          'SELECT rowid, full_name, card_number, email, phone, address, guardian '
+          'FROM members',
+        );
+
+        // Two indexes widen under their old names; the rest are new.
+        await customStatement('DROP INDEX copies_title');
+        await m.createIndex(schema.copiesTitle);
+        await customStatement('DROP INDEX loans_open_by_member');
+        await m.createIndex(schema.loansOpenByMember);
+        await m.createIndex(schema.loansCheckedOut);
+        await m.createIndex(schema.loansReturned);
+        await m.createIndex(schema.finesMember);
+        await m.createIndex(schema.finesRaised);
+
+        // Reconcile holds whose status and closed_at disagree before the
+        // CHECK refuses them. Both fixes close the hold, never reopen one, so
+        // neither can collide with the one-open-hold-per-member index.
+        await customStatement(
+          'UPDATE reservations SET closed_at = updated_at '
+          "WHERE closed_at IS NULL AND status NOT IN ('waiting', 'ready')",
+        );
+        await customStatement(
+          "UPDATE reservations SET status = 'cancelled' "
+          "WHERE closed_at IS NOT NULL AND status IN ('waiting', 'ready')",
+        );
+        await m.alterTable(TableMigration(schema.reservations));
+        await m.createIndex(schema.reservationsMember);
+      },
     )(m, from, to);
   }
 }
+
+/// The v12 search triggers, exactly as `titles_fts.drift` and
+/// `members_fts.drift` declared them when `from11To12` shipped. They are frozen
+/// with that step: a later change to those files ships as a later migration.
+const List<String> _v12SearchTriggers = [
+  '''
+CREATE TRIGGER titles_fts_insert AFTER INSERT ON titles BEGIN
+  INSERT INTO titles_fts (rowid, title, author, isbn, publisher, shelf)
+  VALUES (new.rowid, new.title, new.author, new.isbn, new.publisher, new.shelf);
+END;''',
+  '''
+CREATE TRIGGER titles_fts_update
+AFTER UPDATE OF title, author, isbn, publisher, shelf ON titles BEGIN
+  UPDATE titles_fts
+  SET title = new.title,
+      author = new.author,
+      isbn = new.isbn,
+      publisher = new.publisher,
+      shelf = new.shelf
+  WHERE rowid = old.rowid;
+END;''',
+  '''
+CREATE TRIGGER titles_fts_delete AFTER DELETE ON titles BEGIN
+  DELETE FROM titles_fts WHERE rowid = old.rowid;
+END;''',
+  '''
+CREATE TRIGGER members_fts_insert AFTER INSERT ON members BEGIN
+  INSERT INTO members_fts (rowid, full_name, card_number, email, phone, address, guardian)
+  VALUES (new.rowid, new.full_name, new.card_number, new.email, new.phone, new.address, new.guardian);
+END;''',
+  '''
+CREATE TRIGGER members_fts_update
+AFTER UPDATE OF full_name, card_number, email, phone, address, guardian ON members BEGIN
+  UPDATE members_fts
+  SET full_name = new.full_name,
+      card_number = new.card_number,
+      email = new.email,
+      phone = new.phone,
+      address = new.address,
+      guardian = new.guardian
+  WHERE rowid = old.rowid;
+END;''',
+  '''
+CREATE TRIGGER members_fts_delete AFTER DELETE ON members BEGIN
+  DELETE FROM members_fts WHERE rowid = old.rowid;
+END;''',
+];

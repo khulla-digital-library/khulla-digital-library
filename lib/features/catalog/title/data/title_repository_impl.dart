@@ -8,14 +8,12 @@ import 'package:khulla/features/catalog/title/data/title_local_data_source.dart'
 import 'package:khulla/features/catalog/title/domain/models/title.dart';
 import 'package:khulla/features/catalog/title/domain/models/title_query.dart';
 import 'package:khulla/features/catalog/title/domain/title_repository.dart';
-import 'package:khulla/shared/utils/search_text.dart';
 import 'package:uuid/uuid.dart';
 
 /// [TitleRepository] over the local catalogue.
 ///
-/// Owns id assignment, [buildSearchText] for list filters, and the guard that
-/// blocks [removeTitle] while copies remain. Row mapping stays in
-/// [TitleLocalDataSource].
+/// Owns id assignment and the guard that blocks [removeTitle] while copies
+/// remain. Row mapping stays in [TitleLocalDataSource].
 @LazySingleton(as: TitleRepository)
 class TitleRepositoryImpl implements TitleRepository {
   TitleRepositoryImpl(this._dataSource);
@@ -50,13 +48,6 @@ class TitleRepositoryImpl implements TitleRepository {
     final now = DateTime.now();
     final recordId = id ?? _uuid.v4();
     final existing = id == null ? null : await _dataSource.findTitleById(id);
-    final search = buildSearchText([
-      title,
-      author,
-      isbn ?? '',
-      publisher ?? '',
-      shelf ?? '',
-    ]);
 
     final draft = Title(
       id: recordId,
@@ -82,9 +73,9 @@ class TitleRepositoryImpl implements TitleRepository {
     );
 
     if (existing == null) {
-      return await _dataSource.insertTitle(draft, searchText: search);
+      return await _dataSource.insertTitle(draft);
     }
-    return await _dataSource.updateTitle(draft, searchText: search);
+    return await _dataSource.updateTitle(draft);
   }
 
   @override

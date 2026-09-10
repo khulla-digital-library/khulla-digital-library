@@ -1,0 +1,40 @@
+-- Copyright (c) 2026 Khulla Digital Library contributors.
+-- SPDX-License-Identifier: MIT
+
+import 'titles.dart';
+
+-- Search index over the text a librarian types to find a title.
+--
+-- Trigram rather than a word tokenizer: `unicode61` splits Devanagari at
+-- every vowel sign, so a Nepali title would never match, and trigrams keep
+-- the substring search the catalogue has always had ("otte" finds
+-- "Potter"). Each row's rowid is its title's rowid; the triggers below are
+-- the only writers, so nothing in Dart can forget to keep it current.
+CREATE VIRTUAL TABLE titles_fts USING fts5(
+  title,
+  author,
+  isbn,
+  publisher,
+  shelf,
+  tokenize = 'trigram remove_diacritics 1'
+);
+
+CREATE TRIGGER titles_fts_insert AFTER INSERT ON titles BEGIN
+  INSERT INTO titles_fts (rowid, title, author, isbn, publisher, shelf)
+  VALUES (new.rowid, new.title, new.author, new.isbn, new.publisher, new.shelf);
+END;
+
+CREATE TRIGGER titles_fts_update
+AFTER UPDATE OF title, author, isbn, publisher, shelf ON titles BEGIN
+  UPDATE titles_fts
+  SET title = new.title,
+      author = new.author,
+      isbn = new.isbn,
+      publisher = new.publisher,
+      shelf = new.shelf
+  WHERE rowid = old.rowid;
+END;
+
+CREATE TRIGGER titles_fts_delete AFTER DELETE ON titles BEGIN
+  DELETE FROM titles_fts WHERE rowid = old.rowid;
+END;

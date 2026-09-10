@@ -6,6 +6,10 @@ import 'package:drift/drift.dart';
 import 'package:drift_dev/api/migrations_native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:khulla/core/database/app_database.dart';
+import 'package:khulla/features/catalog/title/data/local_title_data_source.dart';
+import 'package:khulla/features/catalog/title/domain/models/title_query.dart';
+import 'package:khulla/features/members/data/local_member_data_source.dart';
+import 'package:khulla/features/members/domain/models/member_query.dart';
 
 import 'generated/schema.dart';
 
@@ -46,5 +50,76 @@ void main() {
       createItems: (batch, oldDb) {},
       validateItems: (newDb) async {},
     );
+  });
+
+  test('v11 to v12 indexes existing rows for search and reconciles holds '
+      'whose status and closed_at disagree', () async {
+    final schema = await verifier.schemaAt(11);
+    const at = '2026-09-01T10:00:00.000Z';
+    schema.rawDatabase
+      ..execute(
+        'INSERT INTO title_formats (id, name, sort_order, created_at) '
+        "VALUES ('f1', 'Book', 0, '$at')",
+      )
+      ..execute(
+        'INSERT INTO member_types (id, name, sort_order, created_at) '
+        "VALUES ('mt1', 'Student', 0, '$at')",
+      )
+      ..execute(
+        'INSERT INTO titles '
+        '(id, title, author, format_id, search_text, created_at, updated_at) '
+        "VALUES ('t1', 'मुना मदन', 'लक्ष्मीप्रसाद देवकोटा', 'f1', "
+        "'मुना मदन लक्ष्मीप्रसाद देवकोटा', '$at', '$at')",
+      )
+      ..execute(
+        'INSERT INTO members (id, card_number, full_name, member_type_id, '
+        'joined_at, search_text, created_at, updated_at) '
+        "VALUES ('m1', 'KH-000123', 'Sita Sharma', 'mt1', '$at', "
+        "'sita sharma kh-000123', '$at', '$at')",
+      )
+      // Closed by status, still open by date.
+      ..execute(
+        'INSERT INTO reservations (id, title_id, member_id, placed_at, '
+        'status, created_at, updated_at) '
+        "VALUES ('r1', 't1', 'm1', '$at', 'fulfilled', '$at', '$at')",
+      )
+      // Closed by date, still open by status.
+      ..execute(
+        'INSERT INTO reservations (id, title_id, member_id, placed_at, '
+        'status, closed_at, created_at, updated_at) '
+        "VALUES ('r2', 't1', 'm1', '$at', 'waiting', '$at', '$at', '$at')",
+      );
+
+    final db = AppDatabase.connect(schema.newConnection());
+    await verifier.migrateAndValidate(db, 12);
+
+    final titles = await LocalTitleDataSource(
+      db,
+    ).findTitles(const TitleQuery(search: 'देवको'));
+    expect([for (final title in titles.items) title.id], ['t1']);
+
+    final members = await LocalMemberDataSource(
+      db,
+    ).findMembers(const MemberQuery(search: '0123'));
+    expect([for (final member in members.items) member.id], ['m1']);
+
+    final holds = await db
+        .customSelect(
+          'SELECT id, status, closed_at FROM reservations ORDER BY id',
+        )
+        .get();
+    expect(
+      [
+        for (final hold in holds)
+          (
+            hold.read<String>('id'),
+            hold.read<String>('status'),
+            hold.readNullable<String>('closed_at'),
+          ),
+      ],
+      [('r1', 'fulfilled', at), ('r2', 'cancelled', at)],
+    );
+
+    await db.close();
   });
 }

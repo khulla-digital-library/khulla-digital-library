@@ -47,26 +47,24 @@ extension MemberRowMapper on MemberRow {
 }
 
 extension MemberDomainMapper on Member {
-  MembersCompanion toCompanion({required String searchText}) =>
-      MembersCompanion(
-        id: Value(id),
-        cardNumber: Value(cardNumber),
-        fullName: Value(fullName),
-        memberTypeId: Value(memberTypeId),
-        dateOfBirth: Value(dateOfBirth),
-        email: Value(email),
-        phone: Value(phone),
-        address: Value(address),
-        guardian: Value(guardian),
-        notes: Value(notes),
-        joinedAt: Value(joinedAt),
-        expiresAt: Value(expiresAt),
-        suspendedAt: Value(suspendedAt),
-        suspensionReason: Value(suspensionReason),
-        sendNotices: Value(sendNotices),
-        searchText: Value(searchText),
-        createdAt: Value(createdAt),
-        updatedAt: Value(updatedAt),
-        archivedAt: Value(archivedAt),
-      );
+  MembersCompanion toCompanion() => MembersCompanion(
+    id: Value(id),
+    cardNumber: Value(cardNumber),
+    fullName: Value(fullName),
+    memberTypeId: Value(memberTypeId),
+    dateOfBirth: Value(dateOfBirth),
+    email: Value(email),
+    phone: Value(phone),
+    address: Value(address),
+    guardian: Value(guardian),
+    notes: Value(notes),
+    joinedAt: Value(joinedAt),
+    expiresAt: Value(expiresAt),
+    suspendedAt: Value(suspendedAt),
+    suspensionReason: Value(suspensionReason),
+    sendNotices: Value(sendNotices),
+    createdAt: Value(createdAt),
+    updatedAt: Value(updatedAt),
+    archivedAt: Value(archivedAt),
+  );
 }
