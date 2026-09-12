@@ -73,6 +73,7 @@ khulla-digital-library/
 ├── assets/               # Icons and images
 ├── docs/
 │   ├── architecture/     # Design decisions and ADRs
+│   ├── database/         # Data layer: overview, how-to, schema diagram
 │   └── contributing/     # How to contribute
 ├── test/
 ├── android/ ios/ linux/ macos/ web/ windows/
@@ -94,7 +95,7 @@ khulla-digital-library/
 
 ## Architecture
 
-The full guide lives in [CLAUDE.md](./CLAUDE.md) — folder conventions, the data-layer stack, migration rules, state management, and naming. In short:
+The full guide lives in [docs/architecture](./docs/architecture/) — folder conventions, the data-layer stack, migration rules, state management, and naming. In short:
 
 - **State** — `flutter_bloc` cubits with single-class `freezed` states and `formz` inputs.
 - **Data** — `Page → Cubit → Repository → LocalDataSource → AppDatabase → SQLite`. Driver errors are converted to a small sealed `AppException` set at the data-source boundary.
