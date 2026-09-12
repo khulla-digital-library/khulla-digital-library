@@ -6,10 +6,10 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// The modal bottom sheet: 10px top corners, a grab handle, and keyboard-safe
 /// padding, over a scrim that dims hard.
 ///
-/// The handle is the whole dismiss affordance — a 100×8 bar 16px from the top
-/// edge — rather than a floating close button. On a phone the gesture is the
-/// drag, and a chip in the corner is both a smaller target and a second way
-/// to say the same thing.
+/// The handle is the whole dismiss affordance — a slim 32×4 pill 12px from
+/// the top edge — rather than a floating close button. On a phone the gesture
+/// is the drag, and a chip in the corner is both a smaller target and a
+/// second way to say the same thing.
 ///
 /// Pass [actions] to pin a button row to the bottom of the sheet. Actions sit
 /// outside the scrolling body, so a sheet whose content grows — an extra field,
@@ -102,12 +102,12 @@ class AppBottomSheet extends StatelessWidget {
         mainAxisSize: expandBody ? MainAxisSize.max : MainAxisSize.min,
         children: [
           Padding(
-            padding: EdgeInsets.only(top: spacing.md, bottom: spacing.xs),
+            padding: EdgeInsets.only(top: spacing.sm, bottom: spacing.xs),
             child: Container(
-              width: 100,
-              height: 8,
+              width: spacing.xlg,
+              height: spacing.xxs,
               decoration: BoxDecoration(
-                color: colors.muted,
+                color: colors.muted.withValues(alpha: 0.55),
                 borderRadius: BorderRadius.circular(context.appRadius.pill),
               ),
             ),
@@ -157,7 +157,16 @@ class AppBottomSheet extends StatelessWidget {
                         ),
                       ],
                       SizedBox(height: spacing.md),
-                      if (expandBody) Expanded(child: child) else child,
+                      // A fixed-height sheet cannot size to its content, so the
+                      // body scrolls: a plain Column of rows here is the
+                      // 116px-overflow the category sheet hit. Callers that
+                      // already scroll (the *More* list) size themselves to
+                      // their content inside this, so the outer view does the
+                      // scrolling and nothing nests badly.
+                      if (expandBody)
+                        Expanded(child: SingleChildScrollView(child: child))
+                      else
+                        child,
                       if (actionRow != null) ...[
                         SizedBox(height: spacing.md),
                         actionRow,

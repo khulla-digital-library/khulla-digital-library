@@ -1227,8 +1227,6 @@
   "guideSearchEmptyBody": "तपाईं भएकै स्क्रिनको शब्द प्रयोग गर्नुहोस्: होल्ड, जरिवाना, कल नम्बर, नवीकरण।",
   "guideSearchResults": "{count, plural, =1{१ मिल्दो खण्ड} other{{count} मिल्दा खण्ड}}",
   "guideSectionCount": "{count, plural, =1{१ खण्ड} other{{count} खण्ड}}",
-  "guideStartHereTitle": "पुस्तकालय एक पटक सेटअप गर्नुहोस्",
-  "guideStartHereBody": "आठ चरण, क्रमैसँग। हरेकले आफूले बताएको स्क्रिन खोल्छ।",
   "guideStartHereAction": "पूरा वाकथ्रु खोल्नुहोस्",
   "guideBrowseTitle": "हरेक खण्ड, व्याख्यासहित",
   "guideBrowseBody": "तपाईं काम गरिरहेको भाग रोज्नुहोस्।",

@@ -1225,8 +1225,6 @@
     "guideSearchEmptyBody": "Try a word from the screen you are on: hold, fine, call number, renewal.",
     "guideSearchResults": "{count, plural, =1{1 matching section} other{{count} matching sections}}",
     "guideSectionCount": "{count, plural, =1{1 section} other{{count} sections}}",
-    "guideStartHereTitle": "Set the library up once",
-    "guideStartHereBody": "Eight steps, in order. Each one opens the screen it describes.",
     "guideStartHereAction": "Open the full walkthrough",
     "guideBrowseTitle": "Every section, explained",
     "guideBrowseBody": "Pick the part of the app you are working in.",

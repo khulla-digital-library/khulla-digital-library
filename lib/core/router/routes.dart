@@ -109,6 +109,15 @@ abstract final class Routes {
   /// One borrower's record.
   static String member(String id) => '$members/$id';
 
+  /// The manual: one article per section of the app.
+  static const String guide = '/guide';
+
+  /// A guide article, addressed by its topic slug.
+  static const String guideTopicSegment = ':topic';
+
+  /// One topic's article.
+  static String guideTopic(String slug) => '$guide/$slug';
+
   /// Settings: library profile, loan rules, backup, appearance.
   static const String settings = '/settings';
 

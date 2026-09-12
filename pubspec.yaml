@@ -46,6 +46,11 @@ dependencies:
   crypto: ^3.0.7
   file_selector: ^1.0.3
 
+  # System share sheet on Android/iOS, where `file_selector`'s
+  # `getSaveLocation` is not implemented (throws UnimplementedError).
+  # Export helpers in `lib/core/files/` write to a temp file and share it.
+  share_plus: ^13.3.0
+
   # A backup restore replaces the catalogue file/store underneath a live
   # connection — the app has to restart cleanly, and on web that means
   # reloading the page. Already resolved transitively; declared directly

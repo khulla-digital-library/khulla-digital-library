@@ -49,8 +49,8 @@ enum AppDialogWidth {
 ///   recognisable interaction in the design language;
 /// * the body scrolls **inside** the dialog at a 90% viewport-height cap, so
 ///   a long form never pushes the footer off screen;
-/// * the footer is a right-aligned row on a wide window and a **reversed
-///   column** on a narrow one, which keeps the confirming action under the
+/// * the footer is a right-aligned row on a wide window and an equal-width
+///   row on a narrow one, which keeps the confirming action under the
 ///   thumb on a phone.
 ///
 /// Use [AppDialog.show] for arbitrary content and [AppDialog.confirmDestructive]
@@ -279,8 +279,13 @@ class AppDialog extends StatelessWidget {
   }
 }
 
-/// A dialog's button row: right-aligned on a wide window, reversed column on
-/// a narrow one so the confirming action lands under the thumb.
+/// A dialog's button row: the actions huddle at the trailing edge at every
+/// width — dismiss first, confirm last and flush right.
+///
+/// A phone footer stays a *row*: stacking two buttons costs a whole extra
+/// band of height on the screen that has the least of it. The one exception
+/// is a lone action on a narrow slot, which fills the footer on its own
+/// rather than floating a small button in a wide empty row.
 ///
 /// Pass the children in reading order — dismiss first, confirm last.
 class AppDialogActions extends StatelessWidget {
@@ -292,29 +297,37 @@ class AppDialogActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final narrow = context.formFactor.isCompact;
 
-    if (narrow) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (final child in children.reversed) ...[
-            child,
-            if (child != children.first) SizedBox(height: spacing.xs),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // The footer is measured by its slot, not the window: a 576px panel
+        // on a wide screen still wants the compact row, and a full-screen
+        // phone page must keep it even if the reporting context above
+        // disagrees about the breakpoint.
+        final narrow =
+            context.formFactor.isCompact || constraints.maxWidth < 480;
+        // A lone action on a narrow slot fills the footer; every other row
+        // clusters its buttons at the trailing edge.
+        if (narrow && children.length == 1) {
+          return Row(
+            children: [
+              Expanded(
+                child: SizedBox(width: double.infinity, child: children.single),
+              ),
+            ],
+          );
+        }
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            for (final (index, child) in children.indexed) ...[
+              if (index > 0) SizedBox(width: spacing.xs),
+              child,
+            ],
           ],
-        ],
-      );
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        for (final child in children) ...[
-          if (child != children.first) SizedBox(width: spacing.xs),
-          child,
-        ],
-      ],
+        );
+      },
     );
   }
 }
