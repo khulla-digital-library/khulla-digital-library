@@ -116,6 +116,17 @@ class RecordHeader extends StatelessWidget {
 
     final compact = context.formFactor.isCompact;
 
+    // A bare Row gives a non-flex child unbounded main-axis width, so a
+    // Wrap inside one never actually wraps — it has to sit where its own
+    // parent already bounds its width (Column's cross axis, or a Flexible
+    // inside the wide Row below), or a long action label overflows a phone.
+    final actionsRow = Wrap(
+      alignment: WrapAlignment.end,
+      spacing: spacing.xs,
+      runSpacing: spacing.xs,
+      children: actions,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
@@ -124,7 +135,7 @@ class RecordHeader extends StatelessWidget {
           lead,
           if (actions.isNotEmpty) ...[
             SizedBox(height: spacing.md),
-            Row(children: actions),
+            actionsRow,
           ],
         ] else
           Row(
@@ -133,7 +144,7 @@ class RecordHeader extends StatelessWidget {
               Expanded(child: lead),
               if (actions.isNotEmpty) ...[
                 SizedBox(width: spacing.lg),
-                Row(mainAxisSize: MainAxisSize.min, children: actions),
+                Flexible(child: actionsRow),
               ],
             ],
           ),

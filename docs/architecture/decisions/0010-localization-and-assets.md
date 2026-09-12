@@ -109,7 +109,7 @@ Assets used only in the design system live in `packages/khulla_ui/assets/`. They
 
 `lib/l10n/gen/`, `lib/gen/assets.gen.dart`, and all `*.g.dart` / `*.freezed.dart` / `*.config.dart` files are in `.gitignore`. The source of truth is the ARB files, `pubspec.yaml`, and the Dart source that `build_runner` processes. Committing generated files means every regeneration produces a diff; it also invites merge conflicts on files no human should be editing.
 
-The consequence is that a fresh clone does not analyze or run without running `make build` and `make localize`. This is documented in the README, the contributing guide, and `CLAUDE.md`. It is a one-time setup cost that keeps the repository clean.
+The consequence is that a fresh clone does not analyze or run without running `make build` and `make localize`. This is documented in the README and the contributing guide. It is a one-time setup cost that keeps the repository clean.
 
 ### `make localize` vs `make build`
 

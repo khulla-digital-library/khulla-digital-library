@@ -61,8 +61,8 @@ enum AppDialogWidth {
 class AppDialog extends StatelessWidget {
   /// {@macro app_dialog}
   const AppDialog({
-    required this.title,
     required this.actions,
+    this.title,
     this.message,
     this.content,
     this.width = AppDialogWidth.md,
@@ -73,8 +73,10 @@ class AppDialog extends StatelessWidget {
     super.key,
   });
 
-  /// The dialog's heading, already localized.
-  final String title;
+  /// The dialog's heading, already localized. Omit it for content that
+  /// carries its own heading — the about panel, say, which opens on the
+  /// product's name.
+  final String? title;
 
   /// The supporting line under the heading.
   final String? message;
@@ -104,8 +106,8 @@ class AppDialog extends StatelessWidget {
   /// Presents an [AppDialog] and resolves to whatever it is popped with.
   static Future<T?> show<T>({
     required BuildContext context,
-    required String title,
     required WidgetBuilder actionsBuilder,
+    String? title,
     String? message,
     Widget? content,
     AppDialogWidth width = AppDialogWidth.md,
@@ -226,6 +228,7 @@ class AppDialog extends StatelessWidget {
                 size: context.appMetrics.iconLarge,
               ));
 
+    final titleText = title;
     final body = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -245,11 +248,12 @@ class AppDialog extends StatelessWidget {
           ),
           SizedBox(height: spacing.md),
         ],
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: typography.formTitle.copyWith(color: colors.ink200),
-        ),
+        if (titleText != null)
+          Text(
+            titleText,
+            textAlign: TextAlign.center,
+            style: typography.formTitle.copyWith(color: colors.ink200),
+          ),
         if (message != null) ...[
           SizedBox(height: spacing.xs),
           Text(

@@ -1,12 +1,12 @@
-# 🗄️ How the Database Works in Khulla Digital Library
+# How the database works in Khulla
 
-A complete, line-by-line walkthrough of every database file — what it does, why it's there, and how it all connects.
+A walkthrough of every database file — what it does, why it is there, and how it all connects. For the day-to-day workflow (adding tables, writing queries, running migrations), see [guide.md](guide.md); for the visual schema, see [schema.md](schema.md).
 
 ---
 
-## 📦 The Tech Stack
+## Tech stack
 
-The project uses **Drift** (formerly called Moor), which is a type-safe SQLite ORM for Flutter/Dart. Think of it like TypeORM or Prisma but for Flutter. It:
+The project uses **Drift**, a type-safe SQLite layer for Dart. It:
 
 - Auto-generates Dart classes from your table definitions
 - Runs SQLite on a **background isolate** (on native) so DB queries never freeze the UI
@@ -16,7 +16,7 @@ The database is **fully local** — no backend server. Everything lives on the d
 
 ---
 
-## 🗺️ The Big Picture Flow
+## The big picture
 
 ```
 app startup
@@ -34,7 +34,7 @@ bootstrap()                    ← lib/bootstrap.dart
             ├─ runs migrations (onCreate / onUpgrade)
             ├─ sets PRAGMA foreign_keys = ON
             │
-            └─ ✅ App starts, all widgets can now use the DB
+            └─ App starts, all widgets can now use the DB
 ```
 
 When a feature needs data:
@@ -52,7 +52,7 @@ Widget / Cubit
 
 ---
 
-## 📁 File-by-File Breakdown
+## File-by-file breakdown
 
 ---
 
@@ -196,7 +196,7 @@ void _reportWebStorage(WasmDatabaseResult result) {
     return;
   }
 
-  // ⚠️ IMPORTANT:
+  // IMPORTANT:
   // If the browser gives nothing persistent, Drift silently falls back to
   // IN-MEMORY storage. A librarian would enter a full day of checkouts and
   // lose everything on page refresh, with zero errors shown.
@@ -217,7 +217,18 @@ This is the heart of it all. Let's go line by line.
 
 ```dart
 @lazySingleton          // GetIt creates exactly one instance, on first use
-@DriftDatabase()        // Tables will go inside here: @DriftDatabase(tables: [...])
+@DriftDatabase(         // Every table the app owns, registered here
+  tables: [
+    LibrarySettings, Staff, StaffRecoveryCodes, LoanRules,
+    TitleFormats, MemberTypes, Titles, Copies,
+    Members, Loans, Fines, Reservations,
+  ],
+  include: {
+    // FTS5 search indexes — virtual tables can only be declared in SQL.
+    'package:khulla/features/catalog/title/data/tables/titles_fts.drift',
+    'package:khulla/features/members/data/tables/members_fts.drift',
+  },
+)
 class AppDatabase extends _$AppDatabase {
 
   // Normal constructor used in production.
@@ -231,10 +242,10 @@ class AppDatabase extends _$AppDatabase {
 ```
 
 ```dart
-  // Bumped by 1 for every schema change (table added, column added, etc.)
-  // Currently at 1 because no tables have been added yet.
+  // Bumped by 1 for every schema change (table added, column added, etc.).
+  // Currently at 13 — drift_schemas/ records what each version looked like.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 13;
 ```
 
 ```dart
@@ -285,7 +296,7 @@ class AppDatabase extends _$AppDatabase {
     // Drift calls this even for DOWNGRADES (from > to).
     // e.g. user had v2, installs an older v1 build.
     if (from > to) {
-      // 🚨 REFUSE TO OPEN instead of wiping data.
+      // REFUSE TO OPEN instead of wiping data.
       // A library's catalogue may be irreplaceable.
       // Let the operator reinstall the newer build or restore a backup.
       AppLogger.error(
@@ -297,10 +308,11 @@ class AppDatabase extends _$AppDatabase {
       );
     }
 
-    // Once real schema changes ship, migration steps go here like:
+    // One fromNToM: step per shipped version bump — see app_database.dart
+    // for the full list, and guide.md for how to add the next one.
     // await stepByStep(from1To2: (m, schema) async { ... })(m, from, to);
     //
-    // ⚠️ Steps must NEVER reference `this` (the live schema).
+    // Steps must NEVER reference `this` (the live schema).
     // They must only use the snapshot object passed to them.
     // Referencing `this` inside a step is how migrations pass in dev
     // and silently corrupt a real upgrade.
@@ -319,13 +331,13 @@ class AppDatabase extends _$AppDatabase {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
 
-  // This manager gives you type-safe query builders for every table.
-  // Once tables are added: db.managers.titles.filter(...).get()
+  // This manager gives you type-safe query builders for every table,
+  // e.g. db.managers.titles.filter(...).get()
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
 
-  // Right now: empty, because no tables have been added yet.
+  // Every registered table and index, generated from @DriftDatabase above.
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [ ... ];
 
   @override
   DriftDatabaseOptions get options =>
@@ -335,10 +347,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 }
 ```
 
-When you add a table (e.g. `Titles`), this generated file will grow to include:
-- A `$TitlesTable` class with all column definitions
-- A `TitleData` row class
-- Query helpers on `$AppDatabaseManager`
+Each registered table grows this file with a `$TitlesTable` column class, a
+`TitleData` row class, and query helpers on `$AppDatabaseManager`.
 
 ---
 
@@ -381,14 +391,14 @@ Floating point math is imprecise. `2.99 + 1.01` might give `3.9999999999` in flo
 Every data source method wraps itself in `guardDatabase()`:
 
 ```dart
-// Example usage in a future data source:
+// Example usage in a data source:
 Future<List<Title>> findAll() => guardDatabase(
   () => _db.select(_db.titles).get().then(toDomain),
   source: 'TitleLocalDataSource.findAll',
 );
 
-Future<void> save(BooksCompanion data) => guardDatabase(
-  () => _db.into(_db.books).insert(data),
+Future<void> save(TitlesCompanion data) => guardDatabase(
+  () => _db.into(_db.titles).insert(data),
   source: 'TitleLocalDataSource.save',
 );
 ```
@@ -425,7 +435,8 @@ The `_classify()` function maps raw SQLite errors to friendly `AppException` typ
 | `SQLITE_BUSY` / `SQLITE_LOCKED` | `DatabaseUnavailableException` | "DB in use by another process" |
 | `SQLITE_CORRUPT` | `DatabaseUnavailableException` | "Database file is damaged" |
 | `InvalidDataException` (Drift) | `InvalidInputException` | "Row rejected before hitting SQLite" |
-| Everything else | `UnknownException` | "Something went wrong" |
+| Unrecognized driver code | `DatabaseFailureException` | "Something went wrong with the database" |
+| Non-database failure | `UnknownException` | "Something went wrong" |
 
 **Why does this matter?**
 Cubits (your BLoC layer) only ever need to catch `AppException`. They never need to know about SQLite error codes or isolate boundaries. Clean separation of concerns.
@@ -476,13 +487,13 @@ Future<void> _runApp() async {
     return;
   }
 
-  runApp(const App()); // 🎉 All good, start the real app
+  runApp(const App()); // All good, start the real app
 }
 ```
 
 ---
 
-## 🔗 How Dependency Injection Connects It All
+## How dependency injection connects it all
 
 ```dart
 // injection.dart
@@ -516,76 +527,30 @@ final db = getIt<AppDatabase>();
 
 // Option 2: constructor injection (preferred, testable)
 @injectable
-class BookDataSource {
-  BookDataSource(this._db); // Injectable automatically passes AppDatabase
+class LocalTitleDataSource implements TitleLocalDataSource {
+  LocalTitleDataSource(this._db); // Injectable automatically passes AppDatabase
   final AppDatabase _db;
 
-  Future<List<BookData>> findAll() => guardDatabase(
-    () => _db.select(_db.books).get(),
-    source: 'BookDataSource.findAll',
+  Future<List<TitleData>> findAll() => guardDatabase(
+    () => _db.select(_db.titles).get(),
+    source: 'LocalTitleDataSource.findAll',
   );
 }
 ```
 
 ---
 
-## 🚀 How to Add Your First Table (The Future Flow)
+## How to add a table
 
-When you add a feature like "Books":
-
-**Step 1** — Define the table class:
-```dart
-// lib/features/catalog/data/local/books_table.dart
-class Books extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get title => text().withLength(max: 500)();
-  TextColumn get isbn => text().withLength(min: 10, max: 13).unique()();
-  IntColumn get finePerDay => integer().map(const MoneyConverter())();
-  DateTimeColumn get addedAt => dateTime().withDefault(currentDateAndTime)();
-}
-```
-
-**Step 2** — Register it in `AppDatabase`:
-```dart
-@DriftDatabase(tables: [Books])  // ← add your table here
-class AppDatabase extends _$AppDatabase { ... }
-```
-
-**Step 3** — Bump the schema version and regenerate:
-```bash
-make migrate
-# or:
-dart run build_runner build --delete-conflicting-outputs
-```
-
-This updates `app_database.g.dart`, adds `BookData`, `BooksCompanion`, and query helpers. It also bumps `schemaVersion` to 2 and records a migration step.
-
-**Step 4** — Query it in a data source:
-```dart
-// Select all books
-Future<List<BookData>> findAll() => guardDatabase(
-  () => _db.select(_db.books).get(),
-  source: 'BookDataSource.findAll',
-);
-
-// Insert a book
-Future<void> save(BooksCompanion data) => guardDatabase(
-  () => _db.into(_db.books).insert(data),
-  source: 'BookDataSource.save',
-);
-
-// Filter books by title
-Future<List<BookData>> search(String query) => guardDatabase(
-  () => (_db.select(_db.books)
-    ..where((b) => b.title.contains(query)))
-    .get(),
-  source: 'BookDataSource.search',
-);
-```
+Tables live with the sub-feature that owns them — for example
+`features/catalog/title/data/tables/titles.dart` — and are registered in
+`@DriftDatabase(tables: [...])` in `app_database.dart`. The full workflow
+(defining the table, bumping `schemaVersion`, `make migrate`, filling in the
+step, `make build`, `make db-diagram`) is in [guide.md](guide.md).
 
 ---
 
-## 📐 Full Architecture Diagram
+## Architecture diagram
 
 ```
 AppConfig (flavor, databaseName)
@@ -605,7 +570,7 @@ openDatabaseConnection()          ← lib/core/database/connection.dart
     ▼
 AppDatabase (@lazySingleton)      ← lib/core/database/app_database.dart
     │
-    ├── schemaVersion = 1
+    ├── schemaVersion = 13
     ├── onCreate  → m.createAll()
     ├── onUpgrade → stepByStep migrations (refuse downgrades)
     ├── beforeOpen → PRAGMA foreign_keys = ON
@@ -619,17 +584,19 @@ guardDatabase()                   ← lib/core/error/guard.dart
     │
     ▼
 Feature Data Sources
-    └── use db.select(db.books) / db.managers.books / db.into(db.books)
+    └── use db.select(db.titles) / db.managers.titles / db.into(db.titles)
 ```
 
 ---
 
-## 🗺️ Current Schema
+## Current schema
 
 The visual schema lives in [`schema.md`](schema.md) — a Mermaid ER diagram
 generated from the latest drift snapshot. Regenerate it with
 `make db-diagram` after `make migrate` / `make build`.
 
-It currently covers `library_settings` (single-row) and `staff` at
-`schemaVersion` 2. The next tables will likely be things like `Books`,
-`Members`, `Loans`, `Fines` as catalog sub-features land.
+It currently covers twelve tables plus two FTS5 search indexes at
+`schemaVersion` 13: `library_settings`, `loan_rules`, `staff`,
+`staff_recovery_codes`, `title_formats`, `titles`, `copies`, `member_types`,
+`members`, `loans`, `fines` and `reservations`, with `titles_fts` and
+`members_fts` kept in step by triggers.

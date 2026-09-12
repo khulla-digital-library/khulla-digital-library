@@ -50,7 +50,7 @@ Use **`go_router`** as the sole navigation layer. All route configuration lives 
 ```
 
 Creating and editing a record has **no route**: those forms open as modals
-through `AppFormModal.show` (see `DESIGN.md` §6), which is why there is no
+through `AppFormModal.show` — a centred panel on a window, a full-screen page on a phone — which is why there is no
 `/titles/new` or `/members/:id/edit` here.
 
 All eight main sections are `StatefulShellBranch` entries under one `StatefulShellRoute`. `AppShell` is the shell widget; it receives the `StatefulNavigationShell` and renders the adaptive layout around it.

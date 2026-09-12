@@ -99,28 +99,23 @@ class TitleDetailHeader extends StatelessWidget {
           ),
         ],
       ),
+      // RecordHeader already wraps its actions in a Wrap, so these are
+      // plain list items rather than a nested Wrap of their own.
       actions: [
-        Wrap(
-          spacing: spacing.xs,
-          runSpacing: spacing.xs,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            if (onDelete != null)
-              AppButton(
-                variant: AppButtonVariant.destructive,
-                size: AppButtonSize.medium,
-                icon: AppIcons.delete,
-                onPressed: onDelete,
-                child: Text(l10n.titleDetailDelete),
-              ),
-            if (onEdit != null)
-              AppButton(
-                size: AppButtonSize.medium,
-                onPressed: onEdit,
-                child: Text(l10n.titleDetailEdit(title.title)),
-              ),
-          ],
-        ),
+        if (onDelete != null)
+          AppButton(
+            variant: AppButtonVariant.destructive,
+            size: AppButtonSize.medium,
+            icon: AppIcons.delete,
+            onPressed: onDelete,
+            child: Text(l10n.titleDetailDelete),
+          ),
+        if (onEdit != null)
+          AppButton(
+            size: AppButtonSize.medium,
+            onPressed: onEdit,
+            child: Text(l10n.titleDetailEdit(title.title)),
+          ),
       ],
     );
   }

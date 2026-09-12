@@ -5,7 +5,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:khulla/app/shell/help/help_dialog.dart';
+import 'package:khulla/app/shell/help/about_dialog.dart';
+import 'package:khulla/app/shell/help/guide_dialog.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
@@ -41,12 +42,17 @@ class ShellAccountChip extends StatelessWidget {
 
     if (staff == null) return const SizedBox.shrink();
 
+    // The cursor sits on the trigger itself, inside the button:
+    // PopupMenuButton wraps its child in an InkWell whose default cursor
+    // (adaptiveClickable) resolves to the basic arrow on desktop, and the
+    // innermost MouseRegion wins — an outer one would never take effect.
     return PopupMenuButton<int>(
       tooltip: l10n.shellAccountMenu,
       position: PopupMenuPosition.over,
       constraints: const BoxConstraints(minWidth: 220),
       itemBuilder: (context) => [
         PopupMenuItem<int>(
+          mouseCursor: SystemMouseCursors.click,
           onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) {
             if (context.mounted) {
               unawaited(StaffProfileDialog.show(context));
@@ -58,25 +64,40 @@ class ShellAccountChip extends StatelessWidget {
           ),
         ),
         PopupMenuItem<int>(
+          mouseCursor: SystemMouseCursors.click,
           onTap: () => context.go(Routes.settingsAppearance),
           child: _MenuRow(
             icon: AppIcons.settings,
-            label: l10n.navSettings,
+            label: l10n.navSettingsAppearance,
           ),
         ),
         PopupMenuItem<int>(
+          mouseCursor: SystemMouseCursors.click,
           onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) {
             if (context.mounted) {
-              unawaited(HelpDialog.show(context));
+              unawaited(HelpGuideDialog.show(context));
             }
           }),
           child: _MenuRow(
-            icon: AppIcons.help,
-            label: l10n.shellHelp,
+            icon: AppIcons.openBook,
+            label: l10n.shellGuide,
+          ),
+        ),
+        PopupMenuItem<int>(
+          mouseCursor: SystemMouseCursors.click,
+          onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              unawaited(HelpAboutDialog.show(context));
+            }
+          }),
+          child: _MenuRow(
+            icon: AppIcons.info,
+            label: l10n.shellAbout,
           ),
         ),
         const PopupMenuDivider(),
         PopupMenuItem<int>(
+          mouseCursor: SystemMouseCursors.click,
           // No confirmation: signing out costs nothing to undo, and the
           // catalogue is untouched — the next screen is sign-in.
           onTap: () => unawaited(context.read<AuthCubit>().signOut()),
@@ -87,52 +108,67 @@ class ShellAccountChip extends StatelessWidget {
           ),
         ),
       ],
-      child: SizedBox(
-        width: double.infinity,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: compact ? spacing.xxs : spacing.sm,
-            vertical: spacing.xxs,
-          ),
-          child: compact
-              ? Center(child: AppAvatar(initials: staff.initials, size: 34))
-              : Row(
-                  children: [
-                    AppAvatar(initials: staff.initials, size: 34),
-                    SizedBox(width: spacing.xs),
-                    Flexible(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            staff.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: colors.textHigh,
-                              fontWeight: FontWeight.w600,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: SizedBox(
+          width: double.infinity,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? spacing.xxs : spacing.sm,
+              vertical: spacing.xxs,
+            ),
+            child: compact
+                ? Center(child: AppAvatar(initials: staff.initials, size: 34))
+                : Row(
+                    children: [
+                      AppAvatar(initials: staff.initials, size: 34),
+                      SizedBox(width: spacing.xs),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              staff.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.textTheme.bodySmall?.copyWith(
+                                color: colors.textHigh,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                          Text(
-                            staff.role.label(l10n),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: colors.textMuted,
+                            Text(
+                              staff.role.label(l10n),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.textTheme.bodySmall?.copyWith(
+                                color: colors.textMuted,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(width: spacing.xxs),
-                    AppIcon(
-                      AppIcons.chevronDown,
-                      size: 18,
-                      color: colors.textMuted,
-                    ),
-                  ],
-                ),
+                      SizedBox(width: spacing.xs),
+                      Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: colors.hairline.withValues(alpha: 0.35),
+                          borderRadius: BorderRadius.circular(
+                            context.appRadius.pill,
+                          ),
+                        ),
+                        child: Center(
+                          child: AppIcon(
+                            AppIcons.chevronDown,
+                            size: 14,
+                            color: colors.ink400,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );

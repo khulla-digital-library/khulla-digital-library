@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:khulla/app/shell/widgets/shell_account_chip.dart';
-import 'package:khulla/app/shell/widgets/shell_version_label.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// The app-wide chrome, parked at the foot of the rail.
@@ -26,24 +25,9 @@ class ShellRailFooter extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: colors.hairline)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(height: spacing.xs),
-          ShellAccountChip(compact: !extended),
-          // Version only shown in the extended rail — collapsed rail has no
-          // room for text, and the brand tooltip already carries the name.
-          if (extended) SizedBox(height: spacing.xxs),
-          Divider(height: 1, thickness: 1, color: colors.hairline),
-          SizedBox(height: spacing.xs),
-          Padding(
-            padding: EdgeInsets.fromLTRB(spacing.sm, 0, spacing.sm, 0),
-            child: const ShellVersionLabel(
-              textAlign: TextAlign.start,
-            ),
-          ),
-        ],
+      child: Padding(
+        padding: EdgeInsets.only(top: spacing.xs),
+        child: ShellAccountChip(compact: !extended),
       ),
     );
   }

@@ -86,15 +86,13 @@ class _LabelBulkQueueDialogState extends State<LabelBulkQueueDialog>
         maxLines: 10,
         onChanged: (_) {},
       ),
-      actions: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+      actions: AppDialogActions(
         children: [
           AppDialog.secondaryAction(
             context: context,
             label: l10n.commonCancel,
             onPressed: () => Navigator.of(context).pop(),
           ),
-          SizedBox(width: context.appSpacing.sm),
           AppDialog.primaryAction(
             context: context,
             label: l10n.labelsBulkQueueAction,

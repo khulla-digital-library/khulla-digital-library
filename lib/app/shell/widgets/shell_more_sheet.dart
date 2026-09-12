@@ -3,10 +3,15 @@
 
 import 'dart:async';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:khulla/app/shell/help/help_dialog.dart';
+import 'package:khulla/app/shell/help/about_dialog.dart';
+import 'package:khulla/app/shell/help/guide_dialog.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
 import 'package:khulla/app/shell/widgets/shell_version_label.dart';
+import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
+import 'package:khulla/features/users/presentation/user_labels.dart';
+import 'package:khulla/features/users/presentation/widgets/staff_profile_dialog.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
@@ -40,11 +45,28 @@ class _MoreList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
+    final l10n = context.l10n;
+    final staff = context.watch<AuthCubit>().state.staff;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
+        // The rail carries the account chip in its footer; a phone has no
+        // rail, so who is signed in and how to sign out have to live here
+        // instead — otherwise a compact window can never reach either.
+        if (staff != null) ...[
+          _MoreRow(
+            label: staff.name,
+            caption: staff.role.label(l10n),
+            icon: AppIcons.person,
+            selected: false,
+            onTap: () => unawaited(StaffProfileDialog.show(context)),
+          ),
+          SizedBox(height: spacing.xxs),
+          Divider(height: 1, color: context.appColors.hairline),
+          SizedBox(height: spacing.xxs),
+        ],
         for (final destination in destinations) ...[
           _MoreRow(
             label: destination.label,
@@ -78,16 +100,32 @@ class _MoreList extends StatelessWidget {
           SizedBox(height: spacing.xxs),
         ],
         // Phones never see the rail footer, and the account menu that carries
-        // help on a window lives in it — so the manual hangs here instead,
-        // below the sections and above the version line.
+        // help on a window lives in it — so the manual and the about panel
+        // hang here instead, below the sections and above the version line.
         _MoreRow(
-          label: context.l10n.shellHelp,
-          icon: AppIcons.help,
+          label: l10n.shellGuide,
+          icon: AppIcons.openBook,
           selected: false,
-          onTap: () => unawaited(HelpDialog.show(context)),
+          onTap: () => unawaited(HelpGuideDialog.show(context)),
         ),
+        _MoreRow(
+          label: l10n.shellAbout,
+          icon: AppIcons.info,
+          selected: false,
+          onTap: () => unawaited(HelpAboutDialog.show(context)),
+        ),
+        if (staff != null) ...[
+          SizedBox(height: spacing.xxs),
+          _MoreRow(
+            label: l10n.shellSignOut,
+            icon: AppIcons.signOut,
+            selected: false,
+            destructive: true,
+            onTap: () => unawaited(context.read<AuthCubit>().signOut()),
+          ),
+        ],
         SizedBox(height: spacing.xxs),
-        const ShellVersionLabel(showDivider: true),
+        const ShellVersionLabel(),
       ],
     );
   }
@@ -99,11 +137,17 @@ class _MoreRow extends StatelessWidget {
     required this.icon,
     required this.selected,
     required this.onTap,
+    this.caption,
+    this.destructive = false,
   });
 
   final String label;
+
+  /// A second line under [label] — the role under a name, say.
+  final String? caption;
   final AppIconSpec icon;
   final bool selected;
+  final bool destructive;
 
   /// Run after the sheet closes — the sheet is always dismissed first, so a
   /// row never leaves the panel sitting over what it just opened.
@@ -115,6 +159,12 @@ class _MoreRow extends StatelessWidget {
     final colors = context.appColors;
     final scheme = context.colorScheme;
     final radius = BorderRadius.circular(context.appRadius.control);
+    final captionText = caption;
+    final foreground = destructive
+        ? scheme.error
+        : selected
+        ? scheme.primary
+        : colors.textHigh;
 
     return Material(
       color: selected ? colors.brandSoft : Colors.transparent,
@@ -135,16 +185,39 @@ class _MoreRow extends StatelessWidget {
               AppIcon(
                 icon,
                 size: spacing.md + 2,
-                color: selected ? scheme.primary : colors.textMuted,
+                color: destructive
+                    ? scheme.error
+                    : selected
+                    ? scheme.primary
+                    : colors.textMuted,
               ),
               SizedBox(width: spacing.sm),
               Expanded(
-                child: Text(
-                  label,
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: selected ? scheme.primary : colors.textHigh,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: foreground,
+                        fontWeight: selected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
+                      ),
+                    ),
+                    if (captionText != null)
+                      Text(
+                        captionText,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: colors.textMuted,
+                        ),
+                      ),
+                  ],
                 ),
               ),
             ],
