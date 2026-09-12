@@ -16,14 +16,10 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// between a manual and a manual you can follow: the reader never has to
 /// translate "Settings, then Loan rules" into a hunt through the rail.
 class GuideStepList extends StatelessWidget {
-  const GuideStepList(this.steps, {this.dense = false, super.key});
+  const GuideStepList(this.steps, {super.key});
 
   /// The steps, in the order they are done.
   final GuideSteps steps;
-
-  /// Tightens the rail for a summary on the guide's landing page, where the
-  /// walkthrough is a preview rather than the thing being read.
-  final bool dense;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +28,7 @@ class GuideStepList extends StatelessWidget {
     final colors = context.appColors;
     final l10n = context.l10n;
     final entries = steps.steps;
-    final discSize = dense ? 24.0 : 28.0;
+    const discSize = 28.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -79,28 +75,36 @@ class GuideStepList extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          step.title,
-                          style: type.sectionTitle.copyWith(
-                            color: colors.textHigh,
-                          ),
+                        // The screen link rides beside the title rather than
+                        // on a row of its own: a walkthrough of eight steps
+                        // would otherwise pay eight rows of chrome for eight
+                        // links.
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                step.title,
+                                style: type.sectionTitle.copyWith(
+                                  color: colors.textHigh,
+                                ),
+                              ),
+                            ),
+                            if (step.route case final route?) ...[
+                              SizedBox(width: spacing.xs),
+                              AppLinkButton(
+                                onPressed: () => context.go(route),
+                                color: context.colorScheme.primary,
+                                child: Text(l10n.guideOpenScreen),
+                              ),
+                            ],
+                          ],
                         ),
                         SizedBox(height: spacing.xxs),
                         Text(
                           step.body,
                           style: type.body.copyWith(color: colors.textMuted),
                         ),
-                        if (step.route case final route?) ...[
-                          SizedBox(height: spacing.xs),
-                          Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: AppLinkButton(
-                              onPressed: () => context.go(route),
-                              color: context.colorScheme.primary,
-                              child: Text(l10n.guideOpenScreen),
-                            ),
-                          ),
-                        ],
                       ],
                     ),
                   ),

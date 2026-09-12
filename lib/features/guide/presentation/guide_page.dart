@@ -9,7 +9,6 @@ import 'package:khulla/features/guide/domain/guide_topic.dart';
 import 'package:khulla/features/guide/presentation/guide_content.dart';
 import 'package:khulla/features/guide/presentation/widgets/guide_hero.dart';
 import 'package:khulla/features/guide/presentation/widgets/guide_search_results.dart';
-import 'package:khulla/features/guide/presentation/widgets/guide_step_list.dart';
 import 'package:khulla/features/guide/presentation/widgets/guide_topic_card.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -65,12 +64,6 @@ class _GuidePageState extends State<GuidePage> with DisposeBag {
     final colors = context.appColors;
     final articles = guideArticles(l10n);
     final searching = _query.trim().isNotEmpty;
-    final compact = context.formFactor.isCompact;
-
-    final walkthroughAction = AppTextButton(
-      onPressed: () => _openArticle(GuideTopic.gettingStarted),
-      child: Text(l10n.guideStartHereAction),
-    );
 
     return AppPageBody(
       wide: true,
@@ -87,6 +80,7 @@ class _GuidePageState extends State<GuidePage> with DisposeBag {
             GuideHero(
               controller: _search,
               onQueryChanged: (value) => setState(() => _query = value),
+              onStartWalkthrough: () => _openArticle(GuideTopic.gettingStarted),
             ),
             SizedBox(height: spacing.lg),
             if (searching)
@@ -98,34 +92,6 @@ class _GuidePageState extends State<GuidePage> with DisposeBag {
                 ),
               )
             else ...[
-              AppCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AppSectionHeader(
-                      icon: AppIcons.discover,
-                      title: l10n.guideStartHereTitle,
-                      subtitle: l10n.guideStartHereBody,
-                      dense: true,
-                      // A phone has no room beside a two-line heading for a
-                      // five-word button, so the action moves under the
-                      // steps rather than being shortened into a label that
-                      // says less than the walkthrough it opens.
-                      trailing: compact ? null : walkthroughAction,
-                    ),
-                    SizedBox(height: spacing.md),
-                    GuideStepList(guideQuickStart(l10n), dense: true),
-                    if (compact) ...[
-                      SizedBox(height: spacing.sm),
-                      Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: walkthroughAction,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              SizedBox(height: spacing.lg),
               Text(
                 l10n.guideBrowseTitle,
                 style: type.title.copyWith(color: colors.textHigh),
@@ -140,10 +106,7 @@ class _GuidePageState extends State<GuidePage> with DisposeBag {
                 expandedColumns: 2,
                 largeColumns: 3,
                 children: [
-                  // Getting started is the card above, opened in full there.
-                  // Listing it again here would put the same article on the
-                  // page twice under two different promises.
-                  for (final article in articles.skip(1))
+                  for (final article in articles)
                     GuideTopicCard(
                       article: article,
                       onTap: () => _openArticle(article.topic),

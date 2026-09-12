@@ -47,8 +47,21 @@ class _GuideArticlePageState extends State<GuideArticlePage> {
   void didUpdateWidget(GuideArticlePage oldWidget) {
     super.didUpdateWidget(oldWidget);
     // The branch keeps this page alive, so arriving from a second search
-    // result is a widget update rather than a fresh mount.
-    if (widget.topic != oldWidget.topic || widget.anchor != oldWidget.anchor) {
+    // result — or the pager's previous/next — is a widget update rather
+    // than a fresh mount. The scroll offset would otherwise stay where the
+    // last article left it, greeting the reader with its footer.
+    if (widget.topic != oldWidget.topic) {
+      _anchors.clear();
+      _active = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (widget.anchor != null) {
+          _jumpToAnchor();
+        } else {
+          _scrollToTop();
+        }
+      });
+    } else if (widget.anchor != oldWidget.anchor) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _jumpToAnchor());
     }
   }
@@ -69,6 +82,13 @@ class _GuideArticlePageState extends State<GuideArticlePage> {
       duration: context.appMotion.layout,
       alignment: 0.05,
     );
+  }
+
+  /// A new article opens at its top — it is never a continuation of the
+  /// scroll the reader just left.
+  void _scrollToTop() {
+    if (!_scroll.hasClients) return;
+    _scroll.jumpTo(0);
   }
 
   /// The heading nearest the top of the viewport, for the contents panel.
@@ -130,7 +150,7 @@ class _GuideArticlePageState extends State<GuideArticlePage> {
           spacing.page,
           spacing.xlg,
         ),
-        child: AppContentConstraint(
+        child: AppContentConstraint.wide(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -159,7 +179,9 @@ class _GuideArticlePageState extends State<GuideArticlePage> {
       ),
     );
 
-    if (context.formFactor != FormFactor.large) return AppPageBody(child: body);
+    if (context.formFactor != FormFactor.large) {
+      return AppPageBody(wide: true, child: body);
+    }
 
     return AppPageBody(
       wide: true,
@@ -205,6 +227,7 @@ class _ArticleHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               width: 40,
@@ -236,6 +259,18 @@ class _ArticleHeader extends StatelessWidget {
                 ],
               ),
             ),
+            // Beside the title rather than on a row of its own: the header
+            // already spans an icon, a title and a summary, and a lone
+            // button row underneath is pure height.
+            if (article.route case final route?) ...[
+              SizedBox(width: spacing.sm),
+              AppButton(
+                variant: AppButtonVariant.outline,
+                icon: AppIcons.openExternal,
+                onPressed: () => context.go(route),
+                child: Text(l10n.guideOpenScreen),
+              ),
+            ],
           ],
         ),
         SizedBox(height: spacing.sm),
@@ -243,18 +278,6 @@ class _ArticleHeader extends StatelessWidget {
           article.summary,
           style: type.bodyLarge.copyWith(color: colors.textMuted),
         ),
-        if (article.route case final route?) ...[
-          SizedBox(height: spacing.md),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: AppButton(
-              variant: AppButtonVariant.outline,
-              icon: AppIcons.openExternal,
-              onPressed: () => context.go(route),
-              child: Text(l10n.guideOpenScreen),
-            ),
-          ),
-        ],
       ],
     );
   }
