@@ -279,12 +279,13 @@ class AppDialog extends StatelessWidget {
   }
 }
 
-/// A dialog's button row: right-aligned on a wide window, and on a narrow one
-/// a single row of equal-width buttons that fills the footer.
+/// A dialog's button row: the actions huddle at the trailing edge at every
+/// width — dismiss first, confirm last and flush right.
 ///
-/// A phone footer stays a *row*: two short labels fit side by side at 360px,
-/// and stacking them costs a whole extra band of height on the screen that
-/// has the least of it.
+/// A phone footer stays a *row*: stacking two buttons costs a whole extra
+/// band of height on the screen that has the least of it. The one exception
+/// is a lone action on a narrow slot, which fills the footer on its own
+/// rather than floating a small button in a wide empty row.
 ///
 /// Pass the children in reading order — dismiss first, confirm last.
 class AppDialogActions extends StatelessWidget {
@@ -300,21 +301,19 @@ class AppDialogActions extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // The footer is measured by its slot, not the window: a 576px panel
-        // on a wide screen still wants the compact equal-width row, and a
-        // full-screen phone page must keep it even if the reporting context
-        // above disagrees about the breakpoint.
+        // on a wide screen still wants the compact row, and a full-screen
+        // phone page must keep it even if the reporting context above
+        // disagrees about the breakpoint.
         final narrow =
             context.formFactor.isCompact || constraints.maxWidth < 480;
-        if (narrow) {
+        // A lone action on a narrow slot fills the footer; every other row
+        // clusters its buttons at the trailing edge.
+        if (narrow && children.length == 1) {
           return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              for (final (index, child) in children.indexed) ...[
-                if (index > 0) SizedBox(width: spacing.xs),
-                Expanded(
-                  child: SizedBox(width: double.infinity, child: child),
-                ),
-              ],
+              Expanded(
+                child: SizedBox(width: double.infinity, child: children.single),
+              ),
             ],
           );
         }

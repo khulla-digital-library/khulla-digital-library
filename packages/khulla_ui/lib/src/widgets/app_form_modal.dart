@@ -93,10 +93,10 @@ class AppFormModal extends StatelessWidget {
 
     final footer = Padding(
       padding: EdgeInsets.fromLTRB(
-        spacing.lg,
-        spacing.sm,
-        spacing.lg,
-        spacing.lg,
+        spacing.page,
+        spacing.xs,
+        spacing.page,
+        spacing.md,
       ),
       child: AppDialogActions(children: actions),
     );
@@ -132,7 +132,7 @@ class AppFormModal extends StatelessWidget {
                     spacing.page,
                     spacing.md,
                     spacing.page,
-                    spacing.lg,
+                    spacing.md,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -153,7 +153,6 @@ class AppFormModal extends StatelessWidget {
               ),
               SafeArea(
                 top: false,
-                minimum: EdgeInsets.only(bottom: spacing.sm),
                 child: footer,
               ),
             ],

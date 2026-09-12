@@ -157,7 +157,16 @@ class AppBottomSheet extends StatelessWidget {
                         ),
                       ],
                       SizedBox(height: spacing.md),
-                      if (expandBody) Expanded(child: child) else child,
+                      // A fixed-height sheet cannot size to its content, so the
+                      // body scrolls: a plain Column of rows here is the
+                      // 116px-overflow the category sheet hit. Callers that
+                      // already scroll (the *More* list) size themselves to
+                      // their content inside this, so the outer view does the
+                      // scrolling and nothing nests badly.
+                      if (expandBody)
+                        Expanded(child: SingleChildScrollView(child: child))
+                      else
+                        child,
                       if (actionRow != null) ...[
                         SizedBox(height: spacing.md),
                         actionRow,

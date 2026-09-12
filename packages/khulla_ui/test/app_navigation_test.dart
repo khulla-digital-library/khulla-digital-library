@@ -178,7 +178,7 @@ void main() {
     testWidgets('keeps both buttons on one row on a phone', (tester) async {
       // Stacked full-width buttons cost a band of height on the screen with
       // the least of it, and read as two unrelated controls rather than as a
-      // choice. Both buttons share the footer row at every width.
+      // choice. Both buttons share one row, clustered at the trailing edge.
       tester.view.physicalSize = const Size(360, 640);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -198,11 +198,12 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
+      final row = tester.getRect(find.byType(AppDialogActions));
       final cancel = tester.getRect(find.byType(AppButton).first);
       final save = tester.getRect(find.byType(AppButton).last);
       expect(cancel.top, save.top);
       expect(cancel.right, lessThanOrEqualTo(save.left));
-      expect(cancel.width, closeTo(save.width, 1));
+      expect(save.right, closeTo(row.right, 1));
     });
   });
 }
