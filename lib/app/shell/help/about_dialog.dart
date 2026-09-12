@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:khulla/app/shell/help/widgets/help_about_panel.dart';
-import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// What this product is, who made it, and where the source lives.
@@ -14,9 +13,11 @@ class HelpAboutDialog extends StatelessWidget {
   const HelpAboutDialog({super.key});
 
   /// Presents the about dialog.
+  ///
+  /// No heading: the panel opens on the product's own name, so a second
+  /// *About* above it only repeats what the menu entry just said.
   static Future<void> show(BuildContext context) => AppDialog.show<void>(
     context: context,
-    title: context.l10n.aboutDialogTitle,
     width: AppDialogWidth.xxl,
     content: const HelpAboutDialog(),
     // No footer button: about is read and dismissed, never confirmed, and a
