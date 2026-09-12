@@ -5,7 +5,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:khulla/app/shell/help/help_dialog.dart';
+import 'package:khulla/app/shell/help/about_dialog.dart';
+import 'package:khulla/app/shell/help/guide_dialog.dart';
 import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
@@ -74,12 +75,24 @@ class ShellAccountChip extends StatelessWidget {
           mouseCursor: SystemMouseCursors.click,
           onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) {
             if (context.mounted) {
-              unawaited(HelpDialog.show(context));
+              unawaited(HelpGuideDialog.show(context));
             }
           }),
           child: _MenuRow(
-            icon: AppIcons.help,
-            label: l10n.shellHelp,
+            icon: AppIcons.openBook,
+            label: l10n.shellGuide,
+          ),
+        ),
+        PopupMenuItem<int>(
+          mouseCursor: SystemMouseCursors.click,
+          onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              unawaited(HelpAboutDialog.show(context));
+            }
+          }),
+          child: _MenuRow(
+            icon: AppIcons.info,
+            label: l10n.shellAbout,
           ),
         ),
         const PopupMenuDivider(),

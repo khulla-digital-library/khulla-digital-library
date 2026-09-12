@@ -5,7 +5,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:khulla/app/shell/help/help_dialog.dart';
+import 'package:khulla/app/shell/help/about_dialog.dart';
+import 'package:khulla/app/shell/help/guide_dialog.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
 import 'package:khulla/app/shell/widgets/shell_version_label.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
@@ -99,13 +100,19 @@ class _MoreList extends StatelessWidget {
           SizedBox(height: spacing.xxs),
         ],
         // Phones never see the rail footer, and the account menu that carries
-        // help on a window lives in it — so the manual hangs here instead,
-        // below the sections and above the version line.
+        // help on a window lives in it — so the manual and the about panel
+        // hang here instead, below the sections and above the version line.
         _MoreRow(
-          label: l10n.shellHelp,
-          icon: AppIcons.help,
+          label: l10n.shellGuide,
+          icon: AppIcons.openBook,
           selected: false,
-          onTap: () => unawaited(HelpDialog.show(context)),
+          onTap: () => unawaited(HelpGuideDialog.show(context)),
+        ),
+        _MoreRow(
+          label: l10n.shellAbout,
+          icon: AppIcons.info,
+          selected: false,
+          onTap: () => unawaited(HelpAboutDialog.show(context)),
         ),
         if (staff != null) ...[
           SizedBox(height: spacing.xxs),

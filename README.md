@@ -85,8 +85,7 @@ khulla-digital-library/
 | Command | What it does |
 | --- | --- |
 | `make bootstrap` | Resolve dependencies across the workspace |
-| `make build` | Run code generation, including the app version |
-| `make version` | Regenerate `lib/gen/app_version.dart` from `pubspec.yaml` after a bump |
+| `make build` | Run code generation |
 | `make localize` | Regenerate localizations from `lib/l10n/arb/` |
 | `make check` | Format, copyright, analyze and test — run this before a PR |
 | `make ci` | The same gates CI runs, failing on unformatted code instead of rewriting it |

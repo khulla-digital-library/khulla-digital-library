@@ -89,6 +89,7 @@ dependencies:
   # Cropping the uploaded library logo. Pure Flutter, no native platform
   # views, so it runs the same on Windows and web as it does on mobile.
   crop_your_image: ^2.0.0
+  package_info_plus: ^10.2.1
 
 dev_dependencies:
   # Code generation
