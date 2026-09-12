@@ -78,9 +78,16 @@ class AppTopBar extends StatelessWidget {
       ],
     );
 
+    // A phone's bar is a single band: title on the left, actions on the
+    // right. It gets the tighter vertical inset because the bottom bar
+    // already names the section — this row exists for what the section can
+    // *do*, and every pixel it takes is a record the list cannot show.
+    final compact = context.formFactor.isCompact;
+
     final bar = LayoutBuilder(
       builder: (context, constraints) {
-        final stacked = constraints.maxWidth < 640 && actions.length > 1;
+        final stacked =
+            !compact && constraints.maxWidth < 640 && actions.length > 1;
 
         final actionRow = Row(
           mainAxisSize: MainAxisSize.min,
@@ -95,7 +102,7 @@ class AppTopBar extends StatelessWidget {
         return Padding(
           padding: EdgeInsets.symmetric(
             horizontal: spacing.page,
-            vertical: spacing.sm,
+            vertical: compact ? spacing.xs : spacing.sm,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -108,7 +115,7 @@ class AppTopBar extends StatelessWidget {
                   ],
                   Expanded(child: titleBlock),
                   if (actions.isNotEmpty && !stacked) ...[
-                    SizedBox(width: spacing.md),
+                    SizedBox(width: compact ? spacing.xs : spacing.md),
                     actionRow,
                   ],
                 ],

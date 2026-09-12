@@ -6,9 +6,9 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:khulla/app/shell/help/about_dialog.dart';
-import 'package:khulla/app/shell/help/guide_dialog.dart';
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
 import 'package:khulla/app/shell/widgets/shell_version_label.dart';
+import 'package:khulla/core/router/routes.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
 import 'package:khulla/features/users/presentation/user_labels.dart';
 import 'package:khulla/features/users/presentation/widgets/staff_profile_dialog.dart';
@@ -29,7 +29,9 @@ Future<void> showShellMoreSheet(
 }) => AppBottomSheet.show<void>(
   context: context,
   title: context.l10n.shellMoreTitle,
-  heightFactor: AppBottomSheet.defaultHeightFactor,
+  // The whole navigation tree, not a short picker: it earns more of the
+  // screen than the default sheet does.
+  heightFactor: 0.85,
   builder: (sheetContext) => _MoreList(
     destinations: destinations,
     current: current,
@@ -48,85 +50,93 @@ class _MoreList extends StatelessWidget {
     final l10n = context.l10n;
     final staff = context.watch<AuthCubit>().state.staff;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // The rail carries the account chip in its footer; a phone has no
-        // rail, so who is signed in and how to sign out have to live here
-        // instead — otherwise a compact window can never reach either.
-        if (staff != null) ...[
-          _MoreRow(
-            label: staff.name,
-            caption: staff.role.label(l10n),
-            icon: AppIcons.person,
-            selected: false,
-            onTap: () => unawaited(StaffProfileDialog.show(context)),
-          ),
-          SizedBox(height: spacing.xxs),
-          Divider(height: 1, color: context.appColors.hairline),
-          SizedBox(height: spacing.xxs),
-        ],
-        for (final destination in destinations) ...[
-          _MoreRow(
-            label: destination.label,
-            icon: destination.icon,
-            selected: isSelectedShellRoute(
-              current,
-              destination.route,
-              [
-                for (final d in destinations) ...[
-                  d.route,
-                  for (final child in d.children) child.route,
+    // Eight sections, each with its sub-routes, plus the account row, help
+    // and sign-out: the list is taller than the sheet on every phone, and a
+    // `Column` in a fixed-height sheet can only overflow. The row count is
+    // small and bounded, so a `SingleChildScrollView` is the right shape
+    // here — see the lists-and-scrolling rule in CLAUDE.md.
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // The rail carries the account chip in its footer; a phone has no
+          // rail, so who is signed in and how to sign out have to live here
+          // instead — otherwise a compact window can never reach either.
+          if (staff != null) ...[
+            _MoreRow(
+              label: staff.name,
+              caption: staff.role.label(l10n),
+              icon: AppIcons.person,
+              selected: false,
+              onTap: () => unawaited(StaffProfileDialog.show(context)),
+            ),
+            SizedBox(height: spacing.xxs),
+            Divider(height: 1, color: context.appColors.hairline),
+            SizedBox(height: spacing.xxs),
+          ],
+          for (final destination in destinations) ...[
+            _MoreRow(
+              label: destination.label,
+              icon: destination.icon,
+              selected: isSelectedShellRoute(
+                current,
+                destination.route,
+                [
+                  for (final d in destinations) ...[
+                    d.route,
+                    for (final child in d.children) child.route,
+                  ],
                 ],
-              ],
-            ),
-            onTap: () => context.go(destination.route),
-          ),
-          for (final child in destination.children)
-            Padding(
-              padding: EdgeInsets.only(left: spacing.xlg),
-              child: _MoreRow(
-                label: child.label,
-                icon: AppIcons.subEntry,
-                selected: isSelectedShellRoute(
-                  current,
-                  child.route,
-                  [for (final c in destination.children) c.route],
-                ),
-                onTap: () => context.go(child.route),
               ),
+              onTap: () => context.go(destination.route),
             ),
-          SizedBox(height: spacing.xxs),
-        ],
-        // Phones never see the rail footer, and the account menu that carries
-        // help on a window lives in it — so the manual and the about panel
-        // hang here instead, below the sections and above the version line.
-        _MoreRow(
-          label: l10n.shellGuide,
-          icon: AppIcons.openBook,
-          selected: false,
-          onTap: () => unawaited(HelpGuideDialog.show(context)),
-        ),
-        _MoreRow(
-          label: l10n.shellAbout,
-          icon: AppIcons.info,
-          selected: false,
-          onTap: () => unawaited(HelpAboutDialog.show(context)),
-        ),
-        if (staff != null) ...[
+            for (final child in destination.children)
+              Padding(
+                padding: EdgeInsets.only(left: spacing.xlg),
+                child: _MoreRow(
+                  label: child.label,
+                  icon: AppIcons.subEntry,
+                  selected: isSelectedShellRoute(
+                    current,
+                    child.route,
+                    [for (final c in destination.children) c.route],
+                  ),
+                  onTap: () => context.go(child.route),
+                ),
+              ),
+            SizedBox(height: spacing.xxs),
+          ],
+          // Phones never see the rail footer, and the account menu that carries
+          // the guide and the about panel on a window lives in it — so both
+          // hang here instead, below the sections and above the version line.
+          _MoreRow(
+            label: l10n.shellGuide,
+            icon: AppIcons.openBook,
+            selected: Routes.isUnder(current, Routes.guide),
+            onTap: () => context.go(Routes.guide),
+          ),
           SizedBox(height: spacing.xxs),
           _MoreRow(
-            label: l10n.shellSignOut,
-            icon: AppIcons.signOut,
+            label: l10n.shellAbout,
+            icon: AppIcons.info,
             selected: false,
-            destructive: true,
-            onTap: () => unawaited(context.read<AuthCubit>().signOut()),
+            onTap: () => unawaited(HelpAboutDialog.show(context)),
           ),
+          if (staff != null) ...[
+            SizedBox(height: spacing.xxs),
+            _MoreRow(
+              label: l10n.shellSignOut,
+              icon: AppIcons.signOut,
+              selected: false,
+              destructive: true,
+              onTap: () => unawaited(context.read<AuthCubit>().signOut()),
+            ),
+          ],
+          SizedBox(height: spacing.xxs),
+          const ShellVersionLabel(),
         ],
-        SizedBox(height: spacing.xxs),
-        const ShellVersionLabel(),
-      ],
+      ),
     );
   }
 }

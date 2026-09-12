@@ -279,8 +279,14 @@ class AppDialog extends StatelessWidget {
   }
 }
 
-/// A dialog's button row: right-aligned on a wide window, reversed column on
-/// a narrow one so the confirming action lands under the thumb.
+/// A dialog's button row: right-aligned on a wide window, and on a narrow one
+/// a single row of equal-width buttons that fills the footer.
+///
+/// A phone footer stays a *row*. Stacking two buttons costs a whole extra
+/// band of height on the screen that has the least of it, and a full-width
+/// button above another full-width button reads as two unrelated controls
+/// rather than as a choice. Two or three short labels fit side by side at
+/// 360px; past that the labels, not the layout, are the thing to fix.
 ///
 /// Pass the children in reading order — dismiss first, confirm last.
 class AppDialogActions extends StatelessWidget {
@@ -292,16 +298,13 @@ class AppDialogActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final narrow = context.formFactor.isCompact;
 
-    if (narrow) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    if (context.formFactor.isCompact) {
+      return Row(
         children: [
-          for (final child in children.reversed) ...[
-            child,
-            if (child != children.first) SizedBox(height: spacing.xs),
+          for (final (index, child) in children.indexed) ...[
+            if (index > 0) SizedBox(width: spacing.xs),
+            Expanded(child: child),
           ],
         ],
       );
@@ -310,8 +313,8 @@ class AppDialogActions extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        for (final child in children) ...[
-          if (child != children.first) SizedBox(width: spacing.xs),
+        for (final (index, child) in children.indexed) ...[
+          if (index > 0) SizedBox(width: spacing.xs),
           child,
         ],
       ],

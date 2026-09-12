@@ -93,29 +93,25 @@ class AppShell extends StatelessWidget {
       onNavigate: (route) => _goRoute(context, route),
     );
 
+    final actions = shellPageActions(context, location, l10n);
+    final compact = !formFactor.usesNavigationRail;
+
     final topBar = AppTopBar(
       title: page.title,
-      breadcrumbs: page.crumbs.isEmpty
+      // A phone drops the trail. It is one row of chrome saying what the
+      // bottom bar's highlighted tab already says, and the title below it
+      // repeats its last crumb verbatim.
+      breadcrumbs: page.crumbs.isEmpty || compact
           ? null
           : AppBreadcrumbs(crumbs: page.crumbs),
-      actions: shellPageActions(context, location, l10n),
-      wrapSafeArea: !formFactor.usesNavigationRail,
-      leading: formFactor.usesNavigationRail
-          ? null
-          : AppIconButton(
-              icon: AppIcons.gridView,
-              tooltip: l10n.shellMoreTitle,
-              onPressed: () => unawaited(
-                showShellMoreSheet(
-                  context,
-                  destinations: visibleDestinations,
-                  current: location,
-                ),
-              ),
-            ),
+      actions: actions,
+      wrapSafeArea: compact,
+      // No `leading`. A phone used to get a menu button here, but the bottom
+      // bar's *More* slot opens the same sheet, and two ways to reach it is
+      // one too many on the width that can least afford the control.
     );
 
-    if (!formFactor.usesNavigationRail) {
+    if (compact) {
       // A primary destination can be hidden like any other — a role that
       // cannot open the catalogue does not get a catalogue tab — so the bar's
       // slots are numbered over what this role actually sees. `compactSlots`
@@ -125,14 +121,39 @@ class AppShell extends StatelessWidget {
         for (final i in visibleIndices)
           if (destinations[i].primary) i,
       ].take(_compactSlots).toList();
-      final compact = [for (final i in compactSlots) destinations[i]];
+      final compactDestinations = [
+        for (final i in compactSlots) destinations[i],
+      ];
       final slot = compactSlots.indexOf(navigationShell.currentIndex);
+
+      // A section that is already named by the highlighted tab, with nothing
+      // to offer beyond its name, gets no bar at all — the band of chrome was
+      // pure repetition, and the dashboard starts a phone screen higher
+      // without it. A section reached through *More* keeps its bar whatever
+      // else is on it: the bottom bar says *More*, not where you are.
+      final showTopBar =
+          actions.isNotEmpty || page.crumbs.isNotEmpty || slot < 0;
 
       return Scaffold(
         body: Column(
           children: [
-            topBar,
-            Expanded(child: navigationShell),
+            if (showTopBar)
+              topBar
+            else
+              // The bar consumed the status-bar inset for the page. Without
+              // it the page has to, and the inset is handed to whatever the
+              // page draws first rather than being paid twice.
+              SizedBox(height: MediaQuery.paddingOf(context).top),
+            // The page's own `AppPageBody` would otherwise re-inset for a
+            // status bar that the bar above has already cleared — the gap
+            // between the header and the content.
+            Expanded(
+              child: MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                child: navigationShell,
+              ),
+            ),
           ],
         ),
         bottomNavigationBar: AppNavBar(
@@ -153,7 +174,7 @@ class AppShell extends StatelessWidget {
             );
           },
           destinations: [
-            for (final destination in compact)
+            for (final destination in compactDestinations)
               AppNavDestination(
                 icon: AppIcon(destination.icon),
                 label: destination.label,

@@ -44,7 +44,6 @@ class CollectionPageView<T> extends StatefulWidget {
     this.sort,
     this.onSort,
     this.compactBuilder,
-    this.compactExtent = 116,
     this.footer,
     this.onPageSizeChanged,
     super.key,
@@ -87,9 +86,6 @@ class CollectionPageView<T> extends StatefulWidget {
 
   /// Renders one record as a card, for windows too narrow for a table.
   final Widget Function(BuildContext context, T item)? compactBuilder;
-
-  /// The fixed height of a compact card row.
-  final double compactExtent;
 
   /// The pagination footer.
   final Widget? footer;
@@ -157,7 +153,6 @@ class _CollectionPageViewState<T> extends State<CollectionPageView<T>> {
       sort: widget.sort,
       onSort: widget.onSort,
       compactBuilder: widget.compactBuilder,
-      compactExtent: widget.compactExtent,
     );
   }
 
@@ -301,6 +296,21 @@ class _FilterBand extends StatelessWidget {
 
     if (bar == null) {
       return Align(alignment: AlignmentDirectional.centerStart, child: label);
+    }
+
+    // On a phone the count goes under the filters rather than beside them.
+    // Parked on the trailing edge it takes a third of the row from a search
+    // field and a chip set that already have none to spare.
+    if (context.formFactor.isCompact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          bar,
+          SizedBox(height: spacing.xs),
+          label,
+        ],
+      );
     }
 
     return Row(

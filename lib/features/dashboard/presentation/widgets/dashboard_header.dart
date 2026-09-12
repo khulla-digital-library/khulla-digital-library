@@ -42,6 +42,10 @@ class DashboardHeader extends StatelessWidget {
 
     final periods = AppSegmentedControl<DashboardPeriod>(
       value: period,
+      // Stacked, the control owns the full width, and three segments sharing
+      // it equally is the only arrangement where the track does not end in
+      // dead grey space beside *This month*.
+      expand: stacked,
       items: DashboardPeriod.values,
       itemLabel: (item) => switch (item) {
         DashboardPeriod.today => l10n.commonToday,
@@ -54,6 +58,7 @@ class DashboardHeader extends StatelessWidget {
     final checkOut = AppButton(
       size: AppButtonSize.medium,
       icon: AppIcons.scan,
+      expand: stacked,
       onPressed: () => context.go(Routes.circulationCheckOut),
       child: Text(l10n.dashboardCheckOut),
     );
@@ -62,11 +67,16 @@ class DashboardHeader extends StatelessWidget {
       size: AppButtonSize.medium,
       variant: AppButtonVariant.outline,
       icon: AppIcons.checkIn,
+      expand: stacked,
       onPressed: () => context.go(Routes.circulationReturn),
       child: Text(l10n.dashboardReturnCopy),
     );
 
     if (stacked) {
+      // The two desk shortcuts share one row rather than taking a band each.
+      // They are a pair — the same copy goes out and comes back — and two
+      // full-width buttons stacked read as two unrelated decisions while
+      // costing the board a card's worth of height.
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -74,9 +84,13 @@ class DashboardHeader extends StatelessWidget {
           periods,
           if (canWorkTheDesk) ...[
             SizedBox(height: spacing.xs),
-            checkOut,
-            SizedBox(height: spacing.xs),
-            returnCopy,
+            Row(
+              children: [
+                Expanded(child: checkOut),
+                SizedBox(width: spacing.xs),
+                Expanded(child: returnCopy),
+              ],
+            ),
           ],
         ],
       );
