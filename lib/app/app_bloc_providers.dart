@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:khulla/core/di/injection.dart';
 import 'package:khulla/core/theme/cubit/theme_cubit.dart';
 import 'package:khulla/features/staff_auth/presentation/auth/cubit/auth_cubit.dart';
+import 'package:khulla/shared/presentation/cubit/library_branding_cubit.dart';
 import 'package:khulla/shared/presentation/cubit/reference_data_cubit.dart';
 
 /// Root [BlocProvider]s for the widget tree.
@@ -24,12 +25,15 @@ class AppBlocProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     final referenceData = getIt<ReferenceDataCubit>();
     unawaited(referenceData.loadReferenceData());
+    final branding = getIt<LibraryBrandingCubit>();
+    unawaited(branding.loadLogo());
 
     return MultiBlocProvider(
       providers: [
         BlocProvider<ThemeCubit>.value(value: getIt<ThemeCubit>()),
         BlocProvider<AuthCubit>.value(value: getIt<AuthCubit>()),
         BlocProvider<ReferenceDataCubit>.value(value: referenceData),
+        BlocProvider<LibraryBrandingCubit>.value(value: branding),
       ],
       child: child,
     );

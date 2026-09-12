@@ -24,6 +24,7 @@ extension LibrarySettingsRowX on LibrarySettingsRow {
     barcodePrefix: barcodePrefix,
     barcodeNextValue: barcodeNextValue,
     updatedAt: updatedAt,
+    logoRef: logoRef,
   );
 }
 
@@ -42,5 +43,6 @@ extension LibraryProfileX on LibraryProfile {
     barcodeNextValue: Value(barcodeNextValue),
     createdAt: Value(createdAt),
     updatedAt: Value(updatedAt),
+    logoRef: Value(logoRef),
   );
 }

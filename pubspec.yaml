@@ -86,6 +86,10 @@ dependencies:
   printing: ^5.15.0
   pdf: ^3.13.0
 
+  # Cropping the uploaded library logo. Pure Flutter, no native platform
+  # views, so it runs the same on Windows and web as it does on mobile.
+  crop_your_image: ^2.0.0
+
 dev_dependencies:
   # Code generation
   build_runner: ^2.16.0

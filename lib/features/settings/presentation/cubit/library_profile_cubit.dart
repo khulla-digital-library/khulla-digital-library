@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Khulla Digital Library contributors.
 // SPDX-License-Identifier: MIT
 
+import 'dart:typed_data';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/error/app_exception.dart';
@@ -19,22 +21,67 @@ class LibraryProfileCubit extends Cubit<LibraryProfileState> {
 
   final LibrarySettingsRepository _repository;
 
-  /// Loads the library profile row.
+  /// Loads the library profile row and its logo, if any.
   Future<void> loadProfile() async {
     emit(state.copyWith(status: LoadStatus.loading, error: null));
     try {
       final profile = await _repository.findProfile();
+      final logoBytes = await _repository.loadLogoBytes();
       if (isClosed) return;
       emit(
         state.copyWith(
           status: LoadStatus.loaded,
           profile: profile,
+          logoBytes: logoBytes,
           error: null,
         ),
       );
     } on AppException catch (error) {
       if (isClosed) return;
       emit(state.copyWith(status: LoadStatus.failure, error: error));
+    }
+  }
+
+  /// Uploads [bytes] as the library's mark. Emits and rethrows on failure so
+  /// the settings form can toast.
+  Future<void> uploadLogo(Uint8List bytes, String extension) async {
+    emit(state.copyWith(isSavingLogo: true, error: null));
+    try {
+      final saved = await _repository.saveLogo(bytes, extension: extension);
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          profile: saved,
+          logoBytes: bytes,
+          isSavingLogo: false,
+          error: null,
+        ),
+      );
+    } on AppException catch (error) {
+      if (isClosed) return;
+      emit(state.copyWith(isSavingLogo: false, error: error));
+      rethrow;
+    }
+  }
+
+  /// Clears the library's mark. Emits and rethrows on failure.
+  Future<void> removeLogo() async {
+    emit(state.copyWith(isSavingLogo: true, error: null));
+    try {
+      final saved = await _repository.removeLogo();
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          profile: saved,
+          logoBytes: null,
+          isSavingLogo: false,
+          error: null,
+        ),
+      );
+    } on AppException catch (error) {
+      if (isClosed) return;
+      emit(state.copyWith(isSavingLogo: false, error: error));
+      rethrow;
     }
   }
 

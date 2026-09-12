@@ -569,6 +569,12 @@
   },
   "settingsLibraryIdentity": "पहिचान",
   "settingsLibraryIdentityDescription": "यस स्थापना वा पुस्तकालयको नाम रसिद र सूचनाहरूमा कसरी देखिन्छ।",
+  "settingsLibraryLogoHint": "नेभिगेसन रेलमा खुल्ला चिन्हको सट्टा देखिन्छ।",
+  "settingsLibraryLogoUpload": "लोगो अपलोड गर्नुहोस्",
+  "settingsLibraryLogoRemove": "हटाउनुहोस्",
+  "settingsLibraryLogoCropTitle": "लोगो काट्नुहोस्",
+  "settingsLibraryLogoCropDescription": "नेभिगेसन रेलमा के देखिने छ भनी छान्न तान्नुहोस्।",
+  "settingsLibraryLogoCropHint": "जुम गर्न पिन्च वा स्क्रोल गर्नुहोस्, सार्न तान्नुहोस्।",
   "settingsLibraryContact": "सम्पर्क",
   "settingsLibraryContactDescription": "म्याद नाघेको सूचनामा छापिन्छ, ताकि सदस्यले कसलाई सम्पर्क गर्ने थाहा पाओस्।",
   "settingsLibraryLocale": "मुद्रा र स्थानीयकरण",
@@ -655,20 +661,6 @@
     "description": "नेभिगेसन - बारमा नअट्ने खण्डहरू खोल्ने छोटो तल्लो बार प्रविष्टि"
   },
   "shellMoreTitle": "सबै खण्डहरू",
-  "shellCopyright": "© {year} {name}",
-  "@shellCopyright": {
-    "description": "नेभिगेसन - रेल फुटर र More सिटमा देखाइने प्रतिलिपि अधिकार पङ्क्ति",
-    "placeholders": {
-      "year": {
-        "type": "String",
-        "example": "2026"
-      },
-      "name": {
-        "type": "String",
-        "example": "Khulla Digital Library"
-      }
-    }
-  },
   "shellAccountMenu": "खाता",
   "shellProfile": "तपाईंको प्रोफाइल",
   "shellSignOut": "साइन आउट गर्नुहोस्",

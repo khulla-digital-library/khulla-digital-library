@@ -70,7 +70,7 @@ class AppDatabase extends _$AppDatabase {
   static const String _source = 'AppDatabase';
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -360,6 +360,12 @@ class AppDatabase extends _$AppDatabase {
         );
         await m.alterTable(TableMigration(schema.reservations));
         await m.createIndex(schema.reservationsMember);
+      },
+      from12To13: (m, schema) async {
+        await m.addColumn(
+          schema.librarySettings,
+          schema.librarySettings.logoRef,
+        );
       },
     )(m, from, to);
   }
