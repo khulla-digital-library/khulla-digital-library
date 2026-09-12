@@ -105,12 +105,23 @@ class AppFormModal extends StatelessWidget {
       return Scaffold(
         backgroundColor: scheme.surface,
         appBar: AppBar(
-          leading: AppIconButton(
-            icon: AppIcons.close,
-            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-            onPressed: () => Navigator.of(context).maybePop(),
+          automaticallyImplyLeading: false,
+          centerTitle: false,
+          title: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: typography.title.copyWith(color: colors.ink200),
           ),
-          title: Text(title, style: typography.displaySmall),
+          titleSpacing: spacing.page,
+          actions: [
+            AppIconButton(
+              icon: AppIcons.close,
+              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+              onPressed: () => Navigator.of(context).maybePop(),
+            ),
+            SizedBox(width: spacing.xs),
+          ],
         ),
         body: SafeArea(
           child: Column(
@@ -140,7 +151,11 @@ class AppFormModal extends StatelessWidget {
                   ),
                 ),
               ),
-              footer,
+              SafeArea(
+                top: false,
+                minimum: EdgeInsets.only(bottom: spacing.sm),
+                child: footer,
+              ),
             ],
           ),
         ),

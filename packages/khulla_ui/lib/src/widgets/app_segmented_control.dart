@@ -60,6 +60,7 @@ class AppSegmentedControl<T> extends StatelessWidget {
     final radius = context.appRadius;
 
     return Container(
+      width: expand ? double.infinity : null,
       padding: EdgeInsets.all(spacing.xxs),
       decoration: BoxDecoration(
         color: colors.secondary,
@@ -127,6 +128,7 @@ class _Segment extends StatelessWidget {
       pressScale: 1,
       child: AnimatedContainer(
         duration: context.appMotion.color,
+        width: expand ? double.infinity : null,
         padding: EdgeInsets.symmetric(
           horizontal: spacing.sm,
           vertical: spacing.xxs + 2,
@@ -137,7 +139,7 @@ class _Segment extends StatelessWidget {
           boxShadow: selected ? context.appShadows.card : null,
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
           mainAxisAlignment: expand
               ? MainAxisAlignment.center
               : MainAxisAlignment.start,
@@ -150,9 +152,14 @@ class _Segment extends StatelessWidget {
               ),
               SizedBox(width: spacing.xs - 2),
             ],
-            Text(
-              label,
-              style: context.appTextStyles.label.copyWith(color: foreground),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: expand ? TextAlign.center : TextAlign.start,
+                style: context.appTextStyles.label.copyWith(color: foreground),
+              ),
             ),
           ],
         ),

@@ -102,30 +102,33 @@ class _NavBarItem extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(context.appRadius.container),
       pressScale: 1,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: spacing.xxs,
-          vertical: spacing.xxs,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconTheme.merge(
-              data: IconThemeData(
-                color: foreground,
-                size: context.appMetrics.icon,
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: spacing.xxs,
+            vertical: spacing.xxs,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconTheme.merge(
+                data: IconThemeData(
+                  color: foreground,
+                  size: context.appMetrics.icon,
+                ),
+                child: destination.icon,
               ),
-              child: destination.icon,
-            ),
-            SizedBox(height: spacing.xxs),
-            Text(
-              destination.label,
-              maxLines: 1,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: context.appTextStyles.micro.copyWith(color: foreground),
-            ),
-          ],
+              SizedBox(height: spacing.xxs),
+              Text(
+                destination.label,
+                maxLines: 1,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: context.appTextStyles.micro.copyWith(color: foreground),
+              ),
+            ],
+          ),
         ),
       ),
     );
