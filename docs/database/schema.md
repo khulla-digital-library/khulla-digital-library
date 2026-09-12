@@ -1,8 +1,8 @@
 # Database schema
 
-> DO NOT HAND-EDIT. Generated from `drift_schemas/app_database/drift_schema_v12.json` by `tools/db_diagram.dart`. Regenerate with `make db-diagram`.
+> DO NOT HAND-EDIT. Generated from `drift_schemas/app_database/drift_schema_v13.json` by `tools/db_diagram.dart`. Regenerate with `make db-diagram`.
 
-## ER diagram — schema v12
+## ER diagram — schema v13
 
 Renders on GitHub and in VS Code Markdown preview.
 
@@ -46,6 +46,7 @@ erDiagram
     TEXT opening_hours "nullable, max 200"
     TEXT barcode_prefix "required"
     INTEGER barcode_next_value "required"
+    TEXT logo_ref "nullable"
     DATETIME created_at "required"
     DATETIME updated_at "nullable"
   }

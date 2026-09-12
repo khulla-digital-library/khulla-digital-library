@@ -133,7 +133,7 @@ make test
 **What this costs**
 
 - `make build` is required on every fresh clone. This is documented everywhere but is still the most common contributor mistake.
-- The distinction between "generated, not committed" and "generated but committed" (drift schema files) is non-obvious. A contributor who adds `*.steps.dart` to `.gitignore` destroys the migration record. CLAUDE.md and this ADR name the distinction explicitly.
+- The distinction between "generated, not committed" and "generated but committed" (drift schema files) is non-obvious. A contributor who adds `*.steps.dart` to `.gitignore` destroys the migration record. This guide and ADR 0002 name the distinction explicitly.
 - `build_runner` is slow on a cold cache. On a large codebase, `make build` can take 30–60 seconds. `make clean` followed by `make build` is slower still. Modular drift generation (which writes `.drift.dart` libraries instead of part files) can help if build times become a bottleneck — not worth it yet.
 - `flutter gen-l10n` is separate from `build_runner`. Forgetting `make localize` after an ARB change leaves the localization class stale. It is a fast command (< 1 second) but a separate step contributors must learn.
 

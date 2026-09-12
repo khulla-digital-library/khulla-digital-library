@@ -10,7 +10,7 @@ Naming conventions also determine searchability. `grep TitleCubit.loadTitles` re
 
 ## Decision
 
-The following conventions apply across the entire repository. They are a single reference — the authoritative source is this document; CLAUDE.md summarizes the most commonly needed rules.
+The following conventions apply across the entire repository. They are a single reference — the authoritative source is this document.
 
 ---
 

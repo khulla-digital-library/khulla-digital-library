@@ -1,11 +1,11 @@
-# 📚 Database Guide — How to Work with the DB in Khulla
+# Database guide — how to work with the DB in Khulla
 
 Everything you need to add tables, query data, write data, do migrations, and remove things safely.  
-This is the **how-to** companion to [DATABASE.md](../DATABASE.md), which covers the *what* and *why*.
+This is the **how-to** companion to [overview.md](overview.md), which covers the *what* and *why*.
 
 ---
 
-## 🗂️ Quick Reference
+## Quick reference
 
 | Task | Command |
 |---|---|
@@ -17,7 +17,7 @@ This is the **how-to** companion to [DATABASE.md](../DATABASE.md), which covers 
 
 ---
 
-## 📐 Where Do Tables Live?
+## Where do tables live?
 
 > **Rule:** Tables live with the sub-feature that owns them. NOT in `core/`.
 
@@ -32,7 +32,7 @@ lib/
         └── title/
             └── data/
                 └── tables/
-                    └── titles.dart   ✅ table class goes HERE
+                    └── titles.dart   <-- table class goes here
 ```
 
 `core/` owns the **connection** (how to open the DB).  
@@ -40,7 +40,7 @@ Features own the **schema** (what tables exist).
 
 ---
 
-## ➕ How to Add a Table — Full Step-by-Step
+## How to add a table — full step-by-step
 
 Let's say you want to add a `Books` table. Here's the full flow:
 
@@ -196,12 +196,12 @@ Future<void> _upgradeSchema(Migrator m, int from, int to) async {
 > inside a step uses today's schema instead — migrations pass in dev and corrupt real upgrades.
 >
 > ```dart
-> // ❌ WRONG — uses live schema
+> // WRONG — uses live schema
 > from1To2: (m, schema) async {
 >   await m.createTable(titles);   // `titles` refers to `this.titles`
 > }
 >
-> // ✅ CORRECT — uses the snapshot
+> // CORRECT — uses the snapshot
 > from1To2: (m, schema) async {
 >   await m.createTable(schema.titles);   // `schema.titles` is the v2 snapshot
 > }
@@ -224,7 +224,7 @@ If the test is red → your migration step has a bug. Fix the step before mergin
 
 ---
 
-### ✅ Summary: Adding a Table
+### Summary: adding a table
 
 ```
 1. Create Table class          lib/features/<name>/data/tables/<name>.dart
@@ -239,7 +239,7 @@ If the test is red → your migration step has a bug. Fix the step before mergin
 
 ---
 
-## 🔍 How to Access / Query Data
+## How to access / query data
 
 After `make build`, Drift generates typed classes for your table.  
 For a `Titles` table, you get:
@@ -542,7 +542,7 @@ Future<List<Title>> findAll() => guardDatabase(
 
 ---
 
-## 🔄 How Migrations Work
+## How migrations work
 
 Migrations are how you evolve the database schema over time **without losing existing data**.
 
@@ -623,7 +623,7 @@ from2To3: (m, schema) async {
 
 ---
 
-## ➖ How to Remove a Table or Column
+## How to remove a table or column
 
 ### Removing a Column
 
@@ -659,7 +659,7 @@ from2To3: (m, schema) async {
 
 ---
 
-## 🔗 Joins — Querying Multiple Tables
+## Joins — querying multiple tables
 
 Drift supports joining tables with typed results:
 
@@ -687,7 +687,7 @@ Future<List<TitleWithAuthor>> findAllWithAuthor() => guardDatabase(
 
 ---
 
-## 🔢 Aggregates — COUNT, SUM, etc.
+## Aggregates — COUNT, SUM, etc.
 
 ```dart
 // Count all titles
@@ -715,7 +715,7 @@ Future<Money> totalFinesOwed() => guardDatabase(
 
 ---
 
-## 🧪 Testing with an In-Memory Database
+## Testing with an in-memory database
 
 For tests, use `AppDatabase.connect()` with an in-memory database.  
 It wipes itself after each test — no cleanup needed.
@@ -773,7 +773,7 @@ void main() {
 
 ---
 
-## ❌ Error Handling
+## Error handling
 
 All database errors are converted to `AppException` by `guardDatabase`. Cubits catch these:
 
@@ -816,7 +816,7 @@ Future<void> saveTitle(Title title) async {
 
 ---
 
-## 📋 Checklist — Definition of Done for DB Changes
+## Checklist — definition of done for DB changes
 
 Every schema change must complete all of these before it's considered done:
 

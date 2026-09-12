@@ -32,7 +32,7 @@ Never run `dart format .` or `dart analyze` from the repository root. `make form
 
 ## Conventions
 
-The architecture guide is [CLAUDE.md](../../CLAUDE.md) at the repository root. It is written for an AI coding assistant, but it is the accurate and complete description of how this codebase is organized — read it before your first change. The short version:
+The architecture guide is [`docs/architecture/`](../architecture/README.md). It is the accurate and complete description of how this codebase is organized — read it before your first change. The short version:
 
 - **One public class per file**, filename matching the class in `snake_case`.
 - **No hard-coded colors, spacing, or corner radii.** Read tokens from the theme. `packages/khulla_ui/lib/src/theme/app_palette.dart` is the only file allowed to contain a hex color.
