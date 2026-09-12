@@ -118,7 +118,7 @@ class _MoreList extends StatelessWidget {
           ),
         ],
         SizedBox(height: spacing.xxs),
-        const ShellVersionLabel(showDivider: true),
+        const ShellVersionLabel(),
       ],
     );
   }
