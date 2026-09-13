@@ -40,6 +40,7 @@ class TitleDetailHeader extends StatelessWidget {
     final spacing = context.appSpacing;
     final colors = context.appColors;
     final scheme = context.colorScheme;
+    final compact = context.formFactor.isCompact;
     final isAvailable = title.availableCount > 0;
     final muted = colors.mutedForeground;
     final metaStyle = context.appTextStyles.body.copyWith(color: muted);
@@ -108,13 +109,17 @@ class TitleDetailHeader extends StatelessWidget {
             size: AppButtonSize.medium,
             icon: AppIcons.delete,
             onPressed: onDelete,
-            child: Text(l10n.titleDetailDelete),
+            child: Text(
+              compact ? l10n.commonDelete : l10n.titleDetailDelete,
+            ),
           ),
         if (onEdit != null)
           AppButton(
             size: AppButtonSize.medium,
             onPressed: onEdit,
-            child: Text(l10n.titleDetailEdit(title.title)),
+            child: Text(
+              compact ? l10n.commonEdit : l10n.titleDetailEdit(title.title),
+            ),
           ),
       ],
     );
