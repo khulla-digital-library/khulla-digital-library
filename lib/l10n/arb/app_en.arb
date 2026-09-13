@@ -189,8 +189,18 @@
             }
         }
     },
+    "titleDetailAddCopy": "Add a copy",
     "titleDetailAddCopyDialogTitle": "Add copies",
     "titleDetailAddCopyCount": "Copies to add",
+    "titleDetailAddCopySuccess": "Added {count} copies",
+    "@titleDetailAddCopySuccess": {
+        "description": "Catalogue - toast after adding one or more copies from the detail screen",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
     "titleDetailDelete": "Delete title",
     "titleDetailDeleteTitle": "Delete this title?",
     "titleDetailDeleteBody": "The title and every copy under it are removed from the catalogue. Loan history is kept.",
