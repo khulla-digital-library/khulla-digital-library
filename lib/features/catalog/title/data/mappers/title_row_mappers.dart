@@ -41,7 +41,7 @@ extension TitleRowMapper on TitleRow {
 }
 
 extension TitleDomainMapper on Title {
-  TitlesCompanion toCompanion({required String searchText}) => TitlesCompanion(
+  TitlesCompanion toCompanion() => TitlesCompanion(
     id: Value(id),
     title: Value(title),
     author: Value(author),
@@ -56,7 +56,6 @@ extension TitleDomainMapper on Title {
     shelf: Value(shelf),
     lendable: Value(lendable),
     replacementCost: Value(replacementCost),
-    searchText: Value(searchText),
     createdAt: Value(createdAt),
     updatedAt: Value(updatedAt),
     archivedAt: Value(archivedAt),

@@ -7,12 +7,18 @@ import 'dart:typed_data';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:khulla/core/files/saved_text_file.dart';
+import 'package:khulla/core/files/share_mobile_file.dart';
 
 /// Writes rows as CSV to a location the operator picked.
 ///
+/// On Android/iOS there is no save dialog (`getSaveLocation` is not
+/// implemented there), so the rows go to a temp file opened in the system
+/// share sheet instead.
+///
 /// A field containing a comma, a quote or a newline is wrapped in quotes with
 /// its own quotes doubled — the one escaping rule CSV has. Returns null when
-/// the operator cancels the save dialog, the same as `saveTextFile`.
+/// the operator cancels the save dialog (or dismisses the sheet), the same
+/// as `saveTextFile`.
 Future<SavedTextFile?> saveCsvFile({
   required String filename,
   required List<String> header,
@@ -23,14 +29,21 @@ Future<SavedTextFile?> saveCsvFile({
     buffer.writeln(_csvRow(row));
   }
 
-  final file = XFile.fromData(
-    Uint8List.fromList(utf8.encode(buffer.toString())),
-    mimeType: 'text/csv',
-    name: filename,
-  );
+  final bytes = Uint8List.fromList(utf8.encode(buffer.toString()));
+  final file = XFile.fromData(bytes, mimeType: 'text/csv', name: filename);
   if (kIsWeb) {
     await file.saveTo(filename);
     return SavedTextFile(filename: filename);
+  }
+
+  if (isMobileShareTarget) {
+    final path = await shareMobileFile(
+      filename: filename,
+      bytes: bytes,
+      mimeType: 'text/csv',
+    );
+    if (path == null) return null;
+    return SavedTextFile(filename: filename, path: path);
   }
 
   final location = await getSaveLocation(suggestedName: filename);

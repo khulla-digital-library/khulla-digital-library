@@ -1,8 +1,8 @@
 # Database schema
 
-> DO NOT HAND-EDIT. Generated from `drift_schemas/app_database/drift_schema_v11.json` by `tools/db_diagram.dart`. Regenerate with `make db-diagram`.
+> DO NOT HAND-EDIT. Generated from `drift_schemas/app_database/drift_schema_v13.json` by `tools/db_diagram.dart`. Regenerate with `make db-diagram`.
 
-## ER diagram — schema v11
+## ER diagram — schema v13
 
 Renders on GitHub and in VS Code Markdown preview.
 
@@ -46,6 +46,7 @@ erDiagram
     TEXT opening_hours "nullable, max 200"
     TEXT barcode_prefix "required"
     INTEGER barcode_next_value "required"
+    TEXT logo_ref "nullable"
     DATETIME created_at "required"
     DATETIME updated_at "nullable"
   }
@@ -118,10 +119,17 @@ erDiagram
     DATETIME suspended_at "nullable"
     TEXT suspension_reason "nullable"
     BOOLEAN send_notices "required"
-    TEXT search_text "required"
     DATETIME created_at "required"
     DATETIME updated_at "required"
     DATETIME archived_at "nullable"
+  }
+  members_fts {
+    TEXT full_name "required"
+    TEXT card_number "required"
+    TEXT email "required"
+    TEXT phone "required"
+    TEXT address "required"
+    TEXT guardian "required"
   }
   reservations {
     TEXT id PK "required"
@@ -176,10 +184,16 @@ erDiagram
     TEXT shelf "nullable, max 60"
     BOOLEAN lendable "required"
     INTEGER replacement_cost "required, Money"
-    TEXT search_text "required"
     DATETIME created_at "required"
     DATETIME updated_at "required"
     DATETIME archived_at "nullable"
+  }
+  titles_fts {
+    TEXT title "required"
+    TEXT author "required"
+    TEXT isbn "required"
+    TEXT publisher "required"
+    TEXT shelf "required"
   }
 ```
 
@@ -226,9 +240,15 @@ erDiagram
 - Source: `lib/features/members/data/tables/members.dart`
 - No outgoing foreign keys.
 
+### `members_fts`
+
+- Source: `a Drift Table class registered in lib/core/database/app_database.dart`
+- No outgoing foreign keys.
+
 ### `reservations`
 
 - Source: `lib/features/circulation/reservation/data/tables/reservations.dart`
+- Enforces `CHECK ((closed_at IS NULL) = (status IN ('waiting', 'ready')))`.
 - No outgoing foreign keys.
 
 ### `staff`
@@ -251,5 +271,10 @@ erDiagram
 - Source: `lib/features/catalog/title/data/tables/titles.dart`
 - Enforces `CHECK (published_year IS NULL OR (published_year >= 1000 AND published_year <= 2200))`.
 - Enforces `CHECK (pages IS NULL OR pages > 0)`.
+- No outgoing foreign keys.
+
+### `titles_fts`
+
+- Source: `a Drift Table class registered in lib/core/database/app_database.dart`
 - No outgoing foreign keys.
 

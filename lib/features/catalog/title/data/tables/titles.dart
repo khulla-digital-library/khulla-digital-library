@@ -6,8 +6,10 @@ import 'package:khulla/core/database/converters/money_converter.dart';
 import 'package:khulla/features/catalog/title/data/tables/title_formats.dart';
 
 /// One work in the catalogue.
+///
+/// Searched through `titles_fts` (`titles_fts.drift`), which triggers on this
+/// table keep current — there is no search column to write by hand.
 @DataClassName('TitleRow')
-@TableIndex(name: 'titles_search', columns: {#searchText})
 @TableIndex(name: 'titles_format', columns: {#formatId})
 @TableIndex.sql(
   'CREATE INDEX titles_isbn ON titles (isbn) WHERE isbn IS NOT NULL',
@@ -44,9 +46,6 @@ class Titles extends Table {
 
   IntColumn get replacementCost =>
       integer().map(const MoneyConverter()).withDefault(const Constant(0))();
-
-  /// Lowercased concatenation of searchable fields — one LIKE predicate.
-  TextColumn get searchText => text()();
 
   DateTimeColumn get createdAt => dateTime()();
 

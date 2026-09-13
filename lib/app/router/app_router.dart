@@ -26,7 +26,9 @@ import 'package:khulla/features/staff_auth/presentation/sign_in/sign_in_page.dar
 /// Owns the single [GoRouter] instance.
 ///
 /// One [StatefulShellRoute] with one branch per shell destination, in the
-/// order `shellDestinations` declares them. The indexed-stack form keeps
+/// order `shellDestinations` declares them, plus the manual after them all —
+/// it opens from the account menu rather than the rail, so the rail never
+/// targets its index. The indexed-stack form keeps
 /// every branch alive — a section holds its scroll position and navigation
 /// stack while the user is away in another — and swaps between them with no
 /// transition, which is what a desk tool wants.
@@ -101,6 +103,7 @@ class AppRouter {
               auth: _auth,
               includeDesignGallery: !_config.isProduction,
             ),
+            guideBranch(),
           ],
         ),
       ],

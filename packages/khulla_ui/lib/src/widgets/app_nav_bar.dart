@@ -15,6 +15,11 @@ import 'package:khulla_ui/khulla_ui.dart';
 /// Selection is carried by color alone — brand glyph and brand label against
 /// the resting ink. At four destinations there is no room for an indicator
 /// that does not crowd the labels.
+///
+/// The bar is sized for the narrowest window in the product, not for the
+/// density the rest of the app runs at: five labels across 360px leaves each
+/// one about 64px, so the label takes the smallest rung in the scale and the
+/// glyph steps down with it. Anything larger reads as five words touching.
 /// {@endtemplate}
 class AppNavBar extends StatelessWidget {
   /// {@macro app_nav_bar}
@@ -44,9 +49,9 @@ class AppNavBar extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           spacing.sm,
-          spacing.xs,
+          spacing.xxs,
           spacing.sm,
-          spacing.xs,
+          spacing.xxs,
         ),
         child: DecoratedBox(
           decoration: BoxDecoration(
@@ -56,7 +61,7 @@ class AppNavBar extends StatelessWidget {
             boxShadow: context.appShadows.card,
           ),
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: spacing.sm),
+            padding: EdgeInsets.symmetric(vertical: spacing.xs),
             child: Row(
               children: [
                 for (final (index, destination) in destinations.indexed)
@@ -89,6 +94,7 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final spacing = context.appSpacing;
     final colors = context.appColors;
     final foreground = selected ? colors.brand : colors.ink400;
 
@@ -96,24 +102,34 @@ class _NavBarItem extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(context.appRadius.container),
       pressScale: 1,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconTheme.merge(
-            data: IconThemeData(
-              color: foreground,
-              size: context.appMetrics.iconLarge,
-            ),
-            child: destination.icon,
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: spacing.xxs,
+            vertical: spacing.xxs,
           ),
-          SizedBox(height: context.appSpacing.xxs),
-          Text(
-            destination.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: context.appTextStyles.label.copyWith(color: foreground),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconTheme.merge(
+                data: IconThemeData(
+                  color: foreground,
+                  size: context.appMetrics.icon,
+                ),
+                child: destination.icon,
+              ),
+              SizedBox(height: spacing.xxs),
+              Text(
+                destination.label,
+                maxLines: 1,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: context.appTextStyles.micro.copyWith(color: foreground),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

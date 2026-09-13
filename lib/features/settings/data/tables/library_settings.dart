@@ -47,6 +47,12 @@ class LibrarySettings extends Table {
   /// Next integer appended after [barcodePrefix] when a copy gets no barcode.
   IntColumn get barcodeNextValue => integer().withDefault(const Constant(1))();
 
+  /// Opaque reference to the uploaded library mark, resolved through
+  /// `lib/core/storage/logo_store.dart` — an absolute file path on native,
+  /// base64-encoded bytes on web (which has nowhere to keep a file). Never
+  /// interpreted directly outside that pair.
+  TextColumn get logoRef => text().nullable()();
+
   DateTimeColumn get createdAt => dateTime()();
 
   DateTimeColumn get updatedAt => dateTime().nullable()();

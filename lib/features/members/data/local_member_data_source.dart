@@ -4,6 +4,7 @@
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 import 'package:khulla/core/database/app_database.dart';
+import 'package:khulla/core/database/fts_filter.dart';
 import 'package:khulla/core/error/guard.dart';
 import 'package:khulla/core/money/money.dart';
 import 'package:khulla/features/circulation/shared/domain/circulation_fine.dart';
@@ -14,8 +15,9 @@ import 'package:khulla/features/members/domain/models/member_query.dart';
 
 /// Drift-backed [MemberLocalDataSource].
 ///
-/// List and detail queries join member types and subselect open loans and
-/// outstanding fines so each [Member] row is desk-ready without N+1 reads.
+/// List and detail queries join member types and count open loans and
+/// outstanding fines per row, so each [Member] is desk-ready without N+1
+/// reads.
 @LazySingleton(as: MemberLocalDataSource)
 class LocalMemberDataSource implements MemberLocalDataSource {
   LocalMemberDataSource(this._db);
@@ -24,35 +26,49 @@ class LocalMemberDataSource implements MemberLocalDataSource {
 
   static const String _source = 'LocalMemberDataSource';
 
+  /// The `members_fts` columns a search looks in.
+  static const List<String> _searchColumns = [
+    'full_name',
+    'card_number',
+    'email',
+    'phone',
+    'address',
+    'guardian',
+  ];
+
+  /// Circulation figures as per-row subqueries, each an index probe for the
+  /// member on that row (`loans_open_by_member`, `loans_member_history`,
+  /// `fines_outstanding`). A joined `GROUP BY` would aggregate every loan and
+  /// fine ever written before the page was cut.
+  ///
+  /// Binds one variable — today, as `YYYY-MM-DD` — for the overdue count, so
+  /// it must lead the variable list of any query selecting these columns.
   static const String _selectColumns = '''
 m.*,
 mt.name AS member_type_name,
 mt.code AS member_type_code,
-COALESCE(loans_agg.loans_out, 0) AS loans_out,
-COALESCE(loans_agg.overdue_loans, 0) AS overdue_loans,
-COALESCE(fines_agg.fines_owed, 0) AS fines_owed,
-COALESCE(loans_agg.borrowed_all_time, 0) AS borrowed_all_time
+(SELECT COUNT(*) FROM loans l
+ WHERE l.member_id = m.id AND l.returned_at IS NULL) AS loans_out,
+(SELECT COUNT(*) FROM loans l
+ WHERE l.member_id = m.id AND l.returned_at IS NULL
+   AND l.due_at < ?) AS overdue_loans,
+(SELECT COALESCE(SUM(f.assessed - f.paid - f.waived), 0) FROM fines f
+ WHERE f.member_id = m.id AND f.paid + f.waived < f.assessed) AS fines_owed,
+(SELECT COUNT(*) FROM loans l WHERE l.member_id = m.id) AS borrowed_all_time
 ''';
 
   static const String _fromClause = '''
 FROM members m
 JOIN member_types mt ON mt.id = m.member_type_id
-LEFT JOIN (
-  SELECT member_id,
-         COUNT(CASE WHEN returned_at IS NULL THEN 1 END) AS loans_out,
-         COUNT(CASE WHEN returned_at IS NULL AND due_at < ? THEN 1 END) AS overdue_loans,
-         COUNT(*) AS borrowed_all_time
-  FROM loans
-  GROUP BY member_id
-) loans_agg ON loans_agg.member_id = m.id
-LEFT JOIN (
-  SELECT member_id,
-         SUM(assessed - paid - waived) AS fines_owed
-  FROM fines
-  WHERE paid + waived < assessed
-  GROUP BY member_id
-) fines_agg ON fines_agg.member_id = m.id
 ''';
+
+  static const String _hasOpenLoan = '''
+EXISTS (SELECT 1 FROM loans l
+        WHERE l.member_id = m.id AND l.returned_at IS NULL)''';
+
+  static const String _owesFines = '''
+EXISTS (SELECT 1 FROM fines f
+        WHERE f.member_id = m.id AND f.paid + f.waived < f.assessed)''';
 
   @override
   Future<MemberListResult> findMembers(MemberQuery query) => guardDatabase(
@@ -62,18 +78,23 @@ LEFT JOIN (
       final expiringEndSql = _dateToSql(addCalendarDays(today, 30));
 
       final where = StringBuffer('m.archived_at IS NULL');
-      final variables = <Variable<Object>>[Variable<String>(todaySql)];
+      final variables = <Variable<Object>>[];
 
-      final needle = query.search.trim().toLowerCase();
-      if (needle.isNotEmpty) {
-        where.write(' AND m.search_text LIKE ?');
-        variables.add(Variable<String>('%$needle%'));
+      final search = ftsFilter(
+        search: query.search,
+        table: 'members_fts',
+        columns: _searchColumns,
+        rowid: 'm.rowid',
+      );
+      if (search != null) {
+        where.write(' AND ${search.sql}');
+        variables.addAll(search.variables);
       }
       if (query.withLoans) {
-        where.write(' AND COALESCE(loans_agg.loans_out, 0) > 0');
+        where.write(' AND $_hasOpenLoan');
       }
       if (query.owesFines) {
-        where.write(' AND COALESCE(fines_agg.fines_owed, 0) > 0');
+        where.write(' AND $_owesFines');
       }
       if (query.suspended) {
         where.write(' AND m.suspended_at IS NOT NULL');
@@ -92,7 +113,7 @@ LEFT JOIN (
       }
 
       final order = _orderClause(query);
-      final countSql = 'SELECT COUNT(*) AS total $_fromClause WHERE $where';
+      final countSql = 'SELECT COUNT(*) AS total FROM members m WHERE $where';
       final listSql =
           '''
 SELECT $_selectColumns
@@ -111,6 +132,7 @@ LIMIT ? OFFSET ?
           .customSelect(
             listSql,
             variables: [
+              Variable<String>(todaySql),
               ...variables,
               Variable<int>(query.limit),
               Variable<int>(query.offset),
@@ -222,29 +244,24 @@ WHERE m.id = ?
   );
 
   @override
-  Future<Member> insertMember(Member member, {required String searchText}) =>
-      guardDatabase(
-        () async {
-          await _db
-              .into(_db.members)
-              .insert(
-                member.toCompanion(searchText: searchText),
-              );
-          return (await findMemberById(member.id))!;
-        },
-        source: '$_source.insertMember',
-      );
+  Future<Member> insertMember(Member member) => guardDatabase(
+    () async {
+      await _db.into(_db.members).insert(member.toCompanion());
+      return (await findMemberById(member.id))!;
+    },
+    source: '$_source.insertMember',
+  );
 
   @override
-  Future<Member> updateMember(Member member, {required String searchText}) =>
-      guardDatabase(
-        () async {
-          await (_db.update(_db.members)..where((m) => m.id.equals(member.id)))
-              .write(member.toCompanion(searchText: searchText));
-          return (await findMemberById(member.id))!;
-        },
-        source: '$_source.updateMember',
-      );
+  Future<Member> updateMember(Member member) => guardDatabase(
+    () async {
+      await (_db.update(
+        _db.members,
+      )..where((m) => m.id.equals(member.id))).write(member.toCompanion());
+      return (await findMemberById(member.id))!;
+    },
+    source: '$_source.updateMember',
+  );
 
   @override
   Future<void> archiveMember(String id, DateTime archivedAt) => guardDatabase(

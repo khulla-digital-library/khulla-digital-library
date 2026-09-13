@@ -18,6 +18,10 @@ import 'package:khulla/features/members/data/tables/members.dart';
   'CREATE INDEX reservations_queue ON reservations (title_id, placed_at) '
   'WHERE closed_at IS NULL',
 )
+// A member's holds, and the lookup a member delete needs.
+@TableIndex.sql(
+  'CREATE INDEX reservations_member ON reservations (member_id, placed_at)',
+)
 class Reservations extends Table {
   TextColumn get id => text()();
 
@@ -47,4 +51,12 @@ class Reservations extends Table {
 
   @override
   Set<Column<Object>> get primaryKey => {id};
+
+  /// [closedAt] and [status] both say whether a hold is open — the partial
+  /// indexes read one, the queue logic the other — so the table refuses a
+  /// row where they disagree instead of trusting every writer to set both.
+  @override
+  List<String> get customConstraints => const [
+    "CHECK ((closed_at IS NULL) = (status IN ('waiting', 'ready')))",
+  ];
 }

@@ -3,6 +3,8 @@
 
 import 'package:khulla/app/shell/widgets/shell_destinations.dart';
 import 'package:khulla/core/router/routes.dart';
+import 'package:khulla/features/guide/domain/guide_topic.dart';
+import 'package:khulla/features/guide/presentation/guide_content.dart';
 import 'package:khulla/features/users/domain/user_role.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla_ui/khulla_ui.dart';
@@ -37,6 +39,31 @@ ShellPageTitle shellPageTitle(
   required void Function(String route) onNavigate,
 }) {
   final destinations = shellDestinations(l10n, role);
+
+  // The manual is no rail destination — it opens from the account menu —
+  // so neither its landing page nor its articles match the loop below.
+  // The articles are a topic enum rather than declared children, so they
+  // are resolved here instead.
+  if (Routes.isUnder(location, Routes.guide)) {
+    if (location == Routes.guide) {
+      return ShellPageTitle(title: l10n.navGuide);
+    }
+    final topic = guideTopicFromSlug(location.split('/').last);
+    if (topic != null) {
+      final article = guideArticleFor(l10n, topic);
+      return ShellPageTitle(
+        title: article.title,
+        crumbs: [
+          AppBreadcrumb(
+            label: l10n.navGuide,
+            onTap: () => onNavigate(Routes.guide),
+          ),
+          AppBreadcrumb(label: article.title),
+        ],
+      );
+    }
+    return ShellPageTitle(title: l10n.navGuide);
+  }
 
   for (final destination in destinations) {
     if (!Routes.isUnder(location, destination.route)) continue;

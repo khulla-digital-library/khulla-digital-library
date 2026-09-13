@@ -1,0 +1,38 @@
+-- Copyright (c) 2026 Khulla Digital Library contributors.
+-- SPDX-License-Identifier: MIT
+
+import 'members.dart';
+
+-- Search index over the register. Same shape and reasoning as
+-- `titles_fts.drift`: trigram for Nepali names and partial card numbers,
+-- rowid shared with `members`, triggers as the only writers.
+CREATE VIRTUAL TABLE members_fts USING fts5(
+  full_name,
+  card_number,
+  email,
+  phone,
+  address,
+  guardian,
+  tokenize = 'trigram remove_diacritics 1'
+);
+
+CREATE TRIGGER members_fts_insert AFTER INSERT ON members BEGIN
+  INSERT INTO members_fts (rowid, full_name, card_number, email, phone, address, guardian)
+  VALUES (new.rowid, new.full_name, new.card_number, new.email, new.phone, new.address, new.guardian);
+END;
+
+CREATE TRIGGER members_fts_update
+AFTER UPDATE OF full_name, card_number, email, phone, address, guardian ON members BEGIN
+  UPDATE members_fts
+  SET full_name = new.full_name,
+      card_number = new.card_number,
+      email = new.email,
+      phone = new.phone,
+      address = new.address,
+      guardian = new.guardian
+  WHERE rowid = old.rowid;
+END;
+
+CREATE TRIGGER members_fts_delete AFTER DELETE ON members BEGIN
+  DELETE FROM members_fts WHERE rowid = old.rowid;
+END;

@@ -4,9 +4,16 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:drift/drift.dart' show Table, TableInfo, VirtualTableInfo;
 import 'package:khulla/core/config/app_config.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/core/error/app_exception.dart';
+
+/// Every table a backup carries. Search indexes (`titles_fts`,
+/// `members_fts`) are left out: restoring the tables they index fires the
+/// triggers that rebuild them, so a dumped copy would only be written twice.
+Iterable<TableInfo<Table, Object?>> _backedUpTables(AppDatabase db) =>
+    db.allTables.where((table) => table is! VirtualTableInfo);
 
 /// Dumps every table to one JSON document — there is no file to copy on
 /// web, only the OPFS/IndexedDB store behind [db]'s own connection, so the
@@ -16,7 +23,7 @@ Future<Uint8List> exportBackupBytes(AppDatabase db, AppConfig config) async {
   // One consistent snapshot: without the transaction a concurrent write
   // between two tables' SELECTs could export a torn state.
   await db.transaction(() async {
-    for (final table in db.allTables) {
+    for (final table in _backedUpTables(db)) {
       final rows = await db
           .customSelect('SELECT * FROM ${table.actualTableName}')
           .get();
@@ -66,7 +73,7 @@ Future<void> importBackupBytes(
   // the schema before interpolating into SQL — otherwise a crafted file
   // injects arbitrary statements through table/column names.
   final expectedTables = {
-    for (final table in db.allTables) table.actualTableName,
+    for (final table in _backedUpTables(db)) table.actualTableName,
   };
   final backupKeys = <String>{};
   for (final key in tables.keys) {

@@ -146,7 +146,7 @@ It is also excluded from `analysis_options.yaml`'s `analyzer.exclude` list and f
 
 **What this costs**
 
-- `dart run melos bootstrap` is not `flutter pub get`. A contributor who runs `flutter pub get` and then tries to run the app will encounter `khulla_ui` dependency resolution errors if Melos has not been run. This is documented in the README and CLAUDE.md but is still the most common setup mistake.
+- `dart run melos bootstrap` is not `flutter pub get`. A contributor who runs `flutter pub get` and then tries to run the app will encounter `khulla_ui` dependency resolution errors if Melos has not been run. This is documented in the README and the contributing guide but is still the most common setup mistake.
 - `pubspec_overrides.yaml` files are written by Melos into each package directory. They are gitignored. After a `git clean -fd`, they are gone and `melos bootstrap` must be re-run. This surprises contributors who use aggressive git clean.
 - Melos is a dev dependency (`dart pub global activate melos`). CI must install it before running workspace commands. `dart run melos` (via `dev_dependencies: melos: …` in the root pubspec) sidesteps the global activation requirement and is the preferred invocation — it uses the pinned version in the lockfile rather than whatever the system has.
 

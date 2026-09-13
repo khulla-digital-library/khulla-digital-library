@@ -6,16 +6,16 @@ import 'package:khulla/features/catalog/title/domain/models/title_query.dart';
 
 /// Drift access to the `titles` table and its list aggregates.
 ///
-/// List reads join formats and copies so each [Title] carries copy counts;
-/// denormalized search text is written by the repository, not derived here.
+/// List reads join formats and count copies so each [Title] carries copy
+/// counts. Search reads `titles_fts`, which triggers keep current.
 abstract interface class TitleLocalDataSource {
   Future<TitleListResult> findTitles(TitleQuery query);
 
   Future<Title?> findTitleById(String id);
 
-  Future<Title> insertTitle(Title title, {required String searchText});
+  Future<Title> insertTitle(Title title);
 
-  Future<Title> updateTitle(Title title, {required String searchText});
+  Future<Title> updateTitle(Title title);
 
   Future<void> archiveTitle(String id, DateTime archivedAt);
 

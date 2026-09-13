@@ -16,9 +16,8 @@ docs/
 **New to the codebase?** Read in this order:
 
 1. [`../README.md`](../README.md) — what Khulla is, how to get it running
-2. [`../CLAUDE.md`](../CLAUDE.md) — the always-loaded rules for working in this repo (written for AI assistants, accurate for humans too)
-3. [`architecture/`](architecture/README.md) — the eleven decisions that shaped the stack, then the guides as you need them
-4. [`contributing/`](contributing/README.md) — branch conventions, commit format, PR flow
+2. [`architecture/`](architecture/README.md) — how the codebase is organized and the rules for working in it: the eleven decisions that shaped the stack, then the guides as you need them
+3. [`contributing/`](contributing/README.md) — branch conventions, commit format, PR flow
 
 **Looking for something specific?**
 

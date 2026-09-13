@@ -1,25 +1,17 @@
 // Copyright (c) 2026 Khulla Digital Library contributors.
 // SPDX-License-Identifier: MIT
 
-import 'package:khulla/gen/app_version.dart';
+import 'package:khulla/core/config/app_version.dart';
 
-/// Facts about the product itself — the version, who made it, where it lives.
+/// Facts about the product itself — who made it, where it lives.
 ///
-/// None of it is localized: a version string, a person's name and a URL read
-/// the same in every language, and translating any of them would break the
-/// thing it points at.
+/// None of it is localized: a person's name and a URL read the same in every
+/// language, and translating any of them would break the thing it points at.
 ///
-/// [version] comes from `version:` in `pubspec.yaml`, read at build time by
-/// `tools/version.dart` rather than at runtime — a runtime read would mean
-/// another dependency for one string. It is the same number CI names the
-/// release and its tag after, so what the about panel shows identifies the
-/// download it is running.
+/// The version lives next door in [AppVersion]: `version:` in `pubspec.yaml`,
+/// read back from the platform at runtime, so what the about panel shows
+/// identifies the download it is running.
 abstract final class AppInfo {
-  /// The released version, without the build number.
-  ///
-  /// Generated: bump `version:` in `pubspec.yaml` and run `make version`.
-  static const String version = kAppVersion;
-
   /// The person behind the project, shown in the about panel.
   static const String authorName = 'Sangam Adhikari';
 

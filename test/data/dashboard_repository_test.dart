@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:khulla/core/database/app_database.dart';
 import 'package:khulla/core/money/money.dart';
+import 'package:khulla/features/catalog/shared/domain/copy_condition.dart';
 import 'package:khulla/features/catalog/shared/domain/copy_status.dart';
 import 'package:khulla/features/circulation/fine/data/local_fine_data_source.dart';
 import 'package:khulla/features/circulation/loan/data/local_loan_data_source.dart';
@@ -11,6 +12,7 @@ import 'package:khulla/features/circulation/reservation/data/local_reservation_d
 import 'package:khulla/features/circulation/shared/data/circulation_repository_impl.dart';
 import 'package:khulla/features/circulation/shared/domain/fine_reason.dart';
 import 'package:khulla/features/dashboard/data/dashboard_repository_impl.dart';
+import 'package:khulla/features/dashboard/domain/models/dashboard_summary.dart';
 
 import '../helpers/catalog_fixtures.dart';
 import '../helpers/test_database.dart';
@@ -72,6 +74,49 @@ void main() {
         previousEnd: earlierStart,
       );
       expect(summaryBefore.borrowedCount, 0);
+    },
+  );
+
+  test(
+    'loadSummary lists the newest eight events across checkouts and returns',
+    () async {
+      final reference = await seedReferenceData(db);
+      final member = await seedMember(db, memberTypeId: reference.memberTypeId);
+      for (var i = 0; i < 5; i++) {
+        final seeded = await seedTitleWithCopy(
+          db,
+          formatId: reference.formatId,
+          title: 'Title $i',
+          barcode: 'TEST-00$i',
+        );
+        await circulation.checkOutCopy(
+          memberId: member.memberId,
+          barcode: seeded.barcode,
+        );
+        await circulation.returnCopy(
+          barcode: seeded.barcode,
+          condition: CopyCondition.values.first,
+        );
+      }
+
+      final now = DateTime.now();
+      final summary = await dashboard.loadSummary(
+        start: now.subtract(const Duration(hours: 1)),
+        end: now.add(const Duration(hours: 1)),
+        previousStart: now.subtract(const Duration(days: 2)),
+        previousEnd: now.subtract(const Duration(days: 1)),
+      );
+
+      final activity = summary.recentActivity;
+      expect(activity, hasLength(8));
+      for (var i = 1; i < activity.length; i++) {
+        expect(activity[i].when.isAfter(activity[i - 1].when), isFalse);
+      }
+      expect(
+        activity.map((event) => event.kind).toSet(),
+        {DashboardActivityKind.borrow, DashboardActivityKind.returned},
+      );
+      expect(activity.last.item, isNot('Title 0'));
     },
   );
 

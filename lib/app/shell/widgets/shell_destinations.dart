@@ -105,6 +105,10 @@ bool isSelectedShellRoute(
 /// a role cannot open still appears here with its
 /// [ShellDestination.permission] set, and it is `AppShell`'s job to skip it
 /// without breaking that index.
+///
+/// The manual is the one branch with no entry here: it opens from the
+/// account menu (and the phone's *More* sheet) rather than the rail, so it
+/// needs no rail index — only a branch, so it renders inside the shell.
 List<ShellDestination> shellDestinations(
   AppLocalizations l10n,
   UserRole role,

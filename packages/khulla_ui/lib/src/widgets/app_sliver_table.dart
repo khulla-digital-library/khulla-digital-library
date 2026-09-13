@@ -31,7 +31,6 @@ class AppSliverTable<T> extends StatelessWidget {
     this.sort,
     this.onSort,
     this.compactBuilder,
-    this.compactExtent = 108,
     this.headerHeight,
     this.pinHeader = true,
     super.key,
@@ -59,10 +58,6 @@ class AppSliverTable<T> extends StatelessWidget {
   /// is dropped there too — a card list has no columns to label.
   final Widget Function(BuildContext context, T item)? compactBuilder;
 
-  /// Fixed height of a compact card, so the list keeps its `itemExtent` and
-  /// the scrollbar stays honest. Cards must not exceed it.
-  final double compactExtent;
-
   /// Height of the heading row. Null resolves to the density's.
   final double? headerHeight;
 
@@ -77,23 +72,28 @@ class AppSliverTable<T> extends StatelessWidget {
     final rowHeight = metrics.tableRowHeight;
     final resolvedHeaderHeight = headerHeight ?? metrics.tableHeaderHeight;
 
-    final list = SliverFixedExtentList.builder(
-      itemExtent: asCards ? compactExtent : rowHeight,
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        if (asCards) return compact(context, item);
-        return AppTableRow<T>(
-          item: item,
-          index: index,
-          columns: columns,
-          selected: isSelected?.call(item) ?? false,
-          onTap: onRowTap == null ? null : () => onRowTap!(item),
-        );
-      },
-    );
+    // Cards size to their own content. They carry a title, an author and a
+    // badge row whose height depends on the record and on the reader's text
+    // scale, so a fixed `itemExtent` is a guaranteed overflow on the one
+    // record whose author wraps. `SliverList` is just as lazy.
+    if (asCards) {
+      return SliverList.builder(
+        itemCount: items.length,
+        itemBuilder: (context, index) => compact(context, items[index]),
+      );
+    }
 
-    if (asCards) return list;
+    final list = SliverFixedExtentList.builder(
+      itemExtent: rowHeight,
+      itemCount: items.length,
+      itemBuilder: (context, index) => AppTableRow<T>(
+        item: items[index],
+        index: index,
+        columns: columns,
+        selected: isSelected?.call(items[index]) ?? false,
+        onTap: onRowTap == null ? null : () => onRowTap!(items[index]),
+      ),
+    );
 
     return SliverMainAxisGroup(
       slivers: [

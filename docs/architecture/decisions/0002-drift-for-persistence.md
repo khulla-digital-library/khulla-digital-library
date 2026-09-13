@@ -88,7 +88,7 @@ What is left behind the pair is much smaller than what sqflite needed — two th
 - **where the file lives.** Native needs a path, and drift defaults to the *documents* directory; the catalogue is app-managed state and belongs in application support. Web has no path, only a store keyed by name.
 - **write-ahead logging.** Native only, passed through `DriftNativeOptions.setup` as a top-level function (it crosses an isolate boundary, so it may not capture). The WebAssembly virtual file system does not implement WAL.
 
-The `if (kIsWeb)` ban in CLAUDE.md is unchanged: this pair is where a platform difference goes, and there is no second one.
+The `if (kIsWeb)` ban is unchanged: this pair is where a platform difference goes, and there is no second one.
 
 ### Files added
 
@@ -109,7 +109,7 @@ Table classes live with the sub-feature that owns them (`features/catalog/title/
 
 The schema JSONs and the generated migration tests **are committed**, unlike `.g.dart`. They are the record of what every shipped version's schema looked like; without them `make-migrations` cannot tell what changed, and the append-only guarantee has nothing to check against. No `.gitignore` change was needed — neither is a `*.g.dart`.
 
-Neither directory exists yet: there are no tables, so there is no schema to record. **The first table lands at v1**, not v2, and `make migrate` records `drift_schema_v1.json` then. Anyone who ran a build before that point should delete their dev catalogue, whose `user_version` is already 1 with nothing in it.
+Neither directory exists yet at the time of writing: there are no tables, so there is no schema to record. **The first table lands at v1**, not v2, and `make migrate` records `drift_schema_v1.json` then. Anyone who ran a build before that point should delete their dev catalogue, whose `user_version` is already 1 with nothing in it.
 
 ### Connection
 
@@ -207,7 +207,7 @@ class Fines extends Table {
 }
 ```
 
-The generated `Fine` data class now has a `Money amount` field. The `.toMoney()` / `.minorUnits` calls in the Money edge table stop applying to database reads and writes — those two rows collapse into this converter, and the CLAUDE.md Money table needs updating to say so. The text-field and display edges are untouched.
+The generated `Fine` data class carries a `Money amount` field. The `.toMoney()` / `.minorUnits` calls in the Money edge table stop applying to database reads and writes — those two rows collapse into this converter. The text-field and display edges are untouched.
 
 **The column is still a plain SQLite integer of paisa.** `kMinorUnitsPerMajor` stays fixed at 100 and the storage unit stays out of the type system's reach. A converter that divided here would reinterpret every amount already stored.
 
@@ -260,7 +260,7 @@ Note 787 moving to `ConflictException` rather than the old catch-all: under sqfl
 
 `watch()` turns any query into an auto-updating stream: drift tracks which tables a query reads and re-runs it when a write touches one. A checkout updates the loans list, the member's page and the dashboard counts with no cross-cubit notification.
 
-This is a real simplification but it is not free, and the rules go in CLAUDE.md alongside the existing `LoadStatus` section:
+This is a real simplification but it is not free, and it comes with rules that sit alongside the existing `LoadStatus` convention:
 
 - **Streams update more often than they need to.** Drift invalidates per table, not per row — any write to `loans` re-runs every query reading `loans`. Keep watched queries narrow and cheap. A watched query that scans ten thousand titles to compute a dashboard number will re-run on every checkout.
 - **`customStatement` writes do not notify.** Raw SQL bypasses the tracking; call `notifyUpdates()` explicitly, or the screen quietly shows stale data.
@@ -320,7 +320,7 @@ db-web:
 
 ### Definition of done — additions
 
-The CLAUDE.md checklist gains two steps:
+The definition of done gains two steps:
 
 - `make migrate` after changing any table or bumping `schemaVersion`, before `make build`.
 - The generated migration tests are part of `make test`. A schema change with a red migration test is not done.
@@ -362,17 +362,17 @@ Everything above the data layer. Repository and data-source interfaces, `AppExce
 
 ## What shipped
 
-Steps 1–4 and 6 of the original plan are done, on this branch:
+Steps 1–4 and 6 of the original plan shipped with this decision:
 
 1. **Dependencies swapped.** `drift 2.34.3`, `drift_flutter 0.3.1`, `sqlite3 3.5.2`, `drift_dev 2.34.5`; all four `sqflite*` packages gone. `sqlite3_flutter_libs` resolves transitively as `0.6.0+eol`, the empty package, as predicted.
 2. **Web assets.** `sqlite3.wasm` re-fetched from the `drift-2.34.3` release, `drift_worker.js` added, `sqflite_sw.js` deleted, `make db-web` rewritten around a pinned `DRIFT_RELEASE`.
 3. **Connection, database class, `build.yaml`.** The old migration framework and its test are deleted; `bootstrap` calls `warmUp()`; `AppConfig.databaseName` replaces `databaseFileName`; `database_platform.dart` kept and narrowed.
 4. **Errors.** `AppException.fromSqlite`, the `_classify` chain in `guardDatabase`, and thirteen tests over both.
-6. **Docs.** CLAUDE.md's Database, Money, Definition-of-done and command table; `.cursor/rules/architecture.mdc`; the superseded clause in ADR 0001.
+6. **Docs.** The Database, Money, definition-of-done and command-table sections of the contributor docs; the superseded clause in ADR 0001.
 
 Verified with `make analyze` (clean, `--fatal-infos`) and `make test` (green, including a real in-memory drift database). Not verified: the app has not been run, and no build has been produced for Windows or web — **the `sqlite3` build hook is proven under `flutter test` on Linux and nowhere else yet.** That is the one step most likely to surprise.
 
-**Step 5 — the first table — is deliberately not done.** It belongs to whichever `catalog` sub-feature lands first, with its schema reviewed as part of that feature rather than invented here. Until then `@DriftDatabase()` is empty and no schema has been recorded, so the first table is v1 and `make migrate` writes `drift_schema_v1.json` at that point.
+**Step 5 — the first table — was deliberately left out.** It belonged to whichever `catalog` sub-feature landed first, with its schema reviewed as part of that feature rather than invented here. Until then `@DriftDatabase()` stayed empty and no schema was recorded, so the first table became v1 and `make migrate` wrote `drift_schema_v1.json` at that point.
 
 ## Open questions
 

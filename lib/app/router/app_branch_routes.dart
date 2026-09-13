@@ -28,6 +28,9 @@ import 'package:khulla/features/circulation/return_copy/presentation/cubit/retur
 import 'package:khulla/features/circulation/return_copy/presentation/return_page.dart';
 import 'package:khulla/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import 'package:khulla/features/dashboard/presentation/dashboard_page.dart';
+import 'package:khulla/features/guide/domain/guide_topic.dart';
+import 'package:khulla/features/guide/presentation/guide_article_page.dart';
+import 'package:khulla/features/guide/presentation/guide_page.dart';
 import 'package:khulla/features/members/presentation/cubit/member_cubit.dart';
 import 'package:khulla/features/members/presentation/cubit/member_detail_cubit.dart';
 import 'package:khulla/features/members/presentation/pages/member_detail_page.dart';
@@ -49,7 +52,10 @@ import 'package:khulla/features/users/presentation/pages/user_list_page.dart';
 import 'package:khulla_ui/khulla_ui.dart';
 
 /// One [StatefulShellBranch] per shell destination, in the order
-/// `shellDestinations` declares them.
+/// `shellDestinations` declares them — plus the manual, which has no rail
+/// entry and so sits after them all. Its index is never targeted by the rail;
+/// it is reached through `context.go`, which activates whichever branch holds
+/// the matched route.
 ///
 /// Extracted from AppRouter so the router file stays composition (the
 /// single `GoRouter`, the out-of-shell routes, the redirect) while each
@@ -271,6 +277,36 @@ StatefulShellBranch usersBranch() => StatefulShellBranch(
             },
             child: const RoleListPage(),
           ),
+        ),
+      ],
+    ),
+  ],
+);
+
+/// The manual. Last, to match the rail: it sits under the work rather than
+/// above it.
+///
+/// Neither page holds a cubit — the guide is built from localizations on
+/// every build, so both builders hand over plain pages. An unknown `:topic`
+/// segment is not a routing failure: [guideTopicFromSlug] answers null and
+/// the article page renders its own not-found state.
+StatefulShellBranch guideBranch() => StatefulShellBranch(
+  routes: [
+    GoRoute(
+      path: Routes.guide,
+      builder: (context, _) => const GuidePage(),
+      routes: [
+        GoRoute(
+          path: Routes.guideTopicSegment,
+          builder: (context, state) {
+            final topic = guideTopicFromSlug(
+              state.pathParameters['topic'],
+            );
+            return GuideArticlePage(
+              topic: topic,
+              anchor: state.uri.queryParameters['section'],
+            );
+          },
         ),
       ],
     ),

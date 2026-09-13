@@ -45,24 +45,19 @@ whose `versionCode` did not increase, and `+<build>` is where that comes from.
 
 ### One version, three readers
 
-[`tools/version.dart`](../../tools/version.dart) is the only thing that reads
-`version:` out of `pubspec.yaml`, and everything that needs the number goes
-through it:
+`version:` in `pubspec.yaml` is the only copy of the version, and everything
+that needs the number reads that line or what the Flutter tool bakes from it:
 
 | Reader | How |
 | --- | --- |
-| The release workflow | `dart tools/version.dart` — names the release and its tag |
-| CI, on a PR into `prod` | the same call — fails the PR if that version is already released |
-| The app | `--write` generates `lib/gen/app_version.dart`; `AppInfo.version` reads `kAppVersion`, and the help dialog's About panel shows it |
+| The release workflow | greps `^version:` out of `pubspec.yaml` — names the release and its tag |
+| CI, on a PR into `prod` | the same grep — fails the PR if that version is already released |
+| The app | `package_info_plus` reads the baked-in version back at runtime (`AppVersion`); the help dialog's About panel shows it |
 
 So the version a librarian reads in the app names the download they installed
-and the tag you can check out. There is no second copy to update — the file the
-app imports is generated and gitignored, exactly so it cannot sit at `0.1.0`
-while the pubspec says `1.0.0`.
-
-`make build` regenerates it along with everything else; `make version` does it
-alone after a bump. The script imports nothing but `dart:io`, so CI runs it on a
-bare Dart SDK with no pub get and no Flutter.
+and the tag you can check out. There is no second copy to update and no
+codegen step to forget — bumping `version:` is enough, on every target,
+because the Flutter tool carries it into the build.
 
 The workflow reads that version, builds all four targets in parallel, checksums
 them into `SHA256SUMS.txt`, and publishes a GitHub Release tagged `v1.0.0` with

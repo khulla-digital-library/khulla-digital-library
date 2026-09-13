@@ -11,7 +11,9 @@ import 'package:khulla/features/catalog/title/data/tables/titles.dart';
 @TableIndex.sql(
   'CREATE INDEX copies_status ON copies (status) WHERE archived_at IS NULL',
 )
-@TableIndex(name: 'copies_title', columns: {#titleId})
+// Covers the per-title copy and availability counts on every title row, as
+// well as the foreign-key lookup a title delete needs.
+@TableIndex(name: 'copies_title', columns: {#titleId, #archivedAt, #status})
 class Copies extends Table {
   TextColumn get id => text()();
 

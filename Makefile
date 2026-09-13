@@ -1,4 +1,4 @@
-.PHONY: bootstrap install-sdk build version migrate db-diagram localize analyze format format-check fix test check ci clean \
+.PHONY: bootstrap install-sdk build migrate db-diagram localize analyze format format-check fix test check ci clean \
         copyright copyright-check \
         db-web run-web run-windows run-linux build-web build-windows build-linux build-apk pr seed-mock
 
@@ -31,15 +31,9 @@ db-web:
 
 # ── Code generation ─────────────────────────────────────────────────────────
 
-## freezed, injectable, json_serializable, flutter_gen, and the app version.
+## freezed, injectable, json_serializable and flutter_gen.
 build:
 	$(DART) run build_runner build
-	$(DART) tools/version.dart --write
-
-## Regenerate lib/gen/app_version.dart from `version:` in pubspec.yaml.
-## Folded into `make build`; run it alone after bumping the version.
-version:
-	$(DART) tools/version.dart --write
 
 ## Record the current schema, regenerate step-by-step migrations and their
 ## tests. Run after changing a table and bumping schemaVersion, before `build`.

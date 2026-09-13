@@ -35,19 +35,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # tools/version.dart imports nothing but dart:io, so this job needs a
-      # bare SDK — no Flutter, no pub get, no code generation.
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: stable
-
       - name: Resolve the version being built
         id: resolve
         shell: bash
         run: |
-          # The same script the app reads its version from, so the number in
-          # the release, the tag and the About line cannot disagree.
-          version="$(dart tools/version.dart)"
+          # pubspec.yaml is the single source of truth: the Flutter tool bakes
+          # `version:` into every build, and the app reads it back at runtime
+          # via package_info_plus — so the number in the release, the tag and
+          # the About line cannot disagree.
+          version="$(grep -E '^version:' pubspec.yaml | sed -E 's/^version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')"
           tag="v$version"
 
           # A manual run is for handing someone a build, never for publishing:

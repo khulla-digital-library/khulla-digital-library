@@ -3,6 +3,7 @@
 
 import 'package:flutter/services.dart';
 import 'package:khulla/core/config/app_info.dart';
+import 'package:khulla/core/config/app_version.dart';
 import 'package:khulla/core/feedback/app_toast.dart';
 import 'package:khulla/l10n/l10n.dart';
 import 'package:khulla/shared/widgets/app_logo.dart';
@@ -73,9 +74,21 @@ class HelpAboutPanel extends StatelessWidget {
         SizedBox(height: spacing.md),
         AppDetailRow(
           label: l10n.helpAboutVersionLabel,
-          child: Text(
-            AppInfo.version,
-            style: typography.body.copyWith(color: colors.textHigh),
+          child: FutureBuilder<String>(
+            future: AppVersion.version(),
+            builder: (context, snapshot) {
+              final version = snapshot.data;
+              if (version == null) {
+                return Text(
+                  '…',
+                  style: typography.body.copyWith(color: colors.textHigh),
+                );
+              }
+              return Text(
+                version,
+                style: typography.body.copyWith(color: colors.textHigh),
+              );
+            },
           ),
         ),
         AppDetailRow(
