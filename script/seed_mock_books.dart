@@ -12,10 +12,11 @@
 // It deliberately imports nothing from `package:khulla`: anything under `lib/`
 // pulls in Flutter through the database connection, which plain `dart run`
 // cannot load. The INSERT shapes below mirror `TitleRepositoryImpl.saveTitle`
-// and `LocalCopyDataSource.insertCopy` (ids, search text, minor-unit prices,
-// library barcode counter); required columns are validated with PRAGMA before
-// any write, so a future schema change fails loudly instead of corrupting
-// data. Copy barcodes always come from the library's own settings row, exactly
+// and `LocalCopyDataSource.insertCopy` (ids, minor-unit prices,
+// library barcode counter); search needs no column — the `titles_fts_*`
+// triggers keep the FTS index current on every write. Required columns are
+// validated with PRAGMA before any write, so a future schema change fails
+// loudly instead of corrupting data. Copy barcodes always come from the library's own settings row, exactly
 // as unattended check-in copies would — the script consumes the real sequence.
 //
 // The file must already exist with the app schema: open the app once first,
@@ -42,10 +43,6 @@ const Uuid _uuid = Uuid();
 const List<(String, String)> _systemFormats = <(String, String)>[
   ('book', 'Book'),
   ('journal', 'Journal'),
-  ('magazine', 'Magazine'),
-  ('audiobook', 'Audiobook'),
-  ('video', 'Video'),
-  ('ebook', 'E-book'),
   ('other', 'Other'),
 ];
 
@@ -91,8 +88,8 @@ void _seedBooks(_Options options) {
     final titleStmt = db.prepare(
       'INSERT INTO titles (id, title, author, isbn, publisher, '
       'published_year, edition, pages, format_id, language, description, '
-      'shelf, lendable, replacement_cost, search_text, created_at, '
-      'updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      'shelf, lendable, replacement_cost, created_at, '
+      'updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
     );
     final copyStmt = db.prepare(
       'INSERT INTO copies (id, title_id, barcode, shelf, status, '
@@ -125,13 +122,6 @@ void _seedBooks(_Options options) {
             book.shelf,
             if (book.lendable) 1 else 0,
             (book.priceMajor * 100).round(),
-            _searchText(<String?>[
-              book.title,
-              book.author,
-              book.isbn,
-              book.publisher,
-              book.shelf,
-            ]),
             nowText,
             nowText,
           ]);
@@ -266,7 +256,6 @@ void _requireSchema(Database db) {
       'shelf',
       'lendable',
       'replacement_cost',
-      'search_text',
       'created_at',
       'updated_at',
     ],
@@ -403,25 +392,6 @@ String _dateTimeText(DateTime value) {
       .toString()
       .padLeft(2, '0');
   return '${value.toIso8601String()}$sign$hours:$minutes';
-}
-
-/// Same shape as `buildSearchText` in lib/shared/utils/search_text.dart.
-String _searchText(List<String?> parts) {
-  final buffer = StringBuffer();
-  for (final part in parts) {
-    final normalized = (part ?? '').trim().toLowerCase().replaceAll(
-      RegExp(r'\s+'),
-      ' ',
-    );
-    if (normalized.isEmpty) {
-      continue;
-    }
-    if (buffer.isNotEmpty) {
-      buffer.write(' ');
-    }
-    buffer.write(normalized);
-  }
-  return buffer.toString();
 }
 
 List<String> _stringList(Object? value) {
