@@ -4,6 +4,57 @@ An open-source library management system, built as a **local-first Flutter app**
 
 *Khulla* (खुल्ला) is Nepali for "open".
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/dashboard.png" alt="Dashboard" />
+      <br />
+      <sub><b>Dashboard</b> — overdue, due today & inventory at a glance</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/catalog.png" alt="Catalog" />
+      <br />
+      <sub><b>Catalog</b> — titles, copies & availability</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/checkout.png" alt="Checkout" />
+      <br />
+      <sub><b>Checkout</b> — circulation desk</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/loans.png" alt="Loans" />
+      <br />
+      <sub><b>Loans</b> — active & overdue</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/members.png" alt="Members" />
+      <br />
+      <sub><b>Members</b> — patron registry</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/reports.png" alt="Reports" />
+      <br />
+      <sub><b>Reports</b> — circulation insights</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/barcode.png" alt="Barcodes" />
+      <br />
+      <sub><b>Barcodes</b> — print & scan</sub>
+    </td>
+    <td width="50%" align="center">
+      <em><a href="https://khulla-digital-library.github.io/khulla-digital-library/">Try the live demo →</a><br />no install, data stays in your browser</em>
+    </td>
+  </tr>
+</table>
+
 ## Download
 
 Ready-to-run builds are attached to every release: **[latest release](https://github.com/khulla-digital-library/khulla-digital-library/releases/latest)**.
