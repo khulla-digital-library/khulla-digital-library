@@ -131,6 +131,7 @@ class _MemberFormBodyState extends State<_MemberFormBody> with DisposeBag {
     }
     return types.isNotEmpty ? types.first.id : '';
   }
+
   late bool _sendNotices = widget.existing?.sendNotices ?? true;
   late final String _expires = widget.existing?.expires ?? '';
 

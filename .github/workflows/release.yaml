@@ -103,15 +103,29 @@ jobs:
       - name: Build
         run: flutter build windows --release -t lib/main_prod.dart
 
-      # A portable folder, not an installer: unzip anywhere and run khulla.exe.
-      # The catalogue lives in the user's application-support directory, so
-      # moving or replacing this folder never touches library data.
-      - name: Package
+      # Two Windows artifacts: a portable zip (unzip anywhere, run khulla.exe)
+      # and a per-user installer (Start Menu + uninstaller, no admin required).
+      # Both bundle the same Release folder. The catalogue lives in the user's
+      # application-support directory, so moving or replacing either artifact
+      # never touches library data.
+      - name: Package (portable zip)
         shell: pwsh
         run: |
           $name = "khulla-${{ needs.version.outputs.version }}-windows-x64"
           New-Item -ItemType Directory -Path dist | Out-Null
           Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "dist/$name.zip"
+
+      - name: Build installer (Inno Setup)
+        shell: pwsh
+        run: |
+          iscc --version 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            choco install innosetup --no-progress -y
+            # Refresh PATH for this session so `iscc` is found without re-login.
+            $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+          }
+          iscc /DMyAppVersion="${{ needs.version.outputs.version }}" windows/installer.iss
+          Get-ChildItem dist | Format-List Name, Length
 
       - uses: actions/upload-artifact@v4
         with:
@@ -258,7 +272,8 @@ jobs:
 
             | Platform | File | How to run it |
             | --- | --- | --- |
-            | Windows | `khulla-${{ needs.version.outputs.version }}-windows-x64.zip` | Unzip anywhere, run `khulla.exe`. Windows SmartScreen will warn about an unknown publisher — *More info* → *Run anyway*. |
+            | Windows | `khulla-${{ needs.version.outputs.version }}-windows-x64-setup.exe` | **Recommended.** Run the installer — adds Start Menu entry + uninstaller (no admin required). SmartScreen will warn about an unknown publisher — *More info* → *Run anyway*. |
+            | Windows (portable) | `khulla-${{ needs.version.outputs.version }}-windows-x64.zip` | Unzip anywhere, run `khulla.exe`. No install needed. |
             | Android | `khulla-${{ needs.version.outputs.version }}-android.apk` | Sideload it; allow installs from your browser or file manager. |
             | Web | `khulla-${{ needs.version.outputs.version }}-web.tar.gz` | Serve the extracted folder from any static host. |
             | Linux | `khulla-${{ needs.version.outputs.version }}-linux-x64.tar.gz` | Extract and run `./khulla`. |
@@ -268,4 +283,5 @@ jobs:
             Khulla is local-first: your catalogue is a SQLite file on your own
             machine, and nothing is sent anywhere. Uninstalling the app does not
             delete it — take a backup from **Settings → Backup** before moving
-            between machines.
+            between machines. The installer and the portable zip share the same
+            data location, so you can switch between them.

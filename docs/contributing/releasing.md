@@ -98,10 +98,18 @@ does not touch `prod`, the releases page, or the version.
 
 | Target | Artifact | Notes |
 | --- | --- | --- |
-| Windows | `khulla-<version>-windows-x64.zip` | Portable folder, not an installer. Unzip and run `khulla.exe`. SmartScreen warns about an unknown publisher because the binary is unsigned. |
+| Windows | `khulla-<version>-windows-x64-setup.exe` | Per-user installer (Inno Setup) — Start Menu entry + uninstaller, no admin required. Same build as the zip, just easier for normal users. |
+| Windows | `khulla-<version>-windows-x64.zip` | Portable fallback. Unzip anywhere and run `khulla.exe`. Useful when an installer is blocked. |
 | Android | `khulla-<version>-android.apk` | One universal APK, not per-ABI splits — a tester sideloading should not need to know what an ABI is. |
 | Web | `khulla-<version>-web.tar.gz` | Built for the site root. Serve the extracted folder from any static host. |
 | Linux | `khulla-<version>-linux-x64.tar.gz` | Extract, run `./khulla`. |
+
+Both Windows artifacts bundle the same `build/windows/x64/runner/Release/` output and
+share the same data location (`%AppData%` / application-support directory), so a
+library can switch from portable to installed without losing data. The installer
+is defined in `windows/installer.iss` and built with Inno Setup (`iscc`) in the
+`windows` job — no extra secrets needed until code-signing is added. SmartScreen
+still warns about an unknown publisher while the binaries are unsigned.
 
 macOS and iOS build from the same source but are not released: both need an
 Apple Developer account to produce anything a user can open.

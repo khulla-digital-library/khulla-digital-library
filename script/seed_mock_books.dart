@@ -522,8 +522,7 @@ void _usage() {
       '  Windows: %LOCALAPPDATA%/com.khulladigitallibrary.app/khulla_dev.sqlite',
     )
     ..writeln(
-      '  macOS:   ~/Library/Application Support/com.khulladigitallibrary.app/'
-      'khulla_dev.sqlite',
+      '  macOS:   ~/Library/Application Support/com.khulladigitallibrary.app/khulla_dev.sqlite',
     );
   stdout.write(buffer.toString());
 }
