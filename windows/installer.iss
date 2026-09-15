@@ -12,6 +12,7 @@
 #endif
 
 [Setup]
+SourceDir=..
 AppId={{914ECEC2-EB34-4E3E-860C-9C7E2BB82309}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
