@@ -11,11 +11,12 @@ import 'package:khulla_ui/khulla_ui.dart';
 ///
 /// A short row list rather than a table: a title has a handful of copies, so
 /// column headers and a "With" column of dashes bought more chrome than
-/// clarity. Add-copy lives in the page header; per-copy maintenance routes
+/// clarity. Add-copy is wired through [onAddCopy]; per-copy maintenance routes
 /// through the three action callbacks on each [TitleCopyRow].
 class TitleCopiesCard extends StatelessWidget {
   const TitleCopiesCard({
     required this.copies,
+    this.onAddCopy,
     this.onMarkLost,
     this.onMarkDamaged,
     this.onWithdraw,
@@ -23,6 +24,10 @@ class TitleCopiesCard extends StatelessWidget {
   });
 
   final List<Copy> copies;
+
+  /// Opens the add-copies dialog. Null for a role that may read the catalogue
+  /// but not change it — the button is absent rather than disabled.
+  final VoidCallback? onAddCopy;
 
   /// Per-copy maintenance, passed down to each row. Null for a role that may
   /// read the catalogue but not change it.
@@ -34,6 +39,7 @@ class TitleCopiesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = context.appColors;
+    final addCopy = onAddCopy;
     final markLost = onMarkLost;
     final markDamaged = onMarkDamaged;
     final withdraw = onWithdraw;
@@ -41,11 +47,19 @@ class TitleCopiesCard extends StatelessWidget {
     return SectionCard(
       title: l10n.titleDetailCopiesTitle,
       subtitle: l10n.titleDetailCopiesSubtitle,
+      trailing: addCopy == null
+          ? null
+          : AppTextButton(
+              onPressed: addCopy,
+              child: Text(l10n.titleDetailAddCopy),
+            ),
       child: copies.isEmpty
           ? AppEmptyView(
               variant: AppFeedbackVariant.inline,
               title: l10n.titleDetailCopiesEmptyTitle,
               message: l10n.titleDetailCopiesEmptyBody,
+              actionLabel: addCopy == null ? null : l10n.titleDetailAddCopy,
+              onAction: addCopy,
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

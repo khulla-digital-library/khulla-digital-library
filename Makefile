@@ -55,9 +55,9 @@ icons:
 
 # ── Scratch data ────────────────────────────────────────────────────────────
 
-## Insert mock books into a catalogue file. Pass the dev catalogue explicitly;
-## bare `make seed-mock` only prints the script help, never touches real data.
-ARGS ?= --help
+## Insert mock books into the dev catalogue (platform default path).
+## Override with ARGS, e.g. `make seed-mock ARGS="--clear"` or
+## `make seed-mock ARGS="--db /path/to/khulla_dev.sqlite --titles 5"`.
 seed-mock:
 	$(DART) run script/seed_mock_books.dart $(ARGS)
 

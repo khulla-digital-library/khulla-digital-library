@@ -121,7 +121,17 @@ class _MemberFormBodyState extends State<_MemberFormBody> with DisposeBag {
 
   late String _memberTypeId =
       widget.existing?.memberTypeId ??
-      (widget.memberTypes.isNotEmpty ? widget.memberTypes.first.id : '');
+      _memberTypeIdForNewMember(widget.memberTypes);
+
+  /// New cards default to the public category; fall back to the first active
+  /// type when that system category was archived or renamed away.
+  static String _memberTypeIdForNewMember(List<MemberType> types) {
+    for (final type in types) {
+      if (type.code == 'public') return type.id;
+    }
+    return types.isNotEmpty ? types.first.id : '';
+  }
+
   late bool _sendNotices = widget.existing?.sendNotices ?? true;
   late final String _expires = widget.existing?.expires ?? '';
 
