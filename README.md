@@ -72,12 +72,13 @@ Ready-to-run builds are attached to every release: **[latest release](https://gi
 
 | Platform | File | How to run it |
 | --- | --- | --- |
-| Windows | `khulla-<version>-windows-x64.zip` | Unzip anywhere and run `khulla.exe`. It is a portable folder, not an installer. Windows warns about an unknown publisher because the build is unsigned — *More info* → *Run anyway*. |
+| Windows | `khulla-<version>-windows-x64-setup.exe` | **Recommended.** Run the installer — Start Menu entry + uninstaller, no admin required. SmartScreen warns about an unknown publisher because the build is unsigned — *More info* → *Run anyway*. |
+| Windows (portable) | `khulla-<version>-windows-x64.zip` | Unzip anywhere and run `khulla.exe`. Same app, without an installer. |
 | Android | `khulla-<version>-android.apk` | Sideload it, allowing installs from your browser or file manager. It is one universal APK signed with debug keys — fine for sideloading, not for Google Play. |
 | Web | `khulla-<version>-web.tar.gz` | Serve the extracted folder from any static host. |
 | Linux | `khulla-<version>-linux-x64.tar.gz` | Extract and run `./khulla`. |
 
-Verify a download against `SHA256SUMS.txt` attached to the same release.
+Verify a download against `SHA256SUMS.txt` attached to the same release. The installer and portable zip share the same data location, so you can switch between them.
 
 ### System requirements
 
