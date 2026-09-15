@@ -135,7 +135,10 @@ class RecordHeader extends StatelessWidget {
           lead,
           if (actions.isNotEmpty) ...[
             SizedBox(height: spacing.md),
-            actionsRow,
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: actionsRow,
+            ),
           ],
         ] else
           Row(
@@ -144,7 +147,9 @@ class RecordHeader extends StatelessWidget {
               Expanded(child: lead),
               if (actions.isNotEmpty) ...[
                 SizedBox(width: spacing.lg),
-                Flexible(child: actionsRow),
+                // Intrinsic width only — a [Flexible] here would share the
+                // row with [Expanded] and park the buttons in the middle.
+                actionsRow,
               ],
             ],
           ),

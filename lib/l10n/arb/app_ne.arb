@@ -189,8 +189,18 @@
       }
     }
   },
+  "titleDetailAddCopy": "प्रतिलिपि थप्नुहोस्",
   "titleDetailAddCopyDialogTitle": "प्रतिलिपिहरू थप्नुहोस्",
   "titleDetailAddCopyCount": "थपिने प्रतिलिपि संख्या",
+  "titleDetailAddCopySuccess": "{count} प्रतिलिपिहरू थपियो",
+  "@titleDetailAddCopySuccess": {
+    "description": "क्याटलग - विवरण स्क्रिनबाट प्रतिलिपि थपेपछि टोस्ट",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "titleDetailDelete": "शीर्षक मेट्नुहोस्",
   "titleDetailDeleteTitle": "यो शीर्षक मेट्ने?",
   "titleDetailDeleteBody": "शीर्षक र त्यसअन्तर्गतका सबै प्रतिलिपिहरू क्याटलगबाट हटाइनेछन्। सापटी इतिहास भने सुरक्षित रहनेछ।",

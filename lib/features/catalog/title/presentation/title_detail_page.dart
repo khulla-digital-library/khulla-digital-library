@@ -63,6 +63,37 @@ class TitleDetailPage extends StatelessWidget {
     }
   }
 
+  Future<int?> _promptAddCopyCount(BuildContext context) {
+    return AppFormModal.show<int>(
+      context: context,
+      builder: (_) => const _AddCopyCountDialog(),
+    );
+  }
+
+  Future<void> _addCopy(BuildContext context, TitleDetailState state) async {
+    final title = state.title;
+    if (title == null) return;
+    final l10n = context.l10n;
+    final count = await _promptAddCopyCount(context);
+    if (!context.mounted || count == null) return;
+    try {
+      await context.read<TitleDetailCubit>().addCopies(
+        titleId,
+        title.title,
+        count: count,
+        shelf: title.shelf,
+      );
+      if (!context.mounted) return;
+      AppToast.success(
+        context,
+        message: l10n.titleDetailAddCopySuccess(count),
+      );
+    } on AppException catch (error) {
+      if (!context.mounted) return;
+      AppToast.error(context, message: error.localizedMessage(l10n));
+    }
+  }
+
   Future<void> _edit(BuildContext context) async {
     final saved = await TitleFormDialog.show(context, titleId: titleId);
     if (saved == true && context.mounted) {
@@ -161,7 +192,9 @@ class TitleDetailPage extends StatelessWidget {
 
         final copiesCard = TitleCopiesCard(
           copies: state.copies,
-          // onAddCopy: () => unawaited(_addCopy(context, state)),
+          onAddCopy: !canManage
+              ? null
+              : () => unawaited(_addCopy(context, state)),
           onMarkLost: !canManage
               ? null
               : (copy) => unawaited(_markCopyLost(context, copy)),

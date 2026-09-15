@@ -4,6 +4,68 @@ An open-source library management system, built as a **local-first Flutter app**
 
 *Khulla* (खुल्ला) is Nepali for "open".
 
+## What it does
+
+- **Dashboard** — overdue, due today and inventory at a glance.
+- **Catalog** — titles, physical copies and printable spine/barcode labels.
+- **Circulation** — check-out, returns, active loans, holds queue and fines.
+- **Members** — patron registry with member types.
+- **Reports** — circulation insights.
+- **Staff & roles** — local accounts with per-section view/manage permissions.
+- **Settings** — library profile, loan rules, appearance, and backup export/restore.
+- **Guide** — an in-app manual, available offline.
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/dashboard.png" alt="Dashboard" />
+      <br />
+      <sub><b>Dashboard</b> — overdue, due today & inventory at a glance</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/catalog.png" alt="Catalog" />
+      <br />
+      <sub><b>Catalog</b> — titles, copies & availability</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/checkout.png" alt="Checkout" />
+      <br />
+      <sub><b>Checkout</b> — circulation desk</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/loans.png" alt="Loans" />
+      <br />
+      <sub><b>Loans</b> — active & overdue</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/members.png" alt="Members" />
+      <br />
+      <sub><b>Members</b> — patron registry</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/reports.png" alt="Reports" />
+      <br />
+      <sub><b>Reports</b> — circulation insights</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/barcode.png" alt="Barcodes" />
+      <br />
+      <sub><b>Barcodes</b> — print & scan</sub>
+    </td>
+    <td width="50%" align="center">
+      <em><a href="https://khulla-digital-library.github.io/khulla-digital-library/">Try the live demo →</a><br />no install, data stays in your browser</em>
+    </td>
+  </tr>
+</table>
+
 ## Download
 
 Ready-to-run builds are attached to every release: **[latest release](https://github.com/khulla-digital-library/khulla-digital-library/releases/latest)**.
@@ -11,13 +73,22 @@ Ready-to-run builds are attached to every release: **[latest release](https://gi
 | Platform | File | How to run it |
 | --- | --- | --- |
 | Windows | `khulla-<version>-windows-x64.zip` | Unzip anywhere and run `khulla.exe`. It is a portable folder, not an installer. Windows warns about an unknown publisher because the build is unsigned — *More info* → *Run anyway*. |
-| Android | `khulla-<version>-android.apk` | Sideload it, allowing installs from your browser or file manager. |
+| Android | `khulla-<version>-android.apk` | Sideload it, allowing installs from your browser or file manager. It is one universal APK signed with debug keys — fine for sideloading, not for Google Play. |
 | Web | `khulla-<version>-web.tar.gz` | Serve the extracted folder from any static host. |
 | Linux | `khulla-<version>-linux-x64.tar.gz` | Extract and run `./khulla`. |
 
+Verify a download against `SHA256SUMS.txt` attached to the same release.
+
+### System requirements
+
+- **Windows:** 10 or 11, 64-bit.
+- **Linux:** a distribution with the GTK 3 runtime installed.
+- **Android:** sideloading with installs from unknown sources allowed.
+- **Web:** a current Chromium, Firefox or Safari.
+
 You can also **[try it in a browser](https://khulla-digital-library.github.io/khulla-digital-library/)** — a demo with no server behind it, where the catalogue lives in that browser's storage and clearing site data wipes it.
 
-Your catalogue is a SQLite file on your own machine, so uninstalling does not delete it and nothing is uploaded anywhere. Take a backup from **Settings → Backup** before moving between machines.
+Your catalogue is a SQLite file on your own machine, so uninstalling does not delete it and nothing is uploaded anywhere. Take a backup from **Settings → Backup** before moving between machines; on a new machine, choose Restore during setup to adopt that backup.
 
 ## Why local-first
 
@@ -39,7 +110,7 @@ Releases are built by CI for the four released targets. macOS and iOS compile fr
 
 ## Getting started
 
-**Prerequisites** — [FVM](https://fvm.app) to pin the Flutter SDK, plus platform toolchains: Visual Studio with the *Desktop development with C++* workload for Windows; `clang`, `cmake`, `ninja-build`, `libgtk-3-dev` for Linux.
+**Prerequisites** — [FVM](https://fvm.app) to pin the Flutter SDK, plus platform toolchains: Visual Studio with the *Desktop development with C++* workload for Windows; `clang`, `cmake`, `ninja-build`, `libgtk-3-dev` for Linux; Xcode for macOS/iOS; Java 17 plus the Android SDK for the APK.
 
 ```sh
 git clone https://github.com/khulla-digital-library/khulla-digital-library.git
@@ -54,7 +125,7 @@ make localize                  # generate localizations
 make run-windows               # or: make run-web, make run-linux
 ```
 
-The Flutter version is pinned in `.fvmrc` (currently 3.47.0). After pulling a change that bumps it, run `fvm install`.
+The Flutter version is pinned in `.fvmrc`. After pulling a change that bumps it, run `fvm install`.
 
 Generated sources are not committed, so `make build` and `make localize` are required on a fresh clone before anything will analyze or run.
 
@@ -64,9 +135,10 @@ Generated sources are not committed, so `make build` and `make localize` are req
 khulla-digital-library/
 ├── lib/
 │   ├── app/              # Root widget, router, adaptive navigation shell
+│   ├── bootstrap.dart main_dev.dart main_prod.dart
 │   ├── core/             # DI, database, errors, routing, logging, window
 │   ├── features/         # One folder per feature
-│   ├── l10n/             # Localization (ARB source of truth)
+│   ├── gen/ l10n/        # Generated code and localization (ARB source of truth)
 │   └── shared/           # Cross-feature models, widgets, components
 ├── packages/
 │   └── khulla_ui/        # Design system — tokens, theme, primitives
@@ -75,7 +147,7 @@ khulla-digital-library/
 │   ├── architecture/     # Design decisions and ADRs
 │   ├── database/         # Data layer: overview, how-to, schema diagram
 │   └── contributing/     # How to contribute
-├── test/
+├── test/                 # Unit, migration and widget tests
 ├── android/ ios/ linux/ macos/ web/ windows/
 ├── melos.yaml            # Workspace scripts
 └── Makefile              # Everyday commands
@@ -88,6 +160,7 @@ khulla-digital-library/
 | `make bootstrap` | Resolve dependencies across the workspace |
 | `make build` | Run code generation |
 | `make localize` | Regenerate localizations from `lib/l10n/arb/` |
+| `make migrate` | Regenerate migrations after a table change + `schemaVersion` bump |
 | `make check` | Format, copyright, analyze and test — run this before a PR |
 | `make ci` | The same gates CI runs, failing on unformatted code instead of rewriting it |
 | `make run-web` / `run-windows` / `run-linux` | Run the dev flavor |
@@ -99,7 +172,7 @@ The full guide lives in [docs/architecture](./docs/architecture/) — folder con
 
 - **State** — `flutter_bloc` cubits with single-class `freezed` states and `formz` inputs.
 - **Data** — `Page → Cubit → Repository → LocalDataSource → AppDatabase → SQLite`. Driver errors are converted to a small sealed `AppException` set at the data-source boundary.
-- **Schema** — append-only migrations; the schema version is derived from the migration list. A database written by a newer build refuses to open rather than being deleted.
+- **Schema** — append-only migrations on a hardcoded `schemaVersion`. A database written by a newer build refuses to open rather than being deleted.
 - **Design system** — `khulla_ui` holds every token; `app_palette.dart` is the only file in the repository allowed to contain a hex color.
 - **Layout** — one adaptive shell: a bottom bar below 600px, a navigation rail above, extended with labels at 1200px.
 
@@ -107,7 +180,9 @@ The full guide lives in [docs/architecture](./docs/architecture/) — folder con
 
 Contributions are welcome. See [docs/contributing](./docs/contributing/) for setup, conventions and the pull-request flow.
 
-Commits follow a conventional format — `feat:`, `fix:`, `chore:`, `refactor:`, `sync:`, `ci:` — enforced by a git hook. Branch off `dev`; direct commits to `dev` and `prod` are blocked.
+Commits follow a conventional format — `type(scope): message` with types `feat`, `fix`, `chore`, `refactor`, `sync`, `ci` — enforced by a git hook. Branch off `dev`; direct commits to `dev` and `prod` are blocked.
+
+Found a bug? Open an issue with the platform, the version from Settings → About, and steps to reproduce. For anything security-sensitive, use private vulnerability reporting instead — see [SECURITY.md](./SECURITY.md).
 
 Merging into `prod` publishes a release at the version in `pubspec.yaml` and redeploys the web demo — see [releasing](./docs/contributing/releasing.md).
 

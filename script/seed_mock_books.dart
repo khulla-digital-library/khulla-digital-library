@@ -21,8 +21,9 @@
 //
 // The file must already exist with the app schema: open the app once first,
 // which runs migrations and seeds reference rows. By default the script
-// writes to `./khulla_mock.sqlite`... which will NOT exist, so --db is
-// effectively required; the default only avoids accidents.
+// defaults to the dev-flavour catalogue in application support when --db is
+// omitted (same path the app opens via `lib/main_dev.dart`). Pass --db to
+// target another file.
 //
 // `fvm dart run script/seed_mock_books.dart --clear --db <same-file>`
 // removes the rows this script previously inserted (tracked in a
@@ -31,6 +32,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
 import 'package:uuid/uuid.dart';
 
@@ -404,8 +406,43 @@ List<String> _stringList(Object? value) {
   ];
 }
 
+String _defaultDevDbPath() {
+  const appId = 'com.khulladigitallibrary.app';
+  const dbFile = 'khulla_dev.sqlite';
+
+  if (Platform.isLinux) {
+    final home = Platform.environment['HOME'];
+    if (home == null || home.isEmpty) {
+      stderr.writeln('HOME is not set; pass --db explicitly.');
+      exit(2);
+    }
+    return p.join(home, '.local', 'share', appId, dbFile);
+  }
+  if (Platform.isWindows) {
+    final localAppData = Platform.environment['LOCALAPPDATA'];
+    if (localAppData == null || localAppData.isEmpty) {
+      stderr.writeln('LOCALAPPDATA is not set; pass --db explicitly.');
+      exit(2);
+    }
+    return p.join(localAppData, appId, dbFile);
+  }
+  if (Platform.isMacOS) {
+    final home = Platform.environment['HOME'];
+    if (home == null || home.isEmpty) {
+      stderr.writeln('HOME is not set; pass --db explicitly.');
+      exit(2);
+    }
+    return p.join(home, 'Library', 'Application Support', appId, dbFile);
+  }
+
+  stderr.writeln(
+    'No default catalogue path on ${Platform.operatingSystem}; pass --db.',
+  );
+  exit(2);
+}
+
 _Options? _parseArgs(List<String> args) {
-  var dbPath = '${Directory.current.path}/khulla_mock.sqlite';
+  var dbPath = _defaultDevDbPath();
   var titleCount = 20;
   var copiesPerTitle = 2;
   var clear = false;
@@ -457,10 +494,8 @@ void _usage() {
     ..writeln()
     ..writeln('Options:')
     ..writeln('  --db <path>             SQLite file to seed.')
-    ..writeln(
-      '                          Default: ./khulla_mock.sqlite (which will not',
-    )
-    ..writeln('                          exist — pass the real file).')
+    ..writeln('                          Default: dev catalogue in application')
+    ..writeln('                          support (see examples below).')
     ..writeln(
       '  --titles <n>            How many of the 20 mock titles to insert',
     )
@@ -477,16 +512,19 @@ void _usage() {
     ..writeln('exactly as app-added copies would get them.')
     ..writeln()
     ..writeln(
-      'The file must be a catalogue the app opened at least once, e.g.:',
+      'The file must be a catalogue the app opened at least once. Default',
+    )
+    ..writeln('paths (override with --db when needed):')
+    ..writeln(
+      '  Linux:   ~/.local/share/com.khulladigitallibrary.app/khulla_dev.sqlite',
     )
     ..writeln(
-      '  --db ~/.local/share/com.khulladigitallibrary.app/khulla_dev.sqlite',
+      '  Windows: %LOCALAPPDATA%/com.khulladigitallibrary.app/khulla_dev.sqlite',
     )
-    ..writeln('                          (Linux dev catalogue)')
     ..writeln(
-      '  --db %LOCALAPPDATA%/com.khulladigitallibrary.app/khulla_dev.sqlite',
-    )
-    ..writeln('                          (Windows dev catalogue)');
+      '  macOS:   ~/Library/Application Support/com.khulladigitallibrary.app/'
+      'khulla_dev.sqlite',
+    );
   stdout.write(buffer.toString());
 }
 
