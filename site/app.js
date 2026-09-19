@@ -15,10 +15,13 @@
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const root = document.documentElement;
 
-  const storage = {
-    get(key) { try { return localStorage.getItem(key); } catch { return null; } },
-    set(key, value) { try { localStorage.setItem(key, value); } catch { /* private mode */ } },
-  };
+  function externalizeLink(a) {
+    if (!/^https?:/i.test(a.href)) return;
+    a.target = "_blank";
+    const rel = new Set((a.rel || "").split(/\s+/).filter(Boolean));
+    rel.add("noopener");
+    a.rel = [...rel].join(" ");
+  }
 
   // ── Toast ────────────────────────────────────────────────────────────────
 
@@ -34,29 +37,6 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.remove(), 2400);
   }
-
-  // ── Theme ────────────────────────────────────────────────────────────────
-
-  function applyTheme(theme, persist) {
-    root.dataset.theme = theme;
-    if (persist) storage.set("khulla-theme", theme);
-    const dark = theme === "dark";
-    $$("[data-theme-toggle]").forEach((btn) => {
-      const label = dark ? "Switch to light theme" : "Switch to dark theme";
-      btn.setAttribute("aria-label", label);
-      btn.title = label;
-      $("use", btn)?.setAttribute("href", dark ? "#i-sun-2" : "#i-moon");
-    });
-    $$("[data-theme-switch]").forEach((s) => s.setAttribute("aria-checked", String(dark)));
-  }
-
-  applyTheme(root.dataset.theme === "dark" ? "dark" : "light", false);
-  $$("[data-theme-toggle], [data-theme-switch]").forEach((btn) =>
-    btn.addEventListener("click", () => applyTheme(root.dataset.theme === "dark" ? "light" : "dark", true)),
-  );
-  window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", (e) => {
-    if (!storage.get("khulla-theme")) applyTheme(e.matches ? "dark" : "light", false);
-  });
 
   // ── Navigation ───────────────────────────────────────────────────────────
 
@@ -78,6 +58,15 @@
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !sheet.hidden) { setMenu(false); menuBtn.focus(); } });
   window.addEventListener("resize", () => { if (window.innerWidth > 960 && !sheet.hidden) setMenu(false); });
 
+  // The header is sticky, so jumping to its own #top anchor would not move the
+  // page. Scroll explicitly; CSS scroll-behavior handles smooth vs reduced motion.
+  $$(".brand-mark").forEach((logo) => logo.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (!sheet.hidden) setMenu(false);
+    window.scrollTo({ top: 0 });
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  }));
+
   // ── The app preview ──────────────────────────────────────────────────────
 
   const shell = $("#shell");
@@ -93,7 +82,9 @@
       }
       v.hidden = !show;
     });
-    $$("[data-go]", shell).forEach((b) => b.setAttribute("aria-current", String(b.dataset.go === name)));
+    // Only navigation marks the current section; a worklist row that jumps
+    // to one is a link, not a destination.
+    $$(".rail-item[data-go], .navbar [data-go]", shell).forEach((b) => b.setAttribute("aria-current", String(b.dataset.go === name)));
     const inMore = ["reports", "staff", "settings"].includes(name);
     moreBtn.setAttribute("aria-current", String(inMore));
     setMore(false);
@@ -105,7 +96,7 @@
   $$("[data-go]", shell).forEach((b) => b.addEventListener("click", () => showView(b.dataset.go)));
   moreBtn.addEventListener("click", () => setMore(moreSheet.hidden));
 
-  // ── Charts — AppBarChart, paired series ──────────────────────────────────
+  // ── Charts — AppBarChart, AppLineChart, AppDonutChart ───────────────────
 
   const SVG_NS = "http://www.w3.org/2000/svg";
   function node(tag, attrs, text) {
@@ -117,61 +108,189 @@
 
   // Drawn at the slot's real size rather than scaled from a fixed viewBox, so
   // the plot fills its card and the axis text stays at its type size.
-  function drawBars(svg, labels, a, b, step) {
+  function sized(svg) {
     const box = svg.getBoundingClientRect();
-    if (!box.width || !box.height) return;
-    const W = box.width, H = box.height, left = 26, bottom = 20, top = 8;
-    const max = Math.max(...a, ...b);
-    const ceil = Math.ceil(max / step) * step;
-    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    if (!box.width || !box.height) return null;
+    svg.setAttribute("viewBox", `0 0 ${box.width} ${box.height}`);
     svg.replaceChildren();
+    return { W: box.width, H: box.height };
+  }
 
+  // Grouped bars. With `highlight`, every other column is drawn in its
+  // series' soft tone, as AppBarChart does, so today reads first.
+  function drawBars(svg, { labels, series, step, axis = true, highlight = null }) {
+    const size = sized(svg);
+    if (!size) return;
+    const { W, H } = size;
+    const left = axis ? 26 : 0, bottom = 20, top = 8;
+    const max = Math.max(step, ...series.flatMap((s) => s.values));
+    const ceil = Math.ceil(max / step) * step;
     const plotH = H - top - bottom;
+
     for (let i = 0; i <= 4; i++) {
       const y = top + plotH - (plotH * i) / 4;
       svg.append(node("line", { class: "grid-line", x1: left, x2: W, y1: y, y2: y }));
-      svg.append(node("text", { x: 0, y: y + 3 }, String(Math.round((ceil * i) / 4))));
+      if (axis) svg.append(node("text", { x: 0, y: y + 3 }, String(Math.round((ceil * i) / 4))));
     }
 
     const slot = (W - left) / labels.length;
-    const barW = Math.max(3, Math.min(16, slot * 0.3));
+    const barW = Math.max(3, Math.min(axis ? 16 : 18, slot * (axis ? 0.3 : 0.26)));
     const every = slot < 22 ? 2 : 1;
     labels.forEach((label, i) => {
       const cx = left + slot * i + slot / 2;
-      const ha = (a[i] / ceil) * plotH;
-      const hb = (b[i] / ceil) * plotH;
-      if (ha > 0) svg.append(node("rect", { class: "bar-a", x: cx - barW - 1, y: top + plotH - ha, width: barW, height: ha, rx: 2 }));
-      if (hb > 0) svg.append(node("rect", { class: "bar-b", x: cx + 1, y: top + plotH - hb, width: barW, height: hb, rx: 2 }));
-      if (a[i] === 0 && b[i] === 0 && slot >= 34) {
+      const dim = highlight != null && highlight !== i;
+      const x0 = cx - (barW * series.length + series.length - 1) / 2;
+      series.forEach((s, k) => {
+        const h = (s.values[i] / ceil) * plotH;
+        if (h > 0) svg.append(node("rect", { class: s.cls + (dim ? " dim" : ""), x: x0 + k * (barW + 1), y: top + plotH - h, width: barW, height: h, rx: 2 }));
+      });
+      if (series.every((s) => s.values[i] === 0) && slot >= 34 && labels[i] === "Sat") {
         svg.append(node("text", { x: cx, y: top + plotH - 6, "text-anchor": "middle" }, "closed"));
       }
-      if (i % every === 0) svg.append(node("text", { x: cx, y: H - 4, "text-anchor": "middle" }, label));
+      if (i % every === 0) svg.append(node("text", { x: cx, y: H - 4, "text-anchor": "middle", class: highlight === i ? "on" : "" }, label));
     });
   }
 
-  const charts = [
-    // 29 Aug – 11 Sep 2026. The library is shut on Saturdays (29 Aug, 5 Sep).
-    {
-      el: $('[data-chart="usage"]'),
-      labels: ["29", "30", "31", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
-      a: [0, 26, 31, 28, 35, 30, 22, 0, 24, 33, 29, 38, 31, 27],
-      b: [0, 21, 27, 30, 26, 33, 25, 0, 19, 28, 31, 30, 34, 23],
-      step: 10,
-    },
-    {
-      el: $('[data-chart="months"]'),
-      labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep"],
-      a: [512, 604, 431, 389, 655, 298],
-      b: [488, 590, 466, 402, 610, 271],
-      step: 100,
-    },
-  ].filter((c) => c.el);
-
-  function drawCharts() {
-    charts.forEach((c) => drawBars(c.el, c.labels, c.a, c.b, c.step));
+  function drawLine(svg, { labels, values }) {
+    const size = sized(svg);
+    if (!size) return;
+    const { W, H } = size;
+    const pad = 8, bottom = 20, top = 10;
+    const plotH = H - top - bottom;
+    const max = Math.max(...values) * 1.15;
+    for (let i = 0; i <= 3; i++) {
+      const y = top + plotH - (plotH * i) / 3;
+      svg.append(node("line", { class: "grid-line", x1: 0, x2: W, y1: y, y2: y }));
+    }
+    const pts = values.map((v, i) => [pad + ((W - pad * 2) * i) / (values.length - 1), top + plotH - (v / max) * plotH]);
+    const d = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join("");
+    svg.append(node("path", { class: "area", d: `${d}L${pts.at(-1)[0]},${top + plotH}L${pts[0][0]},${top + plotH}Z` }));
+    svg.append(node("path", { class: "line", d }));
+    pts.forEach(([x, y], i) => {
+      const last = i === pts.length - 1;
+      svg.append(node("circle", { class: last ? "pt on" : "pt", cx: x, cy: y, r: last ? 3.5 : 2.5 }));
+      svg.append(node("text", { x, y: H - 4, "text-anchor": "middle", class: last ? "on" : "" }, labels[i]));
+    });
   }
 
-  drawCharts();
+  // Slices separated by a hairline of surface, the way AppDonutChart paints
+  // its `gap`.
+  function drawDonut(svg, slices) {
+    const r = 46, c = 2 * Math.PI * r, gap = 2;
+    const total = slices.reduce((sum, s) => sum + s.value, 0);
+    svg.setAttribute("viewBox", "0 0 108 108");
+    svg.replaceChildren();
+    let offset = 0;
+    slices.forEach((s) => {
+      // A sliver still gets a visible arc, or the legend lists a slice nobody can find.
+      const len = Math.max(2.5, (s.value / total) * c - gap);
+      svg.append(node("circle", { cx: 54, cy: 54, r, stroke: `var(--${s.tone})`, "stroke-dasharray": `${len} ${c - len}`, "stroke-dashoffset": -offset }));
+      offset += len + gap;
+    });
+  }
+
+  // The board's figures for each period. Weekday counts run Sun → Sat;
+  // today is Thursday 17 September, and the library shuts on Saturdays.
+  const PERIODS = {
+    today: {
+      caption: "vs yesterday",
+      borrowed: [40, 41], returned: [27, 33], overdue: [14, 13], fines: [4500, 3000],
+      checkouts: [0, 0, 0, 0, 40, 0, 0], returns: [0, 0, 0, 0, 27, 0, 0],
+    },
+    week: {
+      caption: "vs last week",
+      borrowed: [184, 164], returned: [149, 142], overdue: [14, 11], fines: [21500, 23500],
+      checkouts: [31, 38, 34, 41, 40, 0, 0], returns: [24, 29, 36, 33, 27, 0, 0],
+    },
+    month: {
+      caption: "vs last month",
+      borrowed: [569, 612], returned: [529, 498], overdue: [14, 16], fines: [62000, 54500],
+      checkouts: [78, 96, 101, 112, 118, 64, 0], returns: [70, 88, 97, 104, 99, 71, 0],
+    },
+  };
+  // Overdue and fines rising is bad news, so their pills invert.
+  const INVERTED = new Set(["overdue", "fines"]);
+  let period = PERIODS.week;
+
+  function renderTrend(el, [now, before], inverted) {
+    const pct = before === 0 ? (now === 0 ? 0 : 100) : ((now - before) / before) * 100;
+    const flat = Math.abs(pct) < 0.05;
+    const good = inverted ? pct < 0 : pct > 0;
+    el.className = "trend" + (flat ? " flat" : good ? "" : " down");
+    el.replaceChildren();
+    if (!flat) el.append(node("svg", { class: "icon", "aria-hidden": "true" }));
+    if (!flat) el.firstChild.append(node("use", { href: pct > 0 ? "#i-arrow-up" : "#i-arrow-down" }));
+    el.append(`${pct >= 0 ? "+" : ""}${pct.toFixed(1)}%`);
+  }
+
+  function renderPeriod() {
+    for (const key of ["borrowed", "returned", "overdue"]) {
+      const value = $(`[data-stat="${key}"]`, shell);
+      if (value) value.textContent = period[key][0].toLocaleString("en-IN");
+    }
+    for (const key of ["borrowed", "returned", "overdue", "fines"]) {
+      const el = $(`[data-trend="${key}"]`, shell);
+      if (el) renderTrend(el, period[key], INVERTED.has(key));
+    }
+    $$("[data-caption]", shell).forEach((el) => { el.textContent = period.caption; });
+    drawCharts();
+  }
+
+  const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const usage = $('[data-chart="usage"]');
+  const fines = $('[data-chart="fines"]');
+  const months = $('[data-chart="months"]');
+
+  function drawCharts() {
+    if (usage) {
+      drawBars(usage, {
+        labels: WEEKDAYS,
+        series: [{ values: period.checkouts, cls: "bar-a" }, { values: period.returns, cls: "bar-ret" }],
+        step: 10,
+        axis: false,
+        highlight: 4,
+      });
+    }
+    // Fines accrued per month, in rupees — falling since the grace-day rule changed in July.
+    if (fines) drawLine(fines, { labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep"], values: [980, 1120, 1460, 1720, 1520, 1240] });
+    if (months) {
+      drawBars(months, {
+        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+        series: [{ values: [512, 604, 431, 389, 655, 298], cls: "bar-a" }, { values: [488, 590, 466, 402, 610, 271], cls: "bar-b" }],
+        step: 100,
+      });
+    }
+  }
+
+  const donut = $("[data-donut]");
+  if (donut) {
+    drawDonut(donut, [
+      { value: 4443, tone: "success" },
+      { value: 312, tone: "brand" },
+      { value: 38, tone: "info" },
+      { value: 12, tone: "danger" },
+      { value: 7, tone: "warning" },
+    ]);
+  }
+
+  const periodGroup = $("[data-period]", shell);
+  if (periodGroup) {
+    const buttons = $$('[role="radio"]', periodGroup);
+    const select = (i, focus) => {
+      buttons.forEach((b, j) => { b.setAttribute("aria-checked", String(i === j)); b.tabIndex = i === j ? 0 : -1; });
+      if (focus) buttons[i].focus();
+      period = PERIODS[buttons[i].dataset.p];
+      renderPeriod();
+    };
+    buttons.forEach((b, i) => {
+      b.tabIndex = b.getAttribute("aria-checked") === "true" ? 0 : -1;
+      b.addEventListener("click", () => select(i, false));
+    });
+    // radioKeys is a function declaration further down, so it is hoisted.
+    radioKeys(periodGroup, (i) => select(i, true));
+  }
+
+  renderPeriod();
   if ("ResizeObserver" in window) {
     let frame;
     new ResizeObserver(() => {
@@ -379,7 +498,8 @@
   } else if (platform === "mac" || platform === "ios") {
     // No published build: point at the demo instead of a download that isn't there.
     const hero = $("[data-hero-download]");
-    hero.href = "https://khulla-digital-library.github.io/khulla-digital-library/";
+    hero.href = "https://sawongam.github.io/khulla-digital-library/";
+    externalizeLink(hero);
     heroLabel.textContent = "Open the web version";
     $("use", hero).setAttribute("href", "#i-globe");
     const demo = $('.dl-row[data-platform="demo"]');
@@ -415,7 +535,6 @@
         if (size) size.textContent = formatSize(asset.size);
       }
       if (release.tag_name) {
-        $$("[data-version]").forEach((el) => { el.textContent = `${release.tag_name} is out`; });
         const date = release.published_at
           ? new Date(release.published_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
           : null;
@@ -425,7 +544,7 @@
           const link = document.createElement("a");
           link.className = "link";
           link.href = release.html_url;
-          link.rel = "noopener";
+          externalizeLink(link);
           link.textContent = `Khulla ${release.tag_name}`;
           meta.append(link, date ? `, released ${date}` : "");
         }

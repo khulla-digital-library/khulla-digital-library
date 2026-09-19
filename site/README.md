@@ -6,7 +6,7 @@ The public website for Khulla: one static page, with no framework, no build step
 | --- | --- |
 | `index.html` | The page. The icon sprite at the top is generated, so don't edit it by hand |
 | `styles.css` | Every token, copied from `packages/khulla_ui` (palette, spacing, radius, shadows, motion, type) |
-| `app.js` | Theme, the interactive app preview, brand swatches, the download table and the help form |
+| `app.js` | Logo scroll-to-top, the interactive app preview, brand swatches, the download table and the help form |
 | `assets/` | Poppins (the app's bundled weights), the logos, the favicon |
 | `scripts/icons.sh` | Rebuilds the icon sprite |
 

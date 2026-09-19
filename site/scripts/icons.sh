@@ -28,6 +28,7 @@ python3 - "$here" "$icons" <<'PY'
 import pathlib, re, sys
 
 here, icons = map(pathlib.Path, sys.argv[1:])
+custom = here / "assets" / "icons"
 html_path = here / "index.html"
 html = html_path.read_text()
 sources = html + (here / "app.js").read_text()
@@ -36,6 +37,8 @@ names = sorted(set(re.findall(r"#i-([a-z0-9-]+)", sources)))
 symbols, missing = [], []
 for name in names:
     svg = icons / f"{name}.svg"
+    if not svg.exists():
+        svg = custom / f"{name}.svg"
     if not svg.exists():
         missing.append(name)
         continue
