@@ -18,6 +18,12 @@ Open `index.html` in a browser, or serve the folder:
 python3 -m http.server -d site 8080
 ```
 
+or 
+
+```sh
+npx serve
+```
+
 ## Keeping it in step with the app
 
 - **Tokens.** The page doesn't import the design system. It copies it. When `app_palette.dart`,

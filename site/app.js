@@ -8,7 +8,7 @@
 (() => {
   "use strict";
 
-  const REPO = "khulla-digital-library/khulla-digital-library";
+  const REPO = "sawongam/khulla-digital-library";
   const GITHUB = `https://github.com/${REPO}`;
 
   const $ = (sel, root = document) => root.querySelector(sel);
